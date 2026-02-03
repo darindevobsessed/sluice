@@ -9,7 +9,9 @@
       "mcp__plugin_craft_chrome-devtools__press_key",
       "Skill(craft:craft-cycle-new)",
       "Skill(craft:plan-chunks)",
-      "Bash(npx shadcn@latest add:*)"
+      "Bash(npx shadcn@latest add:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ]
   }
 }
