@@ -8,7 +8,7 @@ updated: 2026-02-03
 cycle: mvp
 story_number: 1
 chunks_total: 6
-chunks_complete: 0
+chunks_complete: 3
 ---
 
 # Story: App Shell
@@ -62,10 +62,10 @@ The foundational structure for Gold Miner. A Next.js 14 app with a persistent le
 - Existing files in directory — should be empty except .craft
 
 **Done When:**
-- [ ] `npm run dev` starts without errors
-- [ ] http://localhost:3000 shows Next.js welcome page
-- [ ] TypeScript strict mode enabled
-- [ ] Tailwind classes work (test with a colored div)
+- [x] `npm run dev` starts without errors
+- [x] http://localhost:3000 shows Next.js welcome page
+- [x] TypeScript strict mode enabled
+- [x] Tailwind classes work (test with a colored div)
 
 ---
 
@@ -103,10 +103,10 @@ The foundational structure for Gold Miner. A Next.js 14 app with a persistent le
 - shadcn/ui prompts — handle interactively
 
 **Done When:**
-- [ ] Button renders with rich green (#059669) background
-- [ ] Dark mode CSS variables defined (for Chunk 6)
-- [ ] `cn()` utility works for class merging
-- [ ] Inter font applied globally
+- [x] Button renders with rich green (#059669) background
+- [x] Dark mode CSS variables defined (for Chunk 6)
+- [x] `cn()` utility works for class merging
+- [x] Inter font applied globally
 
 ---
 
@@ -145,10 +145,10 @@ The foundational structure for Gold Miner. A Next.js 14 app with a persistent le
 - Server-only — cannot import in client components
 
 **Done When:**
-- [ ] `npm run db:push` creates tables
-- [ ] Database file created at `data/gold-miner.db`
-- [ ] Can import db in API routes/server components
-- [ ] Schema matches planned data model
+- [x] `npm run db:push` creates tables
+- [x] Database file created at `data/gold-miner.db`
+- [x] Can import db in API routes/server components
+- [x] Schema matches planned data model
 
 ---
 
