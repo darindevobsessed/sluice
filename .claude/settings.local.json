@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__plugin_craft_chrome-devtools__navigate_page",
+      "mcp__plugin_craft_chrome-devtools__take_screenshot",
+      "mcp__plugin_craft_chrome-devtools__take_snapshot",
+      "mcp__plugin_craft_chrome-devtools__evaluate_script",
+      "mcp__plugin_craft_chrome-devtools__click",
+      "mcp__plugin_craft_chrome-devtools__press_key",
+      "Skill(craft:craft-cycle-new)",
+      "Skill(craft:plan-chunks)",
+      "Bash(npx shadcn@latest add:*)"
+    ]
+  }
+}

@@ -1,0 +1,8 @@
+# Project learnings - captured during implementation
+# Processed at cycle-complete into harness updates
+
+corrections: []   # "Use X instead of Y" corrections
+patterns: []      # Repeated patterns worth locking
+errors: []        # Validation failures to prevent
+conventions: []   # Coding conventions discovered
+automations: []   # Hook/automation opportunities

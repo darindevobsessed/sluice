@@ -1,0 +1,28 @@
+name: mvp
+title: MVP
+status: ready
+created: 2026-02-03
+updated: 2026-02-03
+target: Working end-to-end knowledge extraction platform
+focus: Core functionality with Claude-powered insights
+
+goals:
+  - Users can add YouTube videos with pasted transcripts
+  - Users can browse and search their knowledge bank
+  - Claude extracts insights, generates training docs, suggests plugins
+  - Users can follow channels and discover new content via RSS
+  - Fully localhost with SQLite — no external API keys required (except Claude agent token)
+
+notes: |
+  ## Decisions Locked During Planning
+
+  - **Navigation:** Sidebar nav (Linear-style)
+  - **Pages:** Knowledge Bank, Add Video, Discovery, Settings
+  - **Storage:** SQLite embedded database (localhost)
+  - **Claude:** Uses local agent token via SDK, not user-provided API key
+  - **Settings:** Full settings (theme, preferences, data export)
+  - **Add Video:** Two-step form with auto-metadata extraction
+  - **Knowledge Bank:** Card grid + full-page detail + FTS5 search
+  - **Claude Actions:** Full suite (insights, training docs, summaries, quizzes, code snippets, plugin suggestions)
+  - **Discovery:** RSS-based channel subscriptions, grouped by channel
+  - **Design:** Rich green primary (#059669), Inter font, rounded cards

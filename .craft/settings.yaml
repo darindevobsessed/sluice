@@ -1,0 +1,27 @@
+# Craft Settings
+# These persist across sessions and cycles
+
+# Run mode for implementation
+# - cruise: Autonomous execution, minimal interruptions
+# - guided: Check-ins after each chunk, more user control
+run_mode: guided
+
+# Default mode for new work
+# - creative: Explore options before committing
+# - smart: Direct to planning when idea is clear
+default_mode: creative
+
+# Certainty threshold for story/cycle creation
+certainty_threshold: 95
+
+# Auto-checkpoint before each chunk
+auto_checkpoint: true
+
+# Energy level (affects validation depth and documentation)
+# - fast: Light validation, minimal docs
+# - solid: Full validation, thorough docs
+# - learning: Full validation with explanations
+energy: solid
+
+# Quality gates (override quality.yaml if needed)
+# skip_gates: []

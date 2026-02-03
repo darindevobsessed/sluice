@@ -1,0 +1,405 @@
+# Locked Patterns
+
+Patterns that have been approved and should be followed consistently.
+
+---
+
+## Design Vibe: Prospector's Clarity
+
+**Locked:** 2026-02-03
+**Context:** Established during MVP cycle planning based on LoopOps inspiration
+
+### The Feeling
+Gold Miner should feel like a well-organized workshop where valuable knowledge is extracted and refined. Clean but not sterile. Professional but approachable. The UI gets out of the way so the content — the "gold" — shines.
+
+### What This Vibe IS
+- Warm and professional
+- Content-first, generous whitespace
+- Smooth, elegant motion
+- Clear visual hierarchy
+
+### What This Vibe Is NOT
+- Sterile corporate
+- Busy or cluttered
+- Playful/gamified
+- Dark/moody
+
+---
+
+## Layout Decisions
+
+### Navigation
+**Type:** layout
+**Choice:** sidebar
+**Locked:** 2026-02-03
+**Context:** Linear-style persistent sidebar for power-user navigation
+
+**Specification:**
+- Persistent left sidebar on all pages
+- Logo at top
+- Navigation links: Knowledge Bank, Add Video, Discovery, Settings
+- Collapsed state on mobile (hamburger)
+
+### Knowledge Bank Page
+**Type:** layout
+**Choice:** dashboard
+**Locked:** 2026-02-03
+**Context:** "The Dashboard" design — makes users feel proud of their collection, transforms it from "video bookmarks" into "my knowledge vault"
+
+**Specification:**
+
+**Stats Header:**
+- Three stat cards at top showing collection value:
+  - Video count ("12 videos")
+  - Total content hours ("4.2 hrs of content")
+  - Channel count ("8 channels")
+- Stats update as collection grows — creates rewarding loop
+- Subtle background, doesn't compete with content
+
+**Search Bar:**
+- Prominent search input below stats
+- Placeholder: "Search videos and transcripts..."
+- Real-time filtering (debounced 300ms)
+- Clear button when has value
+
+**Card Grid:**
+- Responsive grid (1 col mobile → 4 col desktop)
+- Cards show: thumbnail (with duration badge), title, channel, date added
+- Hover state with subtle shadow lift
+- Click navigates to `/videos/[id]`
+
+**Empty State ("The Promise"):**
+```
+🏔️ ✨
+
+Start building your knowledge vault
+
+Save videos • Search transcripts • Extract insights
+
+[ Add Your First Video ]
+```
+- Inspirational, not cutesy
+- Clear CTA linking to `/add`
+- Mountain/sparkle icon suggests discovery and value
+
+**Not Allowed:**
+- Plain list without stats header
+- Pagination (use infinite scroll or load more if needed)
+- Complex filtering UI (search covers most needs)
+
+### Video Detail View
+**Type:** layout
+**Choice:** full page
+**Locked:** 2026-02-03
+**Context:** Immersive reading experience for long transcripts
+
+**Specification:**
+- Dedicated route: `/videos/[id]`
+- Embedded video player at top
+- Full transcript below with timestamps
+- Metadata sidebar or header
+- Claude action buttons prominent
+
+### Discovery Feed
+**Type:** layout
+**Choice:** cards (grouped by channel)
+**Locked:** 2026-02-03
+**Context:** "Inline Add with Quick Actions" — clear mental model, easy scanning, no modals
+
+**Specification:**
+
+**Page Header:**
+- Title: "Discovery"
+- "Follow a Channel" button (collapsed state) + "Refresh" button
+- Clicking "Follow" expands to inline input
+
+**Channel Follow Input (Expanded):**
+- Text input: "Paste YouTube channel URL..."
+- Follow button + Cancel button
+- Accepts: @handle, /channel/ID, /c/name formats
+- Shows preview with channel name before confirming
+
+**Channel Sections:**
+- Channels listed vertically, most recently updated first
+- Each channel has header: Channel name, @handle, "Last updated X ago", [Unfollow]
+- Below header: horizontal scroll row of 3-5 latest video cards
+- Scroll indicator arrow when more videos available
+
+**Video Cards (Discovery):**
+- Thumbnail (16:9, rounded-lg)
+- Duration badge (bottom-right)
+- Title (truncate 2 lines)
+- Published date ("3 days ago")
+- "Add to Bank" button
+- "✓ In Bank" badge if already added
+
+**"Add to Bank" Flow:**
+- Click → Navigate to `/add?url=VIDEO_URL`
+- URL is prefilled on Add Video page
+- User just needs to paste transcript
+- After adding, card shows "✓ In Bank" badge
+
+**Empty State:**
+```
+🔭
+
+Discover content worth mining
+
+Follow YouTube channels to see their latest videos.
+Cherry-pick the gold and add it to your bank.
+
+┌─────────────────────────────────────┐
+│ Paste YouTube channel URL...        │  [ Follow ]
+└─────────────────────────────────────┘
+
+Examples:
+• youtube.com/@fireship
+• youtube.com/c/ThePrimeagen
+• youtube.com/channel/UC...
+```
+
+**Density Note:**
+Discovery is a "browse" page — denser layout is acceptable. Horizontal scroll keeps each channel section scannable even with many channels.
+
+**Not Allowed:**
+- Modal for channel management
+- Grid layout for videos (use horizontal scroll)
+- Inline transcript paste (use Add Video page)
+- Pagination or "show more" for channels (show all)
+
+### Settings Page
+**Type:** layout
+**Choice:** full page
+**Locked:** 2026-02-03
+**Context:** Full settings with theme, preferences, data export
+
+**Specification:**
+- Dedicated route: `/settings`
+- Sections: Appearance (theme), Preferences, Data Management
+- Toggle for dark/light mode
+- Export data functionality
+
+### Add Video Page
+**Type:** layout
+**Choice:** conversational flow
+**Locked:** 2026-02-03
+**Context:** Single page with progressive disclosure, feels guided not form-like
+
+**Specification:**
+- Single scrolling page, not a wizard with steps
+- Conversational prompts guide the user: "What video would you like to add?"
+- URL input at top → validates → reveals video preview card
+- Video preview shows thumbnail, title, channel with "✓ Looks good" confirmation
+- Transcript section appears below after URL confirmed
+- "How do I get this?" link expands inline instructions (collapsible)
+- Tags and notes fields below transcript (optional)
+- Single CTA at bottom: "Add to Knowledge Bank"
+
+**Flow:**
+```
+1. User pastes URL
+2. Video preview appears (or manual fallback fields if oEmbed fails)
+3. User scrolls down to transcript section
+4. Instructions available inline if needed
+5. User pastes transcript
+6. Optional: adds tags/notes
+7. Clicks "Add to Knowledge Bank"
+8. Success state with celebration
+```
+
+**Not Allowed:**
+- Step indicators (1, 2, 3)
+- Modal overlays
+- Split panel layout
+- Navigation between "steps"
+
+---
+
+## Component Decisions
+
+### Search
+**Type:** component
+**Choice:** inline
+**Locked:** 2026-02-03
+**Context:** Instant feedback, no mode switching
+
+**Specification:**
+- Search input in Knowledge Bank header
+- Results filter in real-time as user types
+- Full-text search via SQLite FTS5
+- Clear button to reset
+
+### Claude Insights UI
+**Type:** layout
+**Choice:** tabs
+**Locked:** 2026-02-03
+**Context:** "The Insights Tab" — makes AI extraction feel like building valuable knowledge artifacts, not just chatting with AI
+
+**Specification:**
+
+**Tab System:**
+- Video detail page has two tabs below video: **Transcript | Insights**
+- Transcript tab: timestamped transcript (default view)
+- Insights tab: all Claude-generated content for this video
+
+**Insight Cards:**
+Each action type gets a card with three states:
+
+1. **Empty state:** "Not yet generated" + [ Generate ] button
+2. **Streaming state:** Content appears with typing cursor, card expands
+3. **Complete state:** Full result + [ Regenerate ] button + timestamp
+
+**Action Types:**
+
+*MVP (3 cards):*
+| Action | Icon | Description |
+|--------|------|-------------|
+| Extract Insights | ✨ | Key takeaways and techniques |
+| Summarize | 📝 | Quick overview |
+| Suggest Plugins | 🔌 | Claude Code skills, commands, agents |
+
+*Future (post-MVP):*
+| Action | Icon | Description |
+|--------|------|-------------|
+| Generate Training Doc | 📄 | Structured learning material |
+| Generate Quiz | ❓ | Comprehension questions |
+| Extract Code Snippets | 💻 | Code with explanations |
+
+**Card Layout:**
+- 2-column grid on desktop (responsive to 1 col on mobile)
+- Cards have consistent height in empty state
+- Expand vertically when populated
+- Rich green accent on generated cards
+
+**Streaming Behavior:**
+- Text appears word-by-word with subtle cursor
+- Card expands smoothly as content grows
+- "Generating..." indicator at card header
+- Cancel button during generation
+
+**Persistence:**
+- Results saved to database on completion
+- "Generated Jan 15, 2026" timestamp on completed cards
+- Regenerate overwrites previous result
+
+**Not Allowed:**
+- Modal overlays for output
+- Output appearing below transcript (use tab instead)
+- Generic chat-style interface
+- Output that doesn't persist
+
+---
+
+## State Patterns
+
+### Success State
+**Type:** component
+**Choice:** subtle confirmation
+**Locked:** 2026-02-03
+**Context:** Professional and satisfying without being flashy — fits "Prospector's Clarity"
+
+**Specification:**
+- Green checkmark icon (primary color)
+- Clear, direct message: "Added to Knowledge Bank"
+- Smooth fade-in animation (200ms)
+- Optional: subtle green border/glow that fades
+- Toast notification for non-blocking confirmations
+
+**Examples:**
+- Add Video success: Full-screen transition to success state with video thumbnail, "Added to Knowledge Bank!", two buttons
+- Insight generated: Card border briefly glows green, "Generated" timestamp appears
+- Channel followed: Toast: "✓ Following [Channel Name]"
+
+**Not Allowed:**
+- Confetti or particle effects
+- Sound effects
+- Badges or achievement unlocks
+- Bouncy/playful animations
+
+### Error State
+**Type:** component
+**Choice:** helpful and warm
+**Locked:** 2026-02-03
+**Context:** Errors should guide, not alarm
+
+**Specification:**
+- Warm, conversational tone: "Hmm, that didn't work" not "Error 500"
+- Red accent but not aggressive (use error token, not pure red)
+- Clear action: what to do next
+- Icon: subtle warning, not alarming exclamation
+
+**Copy Examples:**
+- "We couldn't find that video. Check the URL and try again."
+- "Something went wrong generating insights. [Retry]"
+- "Couldn't connect to YouTube. Check your connection."
+
+**Not Allowed:**
+- Technical jargon ("500 Internal Server Error")
+- Blame language ("You entered an invalid URL")
+- Empty error states with no guidance
+
+### Loading State
+**Type:** component
+**Choice:** skeleton + spinner
+**Locked:** 2026-02-03
+**Context:** Show structure early, indicate activity
+
+**Specification:**
+- **Cards/Lists:** Skeleton placeholders matching content shape
+- **Actions:** Subtle spinner in button, button disabled
+- **Full page:** Skeleton layout matching page structure
+- **Streaming:** Typing cursor (▌) with pulse animation
+
+**Animation:**
+- Skeleton: subtle shimmer (left-to-right gradient)
+- Spinner: simple rotation, primary color
+- Pulse: gentle opacity change (not flashy)
+
+**Not Allowed:**
+- Blank loading screens
+- "Loading..." text without visual
+- Aggressive spinners that dominate the view
+
+---
+
+## Token Locks
+
+### Primary Color
+**Locked:** 2026-02-03
+**Value:** `#059669` (rich green)
+**Context:** Growth, value, discovery — fits "Gold Miner" theme
+
+### Primary Hover
+**Locked:** 2026-02-03
+**Value:** `#047857`
+
+### Typography
+**Locked:** 2026-02-03
+**Value:** Inter (with system fallbacks)
+**Context:** Modern, widely available, readable
+
+### Border Radius
+**Locked:** 2026-02-03
+**Value:** Soft (12-24px for cards, 8px for inputs, 9999px for pills)
+**Context:** Friendly, modern feel from LoopOps inspiration
+
+### Spacing Philosophy
+**Locked:** 2026-02-03
+**Value:** Generous
+**Context:** Content breathes, not cramped
+
+---
+
+## How to Use These Locks
+
+1. **During implementation:** Reference these decisions, don't deviate
+2. **If you need to change:** Ask first, unlock explicitly
+3. **New patterns:** Add them here when approved
+
+## Unlocking
+
+To change a locked decision:
+1. Explain why the lock should be removed
+2. Propose the replacement
+3. Get explicit approval
+4. Update this file
