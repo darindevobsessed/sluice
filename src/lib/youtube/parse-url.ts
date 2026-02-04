@@ -44,7 +44,9 @@ export function parseYouTubeUrl(url: string): ParsedUrl | null {
     // Handle youtu.be format
     if (hostname === 'youtu.be') {
       // Video ID is in the pathname (e.g., /VIDEO_ID)
-      videoId = urlObj.pathname.slice(1).split('/')[0].split('?')[0];
+      const pathParts = urlObj.pathname.slice(1).split('/');
+      const queryParts = pathParts[0]?.split('?') ?? [];
+      videoId = queryParts[0] ?? null;
     }
     // Handle youtube.com/watch format
     else if (urlObj.pathname.includes('/watch')) {
@@ -52,11 +54,17 @@ export function parseYouTubeUrl(url: string): ParsedUrl | null {
     }
     // Handle youtube.com/embed/VIDEO_ID format
     else if (urlObj.pathname.includes('/embed/')) {
-      videoId = urlObj.pathname.split('/embed/')[1]?.split('/')[0].split('?')[0];
+      const embedParts = urlObj.pathname.split('/embed/');
+      const pathParts = embedParts[1]?.split('/') ?? [];
+      const queryParts = pathParts[0]?.split('?') ?? [];
+      videoId = queryParts[0] ?? null;
     }
     // Handle youtube.com/v/VIDEO_ID format
     else if (urlObj.pathname.includes('/v/')) {
-      videoId = urlObj.pathname.split('/v/')[1]?.split('/')[0].split('?')[0];
+      const vParts = urlObj.pathname.split('/v/');
+      const pathParts = vParts[1]?.split('/') ?? [];
+      const queryParts = pathParts[0]?.split('?') ?? [];
+      videoId = queryParts[0] ?? null;
     }
 
     // Validate video ID format (YouTube IDs are 11 characters, alphanumeric plus - and _)

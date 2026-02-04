@@ -3,11 +3,11 @@
 import { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Sparkles } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { VideoPlayer } from '@/components/videos/VideoPlayer';
-import { TranscriptView } from '@/components/videos/TranscriptView';
 import { VideoMetadata } from '@/components/videos/VideoMetadata';
+import { InsightsTabs } from '@/components/insights/InsightsTabs';
 import type { Video } from '@/lib/db/schema';
 
 interface VideoDetailPageProps {
@@ -129,31 +129,8 @@ export default function VideoDetailPage({ params }: VideoDetailPageProps) {
         className="mb-8"
       />
 
-      {/* Extract Insights button (placeholder for Story 4) */}
-      <div className="mb-8 flex justify-center">
-        <Button
-          disabled
-          size="lg"
-          className="opacity-50"
-        >
-          <Sparkles className="mr-2 h-5 w-5" />
-          Extract Insights
-          <span className="ml-2 text-xs">(Coming Soon)</span>
-        </Button>
-      </div>
-
-      {/* Transcript section */}
-      <div className="mb-4">
-        <h2 className="text-xl font-semibold">Transcript</h2>
-        <p className="text-sm text-muted-foreground">
-          Click any timestamp to jump to that moment in the video
-        </p>
-      </div>
-
-      <TranscriptView
-        transcript={video.transcript || ''}
-        onSeek={handleSeek}
-      />
+      {/* Tabs with Transcript and Insights */}
+      <InsightsTabs video={video} onSeek={handleSeek} />
     </div>
   );
 }

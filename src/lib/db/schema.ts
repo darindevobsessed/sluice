@@ -34,16 +34,21 @@ export const channels = sqliteTable('channels', {
 });
 
 /**
- * Insights table - stores AI-generated insights and Claude plugin suggestions
+ * Insights table - stores AI-generated extraction results for videos
+ * One extraction per video (unique constraint on videoId)
  */
 export const insights = sqliteTable('insights', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+  id: text('id').primaryKey(),
   videoId: integer('video_id')
     .notNull()
+    .unique()
     .references(() => videos.id, { onDelete: 'cascade' }),
-  type: text('type').notNull(), // 'skill', 'command', 'agent', 'rule', 'topic', 'quote'
-  content: text('content').notNull(), // JSON stringified content
+  contentType: text('content_type').notNull(), // 'dev' | 'meeting' | 'educational' | 'thought-leadership' | 'general'
+  extraction: text('extraction', { mode: 'json' }).notNull(), // Full ExtractionResult as JSON
   createdAt: integer('created_at', { mode: 'timestamp' })
+    .notNull()
+    .default(sql`(unixepoch())`),
+  updatedAt: integer('updated_at', { mode: 'timestamp' })
     .notNull()
     .default(sql`(unixepoch())`),
 });

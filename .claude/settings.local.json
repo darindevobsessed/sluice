@@ -21,7 +21,8 @@
       "Bash(/Users/darindrobinski/.claude/plugins/cache/craft-local/craft/0.7.0/hooks/scripts/start-story.sh:*)",
       "Bash(npm test:*)",
       "Bash(sqlite3:*)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(npx drizzle-kit:*)"
     ]
   }
 }

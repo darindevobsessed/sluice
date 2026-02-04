@@ -4,6 +4,7 @@ import "./globals.css";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { MainContent } from "@/components/layout/MainContent";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import { AgentProvider } from "@/lib/agent/AgentProvider";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -31,8 +32,10 @@ export default function RootLayout({
         className={`${inter.variable} ${jetbrainsMono.variable} antialiased font-sans`}
       >
         <ThemeProvider>
-          <Sidebar />
-          <MainContent>{children}</MainContent>
+          <AgentProvider>
+            <Sidebar />
+            <MainContent>{children}</MainContent>
+          </AgentProvider>
         </ThemeProvider>
       </body>
     </html>

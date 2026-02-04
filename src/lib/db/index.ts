@@ -63,11 +63,12 @@ CREATE TABLE IF NOT EXISTS channels (
 );
 
 CREATE TABLE IF NOT EXISTS insights (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  video_id INTEGER NOT NULL REFERENCES videos(id) ON DELETE CASCADE,
-  type TEXT NOT NULL,
-  content TEXT NOT NULL,
-  created_at INTEGER NOT NULL DEFAULT (unixepoch())
+  id TEXT PRIMARY KEY,
+  video_id INTEGER NOT NULL UNIQUE REFERENCES videos(id) ON DELETE CASCADE,
+  content_type TEXT NOT NULL,
+  extraction TEXT NOT NULL,
+  created_at INTEGER NOT NULL DEFAULT (unixepoch()),
+  updated_at INTEGER NOT NULL DEFAULT (unixepoch())
 );
 
 CREATE TABLE IF NOT EXISTS settings (
