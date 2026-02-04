@@ -14,7 +14,8 @@
       "Bash(git commit:*)",
       "Bash(npm run typecheck:*)",
       "Bash(npm run:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Skill(craft:story-implement)"
     ]
   }
 }

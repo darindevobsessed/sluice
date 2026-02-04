@@ -1,7 +1,7 @@
 ---
 name: add-video
 title: Add Video
-status: ready
+status: active
 priority: high
 created: 2026-02-03
 updated: 2026-02-03
