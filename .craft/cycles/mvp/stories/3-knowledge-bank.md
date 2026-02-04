@@ -1,14 +1,14 @@
 ---
 name: knowledge-bank
 title: Knowledge Bank
-status: ready
+status: active
 priority: high
 created: 2026-02-03
 updated: 2026-02-03
 cycle: mvp
 story_number: 3
 chunks_total: 5
-chunks_complete: 0
+chunks_complete: 1
 ---
 
 # Story: Knowledge Bank
