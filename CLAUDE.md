@@ -48,7 +48,20 @@ gold-miner/
 - Validate knowledge extraction quality
 
 ### Commands
-*(Add build, test, and run commands as the project develops)*
+
+- `npm run dev` - Start development server (default port 3000)
+- `npm run build` - Production build
+- `npm test` - Run tests with Vitest
+- `npm run lint` - Run ESLint
+
+### Dev Server Rules
+
+**IMPORTANT**: When the Next.js dev server fails to start:
+1. **DO NOT** try multiple ports in succession leaving hanging processes
+2. **FIRST** check if `.next/dev/lock` exists - if so, remove it: `rm -f .next/dev/lock`
+3. **THEN** start the server on a single chosen port
+4. **NEVER** kill a running dev server without explicit user permission
+5. If startup fails, diagnose the root cause before retrying
 
 ## Knowledge Bank Schema
 
