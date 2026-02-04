@@ -19,7 +19,9 @@
       "Bash(npx tsc:*)",
       "Bash(/Users/darindrobinski/.claude-max/plugins/cache/craft-local/craft/0.7.0/hooks/scripts/complete-story.sh:*)",
       "Bash(/Users/darindrobinski/.claude/plugins/cache/craft-local/craft/0.7.0/hooks/scripts/start-story.sh:*)",
-      "Bash(npm test:*)"
+      "Bash(npm test:*)",
+      "Bash(sqlite3:*)",
+      "WebSearch"
     ]
   }
 }

@@ -140,6 +140,8 @@ export function createDatabase(dbPath: string) {
 
   if (!ftsExists) {
     sqliteConn.exec(FTS_MIGRATION_SQL);
+    // Rebuild FTS index to include any existing videos
+    sqliteConn.exec("INSERT INTO videos_fts(videos_fts) VALUES('rebuild');");
   }
 
   const drizzleDb = drizzle(sqliteConn, { schema });

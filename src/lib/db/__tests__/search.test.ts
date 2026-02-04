@@ -152,6 +152,83 @@ describe('FTS5 Search', () => {
     });
   });
 
+  describe('FTS rebuild', () => {
+    it('indexes pre-existing data when FTS table is created', () => {
+      // This tests the scenario where videos exist before FTS is set up
+      // Simulate by dropping FTS, inserting data, then recreating
+
+      // First, drop the FTS table and triggers
+      dbInstance.sqlite.exec(`
+        DROP TRIGGER IF EXISTS videos_ai;
+        DROP TRIGGER IF EXISTS videos_au;
+        DROP TRIGGER IF EXISTS videos_ad;
+        DROP TABLE IF EXISTS videos_fts;
+      `);
+
+      // Insert a video WITHOUT FTS (no triggers exist)
+      dbInstance.sqlite.exec(`
+        INSERT INTO videos (youtube_id, title, channel, transcript)
+        VALUES ('vid1', 'Claude Tutorial', 'Channel', 'Learn about Claude AI assistant');
+      `);
+
+      // Recreate FTS table with triggers
+      dbInstance.sqlite.exec(`
+        CREATE VIRTUAL TABLE videos_fts USING fts5(
+          title, transcript, channel,
+          content='videos', content_rowid='id'
+        );
+
+        CREATE TRIGGER videos_ai AFTER INSERT ON videos BEGIN
+          INSERT INTO videos_fts(rowid, title, transcript, channel)
+          VALUES (new.id, new.title, new.transcript, new.channel);
+        END;
+      `);
+
+      // Without rebuild, search should NOT find the video (FTS is empty)
+      const beforeRebuild = dbInstance.searchVideos('Claude');
+      expect(beforeRebuild).toHaveLength(0);
+
+      // Rebuild the FTS index
+      dbInstance.sqlite.exec("INSERT INTO videos_fts(videos_fts) VALUES('rebuild');");
+
+      // After rebuild, search SHOULD find the video
+      const afterRebuild = dbInstance.searchVideos('Claude');
+      expect(afterRebuild).toHaveLength(1);
+      expect(afterRebuild[0].title).toBe('Claude Tutorial');
+    });
+
+    it('finds transcript content after FTS rebuild', () => {
+      // Drop and recreate to simulate production scenario
+      dbInstance.sqlite.exec(`
+        DROP TRIGGER IF EXISTS videos_ai;
+        DROP TRIGGER IF EXISTS videos_au;
+        DROP TRIGGER IF EXISTS videos_ad;
+        DROP TABLE IF EXISTS videos_fts;
+      `);
+
+      // Insert video with transcript containing search term
+      dbInstance.sqlite.exec(`
+        INSERT INTO videos (youtube_id, title, channel, transcript)
+        VALUES ('vid1', 'Moltbot Video', 'AI Channel',
+          'This video discusses claude and how it powers the new AI assistant called Moltbot.');
+      `);
+
+      // Recreate FTS with rebuild
+      dbInstance.sqlite.exec(`
+        CREATE VIRTUAL TABLE videos_fts USING fts5(
+          title, transcript, channel,
+          content='videos', content_rowid='id'
+        );
+        INSERT INTO videos_fts(videos_fts) VALUES('rebuild');
+      `);
+
+      // Search for term in transcript should work
+      const results = dbInstance.searchVideos('claude');
+      expect(results).toHaveLength(1);
+      expect(results[0].transcript).toContain('claude');
+    });
+  });
+
   describe('FTS sync triggers', () => {
     it('syncs FTS on insert', () => {
       dbInstance.sqlite.exec(`
