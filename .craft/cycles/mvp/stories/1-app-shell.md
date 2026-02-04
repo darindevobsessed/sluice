@@ -1,14 +1,14 @@
 ---
 name: app-shell
 title: App Shell
-status: active
+status: complete
 priority: high
 created: 2026-02-03
 updated: 2026-02-03
 cycle: mvp
 story_number: 1
 chunks_total: 6
-chunks_complete: 5
+chunks_complete: 6
 ---
 
 # Story: App Shell
@@ -24,15 +24,15 @@ The foundational structure for Gold Miner. A Next.js 14 app with a persistent le
 
 ## Acceptance
 
-- [ ] Next.js 14 app runs with `npm run dev`
-- [ ] Sidebar navigation with 4 pages: Knowledge Bank, Add Video, Discovery, Settings
-- [ ] Active nav item highlighted with rich green
-- [ ] SQLite database initialized with schema for videos, channels, insights, settings
-- [ ] Design tokens wired into Tailwind (colors, typography, spacing)
-- [ ] shadcn/ui installed with Button and Card components themed
-- [ ] Dark/light/system theme toggle in Settings
-- [ ] Theme persists across page refresh
-- [ ] All pages render with consistent layout
+- [x] Next.js 14 app runs with `npm run dev`
+- [x] Sidebar navigation with 4 pages: Knowledge Bank, Add Video, Discovery, Settings
+- [x] Active nav item highlighted with rich green
+- [x] SQLite database initialized with schema for videos, channels, insights, settings
+- [x] Design tokens wired into Tailwind (colors, typography, spacing)
+- [x] shadcn/ui installed with Button and Card components themed
+- [x] Dark/light/system theme toggle in Settings
+- [x] Theme persists across page refresh
+- [x] All pages render with consistent layout
 
 ## Chunks
 
@@ -266,11 +266,11 @@ The foundational structure for Gold Miner. A Next.js 14 app with a persistent le
 - Flash of wrong theme — next-themes handles this
 
 **Done When:**
-- [ ] Theme persists across page refresh
-- [ ] System preference detected by default
-- [ ] Settings page shows current theme
-- [ ] Can switch between light/dark/system
-- [ ] All UI elements respect theme
+- [x] Theme persists across page refresh
+- [x] System preference detected by default
+- [x] Settings page shows current theme
+- [x] Can switch between light/dark/system
+- [x] All UI elements respect theme
 
 ## Notes
 

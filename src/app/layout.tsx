@@ -3,6 +3,7 @@ import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { MainContent } from "@/components/layout/MainContent";
+import { ThemeProvider } from "@/components/providers/ThemeProvider";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -25,12 +26,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${inter.variable} ${jetbrainsMono.variable} antialiased font-sans`}
       >
-        <Sidebar />
-        <MainContent>{children}</MainContent>
+        <ThemeProvider>
+          <Sidebar />
+          <MainContent>{children}</MainContent>
+        </ThemeProvider>
       </body>
     </html>
   );
