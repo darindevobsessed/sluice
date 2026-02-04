@@ -1,25 +1,25 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Knowledge Bank | Gold Miner",
+  title: "Settings | Gold Miner",
 };
 
-export default function Home() {
+export default function Settings() {
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-semibold mb-2">Knowledge Bank</h1>
+      <h1 className="text-2xl font-semibold mb-2">Settings</h1>
       <p className="text-muted-foreground mb-8">
-        Your collection of extracted knowledge from YouTube videos.
+        Manage your preferences and application settings.
       </p>
 
       <div className="flex flex-col items-center justify-center py-12 text-center">
         <div className="max-w-md space-y-4">
-          <div className="text-6xl mb-4">📚</div>
+          <div className="text-6xl mb-4">⚙️</div>
           <p className="text-lg font-medium text-foreground">
-            Your knowledge bank is empty
+            Settings panel coming soon
           </p>
           <p className="text-muted-foreground">
-            Add your first video to start building your knowledge collection.
+            Theme toggle and other preferences will be available here.
           </p>
         </div>
       </div>

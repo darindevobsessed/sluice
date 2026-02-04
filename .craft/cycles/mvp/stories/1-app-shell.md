@@ -8,7 +8,7 @@ updated: 2026-02-03
 cycle: mvp
 story_number: 1
 chunks_total: 6
-chunks_complete: 4
+chunks_complete: 5
 ---
 
 # Story: App Shell
@@ -222,10 +222,10 @@ The foundational structure for Gold Miner. A Next.js 14 app with a persistent le
 - Nothing significant — simple placeholder pages
 
 **Done When:**
-- [ ] All four routes accessible
-- [ ] Navigation between pages works
-- [ ] Consistent styling across pages
-- [ ] Page titles show in browser tab
+- [x] All four routes accessible
+- [x] Navigation between pages works
+- [x] Consistent styling across pages
+- [x] Page titles show in browser tab
 
 ---
 

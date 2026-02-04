@@ -11,7 +11,9 @@
       "Skill(craft:plan-chunks)",
       "Bash(npx shadcn@latest add:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(npm run typecheck:*)",
+      "Bash(npm run:*)"
     ]
   }
 }
