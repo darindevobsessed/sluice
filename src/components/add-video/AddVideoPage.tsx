@@ -3,7 +3,10 @@
 import { useState, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import { VideoPreviewCard } from "./VideoPreviewCard";
+import { TranscriptSection } from "./TranscriptSection";
+import { OptionalFields } from "./OptionalFields";
 import { parseYouTubeUrl, fetchVideoMetadata } from "@/lib/youtube";
 import type { VideoMetadata } from "@/lib/youtube";
 
@@ -15,6 +18,9 @@ export function AddVideoPage() {
   const [showManualFallback, setShowManualFallback] = useState(false);
   const [manualTitle, setManualTitle] = useState("");
   const [manualChannel, setManualChannel] = useState("");
+  const [transcript, setTranscript] = useState("");
+  const [tags, setTags] = useState("");
+  const [notes, setNotes] = useState("");
 
   const handleUrlChange = useCallback(async (value: string) => {
     setUrl(value);
@@ -50,6 +56,14 @@ export function AddVideoPage() {
     const value = e.target.value;
     handleUrlChange(value);
   };
+
+  const handleSubmit = () => {
+    // TODO: Implement submission logic
+    console.log("Submitting:", { url, metadata, transcript, tags, notes });
+  };
+
+  const hasValidMetadata = metadata || (manualTitle && manualChannel);
+  const canSubmit = hasValidMetadata && transcript.length >= 50;
 
   return (
     <div className="p-6">
@@ -113,6 +127,33 @@ export function AddVideoPage() {
               </div>
             </div>
           </div>
+        )}
+
+        {hasValidMetadata && !loading && (
+          <>
+            <TranscriptSection
+              value={transcript}
+              onChange={setTranscript}
+            />
+
+            <OptionalFields
+              tags={tags}
+              notes={notes}
+              onTagsChange={setTags}
+              onNotesChange={setNotes}
+            />
+
+            <div className="flex justify-end pt-4">
+              <Button
+                onClick={handleSubmit}
+                disabled={!canSubmit}
+                size="lg"
+                className="min-w-[200px]"
+              >
+                Add to Knowledge Bank
+              </Button>
+            </div>
+          </>
         )}
       </div>
     </div>

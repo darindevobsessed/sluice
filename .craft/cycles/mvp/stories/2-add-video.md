@@ -8,7 +8,7 @@ updated: 2026-02-03
 cycle: mvp
 story_number: 2
 chunks_total: 4
-chunks_complete: 2
+chunks_complete: 3
 ---
 
 # Story: Add Video
@@ -140,13 +140,13 @@ A conversational single-page flow to add YouTube videos to the knowledge bank. U
 - Collapsible needs proper animation
 
 **Done When:**
-- [ ] Transcript textarea renders with generous size
-- [ ] Instructions toggle open/closed smoothly
-- [ ] Instructions are clear and complete
-- [ ] Tags input accepts comma-separated values
-- [ ] Notes field available
-- [ ] Character count updates as user types
-- [ ] Submit button enables when transcript has content
+- [x] Transcript textarea renders with generous size
+- [x] Instructions toggle open/closed smoothly
+- [x] Instructions are clear and complete
+- [x] Tags input accepts comma-separated values
+- [x] Notes field available
+- [x] Character count updates as user types
+- [x] Submit button enables when transcript has content
 
 ---
 
