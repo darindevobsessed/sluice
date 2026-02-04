@@ -8,7 +8,7 @@ updated: 2026-02-03
 cycle: mvp
 story_number: 2
 chunks_total: 4
-chunks_complete: 1
+chunks_complete: 2
 ---
 
 # Story: Add Video
@@ -98,12 +98,12 @@ A conversational single-page flow to add YouTube videos to the knowledge bank. U
 - oEmbed failure — manual fallback fields
 
 **Done When:**
-- [ ] Page renders with conversational header
-- [ ] URL input validates YouTube URLs
-- [ ] Valid URL triggers metadata fetch with loading state
-- [ ] VideoPreviewCard shows thumbnail, title, channel
-- [ ] Manual fallback fields appear if oEmbed fails
-- [ ] Video preview feels like a confirmation, not just data
+- [x] Page renders with conversational header
+- [x] URL input validates YouTube URLs
+- [x] Valid URL triggers metadata fetch with loading state
+- [x] VideoPreviewCard shows thumbnail, title, channel
+- [x] Manual fallback fields appear if oEmbed fails
+- [x] Video preview feels like a confirmation, not just data
 
 ---
 
