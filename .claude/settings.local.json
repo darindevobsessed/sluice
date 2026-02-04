@@ -15,7 +15,8 @@
       "Bash(npm run typecheck:*)",
       "Bash(npm run:*)",
       "Bash(npm install:*)",
-      "Skill(craft:story-implement)"
+      "Skill(craft:story-implement)",
+      "Bash(npx tsc:*)"
     ]
   }
 }

@@ -8,7 +8,7 @@ updated: 2026-02-03
 cycle: mvp
 story_number: 2
 chunks_total: 4
-chunks_complete: 0
+chunks_complete: 1
 ---
 
 # Story: Add Video
@@ -64,9 +64,9 @@ A conversational single-page flow to add YouTube videos to the knowledge bank. U
 - Invalid URLs — validate before fetching
 
 **Done When:**
-- [ ] parseYouTubeUrl handles all common formats
-- [ ] fetchVideoMetadata returns metadata or null
-- [ ] Types exported for use in components
+- [x] parseYouTubeUrl handles all common formats
+- [x] fetchVideoMetadata returns metadata or null
+- [x] Types exported for use in components
 
 ---
 
