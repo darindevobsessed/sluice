@@ -1,4 +1,4 @@
-import { db, videos } from "@/lib/db";
+import { db, videos, searchVideos, getVideoStats } from "@/lib/db";
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { z } from "zod";
@@ -12,6 +12,30 @@ const videoSchema = z.object({
   tags: z.array(z.string()).optional(),
   notes: z.string().optional(),
 });
+
+export async function GET(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const query = searchParams.get('q') || '';
+
+    // Search videos (empty query returns all videos)
+    const videos = searchVideos(query);
+
+    // Get stats
+    const stats = getVideoStats();
+
+    return NextResponse.json(
+      { videos, stats },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error fetching videos:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch videos. Please try again." },
+      { status: 500 }
+    );
+  }
+}
 
 export async function POST(request: Request) {
   try {
