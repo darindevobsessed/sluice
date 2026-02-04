@@ -1,14 +1,14 @@
 ---
 name: add-video
 title: Add Video
-status: active
+status: complete
 priority: high
 created: 2026-02-03
 updated: 2026-02-03
 cycle: mvp
 story_number: 2
 chunks_total: 4
-chunks_complete: 3
+chunks_complete: 4
 ---
 
 # Story: Add Video
@@ -24,15 +24,15 @@ A conversational single-page flow to add YouTube videos to the knowledge bank. U
 
 ## Acceptance
 
-- [ ] User can paste YouTube URL and see video preview
-- [ ] Metadata (title, channel, thumbnail) auto-extracted via oEmbed
-- [ ] Manual fallback fields appear if oEmbed fails
-- [ ] Transcript paste area with expandable instructions
-- [ ] Tags and notes fields available (optional)
-- [ ] Form validates before submission
-- [ ] Video saved to database on submit
-- [ ] Success state with celebration and next actions
-- [ ] Conversational flow — no step indicators
+- [x] User can paste YouTube URL and see video preview
+- [x] Metadata (title, channel, thumbnail) auto-extracted via oEmbed
+- [x] Manual fallback fields appear if oEmbed fails
+- [x] Transcript paste area with expandable instructions
+- [x] Tags and notes fields available (optional)
+- [x] Form validates before submission
+- [x] Video saved to database on submit
+- [x] Success state with celebration and next actions
+- [x] Conversational flow — no step indicators
 
 ## Chunks
 
@@ -189,13 +189,13 @@ A conversational single-page flow to add YouTube videos to the knowledge bank. U
 - API validation errors — handle gracefully
 
 **Done When:**
-- [ ] API route validates and saves video to database
-- [ ] Form shows loading state during submission
-- [ ] Success state displays with video info
-- [ ] "View Video" links to correct route
-- [ ] "Add Another" resets form completely
-- [ ] Errors display via toast notification
-- [ ] Success feels rewarding, not just functional
+- [x] API route validates and saves video to database
+- [x] Form shows loading state during submission
+- [x] Success state displays with video info
+- [x] "View Video" links to correct route
+- [x] "Add Another" resets form completely
+- [x] Errors display via toast notification
+- [x] Success feels rewarding, not just functional
 
 ## Notes
 

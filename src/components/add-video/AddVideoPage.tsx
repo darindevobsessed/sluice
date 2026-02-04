@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { VideoPreviewCard } from "./VideoPreviewCard";
 import { TranscriptSection } from "./TranscriptSection";
 import { OptionalFields } from "./OptionalFields";
+import { SuccessState } from "./SuccessState";
 import { parseYouTubeUrl, fetchVideoMetadata } from "@/lib/youtube";
 import type { VideoMetadata } from "@/lib/youtube";
 
@@ -21,6 +22,9 @@ export function AddVideoPage() {
   const [transcript, setTranscript] = useState("");
   const [tags, setTags] = useState("");
   const [notes, setNotes] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const handleUrlChange = useCallback(async (value: string) => {
     setUrl(value);
@@ -57,13 +61,106 @@ export function AddVideoPage() {
     handleUrlChange(value);
   };
 
-  const handleSubmit = () => {
-    // TODO: Implement submission logic
-    console.log("Submitting:", { url, metadata, transcript, tags, notes });
+  const handleSubmit = async () => {
+    setSubmitError(null);
+    setSubmitting(true);
+
+    try {
+      // Parse video ID from URL
+      const parsed = parseYouTubeUrl(url);
+      if (!parsed?.videoId) {
+        setSubmitError("Invalid YouTube URL");
+        setSubmitting(false);
+        return;
+      }
+
+      // Get title and channel from metadata or manual input
+      const title = metadata?.title || manualTitle;
+      const channel = metadata?.author_name || manualChannel;
+
+      if (!title || !channel) {
+        setSubmitError("Title and channel are required");
+        setSubmitting(false);
+        return;
+      }
+
+      // Prepare tags array
+      const tagsArray = tags
+        ? tags.split(",").map(tag => tag.trim()).filter(Boolean)
+        : [];
+
+      // Submit to API
+      const response = await fetch("/api/videos", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          youtubeId: parsed.videoId,
+          title,
+          channel,
+          thumbnail: metadata?.thumbnail_url || null,
+          transcript,
+          tags: tagsArray,
+          notes: notes || undefined,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setSubmitError(data.error || "Failed to save video");
+        setSubmitting(false);
+        return;
+      }
+
+      // Success!
+      setSubmitted(true);
+    } catch (err) {
+      console.error("Submission error:", err);
+      setSubmitError("An unexpected error occurred. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleReset = () => {
+    setUrl("");
+    setMetadata(null);
+    setError(null);
+    setShowManualFallback(false);
+    setManualTitle("");
+    setManualChannel("");
+    setTranscript("");
+    setTags("");
+    setNotes("");
+    setSubmitting(false);
+    setSubmitted(false);
+    setSubmitError(null);
   };
 
   const hasValidMetadata = metadata || (manualTitle && manualChannel);
   const canSubmit = hasValidMetadata && transcript.length >= 50;
+
+  // Show success state if submitted
+  if (submitted) {
+    const title = metadata?.title || manualTitle;
+    const thumbnail = metadata?.thumbnail_url || null;
+
+    return (
+      <div className="p-6">
+        <h1 className="mb-2 text-2xl font-semibold">Add a Video</h1>
+        <p className="mb-8 text-muted-foreground">
+          Extract knowledge from YouTube videos and generate plugin ideas.
+        </p>
+        <SuccessState
+          title={title}
+          thumbnail={thumbnail}
+          onReset={handleReset}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="p-6">
@@ -143,14 +240,27 @@ export function AddVideoPage() {
               onNotesChange={setNotes}
             />
 
+            {submitError && (
+              <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-4">
+                <p className="text-sm text-destructive">{submitError}</p>
+              </div>
+            )}
+
             <div className="flex justify-end pt-4">
               <Button
                 onClick={handleSubmit}
-                disabled={!canSubmit}
+                disabled={!canSubmit || submitting}
                 size="lg"
                 className="min-w-[200px]"
               >
-                Add to Knowledge Bank
+                {submitting ? (
+                  <>
+                    <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                    Saving...
+                  </>
+                ) : (
+                  "Add to Knowledge Bank"
+                )}
               </Button>
             </div>
           </>

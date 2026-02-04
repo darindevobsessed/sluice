@@ -16,7 +16,8 @@
       "Bash(npm run:*)",
       "Bash(npm install:*)",
       "Skill(craft:story-implement)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(/Users/darindrobinski/.claude-max/plugins/cache/craft-local/craft/0.7.0/hooks/scripts/complete-story.sh:*)"
     ]
   }
 }
