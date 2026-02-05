@@ -1,8 +1,18 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Prerequisites
+
+- [Docker](https://docs.docker.com/get-docker/) - Required for running the Postgres database with pgvector extension
+
 ## Getting Started
 
-First, run the development server:
+First, start the database:
+
+```bash
+docker compose up -d
+```
+
+Then, run the development server:
 
 ```bash
 npm run dev

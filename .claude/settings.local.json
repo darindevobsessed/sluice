@@ -24,7 +24,8 @@
       "WebSearch",
       "Bash(npx drizzle-kit:*)",
       "WebFetch(domain:www.npmjs.com)",
-      "WebFetch(domain:orm.drizzle.team)"
+      "WebFetch(domain:orm.drizzle.team)",
+      "Bash(docker compose:*)"
     ]
   }
 }

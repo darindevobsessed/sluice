@@ -52,8 +52,8 @@ describe('FTS5 Search', () => {
       `);
 
       const results = dbInstance.searchVideos('');
-      expect(results[0].youtubeId).toBe('new');
-      expect(results[1].youtubeId).toBe('old');
+      expect(results[0]?.youtubeId).toBe('new');
+      expect(results[1]?.youtubeId).toBe('old');
     });
 
     it('finds videos by title match', () => {
@@ -66,7 +66,7 @@ describe('FTS5 Search', () => {
 
       const results = dbInstance.searchVideos('React');
       expect(results).toHaveLength(1);
-      expect(results[0].title).toBe('React Hooks Tutorial');
+      expect(results[0]?.title).toBe('React Hooks Tutorial');
     });
 
     it('finds videos by transcript content', () => {
@@ -79,7 +79,7 @@ describe('FTS5 Search', () => {
 
       const results = dbInstance.searchVideos('useState');
       expect(results).toHaveLength(1);
-      expect(results[0].youtubeId).toBe('vid1');
+      expect(results[0]?.youtubeId).toBe('vid1');
     });
 
     it('finds videos by channel name', () => {
@@ -92,7 +92,7 @@ describe('FTS5 Search', () => {
 
       const results = dbInstance.searchVideos('Fireship');
       expect(results).toHaveLength(1);
-      expect(results[0].channel).toBe('Fireship');
+      expect(results[0]?.channel).toBe('Fireship');
     });
 
     it('handles special characters in query', () => {
@@ -194,7 +194,7 @@ describe('FTS5 Search', () => {
       // After rebuild, search SHOULD find the video
       const afterRebuild = dbInstance.searchVideos('Claude');
       expect(afterRebuild).toHaveLength(1);
-      expect(afterRebuild[0].title).toBe('Claude Tutorial');
+      expect(afterRebuild[0]?.title).toBe('Claude Tutorial');
     });
 
     it('finds transcript content after FTS rebuild', () => {
@@ -225,7 +225,7 @@ describe('FTS5 Search', () => {
       // Search for term in transcript should work
       const results = dbInstance.searchVideos('claude');
       expect(results).toHaveLength(1);
-      expect(results[0].transcript).toContain('claude');
+      expect(results[0]?.transcript).toContain('claude');
     });
   });
 

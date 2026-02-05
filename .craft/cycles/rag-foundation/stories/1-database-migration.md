@@ -1,14 +1,14 @@
 ---
 name: database-migration
 title: Database Migration
-status: ready
+status: active
 priority: high
 created: 2026-02-05
 updated: 2026-02-05
 cycle: rag-foundation
 story_number: 1
 chunks_total: 5
-chunks_complete: 0
+chunks_complete: 1
 ---
 
 # Story: Database Migration
