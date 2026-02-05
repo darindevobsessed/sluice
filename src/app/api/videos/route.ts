@@ -19,10 +19,10 @@ export async function GET(request: Request) {
     const query = searchParams.get('q') || '';
 
     // Search videos (empty query returns all videos)
-    const videos = searchVideos(query);
+    const videos = await searchVideos(query);
 
     // Get stats
-    const stats = getVideoStats();
+    const stats = await getVideoStats();
 
     return NextResponse.json(
       { videos, stats },

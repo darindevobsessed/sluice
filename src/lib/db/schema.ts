@@ -1,64 +1,72 @@
-import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
-import { sql } from 'drizzle-orm';
+import { pgTable, serial, text, integer, timestamp, jsonb, vector } from 'drizzle-orm/pg-core';
 
 /**
  * Videos table - stores YouTube video metadata and transcripts
  */
-export const videos = sqliteTable('videos', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+export const videos = pgTable('videos', {
+  id: serial('id').primaryKey(),
   youtubeId: text('youtube_id').notNull().unique(),
   title: text('title').notNull(),
   channel: text('channel').notNull(),
   thumbnail: text('thumbnail'),
   duration: integer('duration'), // in seconds
   transcript: text('transcript'), // full transcript text
-  createdAt: integer('created_at', { mode: 'timestamp' })
-    .notNull()
-    .default(sql`(unixepoch())`),
-  updatedAt: integer('updated_at', { mode: 'timestamp' })
-    .notNull()
-    .default(sql`(unixepoch())`),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
 /**
  * Channels table - stores YouTube channel information for discovery
  */
-export const channels = sqliteTable('channels', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+export const channels = pgTable('channels', {
+  id: serial('id').primaryKey(),
   channelId: text('channel_id').notNull().unique(),
   name: text('name').notNull(),
   thumbnailUrl: text('thumbnail_url'),
-  createdAt: integer('created_at', { mode: 'timestamp' })
-    .notNull()
-    .default(sql`(unixepoch())`),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
 /**
  * Insights table - stores AI-generated extraction results for videos
  * One extraction per video (unique constraint on videoId)
  */
-export const insights = sqliteTable('insights', {
+export const insights = pgTable('insights', {
   id: text('id').primaryKey(),
   videoId: integer('video_id')
     .notNull()
     .unique()
     .references(() => videos.id, { onDelete: 'cascade' }),
   contentType: text('content_type').notNull(), // 'dev' | 'meeting' | 'educational' | 'thought-leadership' | 'general'
-  extraction: text('extraction', { mode: 'json' }).notNull(), // Full ExtractionResult as JSON
-  createdAt: integer('created_at', { mode: 'timestamp' })
-    .notNull()
-    .default(sql`(unixepoch())`),
-  updatedAt: integer('updated_at', { mode: 'timestamp' })
-    .notNull()
-    .default(sql`(unixepoch())`),
+  extraction: jsonb('extraction').notNull(), // Full ExtractionResult as JSON - native jsonb
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
 /**
  * Settings table - key-value store for user preferences and app configuration
  */
-export const settings = sqliteTable('settings', {
+export const settings = pgTable('settings', {
   key: text('key').primaryKey(),
   value: text('value').notNull(),
+});
+
+/**
+ * Chunks table for RAG embeddings
+ * Vector dimension: 384 (matches FastEmbed all-MiniLM-L6-v2 model)
+ * Populated by Story 3 (Embedding Pipeline)
+ */
+export const chunks = pgTable('chunks', {
+  id: serial('id').primaryKey(),
+  videoId: integer('video_id')
+    .notNull()
+    .references(() => videos.id, { onDelete: 'cascade' }),
+  content: text('content').notNull(),
+  startTime: integer('start_time'), // seconds into video
+  endTime: integer('end_time'),
+  // Vector embedding - 384 dimensions for all-MiniLM-L6-v2
+  // NULL until populated by embedding pipeline
+  embedding: vector('embedding', { dimensions: 384 }),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
 // Type exports for use in application code
@@ -73,3 +81,6 @@ export type NewInsight = typeof insights.$inferInsert;
 
 export type Setting = typeof settings.$inferSelect;
 export type NewSetting = typeof settings.$inferInsert;
+
+export type Chunk = typeof chunks.$inferSelect;
+export type NewChunk = typeof chunks.$inferInsert;

@@ -8,7 +8,7 @@ updated: 2026-02-05
 cycle: rag-foundation
 story_number: 1
 chunks_total: 5
-chunks_complete: 1
+chunks_complete: 3
 ---
 
 # Story: Database Migration
