@@ -1,0 +1,32 @@
+name: experience
+title: Experience
+status: planning
+created: 2026-02-05
+updated: 2026-02-05
+target: Polished UI and advanced creator interactions
+focus: UI enhancements, discovery redesign, persona agents
+
+goals:
+  - Improve content layout (insights first, tabbed focus areas)
+  - Redesign discovery with catch-up and similar creator suggestions
+  - Enable persona agents per creator and ensemble conversations
+  - Keep it agnostic — platform, not niche tool
+
+notes: |
+  ## Brad's Guidance
+
+  > "Put insights before the transcript... I wanna see insights."
+  > "Almost like a profile selector. Instead of having within the knowledge bank having different categories, we just have, like, a root level category tab."
+  > "I wanna catch up. Give me a catch up page."
+  > "For your discovery, you should find similar creators."
+  > "Once you have that, you can create a persona agent... it automatically creates a persona agent."
+  > "I also want a I wanna talk to an ensemble."
+
+  ## Key Decisions
+  - Chat sidebar: holding off for now
+  - Catch-up merges into discovery page
+  - Personas auto-created at transcript threshold
+  - Keep agnostic: "Make it the knowledge base. Don't try to add too many agent things."
+
+  ## Design Principle
+  > "Why is the AR-15 platform so popular? It's because you can put this accessory, that accessory... You have this base and just keep it the base."

@@ -1,8 +1,8 @@
 name: mvp
 title: MVP
-status: ready
+status: complete
 created: 2026-02-03
-updated: 2026-02-03
+updated: 2026-02-05
 target: Working end-to-end knowledge extraction platform
 focus: Core functionality with Claude-powered insights
 

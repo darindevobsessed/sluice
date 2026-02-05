@@ -165,6 +165,17 @@ export function useExtraction({
         },
         onDone: async (fullContent) => {
           const parsed = parsePartialJSON(fullContent);
+
+          // Debug: log what we got
+          console.log('[Extraction] Parse result:', {
+            hasParsed: !!parsed,
+            hasContentType: !!parsed?.contentType,
+            hasSummary: !!parsed?.summary,
+            hasInsights: !!parsed?.insights,
+            hasActionItems: !!parsed?.actionItems,
+            hasClaudeCode: !!parsed?.claudeCode,
+          });
+
           if (parsed && isCompleteExtraction(parsed)) {
             // Persist to API
             try {
@@ -184,16 +195,39 @@ export function useExtraction({
                 summary: 'done',
                 insights: 'done',
                 actions: 'done',
-                claudeCode: 'done',
+                claudeCode: parsed.claudeCode?.applicable ? 'done' : 'pending',
+              },
+              partial: parsed,
+              error: null,
+            });
+          } else if (parsed) {
+            // Partial success - show what we have instead of failing completely
+            console.warn('[Extraction] Partial extraction - missing some sections:', {
+              contentType: parsed.contentType,
+              summary: !!parsed.summary,
+              insights: !!parsed.insights,
+              actionItems: !!parsed.actionItems,
+              claudeCode: !!parsed.claudeCode,
+            });
+
+            setState({
+              overall: 'done',
+              sections: {
+                summary: parsed.summary ? 'done' : 'pending',
+                insights: parsed.insights ? 'done' : 'pending',
+                actions: parsed.actionItems ? 'done' : 'pending',
+                claudeCode: parsed.claudeCode?.applicable ? 'done' : 'pending',
               },
               partial: parsed,
               error: null,
             });
           } else {
+            // Complete failure - couldn't parse anything
+            console.error('[Extraction] Complete parse failure. Raw content length:', fullContent?.length);
             setState((prev) => ({
               ...prev,
               overall: 'error',
-              error: 'Failed to parse complete extraction',
+              error: 'Failed to parse extraction response',
             }));
           }
           setInsightId(null);
@@ -231,16 +265,32 @@ export function useExtraction({
 }
 
 /**
- * Type guard to check if partial extraction is complete
+ * Type guard to check if extraction has minimum required sections.
+ * claudeCode is optional - we don't fail the entire extraction if it doesn't parse.
  */
 function isCompleteExtraction(
   partial: Partial<ExtractionResult>
 ): partial is ExtractionResult {
-  return !!(
+  // Core sections required: contentType, summary, insights, actionItems
+  // claudeCode is optional - it often fails to parse due to nested JSON complexity
+  const hasCoreSection = !!(
     partial.contentType &&
     partial.summary &&
     partial.insights &&
-    partial.actionItems &&
-    partial.claudeCode
+    partial.actionItems
   );
+
+  // If core sections exist but claudeCode is missing, add a default
+  if (hasCoreSection && !partial.claudeCode) {
+    partial.claudeCode = {
+      applicable: false,
+      skills: [],
+      commands: [],
+      agents: [],
+      hooks: [],
+      rules: [],
+    };
+  }
+
+  return hasCoreSection;
 }

@@ -1,12 +1,10 @@
 ---
 name: discovery-feed
 title: Discovery Feed
-status: ready
+status: backlog
 priority: medium
 created: 2026-02-03
-updated: 2026-02-03
-cycle: mvp
-story_number: 5
+updated: 2026-02-05
 chunks_total: 4
 chunks_complete: 0
 ---

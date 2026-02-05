@@ -1,0 +1,27 @@
+name: mcp-intelligence
+title: MCP & Intelligence
+status: planning
+created: 2026-02-05
+updated: 2026-02-05
+target: External API access and advanced RAG capabilities
+focus: MCP server, graph relationships, temporal awareness, automation
+
+goals:
+  - Expose knowledge base via MCP for external tools (Slingshot, etc.)
+  - Add Graph RAG for chunk-to-chunk relationships
+  - Add Temporal Graph RAG to prevent outdated information
+  - Automate content ingestion via cron jobs + RSS
+
+notes: |
+  ## Brad's Guidance
+
+  > "Once you've added the rag, you can add an MCP API to your GoldMiner. And then now I can programmatically access that RAG information."
+  > "You can do graph rag. All you're doing is comparing the chunks with each other."
+  > "Once you add a temporal graph rag, it will say, oh, he talked about this version of cursor. A new one came out. This one is outdated."
+  > "Cron Job, RSS, new video, programmatic extract, database, queue trigger agent to summarize, summarized, done."
+
+  ## Key Decisions
+  - MCP tools: search_rag, get_list_of_creators (composable API)
+  - Graph relationships stored in Postgres (not separate graph DB)
+  - Temporal metadata: version mentions, release dates, freshness signals
+  - Next.js built-in cron for scheduling

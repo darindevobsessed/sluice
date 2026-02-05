@@ -1,0 +1,25 @@
+name: rag-foundation
+title: RAG Foundation
+status: active
+created: 2026-02-05
+updated: 2026-02-05
+target: Semantic search with vector embeddings
+focus: Infrastructure for AI-powered knowledge retrieval
+
+goals:
+  - Replace SQLite with Postgres + PG Vector (Neon-ready)
+  - Auto-fetch transcripts programmatically (no manual paste)
+  - Generate embeddings locally with FastEmbed
+  - Implement RAG search that understands meaning, not just keywords
+
+notes: |
+  ## Brad's Guidance
+
+  > "Use Postgres. You can do Postgres has an embedding feature, and so you can create a rag with this."
+  > "Instead of using OpenAI's embedding API... you can use fast embed. Fast embed will run locally."
+  > "Try to make the transcript programmatic."
+
+  ## Key Decisions
+  - Node-only transcript extraction (youtube-transcript npm) — Python fallback later if needed
+  - Local-first development, but architect for Neon deployment
+  - Chunk transcripts with timestamp metadata for future temporal queries

@@ -1,14 +1,14 @@
 ---
 name: claude-insights
 title: Claude Insights
-status: active
+status: complete
 priority: high
 created: 2026-02-03
-updated: 2026-02-04
+updated: 2026-02-05
 cycle: mvp
 story_number: 4
 chunks_total: 5
-chunks_complete: 0
+chunks_complete: 5
 ---
 
 # Story: Claude Insights

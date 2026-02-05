@@ -100,18 +100,33 @@ function parsePartialJSONContent(cleaned: string): Partial<ExtractionResult> | n
     }
   }
 
-  // Extract claudeCode object using bracket matching (regex fails on nested braces)
+  // Extract claudeCode object - handle nested braces in string content
   const claudeCodeStart = cleaned.indexOf('"claudeCode"');
   if (claudeCodeStart !== -1) {
     const objStart = cleaned.indexOf('{', claudeCodeStart);
     if (objStart !== -1) {
+      // More robust bracket matching that ignores braces inside strings
       let depth = 1;
       let pos = objStart + 1;
+      let inString = false;
+      let escapeNext = false;
+
       while (pos < cleaned.length && depth > 0) {
-        if (cleaned[pos] === '{') depth++;
-        if (cleaned[pos] === '}') depth--;
+        const char = cleaned[pos];
+
+        if (escapeNext) {
+          escapeNext = false;
+        } else if (char === '\\') {
+          escapeNext = true;
+        } else if (char === '"') {
+          inString = !inString;
+        } else if (!inString) {
+          if (char === '{') depth++;
+          if (char === '}') depth--;
+        }
         pos++;
       }
+
       if (depth === 0) {
         const claudeCodeStr = cleaned.slice(objStart, pos);
         try {
@@ -120,7 +135,19 @@ function parsePartialJSONContent(cleaned: string): Partial<ExtractionResult> | n
             result.claudeCode = claudeCodeObj;
           }
         } catch {
-          // Invalid claudeCode, skip
+          // If full parse fails, try to extract just the applicable field
+          // and empty arrays for the rest
+          const applicableMatch = claudeCodeStr.match(/"applicable"\s*:\s*(true|false)/);
+          if (applicableMatch) {
+            result.claudeCode = {
+              applicable: applicableMatch[1] === 'true',
+              skills: [],
+              commands: [],
+              agents: [],
+              hooks: [],
+              rules: [],
+            };
+          }
         }
       }
     }

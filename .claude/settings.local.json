@@ -22,7 +22,9 @@
       "Bash(npm test:*)",
       "Bash(sqlite3:*)",
       "WebSearch",
-      "Bash(npx drizzle-kit:*)"
+      "Bash(npx drizzle-kit:*)",
+      "WebFetch(domain:www.npmjs.com)",
+      "WebFetch(domain:orm.drizzle.team)"
     ]
   }
 }
