@@ -1,14 +1,14 @@
 ---
 name: programmatic-transcripts
 title: Programmatic Transcripts
-status: active
+status: complete
 priority: high
 created: 2026-02-05
-updated: 2026-02-05
+updated: 2026-02-06
 cycle: rag-foundation
 story_number: 2
 chunks_total: 3
-chunks_complete: 2
+chunks_complete: 3
 ---
 
 # Story: Programmatic Transcripts

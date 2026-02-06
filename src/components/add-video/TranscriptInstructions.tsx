@@ -2,8 +2,28 @@
 
 import { useState } from "react";
 
-export function TranscriptInstructions() {
-  const [isOpen, setIsOpen] = useState(false);
+interface TranscriptInstructionsProps {
+  collapsed?: boolean;
+}
+
+export function TranscriptInstructions({ collapsed = false }: TranscriptInstructionsProps) {
+  // When collapsed=true: start closed, show small link
+  // When collapsed=false: start open, show normal toggle
+  const [isOpen, setIsOpen] = useState(!collapsed);
+
+  if (collapsed && !isOpen) {
+    return (
+      <div className="space-y-2">
+        <button
+          type="button"
+          onClick={() => setIsOpen(true)}
+          className="text-xs text-muted-foreground hover:text-foreground transition-colors underline decoration-dotted"
+        >
+          How to get a transcript manually
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-2">

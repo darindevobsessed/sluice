@@ -1,10 +1,10 @@
 ---
 name: embedding-pipeline
 title: Embedding Pipeline
-status: ready
+status: active
 priority: high
 created: 2026-02-05
-updated: 2026-02-05
+updated: 2026-02-06
 cycle: rag-foundation
 story_number: 3
 chunks_total: 4

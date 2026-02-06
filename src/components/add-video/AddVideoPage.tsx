@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -26,11 +26,98 @@ export function AddVideoPage() {
   const [submitted, setSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
+  // Transcript auto-fetch state
+  const [transcriptFetching, setTranscriptFetching] = useState(false);
+  const [transcriptFetchError, setTranscriptFetchError] = useState<string | null>(null);
+  const [transcriptSource, setTranscriptSource] = useState<"auto" | "manual" | null>(null);
+
+  // Refs for cleanup
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
+  }, []);
+
+  const fetchTranscript = useCallback(async (videoId: string, forceRefresh = false) => {
+    // Cancel any pending fetch
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
+    setTranscriptFetching(true);
+    setTranscriptFetchError(null);
+
+    try {
+      const url = `/api/youtube/transcript?videoId=${videoId}${forceRefresh ? '&forceRefresh=true' : ''}`;
+      const response = await fetch(url, { signal: controller.signal });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to fetch transcript');
+      }
+
+      const data = await response.json();
+      setTranscript(data.transcript);
+      setTranscriptSource("auto");
+      setTranscriptFetchError(null);
+    } catch (err) {
+      // Check for AbortError from DOMException or Error
+      if (
+        (err instanceof DOMException && err.name === 'AbortError') ||
+        (err instanceof Error && err.name === 'AbortError')
+      ) {
+        // Request was cancelled, ignore
+        return;
+      }
+
+      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch transcript';
+      setTranscriptFetchError(errorMessage);
+      setTranscriptSource("manual");
+    } finally {
+      setTranscriptFetching(false);
+      abortControllerRef.current = null;
+    }
+  }, []);
+
+  const handleRetryTranscript = useCallback(() => {
+    const parsed = parseYouTubeUrl(url);
+    if (parsed?.videoId) {
+      fetchTranscript(parsed.videoId, true);
+    }
+  }, [url, fetchTranscript]);
+
   const handleUrlChange = useCallback(async (value: string) => {
     setUrl(value);
     setError(null);
     setMetadata(null);
     setShowManualFallback(false);
+    setTranscript("");
+    setTranscriptSource(null);
+    setTranscriptFetchError(null);
+
+    // Cancel pending debounce timer
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+      debounceTimerRef.current = null;
+    }
+
+    // Cancel in-flight transcript requests
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
 
     if (!value.trim()) {
       return;
@@ -43,18 +130,23 @@ export function AddVideoPage() {
       return;
     }
 
-    setLoading(true);
+    // Debounce the metadata fetch
+    debounceTimerRef.current = setTimeout(async () => {
+      setLoading(true);
 
-    const data = await fetchVideoMetadata(parsed.videoId);
-    setLoading(false);
+      const data = await fetchVideoMetadata(parsed.videoId);
+      setLoading(false);
 
-    if (data) {
-      setMetadata(data);
-    } else {
-      setShowManualFallback(true);
-      setError("Could not fetch video details. Please enter them manually.");
-    }
-  }, []);
+      if (data) {
+        setMetadata(data);
+        // Auto-fetch transcript after metadata loads
+        fetchTranscript(parsed.videoId);
+      } else {
+        setShowManualFallback(true);
+        setError("Could not fetch video details. Please enter them manually.");
+      }
+    }, 500);
+  }, [fetchTranscript]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -137,6 +229,9 @@ export function AddVideoPage() {
     setSubmitting(false);
     setSubmitted(false);
     setSubmitError(null);
+    setTranscriptFetching(false);
+    setTranscriptFetchError(null);
+    setTranscriptSource(null);
   };
 
   const hasValidMetadata = metadata || (manualTitle && manualChannel);
@@ -230,7 +325,17 @@ export function AddVideoPage() {
           <>
             <TranscriptSection
               value={transcript}
-              onChange={setTranscript}
+              onChange={(value) => {
+                setTranscript(value);
+                // If user manually edits, mark as manual
+                if (transcriptSource === "auto" && value !== transcript) {
+                  setTranscriptSource("manual");
+                }
+              }}
+              isFetching={transcriptFetching}
+              fetchError={transcriptFetchError}
+              source={transcriptSource}
+              onRetryFetch={handleRetryTranscript}
             />
 
             <OptionalFields
