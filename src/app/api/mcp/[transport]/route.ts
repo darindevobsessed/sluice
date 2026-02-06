@@ -1,5 +1,6 @@
 import { createMcpHandler } from 'mcp-handler'
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
+import { registerSearchRag } from '@/lib/mcp/tools'
 
 /**
  * MCP Route Handler for Gold Miner
@@ -7,17 +8,19 @@ import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
  * Provides Model Context Protocol interface for Claude Code plugins.
  * Supports both SSE and HTTP transports via dynamic [transport] parameter.
  *
- * Available tools will be registered in future chunks:
- * - search_rag: Search the knowledge base
+ * Available tools:
+ * - search_rag: Search the knowledge base with optional creator filtering
+ *
+ * Future tools:
  * - get_list_of_creators: List all creators with video counts
  */
 
 /**
- * Initialize the MCP server
+ * Initialize the MCP server with registered tools
  * This function is called once when the handler is created
  */
-async function initializeServer(_server: McpServer): Promise<void> {
-  // No tools registered yet - they will be added in subsequent chunks
+async function initializeServer(server: McpServer): Promise<void> {
+  registerSearchRag(server)
 }
 
 /**
