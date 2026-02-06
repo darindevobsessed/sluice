@@ -8,7 +8,7 @@ updated: 2026-02-06
 cycle: rag-foundation
 story_number: 4
 chunks_total: 4
-chunks_complete: 3
+chunks_complete: 4
 ---
 
 # Story: RAG Search
