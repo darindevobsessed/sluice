@@ -43,6 +43,7 @@ vi.mock('@/lib/embeddings/service', () => ({
     successCount: 2,
     errorCount: 0,
     durationMs: 500,
+    relationshipsCreated: 3,
   }),
 }));
 
@@ -216,6 +217,7 @@ describe('POST /api/videos/[id]/embed (Postgres)', () => {
       alreadyEmbedded: false,
       chunkCount: 2,
       durationMs: 500,
+      relationshipsCreated: 3,
     });
 
     // Should call chunking and embedding
@@ -256,5 +258,33 @@ describe('POST /api/videos/[id]/embed (Postgres)', () => {
     expect(data).toHaveProperty('chunkCount');
     expect(typeof data.success).toBe('boolean');
     expect(typeof data.chunkCount).toBe('number');
+  });
+
+  it('includes relationshipsCreated in response when embedding new video', async () => {
+    const db = getTestDb();
+
+    // Create video with transcript
+    const [video] = await db
+      .insert(schema.videos)
+      .values({
+        youtubeId: 'vid-with-relationships',
+        title: 'Test Video',
+        channel: 'Test Channel',
+        transcript: '0:00\nTest content',
+        duration: 600,
+      })
+      .returning();
+
+    const request = new Request(`http://localhost:3000/api/videos/${video!.id}/embed`, {
+      method: 'POST',
+    });
+    const params = Promise.resolve({ id: String(video!.id) });
+
+    const response = await POST(request, { params });
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(data).toHaveProperty('relationshipsCreated', 3);
+    expect(typeof data.relationshipsCreated).toBe('number');
   });
 });

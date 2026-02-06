@@ -21,4 +21,5 @@ export interface EmbedChunksResult {
   successCount: number;
   errorCount: number;
   durationMs: number;
+  relationshipsCreated?: number;
 }

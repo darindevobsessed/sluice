@@ -2,6 +2,7 @@ import { generateEmbedding } from './pipeline'
 import type { ChunkData, ChunkWithEmbedding, EmbedChunksResult } from './types'
 import { db, chunks } from '@/lib/db'
 import { eq } from 'drizzle-orm'
+import { computeRelationships } from '@/lib/graph'
 
 const BATCH_SIZE = 32
 
@@ -76,8 +77,18 @@ export async function embedChunks(
   const durationMs = performance.now() - startTime
 
   // Store to database if videoId provided
+  let relationshipsCreated = 0
   if (videoId !== undefined) {
     await storeChunksToDatabase(results, videoId)
+
+    // Auto-compute relationships after embedding
+    try {
+      const relResult = await computeRelationships(videoId)
+      relationshipsCreated = relResult.created
+    } catch (error) {
+      // Relationship computation failure should NOT fail the embedding
+      console.error('Error computing relationships:', error)
+    }
   }
 
   return {
@@ -85,7 +96,8 @@ export async function embedChunks(
     totalChunks,
     successCount,
     errorCount,
-    durationMs
+    durationMs,
+    relationshipsCreated
   }
 }
 

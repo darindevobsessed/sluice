@@ -287,3 +287,264 @@ npm error
 npm error To see a list of scripts, run:
 npm error   npm run
 npm error A complete log of this run can be found in: /Users/darindrobinski/.npm/_logs/2026-02-06T21_32_56_468Z-debug-0.log
+---
+timestamp: "2026-02-06 15:43:28"
+story: "2-graph-rag"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 3 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/lib/embeddings/__tests__/service.test.ts[2m > [22membedChunks[2m > [22mrelationship computation[2m > [22mcalls computeRelationships after embedding with videoId
+[31m[1mAssertionError[22m: expected "vi.fn()" to be called with arguments: [ 123 ][90m
+
+Number of calls: [1m0[22m
+[31m[39m
+[36m [2m❯[22m src/lib/embeddings/__tests__/service.test.ts:[2m360:36[22m[39m
+    [90m358| [39m      [35mconst[39m result [33m=[39m [35mawait[39m [34membedChunks[39m(inputChunks[33m,[39m undefined[33m,[39m [34m123[39m)
+    [90m359| [39m
+    [90m360| [39m      [34mexpect[39m(computeRelationships)[33m.[39m[34mtoHaveBeenCalledWith[39m([34m123[39m)
+    [90m   | [39m                                   [31m^[39m
+    [90m361| [39m      [34mexpect[39m(result[33m.[39mrelationshipsCreated)[33m.[39m[34mtoBe[39m([34m5[39m)
+    [90m362| [39m    })
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/lib/embeddings/__tests__/service.test.ts[2m > [22membedChunks[2m > [22mrelationship computation[2m > [22mcontinues successfully even if relationship computation fails
+[31m[1mAssertionError[22m: expected undefined to be +0 // Object.is equality[39m
+
+[32m- Expected:[39m 
+0
+
+[31m+ Received:[39m 
+undefined
+
+[36m [2m❯[22m src/lib/embeddings/__tests__/service.test.ts:[2m402:43[22m[39m
+    [90m400| [39m      [34mexpect[39m(result[33m.[39msuccessCount)[33m.[39m[34mtoBe[39m([34m1[39m)
+    [90m401| [39m      [34mexpect[39m(result[33m.[39merrorCount)[33m.[39m[34mtoBe[39m([34m0[39m)
+    [90m402| [39m      [34mexpect[39m(result[33m.[39mrelationshipsCreated)[33m.[39m[34mtoBe[39m([34m0[39m)
+    [90m   | [39m                                          [31m^[39m
+    [90m403| [39m      [34mexpect[39m(computeRelationships)[33m.[39m[34mtoHaveBeenCalledWith[39m([34m456[39m)
+    [90m404| [39m    })
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/lib/embeddings/__tests__/service.test.ts[2m > [22membedChunks[2m > [22mrelationship computation[2m > [22msets relationshipsCreated to 0 if computation fails
+[31m[1mAssertionError[22m: expected { chunks: [ { …(5) } ], …(4) } to have property "relationshipsCreated" with value +0[39m
+
+[32m- Expected:[39m 
+0
+
+[31m+ Received:[39m 
+undefined
+
+[36m [2m❯[22m src/lib/embeddings/__tests__/service.test.ts:[2m429:22[22m[39m
+    [90m427| [39m      [35mconst[39m result [33m=[39m [35mawait[39m [34membedChunks[39m(inputChunks[33m,[39m undefined[33m,[39m [34m789[39m)
+    [90m428| [39m
+    [90m429| [39m      [34mexpect[39m(result)[33m.[39m[34mtoHaveProperty[39m([32m'relationshipsCreated'[39m[33m,[39m [34m0[39m)
+    [90m   | [39m                     [31m^[39m
+    [90m430| [39m    })
+    [90m431| [39m  })
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/lib/embeddings/__tests__/service.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/lib/embeddings/__tests__/service.test.ts [2m([22m[2m18 tests[22m[2m | [22m[31m3 failed[39m[2m)[22m[32m 30[2mms[22m[39m
+       [32m✓[39m generates embeddings for all chunks[32m 3[2mms[22m[39m
+       [32m✓[39m returns empty result for empty chunks array[32m 1[2mms[22m[39m
+       [32m✓[39m calls progress callback with correct values after each batch[32m 1[2mms[22m[39m
+       [32m✓[39m does not throw if progress callback is not provided[32m 1[2mms[22m[39m
+       [32m✓[39m respects batch size of 32[32m 3[2mms[22m[39m
+       [32m✓[39m handles chunks count not divisible by batch size[32m 3[2mms[22m[39m
+       [32m✓[39m continues processing when single chunk fails[32m 1[2mms[22m[39m
+       [32m✓[39m returns all chunks even with multiple errors[32m 1[2mms[22m[39m
+       [32m✓[39m includes correct counts in result[32m 1[2mms[22m[39m
+       [32m✓[39m tracks duration in milliseconds[32m 0[2mms[22m[39m
+       [32m✓[39m stores chunks to database when videoId provided[32m 1[2mms[22m[39m
+       [32m✓[39m does not store to database when videoId not provided[32m 0[2mms[22m[39m
+       [32m✓[39m uses transaction for atomicity[32m 0[2mms[22m[39m
+       [32m✓[39m rolls back transaction on complete failure[32m 1[2mms[22m[39m
+[31m       [31m×[31m calls computeRelationships after embedding with videoId[39m[32m 5[2mms[22m[39m
+       [32m✓[39m does not call computeRelationships when videoId not provided[32m 1[2mms[22m[39m
+[31m       [31m×[31m continues successfully even if relationship computation fails[39m[32m 3[2mms[22m[39m
+[31m       [31m×[31m sets relationshipsCreated to 0 if computation fails[39m[32m 2[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m3 failed[39m[22m[2m | [22m[1m[32m15 passed[39m[22m[90m (18)[39m
+[2m   Start at [22m 15:43:25
+[2m   Duration [22m 2.76s[2m (transform 137ms, setup 312ms, import 475ms, tests 30ms, environment 1.46s)[22m
+---
+timestamp: "2026-02-06 15:43:39"
+story: "2-graph-rag"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/app/api/videos/[id]/embed/__tests__/route.test.ts[2m > [22mPOST /api/videos/[id]/embed (Postgres)[2m > [22mincludes relationshipsCreated in response when embedding new video
+[31m[1mAssertionError[22m: expected { success: true, …(3) } to have property "relationshipsCreated" with value 3[39m
+
+[32m- Expected:[39m 
+3
+
+[31m+ Received:[39m 
+undefined
+
+[36m [2m❯[22m src/app/api/videos/[id]/embed/__tests__/route.test.ts:[2m286:18[22m[39m
+    [90m284| [39m
+    [90m285| [39m    [34mexpect[39m(response[33m.[39mstatus)[33m.[39m[34mtoBe[39m([34m200[39m)[33m;[39m
+    [90m286| [39m    [34mexpect[39m(data)[33m.[39m[34mtoHaveProperty[39m([32m'relationshipsCreated'[39m[33m,[39m [34m3[39m)[33m;[39m
+    [90m   | [39m                 [31m^[39m
+    [90m287| [39m    [34mexpect[39m([35mtypeof[39m data[33m.[39mrelationshipsCreated)[33m.[39m[34mtoBe[39m([32m'number'[39m)[33m;[39m
+    [90m288| [39m  })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/app/api/videos/[id]/embed/__tests__/route.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/app/api/videos/[id]/embed/__tests__/route.test.ts [2m([22m[2m6 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 389[2mms[22m[39m
+     [32m✓[39m returns 404 if video not found[32m 107[2mms[22m[39m
+     [32m✓[39m returns 400 if video has no transcript[32m 49[2mms[22m[39m
+     [32m✓[39m returns existing chunk count if already embedded[32m 62[2mms[22m[39m
+     [32m✓[39m generates embeddings for new video[32m 64[2mms[22m[39m
+     [32m✓[39m returns correct response structure on success[32m 51[2mms[22m[39m
+[31m     [31m×[31m includes relationshipsCreated in response when embedding new video[39m[32m 54[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m5 passed[39m[22m[90m (6)[39m
+[2m   Start at [22m 15:43:36
+[2m   Duration [22m 3.11s[2m (transform 151ms, setup 239ms, import 914ms, tests 389ms, environment 1.13s)[22m
+---
+timestamp: "2026-02-06 15:44:22"
+story: "2-graph-rag"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/app/api/videos/[id]/embed/__tests__/route.test.ts[2m > [22mPOST /api/videos/[id]/embed (Postgres)[2m > [22mgenerates embeddings for new video
+[31m[1mAssertionError[22m: expected { success: true, …(4) } to deeply equal { success: true, …(3) }[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[2m  {[22m
+[2m    "alreadyEmbedded": false,[22m
+[2m    "chunkCount": 2,[22m
+[2m    "durationMs": 500,[22m
+[31m+   "relationshipsCreated": 3,[39m
+[2m    "success": true,[22m
+[2m  }[22m
+
+[36m [2m❯[22m src/app/api/videos/[id]/embed/__tests__/route.test.ts:[2m215:18[22m[39m
+    [90m213| [39m
+    [90m214| [39m    [34mexpect[39m(response[33m.[39mstatus)[33m.[39m[34mtoBe[39m([34m200[39m)[33m;[39m
+    [90m215| [39m    [34mexpect[39m(data)[33m.[39m[34mtoEqual[39m({
+    [90m   | [39m                 [31m^[39m
+    [90m216| [39m      success[33m:[39m [35mtrue[39m[33m,[39m
+    [90m217| [39m      alreadyEmbedded[33m:[39m [35mfalse[39m[33m,[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/app/api/videos/[id]/embed/__tests__/route.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/app/api/videos/[id]/embed/__tests__/route.test.ts [2m([22m[2m6 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 401[2mms[22m[39m
+     [32m✓[39m returns 404 if video not found[32m 100[2mms[22m[39m
+     [32m✓[39m returns 400 if video has no transcript[32m 50[2mms[22m[39m
+     [32m✓[39m returns existing chunk count if already embedded[32m 87[2mms[22m[39m
+[31m     [31m×[31m generates embeddings for new video[39m[32m 59[2mms[22m[39m
+     [32m✓[39m returns correct response structure on success[32m 49[2mms[22m[39m
+     [32m✓[39m includes relationshipsCreated in response when embedding new video[32m 53[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m5 passed[39m[22m[90m (6)[39m
+[2m   Start at [22m 15:44:19
+[2m   Duration [22m 2.80s[2m (transform 160ms, setup 163ms, import 890ms, tests 401ms, environment 1.09s)[22m
+---
+timestamp: "2026-02-06 15:50:18"
+story: "2-graph-rag"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+npm error Missing script: "typecheck"
+npm error
+npm error To see a list of scripts, run:
+npm error   npm run
+npm error A complete log of this run can be found in: /Users/darindrobinski/.npm/_logs/2026-02-06T21_50_18_056Z-debug-0.log
+---
+timestamp: "2026-02-06 15:51:05"
+story: "2-graph-rag"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+> gold-miner@0.1.0 lint
+> eslint
+
+
+/Users/darindrobinski/dev/repos/gold-miner/src/components/add-video/__tests__/AddVideoPage.test.tsx
+  15:36  warning  '_videoId' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/darindrobinski/dev/repos/gold-miner/src/components/search/ChunkResult.tsx
+  5:17  warning  'Video' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/darindrobinski/dev/repos/gold-miner/src/components/search/__tests__/ChunkResult.test.tsx
+  1:32  warning  'vi' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/darindrobinski/dev/repos/gold-miner/src/hooks/useSearch.ts
+  48:7  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/darindrobinski/dev/repos/gold-miner/src/hooks/useSearch.ts:48:7
+  46 |     // Clear results if query is empty
+  47 |     if (!query.trim()) {
+> 48 |       setResults(null);
+     |       ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  49 |       setError(null);
+  50 |       return;
+  51 |     }  react-hooks/set-state-in-effect
+
+/Users/darindrobinski/dev/repos/gold-miner/src/lib/agent/__tests__/AgentProvider.test.tsx
+  11:32  warning  'callback' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/darindrobinski/dev/repos/gold-miner/src/lib/embeddings/__tests__/pipeline.test.ts
+  6:66  warning  '_text' is defined but never used     @typescript-eslint/no-unused-vars
+  6:81  warning  '_options' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/darindrobinski/dev/repos/gold-miner/src/lib/mcp/__tests__/types.test.ts
+   93:27  warning  '_params' is defined but never used    @typescript-eslint/no-unused-vars
+  101:27  warning  '_response' is defined but never used  @typescript-eslint/no-unused-vars
+
+✖ 9 problems (1 error, 8 warnings)

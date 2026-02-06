@@ -16,9 +16,15 @@ vi.mock('@/lib/db', () => ({
   chunks: {} // Mock table reference
 }))
 
+// Mock the graph module
+vi.mock('@/lib/graph', () => ({
+  computeRelationships: vi.fn().mockResolvedValue({ created: 5, skipped: 0 })
+}))
+
 import { embedChunks } from '../service'
 import { generateEmbedding } from '../pipeline'
 import { db } from '@/lib/db'
+import { computeRelationships } from '@/lib/graph'
 
 describe('embedChunks', () => {
   beforeEach(() => {
@@ -323,6 +329,104 @@ describe('embedChunks', () => {
 
       // Should throw when database transaction fails
       await expect(embedChunks(inputChunks, undefined, 789)).rejects.toThrow('Database error')
+    })
+  })
+
+  describe('relationship computation', () => {
+    it('calls computeRelationships after embedding with videoId', async () => {
+      const mockTransaction = vi.fn().mockImplementation(async (callback) => {
+        const mockTx = {
+          insert: vi.fn().mockReturnValue({
+            values: vi.fn().mockReturnThis(),
+            returning: vi.fn().mockResolvedValue([])
+          }),
+          delete: vi.fn().mockReturnValue({
+            where: vi.fn().mockResolvedValue([])
+          })
+        }
+        return await callback(mockTx)
+      })
+
+      vi.mocked(db).transaction = mockTransaction
+      vi.mocked(computeRelationships).mockResolvedValue({ created: 5, skipped: 0 })
+
+      const inputChunks: ChunkData[] = [
+        { content: 'Chunk 1', startTime: 0, endTime: 5000, segmentIndices: [0] },
+        { content: 'Chunk 2', startTime: 5000, endTime: 10000, segmentIndices: [1] }
+      ]
+
+      const result = await embedChunks(inputChunks, undefined, 123)
+
+      expect(computeRelationships).toHaveBeenCalledWith(123)
+      expect(result.relationshipsCreated).toBe(5)
+    })
+
+    it('does not call computeRelationships when videoId not provided', async () => {
+      vi.mocked(computeRelationships).mockClear()
+
+      const inputChunks: ChunkData[] = [
+        { content: 'Chunk 1', startTime: 0, endTime: 5000, segmentIndices: [0] }
+      ]
+
+      await embedChunks(inputChunks)
+
+      expect(computeRelationships).not.toHaveBeenCalled()
+    })
+
+    it('continues successfully even if relationship computation fails', async () => {
+      const mockTransaction = vi.fn().mockImplementation(async (callback) => {
+        const mockTx = {
+          insert: vi.fn().mockReturnValue({
+            values: vi.fn().mockReturnThis(),
+            returning: vi.fn().mockResolvedValue([])
+          }),
+          delete: vi.fn().mockReturnValue({
+            where: vi.fn().mockResolvedValue([])
+          })
+        }
+        return await callback(mockTx)
+      })
+
+      vi.mocked(db).transaction = mockTransaction
+      vi.mocked(computeRelationships).mockRejectedValue(new Error('Relationship computation failed'))
+
+      const inputChunks: ChunkData[] = [
+        { content: 'Chunk 1', startTime: 0, endTime: 5000, segmentIndices: [0] }
+      ]
+
+      // Should not throw - embedding should succeed despite relationship error
+      const result = await embedChunks(inputChunks, undefined, 456)
+
+      expect(result.successCount).toBe(1)
+      expect(result.errorCount).toBe(0)
+      expect(result.relationshipsCreated).toBe(0)
+      expect(computeRelationships).toHaveBeenCalledWith(456)
+    })
+
+    it('sets relationshipsCreated to 0 if computation fails', async () => {
+      const mockTransaction = vi.fn().mockImplementation(async (callback) => {
+        const mockTx = {
+          insert: vi.fn().mockReturnValue({
+            values: vi.fn().mockReturnThis(),
+            returning: vi.fn().mockResolvedValue([])
+          }),
+          delete: vi.fn().mockReturnValue({
+            where: vi.fn().mockResolvedValue([])
+          })
+        }
+        return await callback(mockTx)
+      })
+
+      vi.mocked(db).transaction = mockTransaction
+      vi.mocked(computeRelationships).mockRejectedValue(new Error('Graph error'))
+
+      const inputChunks: ChunkData[] = [
+        { content: 'Test', startTime: 0, endTime: 5000, segmentIndices: [0] }
+      ]
+
+      const result = await embedChunks(inputChunks, undefined, 789)
+
+      expect(result).toHaveProperty('relationshipsCreated', 0)
     })
   })
 })

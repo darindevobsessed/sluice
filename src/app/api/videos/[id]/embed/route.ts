@@ -11,6 +11,7 @@ interface EmbedResponse {
   alreadyEmbedded?: boolean;
   chunkCount: number;
   durationMs?: number;
+  relationshipsCreated?: number;
   error?: string;
 }
 
@@ -131,6 +132,7 @@ export async function POST(
       alreadyEmbedded: false,
       chunkCount: embeddingResult.successCount,
       durationMs: embeddingResult.durationMs,
+      relationshipsCreated: embeddingResult.relationshipsCreated,
     });
   } catch (error) {
     console.error('Error generating embeddings:', error);

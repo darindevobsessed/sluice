@@ -8,8 +8,8 @@ updated: 2026-02-06
 cycle: mcp-intelligence
 story_number: 2
 chunks_total: 5
-chunks_complete: 2
-current_chunk: 3
+chunks_complete: 3
+current_chunk: 4
 ---
 
 # Story: Graph RAG
