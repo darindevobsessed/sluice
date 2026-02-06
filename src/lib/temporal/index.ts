@@ -3,3 +3,4 @@
  */
 
 export type { TemporalMetadata, TemporalExtraction } from './types'
+export { extractTemporalMetadata } from './extract'
