@@ -136,3 +136,154 @@ Calling setState synchronously within an effect body causes cascading renders th
   101:27  warning  '_response' is defined but never used  @typescript-eslint/no-unused-vars
 
 ✖ 9 problems (1 error, 8 warnings)
+---
+timestamp: "2026-02-06 15:23:13"
+story: "2-graph-rag"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Suites 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/lib/graph/__tests__/compute-relationships.test.ts[2m [ src/lib/graph/__tests__/compute-relationships.test.ts ][22m
+[31m[1mError[22m: Failed to resolve import "../compute-relationships" from "src/lib/graph/__tests__/compute-relationships.test.ts". Does the file exist?[39m
+  Plugin: [35mvite:import-analysis[39m
+  File: [36m/Users/darindrobinski/dev/repos/gold-miner/src/lib/graph/__tests__/compute-relationships.test.ts[39m:3:37
+[33m  1  |  import { describe, it, expect, beforeEach, afterAll, vi } from "vitest";
+  2  |  import { setupTestDb, teardownTestDb, getTestDb, schema } from "@/lib/db/__tests__/setup";
+  3  |  import { computeRelationships } from "../compute-relationships";
+     |                                        ^
+  4  |  describe("computeRelationships", () => {
+  5  |    beforeEach(async () => {[39m
+[90m [2m❯[22m TransformPluginContext._formatLog node_modules/vite/dist/node/chunks/config.js:[2m28999:43[22m[39m
+[90m [2m❯[22m TransformPluginContext.error node_modules/vite/dist/node/chunks/config.js:[2m28996:14[22m[39m
+[90m [2m❯[22m normalizeUrl node_modules/vite/dist/node/chunks/config.js:[2m27119:18[22m[39m
+[90m [2m❯[22m node_modules/vite/dist/node/chunks/config.js:[2m27177:32[22m[39m
+[90m [2m❯[22m TransformPluginContext.transform node_modules/vite/dist/node/chunks/config.js:[2m27145:4[22m[39m
+[90m [2m❯[22m EnvironmentPluginContainer.transform node_modules/vite/dist/node/chunks/config.js:[2m28797:14[22m[39m
+[90m [2m❯[22m loadAndTransform node_modules/vite/dist/node/chunks/config.js:[2m22670:26[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/lib/graph/__tests__/compute-relationships.test.ts --run
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/lib/graph/__tests__/compute-relationships.test.ts [2m([22m[2m0 test[22m[2m)[22m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [2mno tests[22m
+[2m   Start at [22m 15:23:11
+[2m   Duration [22m 2.03s[2m (transform 37ms, setup 248ms, import 0ms, tests 0ms, environment 1.51s)[22m
+---
+timestamp: "2026-02-06 15:23:42"
+story: "2-graph-rag"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 3 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/lib/graph/__tests__/compute-relationships.test.ts[2m > [22mcomputeRelationships[2m > [22mnormal operation[2m > [22mcreates relationships between similar chunks
+[31m[1mError[22m: Failed query: select "id", "source_chunk_id", "target_chunk_id", "similarity", "created_at" from "relationships" where "relationships"."source_chunk_id"
+params: [39m
+[90m [2m❯[22m NodePgPreparedQuery.queryWithCache node_modules/drizzle-orm/pg-core/session.js:[2m41:15[22m[39m
+[90m [2m❯[22m node_modules/drizzle-orm/node-postgres/session.js:[2m117:22[22m[39m
+[36m [2m❯[22m src/lib/graph/__tests__/compute-relationships.test.ts:[2m64:29[22m[39m
+    [90m 62| [39m
+    [90m 63| [39m      [90m// Verify relationships were created[39m
+    [90m 64| [39m      [35mconst[39m relationships [33m=[39m [35mawait[39m db
+    [90m   | [39m                            [31m^[39m
+    [90m 65| [39m        [33m.[39m[34mselect[39m()
+    [90m 66| [39m        [33m.[39m[35mfrom[39m(schema[33m.[39mrelationships)
+
+[31m[1mCaused by: error[22m: argument of WHERE must be type boolean, not type integer[39m
+[90m [2m❯[22m node_modules/pg-pool/index.js:[2m45:11[22m[39m
+[90m [2m❯[22m node_modules/drizzle-orm/node-postgres/session.js:[2m124:18[22m[39m
+[90m [2m❯[22m NodePgPreparedQuery.queryWithCache node_modules/drizzle-orm/pg-core/session.js:[2m39:16[22m[39m
+[90m [2m❯[22m node_modules/drizzle-orm/node-postgres/session.js:[2m117:22[22m[39m
+[36m [2m❯[22m src/lib/graph/__tests__/compute-relationships.test.ts:[2m64:29[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[22m[39m
+[31m[1mSerialized Error:[22m[39m [90m{ length: 130, severity: 'ERROR', code: '42804', detail: undefined, hint: undefined, position: '106', internalPosition: undefined, internalQuery: undefined, where: undefined, schema: undefined, table: undefined, dataType: undefined, constraint: undefined, file: 'parse_coerce.c', routine: 'coerce_to_boolean' }[39m
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/lib/graph/__tests__/compute-relationships.test.ts[2m > [22mcomputeRelationships[2m > [22medge cases[2m > [22mhandles chunks without embeddings
+[31m[1mAssertionError[22m: expected 0 to be greater than 0[39m
+[36m [2m❯[22m src/lib/graph/__tests__/compute-relationships.test.ts:[2m267:30[22m[39m
+    [90m265| [39m      [90m// Should skip chunks without embeddings[39m
+    [90m266| [39m      [34mexpect[39m(result[33m.[39mcreated)[33m.[39m[34mtoBe[39m([34m0[39m)
+    [90m267| [39m      [34mexpect[39m(result[33m.[39mskipped)[33m.[39m[34mtoBeGreaterThan[39m([34m0[39m)
+    [90m   | [39m                             [31m^[39m
+    [90m268| [39m    })
+    [90m269| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/lib/graph/__tests__/compute-relationships.test.ts[2m > [22mcomputeRelationships[2m > [22medge cases[2m > [22mskips self-relationships
+[31m[1mError[22m: Failed query: select "id", "source_chunk_id", "target_chunk_id", "similarity", "created_at" from "relationships" where "relationships"."source_chunk_id"
+params: [39m
+[90m [2m❯[22m NodePgPreparedQuery.queryWithCache node_modules/drizzle-orm/pg-core/session.js:[2m41:15[22m[39m
+[90m [2m❯[22m node_modules/drizzle-orm/node-postgres/session.js:[2m117:22[22m[39m
+[36m [2m❯[22m src/lib/graph/__tests__/compute-relationships.test.ts:[2m292:32[22m[39m
+    [90m290| [39m
+    [90m291| [39m      [90m// Verify no self-relationship (A->A)[39m
+    [90m292| [39m      [35mconst[39m selfRelationship [33m=[39m [35mawait[39m db
+    [90m   | [39m                               [31m^[39m
+    [90m293| [39m        [33m.[39m[34mselect[39m()
+    [90m294| [39m        [33m.[39m[35mfrom[39m(schema[33m.[39mrelationships)
+
+[31m[1mCaused by: error[22m: argument of WHERE must be type boolean, not type integer[39m
+[90m [2m❯[22m node_modules/pg-pool/index.js:[2m45:11[22m[39m
+[90m [2m❯[22m node_modules/drizzle-orm/node-postgres/session.js:[2m124:18[22m[39m
+[90m [2m❯[22m NodePgPreparedQuery.queryWithCache node_modules/drizzle-orm/pg-core/session.js:[2m39:16[22m[39m
+[90m [2m❯[22m node_modules/drizzle-orm/node-postgres/session.js:[2m117:22[22m[39m
+[36m [2m❯[22m src/lib/graph/__tests__/compute-relationships.test.ts:[2m292:32[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[22m[39m
+[31m[1mSerialized Error:[22m[39m [90m{ length: 130, severity: 'ERROR', code: '42804', detail: undefined, hint: undefined, position: '106', internalPosition: undefined, internalQuery: undefined, where: undefined, schema: undefined, table: undefined, dataType: undefined, constraint: undefined, file: 'parse_coerce.c', routine: 'coerce_to_boolean' }[39m
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/lib/graph/__tests__/compute-relationships.test.ts --run
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/lib/graph/__tests__/compute-relationships.test.ts [2m([22m[2m11 tests[22m[2m | [22m[31m3 failed[39m[2m)[22m[33m 792[2mms[22m[39m
+[31m       [31m×[31m creates relationships between similar chunks[39m[32m 112[2mms[22m[39m
+       [32m✓[39m returns correct counts[32m 90[2mms[22m[39m
+       [32m✓[39m only creates relationships above threshold[32m 75[2mms[22m[39m
+       [32m✓[39m respects custom threshold[32m 69[2mms[22m[39m
+       [32m✓[39m handles empty video (no chunks)[32m 53[2mms[22m[39m
+       [32m✓[39m handles video with single chunk[32m 50[2mms[22m[39m
+[31m       [31m×[31m handles chunks without embeddings[39m[32m 67[2mms[22m[39m
+[31m       [31m×[31m skips self-relationships[39m[32m 65[2mms[22m[39m
+       [32m✓[39m prevents duplicate relationships on re-run[32m 77[2mms[22m[39m
+       [32m✓[39m calls progress callback with updates[32m 77[2mms[22m[39m
+       [32m✓[39m works without progress callback[32m 54[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m3 failed[39m[22m[2m | [22m[1m[32m8 passed[39m[22m[90m (11)[39m
+[2m   Start at [22m 15:23:39
+[2m   Duration [22m 3.11s[2m (transform 110ms, setup 165ms, import 718ms, tests 792ms, environment 980ms)[22m
+---
+timestamp: "2026-02-06 15:32:56"
+story: "2-graph-rag"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+npm error Missing script: "typecheck"
+npm error
+npm error To see a list of scripts, run:
+npm error   npm run
+npm error A complete log of this run can be found in: /Users/darindrobinski/.npm/_logs/2026-02-06T21_32_56_468Z-debug-0.log
