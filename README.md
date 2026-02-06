@@ -44,3 +44,43 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## MCP Integration
+
+Gold Miner exposes a Model Context Protocol (MCP) server, allowing external AI tools to query the knowledge base.
+
+### Available Tools
+
+| Tool | Description | Parameters |
+|------|-------------|------------|
+| `search_rag` | Search the knowledge base | `topic` (required), `creator` (optional), `limit` (optional) |
+| `get_list_of_creators` | List all channels with video counts | none |
+
+### Claude Desktop Setup
+
+Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_desktop_config.json`):
+
+```json
+{
+  "mcpServers": {
+    "gold-miner": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "http://localhost:3000/api/mcp/mcp"]
+    }
+  }
+}
+```
+
+### Authentication
+
+Auth is disabled by default for local development. To enable:
+
+```bash
+MCP_AUTH_ENABLED=true
+MCP_AUTH_TOKEN=your-secret-token
+```
+
+When auth is enabled, include the token in requests:
+```
+Authorization: Bearer your-secret-token
+```
