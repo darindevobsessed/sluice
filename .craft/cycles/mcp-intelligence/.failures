@@ -1,0 +1,138 @@
+---
+timestamp: "2026-02-06 15:07:53"
+story: "2-graph-rag"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+> gold-miner@0.1.0 test
+> vitest run src/lib/db/__tests__/relationships.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/lib/db/__tests__/relationships.test.ts [2m([22m[2m9 tests[22m[2m | [22m[31m9 failed[39m[2m)[22m[32m 212[2mms[22m[39m
+[31m     [31m×[31m creates relationship between chunks[39m[32m 47[2mms[22m[39m
+[31m     [31m×[31m enforces unique constraint on source-target pair[39m[32m 27[2mms[22m[39m
+[31m     [31m×[31m allows reverse relationship (different edge)[39m[32m 24[2mms[22m[39m
+[31m     [31m×[31m queries relationships by source chunk[39m[32m 18[2mms[22m[39m
+[31m     [31m×[31m queries relationships by target chunk[39m[32m 19[2mms[22m[39m
+[31m     [31m×[31m cascades delete when chunk is deleted[39m[32m 18[2mms[22m[39m
+[31m     [31m×[31m handles similarity values at boundaries[39m[32m 19[2mms[22m[39m
+[31m     [31m×[31m handles negative similarity values[39m[32m 21[2mms[22m[39m
+[31m     [31m×[31m handles multiple relationships from same source[39m[32m 18[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 9 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/lib/db/__tests__/relationships.test.ts[2m > [22mrelationships table schema (Postgres)[2m > [22mcreates relationship between chunks
+[41m[1m FAIL [22m[49m src/lib/db/__tests__/relationships.test.ts[2m > [22mrelationships table schema (Postgres)[2m > [22menforces unique constraint on source-target pair
+[41m[1m FAIL [22m[49m src/lib/db/__tests__/relationships.test.ts[2m > [22mrelationships table schema (Postgres)[2m > [22mallows reverse relationship (different edge)
+[41m[1m FAIL [22m[49m src/lib/db/__tests__/relationships.test.ts[2m > [22mrelationships table schema (Postgres)[2m > [22mqueries relationships by source chunk
+[41m[1m FAIL [22m[49m src/lib/db/__tests__/relationships.test.ts[2m > [22mrelationships table schema (Postgres)[2m > [22mqueries relationships by target chunk
+[41m[1m FAIL [22m[49m src/lib/db/__tests__/relationships.test.ts[2m > [22mrelationships table schema (Postgres)[2m > [22mcascades delete when chunk is deleted
+[31m[1merror[22m: relation "relationships" does not exist[39m
+[90m [2m❯[22m node_modules/pg-pool/index.js:[2m45:11[22m[39m
+[36m [2m❯[22m setupTestDb src/lib/db/__tests__/setup.ts:[2m21:3[22m[39m
+    [90m 19| [39m
+    [90m 20| [39m  [90m// Clean tables before each test[39m
+    [90m 21| [39m  await pool.query('TRUNCATE videos, insights, channels, settings, chu…
+    [90m   | [39m  [31m^[39m
+    [90m 22| [39m
+    [90m 23| [39m  [35mreturn[39m testDb[33m![39m[33m;[39m
+[90m [2m❯[22m src/lib/db/__tests__/relationships.test.ts:[2m7:5[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/9]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/lib/db/__tests__/relationships.test.ts[2m > [22medge cases[2m > [22mhandles similarity values at boundaries
+[41m[1m FAIL [22m[49m src/lib/db/__tests__/relationships.test.ts[2m > [22medge cases[2m > [22mhandles negative similarity values
+[41m[1m FAIL [22m[49m src/lib/db/__tests__/relationships.test.ts[2m > [22medge cases[2m > [22mhandles multiple relationships from same source
+[31m[1merror[22m: relation "relationships" does not exist[39m
+[90m [2m❯[22m node_modules/pg-pool/index.js:[2m45:11[22m[39m
+[36m [2m❯[22m setupTestDb src/lib/db/__tests__/setup.ts:[2m21:3[22m[39m
+    [90m 19| [39m
+    [90m 20| [39m  [90m// Clean tables before each test[39m
+    [90m 21| [39m  await pool.query('TRUNCATE videos, insights, channels, settings, chu…
+    [90m   | [39m  [31m^[39m
+    [90m 22| [39m
+    [90m 23| [39m  [35mreturn[39m testDb[33m![39m[33m;[39m
+[90m [2m❯[22m src/lib/db/__tests__/relationships.test.ts:[2m379:5[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/9]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m9 failed[39m[22m[90m (9)[39m
+[2m   Start at [22m 15:07:50
+[2m   Duration [22m 3.00s[2m (transform 104ms, setup 314ms, import 713ms, tests 212ms, environment 1.45s)[22m
+---
+timestamp: "2026-02-06 15:08:20"
+story: "2-graph-rag"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+Did not find any relation named "relationships".
+---
+timestamp: "2026-02-06 15:13:42"
+story: "2-graph-rag"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+npm error Missing script: "typecheck"
+npm error
+npm error To see a list of scripts, run:
+npm error   npm run
+npm error A complete log of this run can be found in: /Users/darindrobinski/.npm/_logs/2026-02-06T21_13_41_781Z-debug-0.log
+---
+timestamp: "2026-02-06 15:14:03"
+story: "2-graph-rag"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+> gold-miner@0.1.0 lint
+> eslint
+
+
+/Users/darindrobinski/dev/repos/gold-miner/src/components/add-video/__tests__/AddVideoPage.test.tsx
+  15:36  warning  '_videoId' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/darindrobinski/dev/repos/gold-miner/src/components/search/ChunkResult.tsx
+  5:17  warning  'Video' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/darindrobinski/dev/repos/gold-miner/src/components/search/__tests__/ChunkResult.test.tsx
+  1:32  warning  'vi' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/darindrobinski/dev/repos/gold-miner/src/hooks/useSearch.ts
+  48:7  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/darindrobinski/dev/repos/gold-miner/src/hooks/useSearch.ts:48:7
+  46 |     // Clear results if query is empty
+  47 |     if (!query.trim()) {
+> 48 |       setResults(null);
+     |       ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  49 |       setError(null);
+  50 |       return;
+  51 |     }  react-hooks/set-state-in-effect
+
+/Users/darindrobinski/dev/repos/gold-miner/src/lib/agent/__tests__/AgentProvider.test.tsx
+  11:32  warning  'callback' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/darindrobinski/dev/repos/gold-miner/src/lib/embeddings/__tests__/pipeline.test.ts
+  6:66  warning  '_text' is defined but never used     @typescript-eslint/no-unused-vars
+  6:81  warning  '_options' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/darindrobinski/dev/repos/gold-miner/src/lib/mcp/__tests__/types.test.ts
+   93:27  warning  '_params' is defined but never used    @typescript-eslint/no-unused-vars
+  101:27  warning  '_response' is defined but never used  @typescript-eslint/no-unused-vars
+
+✖ 9 problems (1 error, 8 warnings)

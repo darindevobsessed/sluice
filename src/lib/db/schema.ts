@@ -1,4 +1,4 @@
-import { pgTable, serial, text, integer, timestamp, jsonb, vector } from 'drizzle-orm/pg-core';
+import { pgTable, serial, text, integer, timestamp, jsonb, vector, real, index, unique } from 'drizzle-orm/pg-core';
 
 /**
  * Videos table - stores YouTube video metadata and transcripts
@@ -69,6 +69,23 @@ export const chunks = pgTable('chunks', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
+/**
+ * Relationships table for Graph RAG
+ * Stores chunk-to-chunk edges with similarity scores
+ * Enables knowledge graph traversal and related content discovery
+ */
+export const relationships = pgTable('relationships', {
+  id: serial('id').primaryKey(),
+  sourceChunkId: integer('source_chunk_id').references(() => chunks.id, { onDelete: 'cascade' }).notNull(),
+  targetChunkId: integer('target_chunk_id').references(() => chunks.id, { onDelete: 'cascade' }).notNull(),
+  similarity: real('similarity').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+}, (table) => ({
+  sourceIdx: index('relationships_source_idx').on(table.sourceChunkId),
+  targetIdx: index('relationships_target_idx').on(table.targetChunkId),
+  uniqueEdge: unique('unique_edge').on(table.sourceChunkId, table.targetChunkId),
+}));
+
 // Type exports for use in application code
 export type Video = typeof videos.$inferSelect;
 export type NewVideo = typeof videos.$inferInsert;
@@ -84,3 +101,6 @@ export type NewSetting = typeof settings.$inferInsert;
 
 export type Chunk = typeof chunks.$inferSelect;
 export type NewChunk = typeof chunks.$inferInsert;
+
+export type Relationship = typeof relationships.$inferSelect;
+export type NewRelationship = typeof relationships.$inferInsert;
