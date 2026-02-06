@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest'
-import { registerSearchRag } from '../tools'
+import { registerSearchRag, registerGetListOfCreators } from '../tools'
 import type { SearchResult } from '@/lib/search/types'
 import type { VideoResult } from '@/lib/search/aggregate'
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
@@ -11,6 +11,10 @@ vi.mock('@/lib/search/hybrid-search', () => ({
 
 vi.mock('@/lib/search/aggregate', () => ({
   aggregateByVideo: vi.fn(),
+}))
+
+vi.mock('@/lib/db/search', () => ({
+  getDistinctChannels: vi.fn(),
 }))
 
 vi.mock('@/lib/db', () => ({
@@ -26,6 +30,7 @@ vi.mock('@/lib/embeddings/pipeline', () => ({
 // Import mocked functions
 import { hybridSearch } from '@/lib/search/hybrid-search'
 import { aggregateByVideo } from '@/lib/search/aggregate'
+import { getDistinctChannels } from '@/lib/db/search'
 
 describe('registerSearchRag', () => {
   let mockServer: {
@@ -343,5 +348,99 @@ describe('registerSearchRag', () => {
     const result = await toolHandler({ topic: 'test' })
 
     expect(result.content[0]?.text).toContain('"startTime": null')
+  })
+})
+
+describe('registerGetListOfCreators', () => {
+  let mockServer: {
+    registerTool: Mock
+  }
+  let toolHandler: () => Promise<{
+    content: Array<{ type: string; text: string }>
+  }>
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+
+    // Create mock server that captures the tool handler
+    mockServer = {
+      registerTool: vi.fn((name, config, handler) => {
+        toolHandler = handler
+      }),
+    }
+
+    // Register the tool
+    registerGetListOfCreators(mockServer as unknown as McpServer)
+  })
+
+  it('registers get_list_of_creators tool with correct configuration', () => {
+    expect(mockServer.registerTool).toHaveBeenCalledTimes(1)
+    expect(mockServer.registerTool).toHaveBeenCalledWith(
+      'get_list_of_creators',
+      expect.objectContaining({
+        title: 'Get List of Creators',
+        description: expect.any(String),
+        inputSchema: {},
+      }),
+      expect.any(Function)
+    )
+  })
+
+  it('returns creators with video counts sorted by count descending', async () => {
+    const mockCreators = [
+      { channel: 'JavaScript Mastery', videoCount: 15 },
+      { channel: 'Fireship', videoCount: 10 },
+      { channel: 'Web Dev Simplified', videoCount: 5 },
+    ]
+
+    ;(getDistinctChannels as Mock).mockResolvedValue(mockCreators)
+
+    const result = await toolHandler()
+
+    expect(getDistinctChannels).toHaveBeenCalledTimes(1)
+    expect(result).toEqual({
+      content: [{ type: 'text', text: JSON.stringify(mockCreators, null, 2) }],
+    })
+  })
+
+  it('returns empty array when no videos exist', async () => {
+    ;(getDistinctChannels as Mock).mockResolvedValue([])
+
+    const result = await toolHandler()
+
+    expect(getDistinctChannels).toHaveBeenCalledTimes(1)
+    expect(result).toEqual({
+      content: [{ type: 'text', text: JSON.stringify([], null, 2) }],
+    })
+  })
+
+  it('handles single creator correctly', async () => {
+    const mockCreators = [
+      { channel: 'Solo Creator', videoCount: 1 },
+    ]
+
+    ;(getDistinctChannels as Mock).mockResolvedValue(mockCreators)
+
+    const result = await toolHandler()
+
+    expect(result.content[0]?.text).toContain('Solo Creator')
+    expect(result.content[0]?.text).toContain('"videoCount": 1')
+  })
+
+  it('preserves exact order from database query', async () => {
+    const mockCreators = [
+      { channel: 'Creator A', videoCount: 100 },
+      { channel: 'Creator B', videoCount: 50 },
+      { channel: 'Creator C', videoCount: 25 },
+    ]
+
+    ;(getDistinctChannels as Mock).mockResolvedValue(mockCreators)
+
+    const result = await toolHandler()
+    const parsed = JSON.parse(result.content[0]?.text ?? '[]')
+
+    expect(parsed).toEqual(mockCreators)
+    expect(parsed[0]?.channel).toBe('Creator A')
+    expect(parsed[2]?.channel).toBe('Creator C')
   })
 })

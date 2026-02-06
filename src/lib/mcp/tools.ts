@@ -2,6 +2,7 @@ import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { z } from 'zod'
 import { hybridSearch } from '@/lib/search/hybrid-search'
 import { aggregateByVideo } from '@/lib/search/aggregate'
+import { getDistinctChannels } from '@/lib/db/search'
 
 /**
  * Register the search_rag tool with the MCP server.
@@ -38,6 +39,31 @@ export function registerSearchRag(server: McpServer): void {
       // Return formatted response
       return {
         content: [{ type: 'text', text: JSON.stringify(videos, null, 2) }],
+      }
+    }
+  )
+}
+
+/**
+ * Register the get_list_of_creators tool with the MCP server.
+ *
+ * This tool returns all distinct YouTube channels (creators) in the knowledge base
+ * with their video counts, sorted by video count descending.
+ *
+ * @param server - MCP server instance to register the tool with
+ */
+export function registerGetListOfCreators(server: McpServer): void {
+  server.registerTool(
+    'get_list_of_creators',
+    {
+      title: 'Get List of Creators',
+      description: 'Returns all distinct YouTube channels (creators) in the knowledge base with video counts',
+      inputSchema: {},
+    },
+    async () => {
+      const creators = await getDistinctChannels()
+      return {
+        content: [{ type: 'text', text: JSON.stringify(creators, null, 2) }],
       }
     }
   )

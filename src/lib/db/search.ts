@@ -55,3 +55,24 @@ export async function getVideoStats(dbInstance = defaultDb): Promise<{
     channels: Number(channelsResult[0]?.channels ?? 0),
   };
 }
+
+/**
+ * Get all distinct channels (creators) with their video counts
+ * Returns results sorted by video count descending
+ * @param dbInstance - Optional database instance (for testing)
+ */
+export async function getDistinctChannels(dbInstance = defaultDb): Promise<Array<{ channel: string; videoCount: number }>> {
+  const results = await dbInstance
+    .select({
+      channel: videos.channel,
+      videoCount: sql<number>`count(*)`,
+    })
+    .from(videos)
+    .groupBy(videos.channel)
+    .orderBy(sql`count(*) desc`)
+
+  return results.map(r => ({
+    channel: r.channel,
+    videoCount: Number(r.videoCount),
+  }))
+}

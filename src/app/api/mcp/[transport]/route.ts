@@ -1,6 +1,6 @@
 import { createMcpHandler } from 'mcp-handler'
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
-import { registerSearchRag } from '@/lib/mcp/tools'
+import { registerSearchRag, registerGetListOfCreators } from '@/lib/mcp/tools'
 
 /**
  * MCP Route Handler for Gold Miner
@@ -10,8 +10,6 @@ import { registerSearchRag } from '@/lib/mcp/tools'
  *
  * Available tools:
  * - search_rag: Search the knowledge base with optional creator filtering
- *
- * Future tools:
  * - get_list_of_creators: List all creators with video counts
  */
 
@@ -21,6 +19,7 @@ import { registerSearchRag } from '@/lib/mcp/tools'
  */
 async function initializeServer(server: McpServer): Promise<void> {
   registerSearchRag(server)
+  registerGetListOfCreators(server)
 }
 
 /**

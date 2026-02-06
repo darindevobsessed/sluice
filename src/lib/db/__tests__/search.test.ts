@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterAll } from 'vitest';
 import { setupTestDb, teardownTestDb, getTestDb, schema } from './setup';
-import { searchVideos, getVideoStats } from '../search';
+import { searchVideos, getVideoStats, getDistinctChannels } from '../search';
 
 describe('searchVideos (Postgres)', () => {
   beforeEach(async () => {
@@ -256,5 +256,159 @@ describe('getVideoStats (Postgres)', () => {
 
     const stats = await getVideoStats(db);
     expect(stats.channels).toBe(2); // Only 2 unique channels
+  });
+});
+
+describe('getDistinctChannels (Postgres)', () => {
+  beforeEach(async () => {
+    await setupTestDb();
+  });
+
+  afterAll(async () => {
+    await teardownTestDb();
+  });
+
+  it('returns empty array when no videos exist', async () => {
+    const db = getTestDb();
+    const creators = await getDistinctChannels(db);
+    expect(creators).toEqual([]);
+  });
+
+  it('returns single channel with correct video count', async () => {
+    const db = getTestDb();
+
+    await db.insert(schema.videos).values([
+      {
+        youtubeId: 'vid1',
+        title: 'Video 1',
+        channel: 'Solo Creator',
+        transcript: 'Content',
+        duration: 600,
+      },
+    ]);
+
+    const creators = await getDistinctChannels(db);
+    expect(creators).toEqual([
+      { channel: 'Solo Creator', videoCount: 1 },
+    ]);
+  });
+
+  it('returns multiple channels with correct video counts', async () => {
+    const db = getTestDb();
+
+    await db.insert(schema.videos).values([
+      {
+        youtubeId: 'vid1',
+        title: 'Video 1',
+        channel: 'Channel A',
+        transcript: 'Content',
+        duration: 600,
+      },
+      {
+        youtubeId: 'vid2',
+        title: 'Video 2',
+        channel: 'Channel A',
+        transcript: 'Content',
+        duration: 900,
+      },
+      {
+        youtubeId: 'vid3',
+        title: 'Video 3',
+        channel: 'Channel B',
+        transcript: 'Content',
+        duration: 1200,
+      },
+    ]);
+
+    const creators = await getDistinctChannels(db);
+    expect(creators).toHaveLength(2);
+    expect(creators).toContainEqual({ channel: 'Channel A', videoCount: 2 });
+    expect(creators).toContainEqual({ channel: 'Channel B', videoCount: 1 });
+  });
+
+  it('sorts channels by video count descending', async () => {
+    const db = getTestDb();
+
+    await db.insert(schema.videos).values([
+      {
+        youtubeId: 'vid1',
+        title: 'Video 1',
+        channel: 'Small Channel',
+        transcript: 'Content',
+        duration: 600,
+      },
+      {
+        youtubeId: 'vid2',
+        title: 'Video 2',
+        channel: 'Big Channel',
+        transcript: 'Content',
+        duration: 900,
+      },
+      {
+        youtubeId: 'vid3',
+        title: 'Video 3',
+        channel: 'Big Channel',
+        transcript: 'Content',
+        duration: 1200,
+      },
+      {
+        youtubeId: 'vid4',
+        title: 'Video 4',
+        channel: 'Big Channel',
+        transcript: 'Content',
+        duration: 1500,
+      },
+      {
+        youtubeId: 'vid5',
+        title: 'Video 5',
+        channel: 'Medium Channel',
+        transcript: 'Content',
+        duration: 1800,
+      },
+      {
+        youtubeId: 'vid6',
+        title: 'Video 6',
+        channel: 'Medium Channel',
+        transcript: 'Content',
+        duration: 2100,
+      },
+    ]);
+
+    const creators = await getDistinctChannels(db);
+    expect(creators).toEqual([
+      { channel: 'Big Channel', videoCount: 3 },
+      { channel: 'Medium Channel', videoCount: 2 },
+      { channel: 'Small Channel', videoCount: 1 },
+    ]);
+  });
+
+  it('handles channels with identical video counts', async () => {
+    const db = getTestDb();
+
+    await db.insert(schema.videos).values([
+      {
+        youtubeId: 'vid1',
+        title: 'Video 1',
+        channel: 'Channel A',
+        transcript: 'Content',
+        duration: 600,
+      },
+      {
+        youtubeId: 'vid2',
+        title: 'Video 2',
+        channel: 'Channel B',
+        transcript: 'Content',
+        duration: 900,
+      },
+    ]);
+
+    const creators = await getDistinctChannels(db);
+    expect(creators).toHaveLength(2);
+    // Both should have videoCount: 1
+    expect(creators.every(c => c.videoCount === 1)).toBe(true);
+    // Should contain both channels
+    const channels = creators.map(c => c.channel);
+    expect(channels).toContain('Channel A');
+    expect(channels).toContain('Channel B');
   });
 });
