@@ -221,12 +221,15 @@ Discovery is a "browse" page — denser layout is acceptable. Horizontal scroll 
 **Type:** component
 **Choice:** inline
 **Locked:** 2026-02-03
-**Context:** Instant feedback, no mode switching
+**Updated:** 2026-02-06
+**Context:** Instant feedback, no mode switching — now with hybrid RAG search
 
 **Specification:**
 - Search input in Knowledge Bank header
-- Results filter in real-time as user types
-- Full-text search via SQLite FTS5
+- Results filter in real-time as user types (debounced 300ms)
+- **Hybrid search:** Vector similarity + keyword matching combined with Reciprocal Rank Fusion (RRF)
+- Three modes available: vector, keyword, hybrid (default)
+- Results grouped by video with chunk previews
 - Clear button to reset
 
 ### Claude Insights UI
@@ -387,6 +390,89 @@ Each action type gets a card with three states:
 **Locked:** 2026-02-03
 **Value:** Generous
 **Context:** Content breathes, not cramped
+
+---
+
+---
+
+## Technical Patterns
+
+### Hybrid Search with RRF
+
+**Locked:** 2026-02-06
+**Location:** `src/lib/search/hybrid-search.ts`
+
+**Description:** Sophisticated search combining vector similarity (pgvector) and keyword matching using Reciprocal Rank Fusion algorithm.
+
+**Key elements:**
+- Three modes: vector, keyword, hybrid (default)
+- RRF constant k=60 for balanced fusion
+- Fetches 2x results from each method before fusion
+- Local FastEmbed embeddings (`all-MiniLM-L6-v2`, 384 dimensions)
+- Results grouped by video with chunk previews
+
+---
+
+### Agent Server Architecture
+
+**Locked:** 2026-02-06
+**Location:** `src/agent/`
+
+**Description:** Separate WebSocket server for Claude Agent SDK integration, runs concurrently with Next.js dev server.
+
+**Key elements:**
+- Token-based authentication (`.agent-token` file)
+- Graceful shutdown with cleanup
+- Runs via `npm run dev` (concurrently with Next.js)
+- Handles chat sessions with video context
+
+---
+
+### Embedding Pipeline with Progress
+
+**Locked:** 2026-02-06
+**Location:** `src/lib/embeddings/service.ts`
+
+**Description:** Batched embedding generation with progress callbacks and database transaction handling.
+
+**Key elements:**
+- Batch size of 32 for optimal throughput
+- Progress callback after each batch
+- Error handling per chunk (continues on failure)
+- Transaction-based database storage (delete old + insert new)
+- Timestamps stored in seconds, processing in milliseconds
+
+---
+
+### Zod Validation at API Boundaries
+
+**Locked:** 2026-02-06
+**Location:** `src/app/api/*/route.ts`
+
+**Description:** Request validation with Zod schemas at all API entry points.
+
+**Key elements:**
+- Schema defined near route handler
+- `safeParse()` for validation
+- User-friendly error messages extracted from first error
+- Consistent 400 response format
+- Type inference from Zod schema
+
+---
+
+### Colocated Tests
+
+**Locked:** 2026-02-06
+**Location:** `src/**/__tests__/`
+
+**Description:** Tests organized in `__tests__/` directories next to the code they test, grouped by domain.
+
+**Key elements:**
+- Unit tests for components (React Testing Library)
+- Integration tests for API routes
+- Mocked Next.js primitives (Image, Link)
+- Vitest with jsdom environment
+- Database tests use better-sqlite3 for speed
 
 ---
 
