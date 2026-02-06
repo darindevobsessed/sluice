@@ -8,7 +8,7 @@ updated: 2026-02-05
 cycle: rag-foundation
 story_number: 2
 chunks_total: 3
-chunks_complete: 0
+chunks_complete: 1
 ---
 
 # Story: Programmatic Transcripts
