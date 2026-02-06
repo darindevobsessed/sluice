@@ -917,3 +917,113 @@ error: |
 [2m      Tests [22m [2mno tests[22m
 [2m   Start at [22m 15:59:22
 [2m   Duration [22m 1.64s[2m (transform 35ms, setup 170ms, import 0ms, tests 0ms, environment 1.01s)[22m
+---
+timestamp: "2026-02-06 16:08:34"
+story: "2-graph-rag"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Suites 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/components/video/__tests__/RelatedTab.test.tsx[2m [ src/components/video/__tests__/RelatedTab.test.tsx ][22m
+[31m[1mError[22m: Failed to resolve import "../RelatedTab" from "src/components/video/__tests__/RelatedTab.test.tsx". Does the file exist?[39m
+  Plugin: [35mvite:import-analysis[39m
+  File: [36m/Users/darindrobinski/dev/repos/gold-miner/src/components/video/__tests__/RelatedTab.test.tsx[39m:3:0
+[33m  8  |  const __vi_import_0__ = await import("react/jsx-dev-runtime");
+  9  |  const __vi_import_1__ = await import("@testing-library/react");
+  10 |  const __vi_import_2__ = await import("../RelatedTab");
+     |                                       ^
+  11 |  
+  12 |  import { describe, it, expect, beforeEach, vi } from "vitest";[39m
+[90m [2m❯[22m TransformPluginContext._formatLog node_modules/vite/dist/node/chunks/config.js:[2m28999:43[22m[39m
+[90m [2m❯[22m TransformPluginContext.error node_modules/vite/dist/node/chunks/config.js:[2m28996:14[22m[39m
+[90m [2m❯[22m normalizeUrl node_modules/vite/dist/node/chunks/config.js:[2m27119:18[22m[39m
+[90m [2m❯[22m node_modules/vite/dist/node/chunks/config.js:[2m27177:32[22m[39m
+[90m [2m❯[22m TransformPluginContext.transform node_modules/vite/dist/node/chunks/config.js:[2m27145:4[22m[39m
+[90m [2m❯[22m EnvironmentPluginContainer.transform node_modules/vite/dist/node/chunks/config.js:[2m28797:14[22m[39m
+[90m [2m❯[22m loadAndTransform node_modules/vite/dist/node/chunks/config.js:[2m22670:26[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/components/video/__tests__/RelatedTab.test.tsx --run
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/components/video/__tests__/RelatedTab.test.tsx [2m([22m[2m0 test[22m[2m)[22m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [2mno tests[22m
+[2m   Start at [22m 16:08:32
+[2m   Duration [22m 1.96s[2m (transform 34ms, setup 187ms, import 0ms, tests 0ms, environment 1.19s)[22m
+---
+timestamp: "2026-02-06 16:13:50"
+story: "2-graph-rag"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+npm error Missing script: "typecheck"
+npm error
+npm error To see a list of scripts, run:
+npm error   npm run
+npm error A complete log of this run can be found in: /Users/darindrobinski/.npm/_logs/2026-02-06T22_13_50_589Z-debug-0.log
+---
+timestamp: "2026-02-06 16:14:26"
+story: "2-graph-rag"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+> gold-miner@0.1.0 lint
+> eslint
+
+
+/Users/darindrobinski/dev/repos/gold-miner/src/components/add-video/__tests__/AddVideoPage.test.tsx
+  15:36  warning  '_videoId' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/darindrobinski/dev/repos/gold-miner/src/components/search/ChunkResult.tsx
+  5:17  warning  'Video' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/darindrobinski/dev/repos/gold-miner/src/components/search/__tests__/ChunkResult.test.tsx
+  1:32  warning  'vi' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/darindrobinski/dev/repos/gold-miner/src/components/video/RelatedTab.tsx
+  36:17  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+/Users/darindrobinski/dev/repos/gold-miner/src/hooks/useSearch.ts
+  48:7  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/darindrobinski/dev/repos/gold-miner/src/hooks/useSearch.ts:48:7
+  46 |     // Clear results if query is empty
+  47 |     if (!query.trim()) {
+> 48 |       setResults(null);
+     |       ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  49 |       setError(null);
+  50 |       return;
+  51 |     }  react-hooks/set-state-in-effect
+
+/Users/darindrobinski/dev/repos/gold-miner/src/lib/agent/__tests__/AgentProvider.test.tsx
+  11:32  warning  'callback' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/darindrobinski/dev/repos/gold-miner/src/lib/embeddings/__tests__/pipeline.test.ts
+  6:66  warning  '_text' is defined but never used     @typescript-eslint/no-unused-vars
+  6:81  warning  '_options' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/darindrobinski/dev/repos/gold-miner/src/lib/mcp/__tests__/types.test.ts
+   93:27  warning  '_params' is defined but never used    @typescript-eslint/no-unused-vars
+  101:27  warning  '_response' is defined but never used  @typescript-eslint/no-unused-vars
+
+✖ 10 problems (2 errors, 8 warnings)

@@ -3,6 +3,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { TranscriptView } from '@/components/videos/TranscriptView';
 import { InsightsPanel } from './InsightsPanel';
+import { RelatedTab } from '@/components/video/RelatedTab';
 import { useAgent } from '@/lib/agent/AgentProvider';
 import { useExtraction } from '@/hooks/useExtraction';
 import type { Video } from '@/lib/db/schema';
@@ -35,9 +36,10 @@ export function InsightsTabs({ video, onSeek, className }: InsightsTabsProps) {
 
   return (
     <Tabs defaultValue="transcript" className={className}>
-      <TabsList className="grid w-full grid-cols-2">
+      <TabsList className="grid w-full grid-cols-3">
         <TabsTrigger value="transcript">Transcript</TabsTrigger>
         <TabsTrigger value="insights">Insights</TabsTrigger>
+        <TabsTrigger value="related">Related</TabsTrigger>
       </TabsList>
 
       <TabsContent value="transcript" className="mt-6">
@@ -58,6 +60,10 @@ export function InsightsTabs({ video, onSeek, className }: InsightsTabsProps) {
           agentStatus={agentStatus}
           agentError={agentError || undefined}
         />
+      </TabsContent>
+
+      <TabsContent value="related" className="mt-6">
+        <RelatedTab videoId={video.id} />
       </TabsContent>
     </Tabs>
   );
