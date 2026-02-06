@@ -1,16 +1,18 @@
 import { eq } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
-import { db } from './index';
+import { db as defaultDb } from './index';
 import { insights } from './schema';
 import type { ExtractionResult } from '@/lib/claude/prompts/types';
 
 /**
  * Get extraction for a video
  * @param videoId - Video ID to get extraction for
+ * @param dbInstance - Optional database instance (for testing)
  * @returns Extraction record or null if not found
  */
 export async function getExtractionForVideo(
-  videoId: number
+  videoId: number,
+  dbInstance = defaultDb
 ): Promise<{
   id: string;
   videoId: number;
@@ -19,7 +21,7 @@ export async function getExtractionForVideo(
   createdAt: Date;
   updatedAt: Date;
 } | null> {
-  const results = await db
+  const results = await dbInstance
     .select()
     .from(insights)
     .where(eq(insights.videoId, videoId))
@@ -38,11 +40,13 @@ export async function getExtractionForVideo(
  * Upsert (create or update) extraction for a video
  * @param videoId - Video ID to save extraction for
  * @param extraction - ExtractionResult to save
+ * @param dbInstance - Optional database instance (for testing)
  * @returns Created or updated extraction record
  */
 export async function upsertExtraction(
   videoId: number,
-  extraction: ExtractionResult
+  extraction: ExtractionResult,
+  dbInstance = defaultDb
 ): Promise<{
   id: string;
   videoId: number;
@@ -52,11 +56,11 @@ export async function upsertExtraction(
   updatedAt: Date;
 }> {
   const now = new Date();
-  const existing = await getExtractionForVideo(videoId);
+  const existing = await getExtractionForVideo(videoId, dbInstance);
 
   if (existing) {
     // Update existing
-    await db
+    await dbInstance
       .update(insights)
       .set({
         contentType: extraction.contentType,
@@ -84,7 +88,7 @@ export async function upsertExtraction(
     updatedAt: now,
   };
 
-  await db.insert(insights).values(dbRecord);
+  await dbInstance.insert(insights).values(dbRecord);
 
   return {
     id,
@@ -99,9 +103,11 @@ export async function upsertExtraction(
 /**
  * Delete extraction for a video
  * @param videoId - Video ID to delete extraction for
+ * @param dbInstance - Optional database instance (for testing)
  */
 export async function deleteExtraction(
-  videoId: number
+  videoId: number,
+  dbInstance = defaultDb
 ): Promise<void> {
-  await db.delete(insights).where(eq(insights.videoId, videoId));
+  await dbInstance.delete(insights).where(eq(insights.videoId, videoId));
 }

@@ -9,7 +9,9 @@ export default defineConfig({
     environment: 'jsdom',
     include: ['**/*.test.{ts,tsx}'],
     exclude: ['node_modules', '.next'],
-    setupFiles: ['./vitest.setup.ts'],
+    setupFiles: ['dotenv/config', './vitest.setup.ts'],
+    // Run database tests sequentially to avoid conflicts
+    fileParallelism: false,
   },
   resolve: {
     alias: {

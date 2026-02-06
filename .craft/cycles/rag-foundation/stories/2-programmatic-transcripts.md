@@ -1,7 +1,7 @@
 ---
 name: programmatic-transcripts
 title: Programmatic Transcripts
-status: ready
+status: active
 priority: high
 created: 2026-02-05
 updated: 2026-02-05
