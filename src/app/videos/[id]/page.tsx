@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { VideoPlayer } from '@/components/videos/VideoPlayer';
 import { VideoMetadata } from '@/components/videos/VideoMetadata';
 import { InsightsTabs } from '@/components/insights/InsightsTabs';
+import { EmbedButton } from '@/components/video/EmbedButton';
 import type { Video } from '@/lib/db/schema';
 
 interface VideoDetailPageProps {
@@ -129,8 +130,14 @@ export default function VideoDetailPage({ params }: VideoDetailPageProps) {
         className="mb-8"
       />
 
+      {/* Embedding status and generation */}
+      <EmbedButton
+        videoId={video.id}
+        hasTranscript={!!video.transcript}
+      />
+
       {/* Tabs with Transcript and Insights */}
-      <InsightsTabs video={video} onSeek={handleSeek} />
+      <InsightsTabs video={video} onSeek={handleSeek} className="mt-8" />
     </div>
   );
 }
