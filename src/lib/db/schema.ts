@@ -87,6 +87,24 @@ export const relationships = pgTable('relationships', {
   uniqueEdge: unique('unique_edge').on(table.sourceChunkId, table.targetChunkId),
 }));
 
+/**
+ * Temporal Metadata table for Temporal Graph RAG
+ * Stores chunk-level version mentions and release dates extracted from content
+ * Enables time-aware knowledge discovery and version tracking
+ */
+export const temporalMetadata = pgTable('temporal_metadata', {
+  id: serial('id').primaryKey(),
+  chunkId: integer('chunk_id')
+    .notNull()
+    .references(() => chunks.id, { onDelete: 'cascade' }),
+  versionMention: text('version_mention'), // e.g., "v2.0", "React 18"
+  releaseDateMention: text('release_date_mention'), // e.g., "released in 2024"
+  confidence: real('confidence').notNull(), // 0-1 confidence score
+  extractedAt: timestamp('extracted_at').defaultNow().notNull(),
+}, (table) => ({
+  chunkIdx: index('temporal_chunk_idx').on(table.chunkId),
+}));
+
 // Type exports for use in application code
 export type Video = typeof videos.$inferSelect;
 export type NewVideo = typeof videos.$inferInsert;
@@ -105,3 +123,6 @@ export type NewChunk = typeof chunks.$inferInsert;
 
 export type Relationship = typeof relationships.$inferSelect;
 export type NewRelationship = typeof relationships.$inferInsert;
+
+export type TemporalMetadata = typeof temporalMetadata.$inferSelect;
+export type NewTemporalMetadata = typeof temporalMetadata.$inferInsert;

@@ -1545,3 +1545,291 @@ Calling setState synchronously within an effect body causes cascading renders th
   101:27  warning  '_response' is defined but never used  @typescript-eslint/no-unused-vars
 
 ✖ 9 problems (1 error, 8 warnings)
+---
+timestamp: "2026-02-06 16:49:57"
+story: "3-temporal-graph-rag"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 8 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/lib/db/__tests__/temporal-metadata.test.ts[2m > [22mtemporal_metadata table schema (Postgres)[2m > [22mcreates temporal metadata for a chunk
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'Symbol(drizzle:Columns)')[39m
+[90m [2m❯[22m node_modules/drizzle-orm/pg-core/query-builders/insert.js:[2m36:30[22m[39m
+[90m [2m❯[22m PgInsertBuilder.values node_modules/drizzle-orm/pg-core/query-builders/insert.js:[2m34:33[22m[39m
+[36m [2m❯[22m src/lib/db/__tests__/temporal-metadata.test.ts:[2m43:8[22m[39m
+    [90m 41| [39m    [35mconst[39m [temporal] [33m=[39m [35mawait[39m db
+    [90m 42| [39m      [33m.[39m[34minsert[39m(schema[33m.[39mtemporalMetadata)
+    [90m 43| [39m      [33m.[39m[34mvalues[39m({
+    [90m   | [39m       [31m^[39m
+    [90m 44| [39m        chunkId[33m:[39m chunk[33m![39m[33m.[39mid[33m,[39m
+    [90m 45| [39m        versionMention[33m:[39m [32m'React 18'[39m[33m,[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/8]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/lib/db/__tests__/temporal-metadata.test.ts[2m > [22mtemporal_metadata table schema (Postgres)[2m > [22mallows null version mention
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'Symbol(drizzle:Columns)')[39m
+[90m [2m❯[22m node_modules/drizzle-orm/pg-core/query-builders/insert.js:[2m36:30[22m[39m
+[90m [2m❯[22m PgInsertBuilder.values node_modules/drizzle-orm/pg-core/query-builders/insert.js:[2m34:33[22m[39m
+[36m [2m❯[22m src/lib/db/__tests__/temporal-metadata.test.ts:[2m88:8[22m[39m
+    [90m 86| [39m    [35mconst[39m [temporal] [33m=[39m [35mawait[39m db
+    [90m 87| [39m      [33m.[39m[34minsert[39m(schema[33m.[39mtemporalMetadata)
+    [90m 88| [39m      [33m.[39m[34mvalues[39m({
+    [90m   | [39m       [31m^[39m
+    [90m 89| [39m        chunkId[33m:[39m chunk[33m![39m[33m.[39mid[33m,[39m
+    [90m 90| [39m        versionMention[33m:[39m [35mnull[39m[33m,[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/8]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/lib/db/__tests__/temporal-metadata.test.ts[2m > [22mtemporal_metadata table schema (Postgres)[2m > [22mallows null release date mention
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'Symbol(drizzle:Columns)')[39m
+[90m [2m❯[22m node_modules/drizzle-orm/pg-core/query-builders/insert.js:[2m36:30[22m[39m
+[90m [2m❯[22m PgInsertBuilder.values node_modules/drizzle-orm/pg-core/query-builders/insert.js:[2m34:33[22m[39m
+[36m [2m❯[22m src/lib/db/__tests__/temporal-metadata.test.ts:[2m129:8[22m[39m
+    [90m127| [39m    [35mconst[39m [temporal] [33m=[39m [35mawait[39m db
+    [90m128| [39m      [33m.[39m[34minsert[39m(schema[33m.[39mtemporalMetadata)
+    [90m129| [39m      [33m.[39m[34mvalues[39m({
+    [90m   | [39m       [31m^[39m
+    [90m130| [39m        chunkId[33m:[39m chunk[33m![39m[33m.[39mid[33m,[39m
+    [90m131| [39m        versionMention[33m:[39m [32m'v2.0'[39m[33m,[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/8]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/lib/db/__tests__/temporal-metadata.test.ts[2m > [22mtemporal_metadata table schema (Postgres)[2m > [22mqueries temporal metadata by chunk
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'Symbol(drizzle:Columns)')[39m
+[90m [2m❯[22m node_modules/drizzle-orm/pg-core/query-builders/insert.js:[2m36:30[22m[39m
+[90m [2m❯[22m PgInsertBuilder.values node_modules/drizzle-orm/pg-core/query-builders/insert.js:[2m34:33[22m[39m
+[36m [2m❯[22m src/lib/db/__tests__/temporal-metadata.test.ts:[2m178:46[22m[39m
+    [90m176| [39m
+    [90m177| [39m    [90m// Create temporal metadata for both chunks[39m
+    [90m178| [39m    [35mawait[39m db[33m.[39m[34minsert[39m(schema[33m.[39mtemporalMetadata)[33m.[39m[34mvalues[39m([
+    [90m   | [39m                                             [31m^[39m
+    [90m179| [39m      {
+    [90m180| [39m        chunkId[33m:[39m chunk1[33m![39m[33m.[39mid[33m,[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/8]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/lib/db/__tests__/temporal-metadata.test.ts[2m > [22mtemporal_metadata table schema (Postgres)[2m > [22mcascades delete when chunk is deleted
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'Symbol(drizzle:Columns)')[39m
+[90m [2m❯[22m node_modules/drizzle-orm/pg-core/query-builders/insert.js:[2m36:30[22m[39m
+[90m [2m❯[22m PgInsertBuilder.values node_modules/drizzle-orm/pg-core/query-builders/insert.js:[2m34:33[22m[39m
+[36m [2m❯[22m src/lib/db/__tests__/temporal-metadata.test.ts:[2m229:46[22m[39m
+    [90m227| [39m
+    [90m228| [39m    [90m// Create temporal metadata[39m
+    [90m229| [39m    [35mawait[39m db[33m.[39m[34minsert[39m(schema[33m.[39mtemporalMetadata)[33m.[39m[34mvalues[39m({
+    [90m   | [39m                                             [31m^[39m
+    [90m230| [39m      chunkId[33m:[39m chunk[33m![39m[33m.[39mid[33m,[39m
+    [90m231| [39m      versionMention[33m:[39m [32m'v1.0'[39m[33m,[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/8]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/lib/db/__tests__/temporal-metadata.test.ts[2m > [22medge cases[2m > [22mhandles confidence values at boundaries
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'Symbol(drizzle:Columns)')[39m
+[90m [2m❯[22m node_modules/drizzle-orm/pg-core/query-builders/insert.js:[2m36:30[22m[39m
+[90m [2m❯[22m PgInsertBuilder.values node_modules/drizzle-orm/pg-core/query-builders/insert.js:[2m34:33[22m[39m
+[36m [2m❯[22m src/lib/db/__tests__/temporal-metadata.test.ts:[2m286:8[22m[39m
+    [90m284| [39m    [35mconst[39m [zero] [33m=[39m [35mawait[39m db
+    [90m285| [39m      [33m.[39m[34minsert[39m(schema[33m.[39mtemporalMetadata)
+    [90m286| [39m      [33m.[39m[34mvalues[39m({
+    [90m   | [39m       [31m^[39m
+    [90m287| [39m        chunkId[33m:[39m chunk[33m![39m[33m.[39mid[33m,[39m
+    [90m288| [39m        versionMention[33m:[39m [32m'uncertain'[39m[33m,[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/8]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/lib/db/__tests__/temporal-metadata.test.ts[2m > [22medge cases[2m > [22mhandles multiple temporal extractions per chunk
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'Symbol(drizzle:Columns)')[39m
+[90m [2m❯[22m node_modules/drizzle-orm/pg-core/query-builders/insert.js:[2m36:30[22m[39m
+[90m [2m❯[22m PgInsertBuilder.values node_modules/drizzle-orm/pg-core/query-builders/insert.js:[2m34:33[22m[39m
+[36m [2m❯[22m src/lib/db/__tests__/temporal-metadata.test.ts:[2m341:46[22m[39m
+    [90m339| [39m
+    [90m340| [39m    [90m// Create multiple temporal metadata entries for same chunk[39m
+    [90m341| [39m    [35mawait[39m db[33m.[39m[34minsert[39m(schema[33m.[39mtemporalMetadata)[33m.[39m[34mvalues[39m([
+    [90m   | [39m                                             [31m^[39m
+    [90m342| [39m      {
+    [90m343| [39m        chunkId[33m:[39m chunk[33m![39m[33m.[39mid[33m,[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/8]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/lib/db/__tests__/temporal-metadata.test.ts[2m > [22medge cases[2m > [22mhandles both version and date as null
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'Symbol(drizzle:Columns)')[39m
+[90m [2m❯[22m node_modules/drizzle-orm/pg-core/query-builders/insert.js:[2m36:30[22m[39m
+[90m [2m❯[22m PgInsertBuilder.values node_modules/drizzle-orm/pg-core/query-builders/insert.js:[2m34:33[22m[39m
+[36m [2m❯[22m src/lib/db/__tests__/temporal-metadata.test.ts:[2m394:8[22m[39m
+    [90m392| [39m    [35mconst[39m [temporal] [33m=[39m [35mawait[39m db
+    [90m393| [39m      [33m.[39m[34minsert[39m(schema[33m.[39mtemporalMetadata)
+    [90m394| [39m      [33m.[39m[34mvalues[39m({
+    [90m   | [39m       [31m^[39m
+    [90m395| [39m        chunkId[33m:[39m chunk[33m![39m[33m.[39mid[33m,[39m
+    [90m396| [39m        versionMention[33m:[39m [35mnull[39m[33m,[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/8]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/lib/db/__tests__/temporal-metadata.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/lib/db/__tests__/temporal-metadata.test.ts [2m([22m[2m8 tests[22m[2m | [22m[31m8 failed[39m[2m)[22m[33m 450[2mms[22m[39m
+[31m     [31m×[31m creates temporal metadata for a chunk[39m[32m 94[2mms[22m[39m
+[31m     [31m×[31m allows null version mention[39m[32m 75[2mms[22m[39m
+[31m     [31m×[31m allows null release date mention[39m[32m 43[2mms[22m[39m
+[31m     [31m×[31m queries temporal metadata by chunk[39m[32m 47[2mms[22m[39m
+[31m     [31m×[31m cascades delete when chunk is deleted[39m[32m 40[2mms[22m[39m
+[31m     [31m×[31m handles confidence values at boundaries[39m[32m 53[2mms[22m[39m
+[31m     [31m×[31m handles multiple temporal extractions per chunk[39m[32m 42[2mms[22m[39m
+[31m     [31m×[31m handles both version and date as null[39m[32m 54[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m8 failed[39m[22m[90m (8)[39m
+[2m   Start at [22m 16:49:54
+[2m   Duration [22m 3.14s[2m (transform 106ms, setup 240ms, import 708ms, tests 450ms, environment 1.45s)[22m
+---
+timestamp: "2026-02-06 16:50:27"
+story: "3-temporal-graph-rag"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 8 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/lib/db/__tests__/temporal-metadata.test.ts[2m > [22mtemporal_metadata table schema (Postgres)[2m > [22mcreates temporal metadata for a chunk
+[41m[1m FAIL [22m[49m src/lib/db/__tests__/temporal-metadata.test.ts[2m > [22mtemporal_metadata table schema (Postgres)[2m > [22mallows null version mention
+[41m[1m FAIL [22m[49m src/lib/db/__tests__/temporal-metadata.test.ts[2m > [22mtemporal_metadata table schema (Postgres)[2m > [22mallows null release date mention
+[41m[1m FAIL [22m[49m src/lib/db/__tests__/temporal-metadata.test.ts[2m > [22mtemporal_metadata table schema (Postgres)[2m > [22mqueries temporal metadata by chunk
+[41m[1m FAIL [22m[49m src/lib/db/__tests__/temporal-metadata.test.ts[2m > [22mtemporal_metadata table schema (Postgres)[2m > [22mcascades delete when chunk is deleted
+[31m[1merror[22m: relation "temporal_metadata" does not exist[39m
+[90m [2m❯[22m node_modules/pg-pool/index.js:[2m45:11[22m[39m
+[36m [2m❯[22m setupTestDb src/lib/db/__tests__/setup.ts:[2m21:3[22m[39m
+    [90m 19| [39m
+    [90m 20| [39m  [90m// Clean tables before each test[39m
+    [90m 21| [39m  await pool.query('TRUNCATE videos, insights, channels, settings, chu…
+    [90m   | [39m  [31m^[39m
+    [90m 22| [39m
+    [90m 23| [39m  [35mreturn[39m testDb[33m![39m[33m;[39m
+[90m [2m❯[22m src/lib/db/__tests__/temporal-metadata.test.ts:[2m7:5[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/8]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/lib/db/__tests__/temporal-metadata.test.ts[2m > [22medge cases[2m > [22mhandles confidence values at boundaries
+[41m[1m FAIL [22m[49m src/lib/db/__tests__/temporal-metadata.test.ts[2m > [22medge cases[2m > [22mhandles multiple temporal extractions per chunk
+[41m[1m FAIL [22m[49m src/lib/db/__tests__/temporal-metadata.test.ts[2m > [22medge cases[2m > [22mhandles both version and date as null
+[31m[1merror[22m: relation "temporal_metadata" does not exist[39m
+[90m [2m❯[22m node_modules/pg-pool/index.js:[2m45:11[22m[39m
+[36m [2m❯[22m setupTestDb src/lib/db/__tests__/setup.ts:[2m21:3[22m[39m
+    [90m 19| [39m
+    [90m 20| [39m  [90m// Clean tables before each test[39m
+    [90m 21| [39m  await pool.query('TRUNCATE videos, insights, channels, settings, chu…
+    [90m   | [39m  [31m^[39m
+    [90m 22| [39m
+    [90m 23| [39m  [35mreturn[39m testDb[33m![39m[33m;[39m
+[90m [2m❯[22m src/lib/db/__tests__/temporal-metadata.test.ts:[2m251:5[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/8]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/lib/db/__tests__/temporal-metadata.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/lib/db/__tests__/temporal-metadata.test.ts [2m([22m[2m8 tests[22m[2m | [22m[31m8 failed[39m[2m)[22m[32m 193[2mms[22m[39m
+[31m     [31m×[31m creates temporal metadata for a chunk[39m[32m 46[2mms[22m[39m
+[31m     [31m×[31m allows null version mention[39m[32m 18[2mms[22m[39m
+[31m     [31m×[31m allows null release date mention[39m[32m 21[2mms[22m[39m
+[31m     [31m×[31m queries temporal metadata by chunk[39m[32m 27[2mms[22m[39m
+[31m     [31m×[31m cascades delete when chunk is deleted[39m[32m 20[2mms[22m[39m
+[31m     [31m×[31m handles confidence values at boundaries[39m[32m 21[2mms[22m[39m
+[31m     [31m×[31m handles multiple temporal extractions per chunk[39m[32m 17[2mms[22m[39m
+[31m     [31m×[31m handles both version and date as null[39m[32m 21[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m8 failed[39m[22m[90m (8)[39m
+[2m   Start at [22m 16:50:25
+[2m   Duration [22m 2.41s[2m (transform 86ms, setup 150ms, import 679ms, tests 193ms, environment 992ms)[22m
+---
+timestamp: "2026-02-06 16:50:44"
+story: "3-temporal-graph-rag"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 8 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/lib/db/__tests__/temporal-metadata.test.ts[2m > [22mtemporal_metadata table schema (Postgres)[2m > [22mcreates temporal metadata for a chunk
+[41m[1m FAIL [22m[49m src/lib/db/__tests__/temporal-metadata.test.ts[2m > [22mtemporal_metadata table schema (Postgres)[2m > [22mallows null version mention
+[41m[1m FAIL [22m[49m src/lib/db/__tests__/temporal-metadata.test.ts[2m > [22mtemporal_metadata table schema (Postgres)[2m > [22mallows null release date mention
+[41m[1m FAIL [22m[49m src/lib/db/__tests__/temporal-metadata.test.ts[2m > [22mtemporal_metadata table schema (Postgres)[2m > [22mqueries temporal metadata by chunk
+[41m[1m FAIL [22m[49m src/lib/db/__tests__/temporal-metadata.test.ts[2m > [22mtemporal_metadata table schema (Postgres)[2m > [22mcascades delete when chunk is deleted
+[31m[1merror[22m: relation "temporal_metadata" does not exist[39m
+[90m [2m❯[22m node_modules/pg-pool/index.js:[2m45:11[22m[39m
+[36m [2m❯[22m setupTestDb src/lib/db/__tests__/setup.ts:[2m21:3[22m[39m
+    [90m 19| [39m
+    [90m 20| [39m  [90m// Clean tables before each test[39m
+    [90m 21| [39m  await pool.query('TRUNCATE videos, insights, channels, settings, chu…
+    [90m   | [39m  [31m^[39m
+    [90m 22| [39m
+    [90m 23| [39m  [35mreturn[39m testDb[33m![39m[33m;[39m
+[90m [2m❯[22m src/lib/db/__tests__/temporal-metadata.test.ts:[2m7:5[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/8]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/lib/db/__tests__/temporal-metadata.test.ts[2m > [22medge cases[2m > [22mhandles confidence values at boundaries
+[41m[1m FAIL [22m[49m src/lib/db/__tests__/temporal-metadata.test.ts[2m > [22medge cases[2m > [22mhandles multiple temporal extractions per chunk
+[41m[1m FAIL [22m[49m src/lib/db/__tests__/temporal-metadata.test.ts[2m > [22medge cases[2m > [22mhandles both version and date as null
+[31m[1merror[22m: relation "temporal_metadata" does not exist[39m
+[90m [2m❯[22m node_modules/pg-pool/index.js:[2m45:11[22m[39m
+[36m [2m❯[22m setupTestDb src/lib/db/__tests__/setup.ts:[2m21:3[22m[39m
+    [90m 19| [39m
+    [90m 20| [39m  [90m// Clean tables before each test[39m
+    [90m 21| [39m  await pool.query('TRUNCATE videos, insights, channels, settings, chu…
+    [90m   | [39m  [31m^[39m
+    [90m 22| [39m
+    [90m 23| [39m  [35mreturn[39m testDb[33m![39m[33m;[39m
+[90m [2m❯[22m src/lib/db/__tests__/temporal-metadata.test.ts:[2m251:5[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/8]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/lib/db/__tests__/temporal-metadata.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/lib/db/__tests__/temporal-metadata.test.ts [2m([22m[2m8 tests[22m[2m | [22m[31m8 failed[39m[2m)[22m[32m 295[2mms[22m[39m
+[31m     [31m×[31m creates temporal metadata for a chunk[39m[32m 77[2mms[22m[39m
+[31m     [31m×[31m allows null version mention[39m[32m 38[2mms[22m[39m
+[31m     [31m×[31m allows null release date mention[39m[32m 23[2mms[22m[39m
+[31m     [31m×[31m queries temporal metadata by chunk[39m[32m 22[2mms[22m[39m
+[31m     [31m×[31m cascades delete when chunk is deleted[39m[32m 22[2mms[22m[39m
+[31m     [31m×[31m handles confidence values at boundaries[39m[32m 21[2mms[22m[39m
+[31m     [31m×[31m handles multiple temporal extractions per chunk[39m[32m 36[2mms[22m[39m
+[31m     [31m×[31m handles both version and date as null[39m[32m 52[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m8 failed[39m[22m[90m (8)[39m
+[2m   Start at [22m 16:50:41
+[2m   Duration [22m 2.70s[2m (transform 106ms, setup 193ms, import 672ms, tests 295ms, environment 1.10s)[22m
+---
+timestamp: "2026-02-06 16:57:34"
+story: "3-temporal-graph-rag"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+npm error Missing script: "typecheck"
+npm error
+npm error To see a list of scripts, run:
+npm error   npm run
+npm error A complete log of this run can be found in: /Users/darindrobinski/.npm/_logs/2026-02-06T22_57_34_431Z-debug-0.log

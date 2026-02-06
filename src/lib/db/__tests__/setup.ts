@@ -18,7 +18,7 @@ export async function setupTestDb() {
   }
 
   // Clean tables before each test
-  await pool.query('TRUNCATE videos, insights, channels, settings, chunks, relationships CASCADE');
+  await pool.query('TRUNCATE videos, insights, channels, settings, chunks, relationships, temporal_metadata CASCADE');
 
   return testDb!;
 }
