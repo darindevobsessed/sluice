@@ -56,6 +56,7 @@ const mockVideo: Video = {
   transcript: '0:00\nIntro\n1:00\nContent',
   createdAt: new Date('2024-01-01'),
   updatedAt: new Date('2024-01-01'),
+  publishedAt: null,
 };
 
 describe('InsightsTabs', () => {

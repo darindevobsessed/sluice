@@ -27,6 +27,7 @@ const mockVideo = {
   transcript: 'Some transcript content',
   createdAt: new Date('2026-01-15'),
   updatedAt: new Date('2026-01-15'),
+  publishedAt: null,
 };
 
 describe('VideoCard', () => {

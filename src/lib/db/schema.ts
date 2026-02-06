@@ -13,6 +13,7 @@ export const videos = pgTable('videos', {
   transcript: text('transcript'), // full transcript text
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  publishedAt: timestamp('published_at'), // nullable for existing videos
 });
 
 /**

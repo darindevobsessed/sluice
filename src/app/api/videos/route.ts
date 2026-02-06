@@ -11,6 +11,7 @@ const videoSchema = z.object({
   transcript: z.string().min(50, "Transcript must be at least 50 characters"),
   tags: z.array(z.string()).optional(),
   notes: z.string().optional(),
+  publishedAt: z.string().datetime().optional(), // ISO 8601 date string
 });
 
 export async function GET(request: Request) {
@@ -77,6 +78,9 @@ export async function POST(request: Request) {
         channel,
         thumbnail: thumbnail || null,
         transcript,
+        publishedAt: validationResult.data.publishedAt
+          ? new Date(validationResult.data.publishedAt)
+          : null,
       })
       .returning();
 

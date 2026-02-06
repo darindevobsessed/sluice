@@ -29,6 +29,7 @@ const mockVideos: Video[] = [
     transcript: 'Transcript content',
     createdAt: new Date('2026-01-15'),
     updatedAt: new Date('2026-01-15'),
+    publishedAt: null,
   },
   {
     id: 2,
@@ -40,6 +41,7 @@ const mockVideos: Video[] = [
     transcript: 'More transcript',
     createdAt: new Date('2026-01-16'),
     updatedAt: new Date('2026-01-16'),
+    publishedAt: null,
   },
 ];
 
