@@ -109,6 +109,26 @@ export const temporalMetadata = pgTable('temporal_metadata', {
   chunkIdx: index('temporal_chunk_idx').on(table.chunkId),
 }));
 
+/**
+ * Jobs table for automation queue
+ * Database-backed job queue for reliable async processing
+ */
+export const jobs = pgTable('jobs', {
+  id: serial('id').primaryKey(),
+  type: text('type').notNull(), // 'fetch_transcript' | 'generate_embeddings'
+  payload: jsonb('payload').notNull(), // { videoId, youtubeId, ... }
+  status: text('status').notNull().default('pending'), // pending | processing | completed | failed
+  attempts: integer('attempts').notNull().default(0),
+  maxAttempts: integer('max_attempts').notNull().default(3),
+  error: text('error'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  startedAt: timestamp('started_at'),
+  completedAt: timestamp('completed_at'),
+}, (table) => ({
+  statusIdx: index('jobs_status_idx').on(table.status),
+  typeIdx: index('jobs_type_idx').on(table.type),
+}));
+
 // Type exports for use in application code
 export type Video = typeof videos.$inferSelect;
 export type NewVideo = typeof videos.$inferInsert;
@@ -130,3 +150,6 @@ export type NewRelationship = typeof relationships.$inferInsert;
 
 export type TemporalMetadata = typeof temporalMetadata.$inferSelect;
 export type NewTemporalMetadata = typeof temporalMetadata.$inferInsert;
+
+export type Job = typeof jobs.$inferSelect;
+export type NewJob = typeof jobs.$inferInsert;

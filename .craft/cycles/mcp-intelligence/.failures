@@ -2435,3 +2435,301 @@ tool: "Bash"
 error: |
   Exit code 1
 ls: /Users/darindrobinski/dev/repos/gold-miner/drizzle: No such file or directory
+---
+timestamp: "2026-02-06 20:04:50"
+story: "4-automation"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Suites 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/lib/automation/__tests__/queue.test.ts[2m [ src/lib/automation/__tests__/queue.test.ts ][22m
+[31m[1mError[22m: Failed to resolve import "../queue" from "src/lib/automation/__tests__/queue.test.ts". Does the file exist?[39m
+  Plugin: [35mvite:import-analysis[39m
+  File: [36m/Users/darindrobinski/dev/repos/gold-miner/src/lib/automation/__tests__/queue.test.ts[39m:29:89
+[33m  21 |    completedAt: "completedAt"
+  22 |  };
+  23 |  const { enqueueJob, claimNextJob, completeJob, failJob, getJobsByStatus } = await import("../queue");
+     |                                                                                           ^
+  24 |  describe("enqueueJob", () => {
+  25 |    beforeEach(() => {[39m
+[90m [2m❯[22m TransformPluginContext._formatLog node_modules/vite/dist/node/chunks/config.js:[2m28999:43[22m[39m
+[90m [2m❯[22m TransformPluginContext.error node_modules/vite/dist/node/chunks/config.js:[2m28996:14[22m[39m
+[90m [2m❯[22m normalizeUrl node_modules/vite/dist/node/chunks/config.js:[2m27119:18[22m[39m
+[90m [2m❯[22m node_modules/vite/dist/node/chunks/config.js:[2m27177:32[22m[39m
+[90m [2m❯[22m TransformPluginContext.transform node_modules/vite/dist/node/chunks/config.js:[2m27145:4[22m[39m
+[90m [2m❯[22m EnvironmentPluginContainer.transform node_modules/vite/dist/node/chunks/config.js:[2m28797:14[22m[39m
+[90m [2m❯[22m loadAndTransform node_modules/vite/dist/node/chunks/config.js:[2m22670:26[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/lib/automation/__tests__/queue.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/lib/automation/__tests__/queue.test.ts [2m([22m[2m0 test[22m[2m)[22m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [2mno tests[22m
+[2m   Start at [22m 20:04:48
+[2m   Duration [22m 1.73s[2m (transform 32ms, setup 170ms, import 0ms, tests 0ms, environment 1.06s)[22m
+---
+timestamp: "2026-02-06 20:05:26"
+story: "4-automation"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 2 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/lib/automation/__tests__/queue.test.ts[2m > [22menqueueJob[2m > [22mcreates a job with correct type and payload
+[31m[1mAssertionError[22m[39m: expected "vi.fn()" to be called with arguments: [ { id: 'id', type: 'type', …(8) } ][90m
+
+Received: 
+
+[1m  1st vi.fn() call:
+
+[22m[2m  [[22m
+[32m-   {[90m
+[32m-     "attempts": "attempts",[90m
+[32m-     "completedAt": "completedAt",[90m
+[32m-     "createdAt": "createdAt",[90m
+[32m-     "error": "error",[90m
+[32m-     "id": "id",[90m
+[32m-     "maxAttempts": "maxAttempts",[90m
+[32m-     "payload": "payload",[90m
+[32m-     "startedAt": "startedAt",[90m
+[32m-     "status": "status",[90m
+[32m-     "type": "type",[90m
+[31m+   PgTable {[90m
+[31m+     "attempts": PgInteger {[90m
+[31m+       "columnType": "PgInteger",[90m
+[31m+       "config": {[90m
+[31m+         "columnType": "PgInteger",[90m
+[31m+         "dataType": "number",[90m
+[31m+         "default": 0,[90m
+[31m+         "generated": undefined,[90m
+[31m+         "hasDefault": true,[90m
+[31m+         "isUnique": false,[90m
+[31m+         "keyAsName": false,[90m
+[31m+         "name": "attempts",[90m
+[31m+         "notNull": true,[90m
+[31m+         "primaryKey": false,[90m
+[31m+         "uniqueName": "jobs_attempts_unique",[90m
+[31m+         "uniqueType": undefined,[90m
+[31m+       },[90m
+[31m+       "dataType": "number",[90m
+[31m+       "default": 0,[90m
+[31m+       "defaultFn": undefined,[90m
+[31m+       "enumValues": undefined,[90m
+[31m+       "generated": undefined,[90m
+[31m+       "generatedIdentity": undefined,[90m
+[31m+       "hasDefault": true,[90m
+[31m+       "isUnique": false,[90m
+[31m+       "keyAsName": false,[90m
+[31m+       "name": "attempts",[90m
+[31m+       "notNull": true,[90m
+[31m+       "onUpdateFn": undefined,[90m
+[31m+       "primary": false,[90m
+[31m+       "table": [Circular],[90m
+[31m+       "uniqueName": "jobs_attempts_unique",[90m
+[31m+       "uniqueType": undefined,[90m
+[31m+     },[90m
+[31m+     "completedAt": PgTimestamp {[90m
+[31m+       "columnType": "PgTimestamp",[90m
+[31m+       "config": {[90m
+[31m+         "columnType": "PgTimestamp",[90m
+[31m+         "dataType": "date",[90m
+[31m+         "default": undefined,[90m
+[31m+         "generated": undefined,[90m
+[31m+         "hasDefault": false,[90m
+[31m+         "isUnique": false,[90m
+[31m+         "keyAsName": false,[90m
+[31m+         "name": "completed_at",[90m
+[31m+         "notNull": false,[90m
+[31m+         "precision": undefined,[90m
+[31m+         "primaryKey": false,[90m
+[31m+         "uniqueName": "jobs_completed_at_unique",[90m
+[31m+         "uniqueType": undefined,[90m
+[31m+         "withTimezone": false,[90m
+[31m+       },[90m
+[31m+       "dataType": "date",[90m
+[31m+       "default": undefined,[90m
+[31m+       "defaultFn": undefined,[90m
+[31m+       "enumValues": undefined,[90m
+[31m+       "generated": undefined,[90m
+[31m+       "generatedIdentity": undefined,[90m
+[31m+       "hasDefault": false,[90m
+[31m+       "isUnique": false,[90m
+[31m+       "keyAsName": false,[90m
+[31m+       "mapToDriverValue": [Function mapToDriverValue],[90m
+[31m+       "name": "completed_at",[90m
+[31m+       "notNull": false,[90m
+[31m+       "onUpdateFn": undefined,[90m
+[31m+       "precision": undefined,[90m
+[31m+       "primary": false,[90m
+[31m+       "table": [Circular],[90m
+[31m+       "uniqueName": "jobs_completed_at_unique",[90m
+[31m+       "uniqueType": undefined,[90m
+[31m+       "withTimezone": false,[90m
+[31m+     },[90m
+[31m+     "createdAt": PgTimestamp {[90m
+[31m+       "columnType": "PgTimestamp",[90m
+[31m+       "config": {[90m
+[31m+         "columnType": "PgTimestamp",[90m
+[31m+         "dataType": "date",[90m
+[31m+         "default": SQL {[90m
+[31m+           "decoder": {[90m
+[31m+             "mapFromDriverValue": [Function mapFromDriverValue],[90m
+[31m+           },[90m
+[31m+           "queryChunks": [[90m
+[31m+             StringChunk {[90m
+[31m+               "value": [[90m
+[31m+                 "now()",[90m
+[31m+               ],[90m
+[31m+             },[90m
+[31m+           ],[90m
+[31m+           "shouldInlineParams": false,[90m
+[31m+           "usedTables": [],[90m
+[31m+         },[90m
+[31m+         "generated": undefined,[90m
+[31m+         "hasDefault": true,[90m
+[31m+         "isUnique": false,[90m
+[31m+         "keyAsName": false,[90m
+[31m+         "name": "created_at",[90m
+[31m+         "notNull": true,[90m
+[31m+         "precision": undefined,[90m
+[31m+         "primaryKey": false,[90m
+[31m+         "uniqueName": "jobs_created_at_unique",[90m
+[31m+         "uniqueType": undefined,[90m
+[31m+         "withTimezone": false,[90m
+[31m+       },[90m
+[31m+       "dataType": "date",[
+
+... [95646 characters truncated] ...
+
+[90m
+[31m+         "name": "status",[90m
+[31m+         "notNull": true,[90m
+[31m+         "onUpdateFn": undefined,[90m
+[31m+         "primary": false,[90m
+[31m+         "table": [Circular],[90m
+[31m+         "uniqueName": "jobs_status_unique",[90m
+[31m+         "uniqueType": undefined,[90m
+[31m+       },[90m
+[31m+       "type": ExtraConfigColumn {[90m
+[31m+         "columnType": "PgText",[90m
+[31m+         "config": {[90m
+[31m+           "columnType": "PgText",[90m
+[31m+           "dataType": "string",[90m
+[31m+           "default": undefined,[90m
+[31m+           "enumValues": undefined,[90m
+[31m+           "generated": undefined,[90m
+[31m+           "hasDefault": false,[90m
+[31m+           "isUnique": false,[90m
+[31m+           "keyAsName": false,[90m
+[31m+           "name": "type",[90m
+[31m+           "notNull": true,[90m
+[31m+           "primaryKey": false,[90m
+[31m+           "uniqueName": "jobs_type_unique",[90m
+[31m+           "uniqueType": undefined,[90m
+[31m+         },[90m
+[31m+         "dataType": "string",[90m
+[31m+         "default": undefined,[90m
+[31m+         "defaultConfig": {[90m
+[31m+           "nulls": "last",[90m
+[31m+           "opClass": undefined,[90m
+[31m+           "order": "asc",[90m
+[31m+         },[90m
+[31m+         "defaultFn": undefined,[90m
+[31m+         "enumValues": undefined,[90m
+[31m+         "generated": undefined,[90m
+[31m+         "generatedIdentity": undefined,[90m
+[31m+         "hasDefault": false,[90m
+[31m+         "indexConfig": {[90m
+[31m+           "nulls": "last",[90m
+[31m+           "opClass": undefined,[90m
+[31m+           "order": "asc",[90m
+[31m+         },[90m
+[31m+         "isUnique": false,[90m
+[31m+         "keyAsName": false,[90m
+[31m+         "name": "type",[90m
+[31m+         "notNull": true,[90m
+[31m+         "onUpdateFn": undefined,[90m
+[31m+         "primary": false,[90m
+[31m+         "table": [Circular],[90m
+[31m+         "uniqueName": "jobs_type_unique",[90m
+[31m+         "uniqueType": undefined,[90m
+[31m+       },[90m
+[31m+     },[90m
+[31m+     Symbol(drizzle:BaseName): "jobs",[90m
+[31m+     Symbol(drizzle:IsAlias): false,[90m
+[31m+     Symbol(drizzle:IsDrizzleTable): true,[90m
+[31m+     Symbol(drizzle:ExtraConfigBuilder): [Function anonymous],[90m
+[31m+     Symbol(drizzle:PgInlineForeignKeys): [],[90m
+[31m+     Symbol(drizzle:EnableRLS): false,[90m
+[2m    },[22m
+[2m  ][22m
+[39m[90m
+
+Number of calls: [1m1[22m
+[39m
+[36m [2m❯[22m src/lib/automation/__tests__/queue.test.ts:[2m240:27[22m[39m
+    [90m238| [39m    [35mawait[39m [34mcompleteJob[39m([34m1[39m)
+    [90m239| [39m
+    [90m240| [39m    [34mexpect[39m(mockDb[33m.[39mupdate)[33m.[39m[34mtoHaveBeenCalledWith[39m(mockJobs)
+    [90m   | [39m                          [31m^[39m
+    [90m241| [39m    [34mexpect[39m(mockSet)[33m.[39m[34mtoHaveBeenCalledWith[39m({
+    [90m242| [39m      status[33m:[39m [32m'completed'[39m[33m,[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/lib/automation/__tests__/queue.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/lib/automation/__tests__/queue.test.ts [2m([22m[2m16 tests[22m[2m | [22m[31m2 failed[39m[2m)[22m[32m 65[2mms[22m[39m
+[31m     [31m×[31m creates a job with correct type and payload[39m[32m 28[2mms[22m[39m
+     [32m✓[39m returns the job ID[32m 1[2mms[22m[39m
+     [32m✓[39m uses custom db instance when provided[32m 1[2mms[22m[39m
+     [32m✓[39m returns null when no pending jobs[32m 1[2mms[22m[39m
+     [32m✓[39m claims the oldest pending job[32m 3[2mms[22m[39m
+     [32m✓[39m filters by type when specified[32m 1[2mms[22m[39m
+     [32m✓[39m sets status to processing and increments attempts[32m 1[2mms[22m[39m
+     [32m✓[39m uses custom db instance when provided[32m 1[2mms[22m[39m
+[31m     [31m×[31m sets status to completed with timestamp[39m[32m 16[2mms[22m[39m
+     [32m✓[39m uses custom db instance when provided[32m 1[2mms[22m[39m
+     [32m✓[39m resets to pending when under max attempts[32m 5[2mms[22m[39m
+     [32m✓[39m marks as failed permanently when at max attempts[32m 1[2mms[22m[39m
+     [32m✓[39m records error message[32m 1[2mms[22m[39m
+     [32m✓[39m uses custom db instance when provided[32m 1[2mms[22m[39m
+     [32m✓[39m returns jobs filtered by status[32m 1[2mms[22m[39m
+     [32m✓[39m uses custom db instance when provided[32m 0[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m14 passed[39m[22m[90m (16)[39m
+[2m   Start at [22m 20:05:24
+[2m   Duration [22m 2.39s[2m (transform 106ms, setup 165ms, import 659ms, tests 65ms, environment 1.03s)[22m
+---
+timestamp: "2026-02-06 20:05:56"
+story: "4-automation"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+npm error Missing script: "typecheck"
+npm error
+npm error To see a list of scripts, run:
+npm error   npm run
+npm error A complete log of this run can be found in: /Users/darindrobinski/.npm/_logs/2026-02-07T02_05_56_383Z-debug-0.log
