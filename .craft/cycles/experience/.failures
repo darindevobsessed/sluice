@@ -307,3 +307,438 @@ npm error
 npm error To see a list of scripts, run:
 npm error   npm run
 npm error A complete log of this run can be found in: /Users/darindrobinski/.npm/_logs/2026-02-07T18_46_43_810Z-debug-0.log
+---
+timestamp: "2026-02-07 13:01:12"
+story: "1-ui-enhancements"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Suites 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/components/layout/__tests__/FocusAreaDropdown.test.tsx[2m [ src/components/layout/__tests__/FocusAreaDropdown.test.tsx ][22m
+[31m[1mError[22m: Failed to resolve import "../FocusAreaDropdown" from "src/components/layout/__tests__/FocusAreaDropdown.test.tsx". Does the file exist?[39m
+  Plugin: [35mvite:import-analysis[39m
+  File: [36m/Users/darindrobinski/dev/repos/gold-miner/src/components/layout/__tests__/FocusAreaDropdown.test.tsx[39m:4:34
+[33m  3  |  import { render, screen, waitFor } from "@testing-library/react";
+  4  |  import { act } from "react";
+  5  |  import { FocusAreaDropdown } from "../FocusAreaDropdown";
+     |                                     ^
+  6  |  import { FocusAreaProvider } from "@/components/providers/FocusAreaProvider";
+  7  |  const mockFetch = vi.fn();[39m
+[90m [2m❯[22m TransformPluginContext._formatLog node_modules/vite/dist/node/chunks/config.js:[2m28999:43[22m[39m
+[90m [2m❯[22m TransformPluginContext.error node_modules/vite/dist/node/chunks/config.js:[2m28996:14[22m[39m
+[90m [2m❯[22m normalizeUrl node_modules/vite/dist/node/chunks/config.js:[2m27119:18[22m[39m
+[90m [2m❯[22m node_modules/vite/dist/node/chunks/config.js:[2m27177:32[22m[39m
+[90m [2m❯[22m TransformPluginContext.transform node_modules/vite/dist/node/chunks/config.js:[2m27145:4[22m[39m
+[90m [2m❯[22m EnvironmentPluginContainer.transform node_modules/vite/dist/node/chunks/config.js:[2m28797:14[22m[39m
+[90m [2m❯[22m loadAndTransform node_modules/vite/dist/node/chunks/config.js:[2m22670:26[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/components/layout/__tests__/FocusAreaDropdown.test.tsx
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/components/layout/__tests__/FocusAreaDropdown.test.tsx [2m([22m[2m0 test[22m[2m)[22m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [2mno tests[22m
+[2m   Start at [22m 13:01:08
+[2m   Duration [22m 4.46s[2m (transform 68ms, setup 676ms, import 0ms, tests 0ms, environment 3.05s)[22m
+---
+timestamp: "2026-02-07 13:01:47"
+story: "1-ui-enhancements"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 8 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/components/layout/__tests__/FocusAreaDropdown.test.tsx[2m > [22mFocusAreaDropdown[2m > [22mopens dropdown menu when trigger is clicked
+[31m[1mTestingLibraryElementError[22m: Unable to find an element with the text: All. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[31m
+  [36m<div>[31m
+    [36m<button[31m
+      [33maria-expanded[31m=[32m"false"[31m
+      [33maria-haspopup[31m=[32m"menu"[31m
+      [33mclass[31m=[32m"rounded-full px-4 py-1.5 text-sm bg-muted hover:bg-muted/80 transition-colors flex items-center gap-2 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"[31m
+      [33mdata-slot[31m=[32m"dropdown-menu-trigger"[31m
+      [33mdata-state[31m=[32m"closed"[31m
+      [33mid[31m=[32m"radix-_r_6_"[31m
+      [33mtype[31m=[32m"button"[31m
+    [36m>[31m
+      [0mAll Areas[0m
+      [36m<svg[31m
+        [33maria-hidden[31m=[32m"true"[31m
+        [33mclass[31m=[32m"lucide lucide-chevron-down h-4 w-4 opacity-50"[31m
+        [33mfill[31m=[32m"none"[31m
+        [33mheight[31m=[32m"24"[31m
+        [33mstroke[31m=[32m"currentColor"[31m
+        [33mstroke-linecap[31m=[32m"round"[31m
+        [33mstroke-linejoin[31m=[32m"round"[31m
+        [33mstroke-width[31m=[32m"2"[31m
+        [33mviewBox[31m=[32m"0 0 24 24"[31m
+        [33mwidth[31m=[32m"24"[31m
+        [33mxmlns[31m=[32m"http://www.w3.org/2000/svg"[31m
+      [36m>[31m
+        [36m<path[31m
+          [33md[31m=[32m"m6 9 6 6 6-6"[31m
+        [36m/>[31m
+      [36m</svg>[31m
+    [36m</button>[31m
+  [36m</div>[31m
+[36m</body>[31m
+
+Ignored nodes: comments, script, style
+[36m<html>[31m
+  [36m<head />[31m
+  [36m<body>[31m
+    [36m<div>[31m
+      [36m<button[31m
+        [33maria-expanded[31m=[32m"false"[31m
+        [33maria-haspopup[31m=[32m"menu"[31m
+        [33mclass[31m=[32m"rounded-full px-4 py-1.5 text-sm bg-muted hover:bg-muted/80 transition-colors flex items-center gap-2 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"[31m
+        [33mdata-slot[31m=[32m"dropdown-menu-trigger"[31m
+        [33mdata-state[31m=[32m"closed"[31m
+        [33mid[31m=[32m"radix-_r_6_"[31m
+        [33mtype[31m=[32m"button"[31m
+      [36m>[31m
+        [0mAll Areas[0m
+        [36m<svg[31m
+          [33maria-hidden[31m=[32m"true"[31m
+          [33mclass[31m=[32m"lucide lucide-chevron-down h-4 w-4 opacity-50"[31m
+          [33mfill[31m=[32m"none"[31m
+          [33mheight[31m=[32m"24"[31m
+          [33mstroke[31m=[32m"currentColor"[31m
+          [33mstroke-linecap[31m=[32m"round"[31m
+          [33mstroke-linejoin[31m=[32m"round"[31m
+          [33mstroke-width[31m=[32m"2"[31m
+          [33mviewBox[31m=[32m"0 0 24 24"[31m
+          [33mwidth[31m=[32m"24"[31m
+          [33mxmlns[31m=[32m"http://www.w3.org/2000/svg"[31m
+        [36m>[31m
+          [36m<path[31m
+            [33md[31m=[32m"m6 9 6 6 6-6"[31m
+          [36m/>[31m
+        [36m</svg>[31m
+      [36m</button>[31m
+    [36m</div>[31m
+  [36m</body>[31m
+[36m</html>[31m[39m
+[90m [2m❯[22m waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:[2m163:27[22m[39m
+[36m [2m❯[22m src/components/layout/__tests__/FocusAreaDropdown.test.tsx:[2m104:11[22m[39m
+    [90m102| [39m    })
+    [90m103| [39m
+    [90m104| [39m    [35mawait[39m [34mwaitFor[39m(() [33m=>[39m {
+    [90m   | [39m          [31m^[39m
+    [90m105| [39m      [34mexpect[39m(screen[33m.[39m[34mgetByText[39m([32m'All'[39m))[33m.[39m[34mtoBeInTheDocument[39m()
+    [90m106| [39m      [34mexpect[39m(screen[33m.[39m[34mgetByText[39m([32m'React'[39m))[33m.[39m[34mtoBeInTheDocument[39m()
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/8]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/layout/__tests__/FocusAreaDropdown.test.tsx[2m > [22mFocusAreaDropdown[2m > [22mdisplays "All" option at the top
+[31m[1mTestingLibraryElementError[22m: Unable to find role="menuitem"
+
+Ignored nodes: comments, script, style
+[36m<body>[31m
+  [36m<div>[31m
+    [36m<button[31m
+      [33maria-expanded[31m=[32m"false"[31m
+      [33maria-haspopup[31m=[32m"menu"[31m
+      [33mclass[31m=[32m"rounded-full px-4 py-1.5 text-sm bg-muted hover:bg-muted/80 transition-colors flex items-center gap-2 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"[31m
+      [33mdata-slot[31m=[32m"dropdown-menu-trigger"[31m
+      [33mdata-state[31m=[32m"closed"[31m
+      [33mid[31m=[32m"radix-_r_8_"[31m
+      [33mtype[31m=[32m"button"[31m
+    [36m>[31
+
+... [23263 characters truncated] ...
+
+[32m"dropdown-menu-trigger"[31m
+      [33mdata-state[31m=[32m"closed"[31m
+      [33mid[31m=[32m"radix-_r_m_"[31m
+      [33mtype[31m=[32m"button"[31m
+    [36m>[31m
+      [0mAll Areas[0m
+      [36m<svg[31m
+        [33maria-hidden[31m=[32m"true"[31m
+        [33mclass[31m=[32m"lucide lucide-chevron-down h-4 w-4 opacity-50"[31m
+        [33mfill[31m=[32m"none"[31m
+        [33mheight[31m=[32m"24"[31m
+        [33mstroke[31m=[32m"currentColor"[31m
+        [33mstroke-linecap[31m=[32m"round"[31m
+        [33mstroke-linejoin[31m=[32m"round"[31m
+        [33mstroke-width[31m=[32m"2"[31m
+        [33mviewBox[31m=[32m"0 0 24 24"[31m
+        [33mwidth[31m=[32m"24"[31m
+        [33mxmlns[31m=[32m"http://www.w3.org/2000/svg"[31m
+      [36m>[31m
+        [36m<path[31m
+          [33md[31m=[32m"m6 9 6 6 6-6"[31m
+        [36m/>[31m
+      [36m</svg>[31m
+    [36m</button>[31m
+  [36m</div>[31m
+[36m</body>[31m
+
+Ignored nodes: comments, script, style
+[36m<html>[31m
+  [36m<head />[31m
+  [36m<body>[31m
+    [36m<div>[31m
+      [36m<button[31m
+        [33maria-expanded[31m=[32m"false"[31m
+        [33maria-haspopup[31m=[32m"menu"[31m
+        [33mclass[31m=[32m"rounded-full px-4 py-1.5 text-sm bg-muted hover:bg-muted/80 transition-colors flex items-center gap-2 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"[31m
+        [33mdata-slot[31m=[32m"dropdown-menu-trigger"[31m
+        [33mdata-state[31m=[32m"closed"[31m
+        [33mid[31m=[32m"radix-_r_m_"[31m
+        [33mtype[31m=[32m"button"[31m
+      [36m>[31m
+        [0mAll Areas[0m
+        [36m<svg[31m
+          [33maria-hidden[31m=[32m"true"[31m
+          [33mclass[31m=[32m"lucide lucide-chevron-down h-4 w-4 opacity-50"[31m
+          [33mfill[31m=[32m"none"[31m
+          [33mheight[31m=[32m"24"[31m
+          [33mstroke[31m=[32m"currentColor"[31m
+          [33mstroke-linecap[31m=[32m"round"[31m
+          [33mstroke-linejoin[31m=[32m"round"[31m
+          [33mstroke-width[31m=[32m"2"[31m
+          [33mviewBox[31m=[32m"0 0 24 24"[31m
+          [33mwidth[31m=[32m"24"[31m
+          [33mxmlns[31m=[32m"http://www.w3.org/2000/svg"[31m
+        [36m>[31m
+          [36m<path[31m
+            [33md[31m=[32m"m6 9 6 6 6-6"[31m
+          [36m/>[31m
+        [36m</svg>[31m
+      [36m</button>[31m
+    [36m</div>[31m
+  [36m</body>[31m
+[36m</html>[31m[39m
+[90m [2m❯[22m waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:[2m163:27[22m[39m
+[36m [2m❯[22m src/components/layout/__tests__/FocusAreaDropdown.test.tsx:[2m305:11[22m[39m
+    [90m303| [39m    })
+    [90m304| [39m
+    [90m305| [39m    [35mawait[39m [34mwaitFor[39m(() [33m=>[39m {
+    [90m   | [39m          [31m^[39m
+    [90m306| [39m      [35mconst[39m menuItems [33m=[39m screen[33m.[39m[34mgetAllByRole[39m([32m'menuitem'[39m)
+    [90m307| [39m      [90m// Should only have "All" and "Manage Focus Areas..."[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/8]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/components/layout/__tests__/FocusAreaDropdown.test.tsx
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/components/layout/__tests__/FocusAreaDropdown.test.tsx [2m([22m[2m12 tests[22m[2m | [22m[31m8 failed[39m[2m)[22m[33m 8778[2mms[22m[39m
+     [33m[2m✓[22m[39m renders pill-shaped trigger button [33m 368[2mms[22m[39m
+     [32m✓[39m shows "All Areas" by default when no area is selected[32m 50[2mms[22m[39m
+     [32m✓[39m shows selected area name when an area is selected[32m 72[2mms[22m[39m
+[31m     [31m×[31m opens dropdown menu when trigger is clicked[39m[33m 1044[2mms[22m[39m
+[31m     [31m×[31m displays "All" option at the top[39m[33m 1036[2mms[22m[39m
+[31m     [31m×[31m displays separator after "All" option[39m[33m 1024[2mms[22m[39m
+[31m     [31m×[31m displays "Manage Focus Areas..." at the bottom[39m[33m 1031[2mms[22m[39m
+[31m     [31m×[31m updates context and localStorage when selecting a focus area[39m[33m 1031[2mms[22m[39m
+[31m     [31m×[31m updates context and localStorage when selecting "All"[39m[33m 1045[2mms[22m[39m
+[31m     [31m×[31m calls onManageClick when "Manage Focus Areas..." is clicked[39m[33m 1022[2mms[22m[39m
+     [32m✓[39m applies muted background styling to trigger button[32m 23[2mms[22m[39m
+[31m     [31m×[31m renders empty list when no focus areas are available[39m[33m 1024[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m8 failed[39m[22m[2m | [22m[1m[32m4 passed[39m[22m[90m (12)[39m
+[2m   Start at [22m 13:01:32
+[2m   Duration [22m 14.55s[2m (transform 214ms, setup 429ms, import 1.51s, tests 8.78s, environment 3.01s)[22m
+---
+timestamp: "2026-02-07 13:03:09"
+story: "1-ui-enhancements"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/components/layout/__tests__/FocusAreaDropdown.test.tsx[2m > [22mFocusAreaDropdown[2m > [22mdisplays separator after "All" option
+[31m[1mTestingLibraryElementError[22m[39m: Found multiple elements with the role "separator"
+
+Here are the matching elements:
+
+Ignored nodes: comments, script, style
+[36m<div[39m
+  [33maria-orientation[39m=[32m"horizontal"[39m
+  [33mclass[39m=[32m"bg-border -mx-1 my-1 h-px"[39m
+  [33mdata-slot[39m=[32m"dropdown-menu-separator"[39m
+  [33mrole[39m=[32m"separator"[39m
+[36m/>[39m
+
+Ignored nodes: comments, script, style
+[36m<div[39m
+  [33maria-orientation[39m=[32m"horizontal"[39m
+  [33mclass[39m=[32m"bg-border -mx-1 my-1 h-px"[39m
+  [33mdata-slot[39m=[32m"dropdown-menu-separator"[39m
+  [33mrole[39m=[32m"separator"[39m
+[36m/>[39m
+
+(If this is intentional, then use the `*AllBy*` variant of the query (like `queryAllByText`, `getAllByText`, or `findAllByText`)).
+
+Ignored nodes: comments, script, style
+[36m<body[39m
+  [33mdata-scroll-locked[39m=[32m"1"[39m
+  [33mstyle[39m=[32m"pointer-events: none;"[39m
+[36m>[39m
+  [36m<span[39m
+    [33maria-hidden[39m=[32m"true"[39m
+    [33mdata-aria-hidden[39m=[32m"true"[39m
+    [33mdata-radix-focus-guard[39m=[32m""[39m
+    [33mstyle[39m=[32m"outline: none; opacity: 0; position: fixed; pointer-events: none;"[39m
+    [33mtabindex[39m=[32m"0"[39m
+  [36m/>[39m
+  [36m<div[39m
+    [33maria-hidden[39m=[32m"true"[39m
+    [33mdata-aria-hidden[39m=[32m"true"[39m
+  [36m>[39m
+    [36m<button[39m
+      [33maria-controls[39m=[32m"radix-_r_l_"[39m
+      [33maria-expanded[39m=[32m"true"[39m
+      [33maria-haspopup[39m=[32m"menu"[39m
+      [33mclass[39m=[32m"rounded-full px-4 py-1.5 text-sm bg-muted hover:bg-muted/80 transition-colors flex items-center gap-2 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"[39m
+      [33mdata-slot[39m=[32m"dropdown-menu-trigger"[39m
+      [33mdata-state[39m=[32m"open"[39m
+      [33mid[39m=[32m"radix-_r_k_"[39m
+      [33mtype[39m=[32m"button"[39m
+    [36m>[39m
+      [0mAll Areas[0m
+      [36m<svg[39m
+        [33maria-hidden[39m=[32m"true"[39m
+        [33mclass[39m=[32m"lucide lucide-chevron-down h-4 w-4 opacity-50"[39m
+        [33mfill[39m=[32m"none"[39m
+        [33mheight[39m=[32m"24"[39m
+        [33mstroke[39m=[32m"currentColor"[39m
+        [33mstroke-linecap[39m=[32m"round"[39m
+        [33mstroke-linejoin[39m=[32m"round"[39m
+        [33mstroke-width[39m=[32m"2"[39m
+        [33mviewBox[39m=[32m"0 0 24 24"[39m
+        [33mwidth[39m=[32m"24"[39m
+        [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+      [36m>[39m
+        [36m<path[39m
+          [33md[39m=[32m"m6 9 6 6 6-6"[39m
+        [36m/>[39m
+      [36m</svg>[39m
+    [36m</button>[39m
+  [36m</div>[39m
+  [36m<div[39m
+    [33mdata-radix-popper-content-wrapper[39m=[32m""[39m
+    [33mdir[39m=[32m"ltr"[39m
+    [33mstyle[39m=[32m"position: fixed; left: 0px; top: 0px; transform: translate(0px, 4px); min-width: max-content; --radix-popper-available-width: 0px; --radix-popper-available-height: -4px; --radix-popper-anchor-width: 0px; --radix-popper-anchor-height: 0px; --radix-popper-transform-origin: 100% 0px;"[39m
+  [36m>[39m
+    [36m<div[39m
+      [33maria-labelledby[39m=[32m"radix-_r_k_"[39m
+      [33maria-orientation[39m=[32m"vertical"[39m
+      [33mclass[39m=[32m"bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 max-h-(--radix-dropdown-menu-content-available-height) min-w-[8rem] origin-(--radix-dropdown-menu-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-md border p-1 shadow-md w-56"[39m
+      [33mdata-align[39m=[32m"end"[39m
+      [33mdata-orientation[39m=[32m"vertical"[39m
+      [33mdata-radix-menu-content[39m=[32m""[39m
+      [33mdata-side[39m=[32m"bottom"[39m
+      [33mdata-slot[39m=[32m"dropdown-menu-content"[39m
+      [33mdata-state[39m=[32m"open"[39m
+      [33mdir[39m=[32m"ltr"[39m
+      [33mid[39m=[32m"radix-_r_l_"[39m
+      [33mrole[39m=[32m"menu"[39m
+      [33mstyle[39m=[32m"outline: none; --radix-dropdown-menu-content-transform-origin: var(--radix-popper-transform-origin); --radix-dropdown-menu-content-available-width: var(--radix-popper-available-width); --radix-dropdown-menu-content-available-height: var(--radix-popper-available-height); --radix-dropdown-menu-trigger-width: var(--radix-popper-anchor-width); --radix-dropdow
+
+... [7667 characters truncated] ...
+
+ant=destructive]:*:[svg]:!text-destructive [&_svg:not([class*='text-'])]:text-muted-foreground relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[inset]:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"[39m
+          [33mdata-orientation[39m=[32m"vertical"[39m
+          [33mdata-radix-collection-item[39m=[32m""[39m
+          [33mdata-slot[39m=[32m"dropdown-menu-item"[39m
+          [33mdata-variant[39m=[32m"default"[39m
+          [33mrole[39m=[32m"menuitem"[39m
+          [33mtabindex[39m=[32m"-1"[39m
+        [36m>[39m
+          [0mAll[0m
+        [36m</div>[39m
+        [36m<div[39m
+          [33maria-orientation[39m=[32m"horizontal"[39m
+          [33mclass[39m=[32m"bg-border -mx-1 my-1 h-px"[39m
+          [33mdata-slot[39m=[32m"dropdown-menu-separator"[39m
+          [33mrole[39m=[32m"separator"[39m
+        [36m/>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"focus:bg-accent focus:text-accent-foreground data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 dark:data-[variant=destructive]:focus:bg-destructive/20 data-[variant=destructive]:focus:text-destructive data-[variant=destructive]:*:[svg]:!text-destructive [&_svg:not([class*='text-'])]:text-muted-foreground relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[inset]:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"[39m
+          [33mdata-orientation[39m=[32m"vertical"[39m
+          [33mdata-radix-collection-item[39m=[32m""[39m
+          [33mdata-slot[39m=[32m"dropdown-menu-item"[39m
+          [33mdata-variant[39m=[32m"default"[39m
+          [33mrole[39m=[32m"menuitem"[39m
+          [33mtabindex[39m=[32m"-1"[39m
+        [36m>[39m
+          [0mReact[0m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"focus:bg-accent focus:text-accent-foreground data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 dark:data-[variant=destructive]:focus:bg-destructive/20 data-[variant=destructive]:focus:text-destructive data-[variant=destructive]:*:[svg]:!text-destructive [&_svg...
+[90m [2m❯[22m waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:[2m163:27[22m[39m
+[36m [2m❯[22m src/components/layout/__tests__/FocusAreaDropdown.test.tsx:[2m148:11[22m[39m
+    [90m146| [39m    [35mawait[39m user[33m.[39m[34mclick[39m(screen[33m.[39m[34mgetByRole[39m([32m'button'[39m))
+    [90m147| [39m
+    [90m148| [39m    [35mawait[39m [34mwaitFor[39m(() [33m=>[39m {
+    [90m   | [39m          [31m^[39m
+    [90m149| [39m      [35mconst[39m separator [33m=[39m screen[33m.[39m[34mgetByRole[39m([32m'separator'[39m)
+    [90m150| [39m      [34mexpect[39m(separator)[33m.[39m[34mtoBeInTheDocument[39m()
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/components/layout/__tests__/FocusAreaDropdown.test.tsx
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/components/layout/__tests__/FocusAreaDropdown.test.tsx [2m([22m[2m12 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 3760[2mms[22m[39m
+     [33m[2m✓[22m[39m renders pill-shaped trigger button [33m 644[2mms[22m[39m
+     [32m✓[39m shows "All Areas" by default when no area is selected[32m 79[2mms[22m[39m
+     [32m✓[39m shows selected area name when an area is selected[32m 142[2mms[22m[39m
+     [33m[2m✓[22m[39m opens dropdown menu when trigger is clicked [33m 429[2mms[22m[39m
+     [32m✓[39m displays "All" option at the top[32m 267[2mms[22m[39m
+[31m     [31m×[31m displays separator after "All" option[39m[33m 1216[2mms[22m[39m
+     [32m✓[39m displays "Manage Focus Areas..." at the bottom[32m 153[2mms[22m[39m
+     [32m✓[39m updates context and localStorage when selecting a focus area[32m 290[2mms[22m[39m
+     [32m✓[39m updates context and localStorage when selecting "All"[32m 198[2mms[22m[39m
+     [32m✓[39m calls onManageClick when "Manage Focus Areas..." is clicked[32m 200[2mms[22m[39m
+     [32m✓[39m applies muted background styling to trigger button[32m 18[2mms[22m[39m
+     [32m✓[39m renders empty list when no focus areas are available[32m 120[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m11 passed[39m[22m[90m (12)[39m
+[2m   Start at [22m 13:02:59
+[2m   Duration [22m 10.08s[2m (transform 248ms, setup 507ms, import 1.88s, tests 3.76s, environment 2.98s)[22m
+---
+timestamp: "2026-02-07 13:06:33"
+story: "1-ui-enhancements"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+npm error Missing script: "typecheck"
+npm error
+npm error To see a list of scripts, run:
+npm error   npm run
+npm error A complete log of this run can be found in: /Users/darindrobinski/.npm/_logs/2026-02-07T19_06_32_924Z-debug-0.log
