@@ -9,6 +9,7 @@ export interface VideoResult {
   title: string;
   channel: string;
   thumbnail: string | null;
+  publishedAt?: Date | null; // Video publication date for freshness badge
   score: number; // Aggregated score (max of all chunks)
   matchedChunks: number; // Count of matching chunks
   bestChunk: {
@@ -57,6 +58,7 @@ export function aggregateByVideo(chunks: SearchResult[]): VideoResult[] {
         title: chunk.videoTitle,
         channel: chunk.channel,
         thumbnail: chunk.thumbnail,
+        publishedAt: chunk.publishedAt,
         score: chunk.similarity,
         matchedChunks: 1,
         bestChunk: {

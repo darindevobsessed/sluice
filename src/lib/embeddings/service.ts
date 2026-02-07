@@ -3,6 +3,7 @@ import type { ChunkData, ChunkWithEmbedding, EmbedChunksResult } from './types'
 import { db, chunks } from '@/lib/db'
 import { eq } from 'drizzle-orm'
 import { computeRelationships } from '@/lib/graph'
+import { extractTemporalForVideo } from '@/lib/temporal/service'
 
 const BATCH_SIZE = 32
 
@@ -88,6 +89,14 @@ export async function embedChunks(
     } catch (error) {
       // Relationship computation failure should NOT fail the embedding
       console.error('Error computing relationships:', error)
+    }
+
+    // Auto-extract temporal metadata after embedding
+    try {
+      await extractTemporalForVideo(videoId)
+    } catch (error) {
+      // Temporal extraction failure should NOT fail the embedding
+      console.error('Error extracting temporal metadata:', error)
     }
   }
 

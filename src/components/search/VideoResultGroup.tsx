@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ChunkResult } from './ChunkResult';
+import { FreshnessBadge } from './FreshnessBadge';
 
 interface VideoResultGroupProps {
   video: VideoResult;
@@ -86,11 +87,13 @@ export function VideoResultGroup({
               {video.bestChunk.content}
             </p>
 
-            {/* Footer with match count and expand button */}
+            {/* Footer with match count, freshness badge, and expand button */}
             <div className="flex items-center gap-2 mt-2">
               <Badge variant="secondary">
                 {video.matchedChunks} {video.matchedChunks === 1 ? 'match' : 'matches'}
               </Badge>
+
+              <FreshnessBadge publishedAt={video.publishedAt} />
 
               {hasChunks && (
                 <Button
