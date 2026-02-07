@@ -129,6 +129,34 @@ export const jobs = pgTable('jobs', {
   typeIdx: index('jobs_type_idx').on(table.type),
 }));
 
+/**
+ * Focus Areas table - user-defined categories for organizing videos
+ * Enables filtering the knowledge bank by topic/theme
+ */
+export const focusAreas = pgTable('focus_areas', {
+  id: serial('id').primaryKey(),
+  name: text('name').notNull().unique(),
+  color: text('color'), // optional color for UI display
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+/**
+ * Video Focus Areas junction table - many-to-many relationship
+ * Videos can belong to multiple focus areas
+ */
+export const videoFocusAreas = pgTable('video_focus_areas', {
+  videoId: integer('video_id')
+    .notNull()
+    .references(() => videos.id, { onDelete: 'cascade' }),
+  focusAreaId: integer('focus_area_id')
+    .notNull()
+    .references(() => focusAreas.id, { onDelete: 'cascade' }),
+}, (table) => ({
+  pk: unique('video_focus_areas_pk').on(table.videoId, table.focusAreaId),
+  videoIdx: index('video_focus_areas_video_idx').on(table.videoId),
+  focusAreaIdx: index('video_focus_areas_focus_area_idx').on(table.focusAreaId),
+}));
+
 // Type exports for use in application code
 export type Video = typeof videos.$inferSelect;
 export type NewVideo = typeof videos.$inferInsert;
@@ -153,3 +181,9 @@ export type NewTemporalMetadata = typeof temporalMetadata.$inferInsert;
 
 export type Job = typeof jobs.$inferSelect;
 export type NewJob = typeof jobs.$inferInsert;
+
+export type FocusArea = typeof focusAreas.$inferSelect;
+export type NewFocusArea = typeof focusAreas.$inferInsert;
+
+export type VideoFocusArea = typeof videoFocusAreas.$inferSelect;
+export type NewVideoFocusArea = typeof videoFocusAreas.$inferInsert;

@@ -1,15 +1,15 @@
 ---
 name: ui-enhancements
 title: UI Enhancements
-status: ready
+status: active
 priority: high
 created: 2026-02-05
 updated: 2026-02-07
 cycle: experience
 story_number: 1
 chunks_total: 6
-chunks_complete: 0
-current_chunk: 0
+chunks_complete: 1
+current_chunk: 2
 ---
 
 # Story: UI Enhancements

@@ -1,0 +1,146 @@
+---
+timestamp: "2026-02-07 12:25:15"
+story: "1-ui-enhancements"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+> gold-miner@0.1.0 test
+> vitest run src/app/api/focus-areas/__tests__/route.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/app/api/focus-areas/__tests__/route.test.ts [2m([22m[2m8 tests[22m[2m | [22m[31m8 failed[39m[2m)[22m[33m 322[2mms[22m[39m
+[31m     [31m×[31m returns empty array when no focus areas exist[39m[32m 77[2mms[22m[39m
+[31m     [31m×[31m returns all focus areas[39m[32m 42[2mms[22m[39m
+[31m     [31m×[31m creates focus area with name only[39m[32m 56[2mms[22m[39m
+[31m     [31m×[31m creates focus area with name and color[39m[32m 30[2mms[22m[39m
+[31m     [31m×[31m returns 400 when name is missing[39m[32m 34[2mms[22m[39m
+[31m     [31m×[31m returns 400 when name is empty string[39m[32m 28[2mms[22m[39m
+[31m     [31m×[31m returns 409 when focus area name already exists[39m[32m 27[2mms[22m[39m
+[31m     [31m×[31m trims whitespace from name[39m[32m 27[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 8 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/app/api/focus-areas/__tests__/route.test.ts[2m > [22mGET /api/focus-areas[2m > [22mreturns empty array when no focus areas exist
+[41m[1m FAIL [22m[49m src/app/api/focus-areas/__tests__/route.test.ts[2m > [22mGET /api/focus-areas[2m > [22mreturns all focus areas
+[31m[1merror[22m: relation "focus_areas" does not exist[39m
+[90m [2m❯[22m node_modules/pg-pool/index.js:[2m45:11[22m[39m
+[36m [2m❯[22m setupTestDb src/lib/db/__tests__/setup.ts:[2m21:3[22m[39m
+    [90m 19| [39m
+    [90m 20| [39m  [90m// Clean tables before each test[39m
+    [90m 21| [39m  await pool.query('TRUNCATE videos, insights, channels, settings, chu…
+    [90m   | [39m  [31m^[39m
+    [90m 22| [39m
+    [90m 23| [39m  [35mreturn[39m testDb[33m![39m[33m;[39m
+[90m [2m❯[22m src/app/api/focus-areas/__tests__/route.test.ts:[2m9:5[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/8]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/app/api/focus-areas/__tests__/route.test.ts[2m > [22mPOST /api/focus-areas[2m > [22mcreates focus area with name only
+[41m[1m FAIL [22m[49m src/app/api/focus-areas/__tests__/route.test.ts[2m > [22mPOST /api/focus-areas[2m > [22mcreates focus area with name and color
+[41m[1m FAIL [22m[49m src/app/api/focus-areas/__tests__/route.test.ts[2m > [22mPOST /api/focus-areas[2m > [22mreturns 400 when name is missing
+[41m[1m FAIL [22m[49m src/app/api/focus-areas/__tests__/route.test.ts[2m > [22mPOST /api/focus-areas[2m > [22mreturns 400 when name is empty string
+[41m[1m FAIL [22m[49m src/app/api/focus-areas/__tests__/route.test.ts[2m > [22mPOST /api/focus-areas[2m > [22mreturns 409 when focus area name already exists
+[41m[1m FAIL [22m[49m src/app/api/focus-areas/__tests__/route.test.ts[2m > [22mPOST /api/focus-areas[2m > [22mtrims whitespace from name
+[31m[1merror[22m: relation "focus_areas" does not exist[39m
+[90m [2m❯[22m node_modules/pg-pool/index.js:[2m45:11[22m[39m
+[36m [2m❯[22m setupTestDb src/lib/db/__tests__/setup.ts:[2m21:3[22m[39m
+    [90m 19| [39m
+    [90m 20| [39m  [90m// Clean tables before each test[39m
+    [90m 21| [39m  await pool.query('TRUNCATE videos, insights, channels, settings, chu…
+    [90m   | [39m  [31m^[39m
+    [90m 22| [39m
+    [90m 23| [39m  [35mreturn[39m testDb[33m![39m[33m;[39m
+[90m [2m❯[22m src/app/api/focus-areas/__tests__/route.test.ts:[2m49:5[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/8]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m8 failed[39m[22m[90m (8)[39m
+[2m   Start at [22m 12:25:08
+[2m   Duration [22m 7.04s[2m (transform 174ms, setup 430ms, import 1.67s, tests 322ms, environment 4.19s)[22m
+---
+timestamp: "2026-02-07 12:26:27"
+story: "1-ui-enhancements"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+> gold-miner@0.1.0 test
+> vitest run src/app/api/focus-areas/__tests__/route.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/app/api/focus-areas/__tests__/route.test.ts [2m([22m[2m8 tests[22m[2m | [22m[31m2 failed[39m[2m)[22m[33m 1352[2mms[22m[39m
+     [32m✓[39m returns empty array when no focus areas exist[32m 269[2mms[22m[39m
+[31m     [31m×[31m returns all focus areas[39m[32m 197[2mms[22m[39m
+     [32m✓[39m creates focus area with name only[32m 171[2mms[22m[39m
+     [32m✓[39m creates focus area with name and color[32m 126[2mms[22m[39m
+     [32m✓[39m returns 400 when name is missing[32m 129[2mms[22m[39m
+     [32m✓[39m returns 400 when name is empty string[32m 127[2mms[22m[39m
+     [32m✓[39m returns 409 when focus area name already exists[32m 197[2mms[22m[39m
+[31m     [31m×[31m trims whitespace from name[39m[32m 134[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 2 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/app/api/focus-areas/__tests__/route.test.ts[2m > [22mGET /api/focus-areas[2m > [22mreturns all focus areas
+[31m[1mAssertionError[22m: expected [] to have a length of 3 but got +0[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 3[39m
+[31m+ 0[39m
+
+[36m [2m❯[22m src/app/api/focus-areas/__tests__/route.test.ts:[2m40:29[22m[39m
+    [90m 38| [39m
+    [90m 39| [39m    [34mexpect[39m(response[33m.[39mstatus)[33m.[39m[34mtoBe[39m([34m200[39m)
+    [90m 40| [39m    [34mexpect[39m(data[33m.[39mfocusAreas)[33m.[39m[34mtoHaveLength[39m([34m3[39m)
+    [90m   | [39m                            [31m^[39m
+    [90m 41| [39m    [34mexpect[39m(data[33m.[39mfocusAreas[[34m0[39m][33m.[39mname)[33m.[39m[34mtoBe[39m([32m'React'[39m)
+    [90m 42| [39m    [34mexpect[39m(data[33m.[39mfocusAreas[[34m0[39m][33m.[39mcolor)[33m.[39m[34mtoBe[39m([32m'#61dafb'[39m)
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/app/api/focus-areas/__tests__/route.test.ts[2m > [22mPOST /api/focus-areas[2m > [22mtrims whitespace from name
+[31m[1mAssertionError[22m: expected 409 to be 201 // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 201[39m
+[31m+ 409[39m
+
+[36m [2m❯[22m src/app/api/focus-areas/__tests__/route.test.ts:[2m143:29[22m[39m
+    [90m141| [39m    [35mconst[39m data [33m=[39m [35mawait[39m response[33m.[39m[34mjson[39m()
+    [90m142| [39m
+    [90m143| [39m    [34mexpect[39m(response[33m.[39mstatus)[33m.[39m[34mtoBe[39m([34m201[39m)
+    [90m   | [39m                            [31m^[39m
+    [90m144| [39m    [34mexpect[39m(data[33m.[39mfocusArea[33m.[39mname)[33m.[39m[34mtoBe[39m([32m'React'[39m)
+    [90m145| [39m  })
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m6 passed[39m[22m[90m (8)[39m
+[2m   Start at [22m 12:26:20
+[2m   Duration [22m 6.32s[2m (transform 243ms, setup 488ms, import 1.53s, tests 1.35s, environment 2.48s)[22m
+---
+timestamp: "2026-02-07 12:29:43"
+story: "1-ui-enhancements"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+npm error Missing script: "typecheck"
+npm error
+npm error To see a list of scripts, run:
+npm error   npm run
+npm error A complete log of this run can be found in: /Users/darindrobinski/.npm/_logs/2026-02-07T18_29_42_896Z-debug-0.log
