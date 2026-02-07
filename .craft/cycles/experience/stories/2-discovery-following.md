@@ -8,8 +8,8 @@ updated: 2026-02-07
 cycle: experience
 story_number: 2
 chunks_total: 5
-chunks_complete: 0
-current_chunk: 0
+chunks_complete: 1
+current_chunk: 2
 ---
 
 # Story: Discovery & Following

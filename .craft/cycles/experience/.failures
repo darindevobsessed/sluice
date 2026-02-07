@@ -1025,3 +1025,309 @@ tool: "Bash"
 error: |
   Exit code 1
 (eval):1: no matches found: src/app/videos/[id]/page.tsx
+---
+timestamp: "2026-02-07 14:25:46"
+story: "2-discovery-following"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 7 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/lib/youtube/__tests__/channel-parser.test.ts[2m > [22mparseChannelUrl[2m > [22m@handle format[2m > [22mparses @handle without domain by fetching channel page
+[31m[1mError[22m: Invalid channel URL format[39m
+[36m [2m❯[22m parseChannelUrl src/lib/youtube/channel-parser.ts:[2m104:9[22m[39m
+    [90m102| [39m  }
+    [90m103| [39m
+    [90m104| [39m  [35mthrow[39m [35mnew[39m [33mError[39m([32m'Invalid channel URL format'[39m)
+    [90m   | [39m        [31m^[39m
+    [90m105| [39m}
+    [90m106| [39m
+[90m [2m❯[22m src/lib/youtube/__tests__/channel-parser.test.ts:[2m82:28[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/7]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/lib/youtube/__tests__/channel-parser.test.ts[2m > [22mparseChannelUrl[2m > [22m@handle format[2m > [22mhandles @handle with externalId in page source
+[31m[1mAssertionError[22m: expected 'UCtest456' to be 'UCtest789' // Object.is equality[39m
+
+Expected: [32m"UCtest[7m789[27m"[39m
+Received: [31m"UCtest[7m456[27m"[39m
+
+[36m [2m❯[22m src/lib/youtube/__tests__/channel-parser.test.ts:[2m102:22[22m[39m
+    [90m100| [39m
+    [90m101| [39m      const result = await parseChannelUrl('https://www.youtube.com/@t…
+    [90m102| [39m      [34mexpect[39m(result)[33m.[39m[34mtoBe[39m([32m'UCtest789'[39m)
+    [90m   | [39m                     [31m^[39m
+    [90m103| [39m    })
+    [90m104| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/7]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/lib/youtube/__tests__/channel-parser.test.ts[2m > [22mparseChannelUrl[2m > [22m@handle format[2m > [22mthrows error when channel page fetch fails
+[31m[1mAssertionError[22m: expected [Function] to throw error including 'Failed to fetch channel page: 404 Not…' but got 'Invalid channel URL format'[39m
+
+Expected: [32m"Failed to fetch channel page: 404 Not Found"[39m
+Received: [31m"Invalid channel URL format"[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/7]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/lib/youtube/__tests__/channel-parser.test.ts[2m > [22mparseChannelUrl[2m > [22m@handle format[2m > [22mthrows error when channel ID not found in HTML
+[31m[1mAssertionError[22m: expected [Function] to throw error including 'Could not extract channel ID from page' but got 'Invalid channel URL format'[39m
+
+Expected: [32m"Could not extract channel ID from page"[39m
+Received: [31m"Invalid channel URL format"[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/7]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/lib/youtube/__tests__/channel-parser.test.ts[2m > [22mparseChannelUrl[2m > [22m/c/ format[2m > [22mparses youtube.com/c/name by fetching channel page
+[31m[1mAssertionError[22m: expected 'UCtest789' to be 'UCcustomname123' // Object.is equality[39m
+
+Expected: [32m"UC[7mcustomname123[27m"[39m
+Received: [31m"UC[7mtest789[27m"[39m
+
+[36m [2m❯[22m src/lib/youtube/__tests__/channel-parser.test.ts:[2m148:22[22m[39m
+    [90m146| [39m
+    [90m147| [39m      const result = await parseChannelUrl('https://www.youtube.com/c/…
+    [90m148| [39m      [34mexpect[39m(result)[33m.[39m[34mtoBe[39m([32m'UCcustomname123'[39m)
+    [90m   | [39m                     [31m^[39m
+    [90m149| [39m    })
+    [90m150| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/7]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/lib/youtube/__tests__/channel-parser.test.ts[2m > [22mparseChannelUrl[2m > [22m/c/ format[2m > [22mparses /c/ format without protocol
+[31m[1mError[22m: Failed to fetch channel page: 404 Not Found[39m
+[36m [2m❯[22m parseChannelUrl src/lib/youtube/channel-parser.ts:[2m89:13[22m[39m
+    [90m 87| [39m
+    [90m 88| [39m    [35mif[39m ([33m![39mresponse[33m.[39mok) {
+    [90m 89| [39m      [35mthrow[39m [35mnew[39m [33mError[39m(
+    [90m   | [39m            [31m^[39m
+    [90m 90| [39m        `Failed to fetch channel page: ${response.status} ${response.s…
+    [90m 91| [39m      )
+[90m [2m❯[22m src/lib/youtube/__tests__/channel-parser.test.ts:[2m166:22[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/7]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/lib/youtube/__tests__/channel-parser.test.ts[2m > [22mparseChannelUrl[2m > [22medge cases[2m > [22mhandles network errors gracefully
+[31m[1mAssertionError[22m: expected [Function] to throw error including 'Failed to fetch channel page: Network…' but got 'Invalid channel URL format'[39m
+
+Expected: [32m"Failed to fetch channel page: Network error"[39m
+Received: [31m"Invalid channel URL format"[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/7]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/lib/youtube/__tests__/channel-parser.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/lib/youtube/__tests__/channel-parser.test.ts [2m([22m[2m22 tests[22m[2m | [22m[31m7 failed[39m[2m)[22m[32m 84[2mms[22m[39m
+       [32m✓[39m parses youtube.com/channel/UCXXX format[32m 5[2mms[22m[39m
+       [32m✓[39m parses youtube.com/channel/UCXXX without protocol[32m 1[2mms[22m[39m
+       [32m✓[39m parses youtube.com/channel/UCXXX with trailing slash[32m 1[2mms[22m[39m
+       [32m✓[39m parses youtube.com/channel/UCXXX with query params[32m 2[2mms[22m[39m
+       [32m✓[39m accepts raw channel ID starting with UC[32m 3[2mms[22m[39m
+       [32m✓[39m parses youtube.com/@handle by fetching channel page[32m 4[2mms[22m[39m
+[31m       [31m×[31m parses @handle without domain by fetching channel page[39m[32m 13[2mms[22m[39m
+[31m       [31m×[31m handles @handle with externalId in page source[39m[32m 15[2mms[22m[39m
+[31m       [31m×[31m throws error when channel page fetch fails[39m[32m 16[2mms[22m[39m
+[31m       [31m×[31m throws error when channel ID not found in HTML[39m[32m 3[2mms[22m[39m
+[31m       [31m×[31m parses youtube.com/c/name by fetching channel page[39m[32m 4[2mms[22m[39m
+[31m       [31m×[31m parses /c/ format without protocol[39m[32m 2[2mms[22m[39m
+       [32m✓[39m throws error for invalid URL format[32m 3[2mms[22m[39m
+       [32m✓[39m throws error for empty string[32m 1[2mms[22m[39m
+       [32m✓[39m throws error for whitespace only[32m 1[2mms[22m[39m
+[31m       [31m×[31m handles network errors gracefully[39m[32m 3[2mms[22m[39m
+     [32m✓[39m extracts channel ID from meta tag[32m 0[2mms[22m[39m
+     [32m✓[39m extracts channel ID from externalId in script[32m 0[2mms[22m[39m
+     [32m✓[39m prefers meta tag over externalId when both present[32m 0[2mms[22m[39m
+     [32m✓[39m returns null when channel ID not found[32m 0[2mms[22m[39m
+     [32m✓[39m returns null for empty HTML[32m 0[2mms[22m[39m
+     [32m✓[39m handles malformed HTML gracefully[32m 0[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m7 failed[39m[22m[2m | [22m[1m[32m15 passed[39m[22m[90m (22)[39m
+[2m   Start at [22m 14:25:41
+[2m   Duration [22m 4.72s[2m (transform 142ms, setup 444ms, import 136ms, tests 84ms, environment 3.46s)[22m
+---
+timestamp: "2026-02-07 14:27:32"
+story: "2-discovery-following"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+[90mstderr[2m | src/app/api/channels/__tests__/route.test.ts[2m > [22m[2mGET /api/channels[2m > [22m[2mreturns 500 on database error
+[22m[39mError fetching channels: Error: Database error
+    at [90m/Users/darindrobinski/dev/repos/gold-miner/[39msrc/app/api/channels/__tests__/route.test.ts:91:39
+    at [90mfile:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:145:11
+    at [90mfile:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:915:26
+    at [90mfile:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1243:20
+    at new Promise (<anonymous>)
+    at runWithTimeout [90m(file:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1209:10[90m)[39m
+    at [90mfile:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1653:37
+    at Traces.$ [90m(file:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4mvitest[24m/dist/chunks/traces.CCmnQaNT.js:142:27[90m)[39m
+    at trace [90m(file:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4mvitest[24m/dist/chunks/test.B8ej_ZHS.js:239:21[90m)[39m
+    at runTest [90m(file:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1653:12[90m)[39m
+
+[90mstderr[2m | src/app/api/channels/__tests__/route.test.ts[2m > [22m[2mPOST /api/channels[2m > [22m[2mcreates a new channel from valid URL
+[22m[39mError following channel: Error: [vitest] No "getFeedUrl" export is defined on the "@/lib/automation/rss" mock. Did you forget to return it from "vi.mock"?
+If you need to partially mock a module, you can use "importOriginal" helper inside:
+
+    at VitestMocker.createError [90m(file:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4mvitest[24m/dist/chunks/startModuleRunner.DEj0jb3e.js:311:17[90m)[39m
+    at Object.get [90m(file:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4mvitest[24m/dist/chunks/startModuleRunner.DEj0jb3e.js:384:16[90m)[39m
+    at Module.POST [90m(/Users/darindrobinski/dev/repos/gold-miner/[39msrc/app/api/channels/route.ts:60:23[90m)[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90m/Users/darindrobinski/dev/repos/gold-miner/[39msrc/app/api/channels/__tests__/route.test.ts:144:22
+    at [90mfile:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:915:20 {
+  codeFrame: [32m'vi.mock(import("@/lib/automation/rss"), async (importOriginal) => {\n'[39m +
+    [32m'  const actual = await importOriginal()\n'[39m +
+    [32m'  return {\n'[39m +
+    [32m'    ...actual,\n'[39m +
+    [32m'    // your mocked methods\n'[39m +
+    [32m'  }\n'[39m +
+    [32m'})'[39m
+}
+
+[90mstderr[2m | src/app/api/channels/__tests__/route.test.ts[2m > [22m[2mPOST /api/channels[2m > [22m[2mreturns 409 when channel already exists
+[22m[39mError following channel: Error: [vitest] No "getFeedUrl" export is defined on the "@/lib/automation/rss" mock. Did you forget to return it from "vi.mock"?
+If you need to partially mock a module, you can use "importOriginal" helper inside:
+
+    at VitestMocker.createError [90m(file:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4mvitest[24m/dist/chunks/startModuleRunner.DEj0jb3e.js:311:17[90m)[39m
+    at Object.get [90m(file:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4mvitest[24m/dist/chunks/startModuleRunner.DEj0jb3e.js:384:16[90m)[39m
+    at Module.POST [90m(/Users/darindrobinski/dev/repos/gold-miner/[39msrc/app/api/channels/route.ts:60:23[90m)[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90m/Users/darindrobinski/dev/repos/gold-miner/[39msrc/app/api/channels/__tests__/route.test.ts:250:22
+    at [90mfile:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:915:20 {
+  codeFrame: [32m'vi.mock(import("@/lib/automation/rss"), async (importOriginal) => {\n'[39m +
+    [32m'  const actual = await importOriginal()\n'[39m +
+    [32m'  return {\n'[39m +
+    [32m'    ...actual,\n'[39m +
+    [32m'    // your mocked methods\n'[39m +
+    [32m'  }\n'[39m +
+    [32m'})'[39m
+}
+
+[90mstderr[2m | src/app/api/channels/__tests__/route.test.ts[2m > [22m[2mPOST /api/channels[2m > [22m[2mreturns 500 on unexpected database error
+[22m[39mError following channel: Error: [vitest] No "getFeedUrl" export is defined on the "@/lib/automation/rss" mock. Did you forget to return it from "vi.mock"?
+If you need to partially mock a module, you can use "importOriginal" helper inside:
+
+    at VitestMocker.createError [90m(file:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4mvites
+
+... [1256 characters truncated] ...
+
+, …(8) }, { id: 2, …(8) } ] to deeply equal [ { id: 1, …(8) }, { id: 2, …(8) } ][39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[33m@@ -1,21 +1,21 @@[39m
+[2m  [[22m
+[2m    {[22m
+[2m      "autoFetch": true,[22m
+[2m      "channelId": "UCtest123",[22m
+[32m-     "createdAt": 2026-01-01T00:00:00.000Z,[39m
+[31m+     "createdAt": "2026-01-01T00:00:00.000Z",[39m
+[2m      "feedUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UCtest123",[22m
+[2m      "fetchIntervalHours": 12,[22m
+[2m      "id": 1,[22m
+[32m-     "lastFetchedAt": 2026-01-15T00:00:00.000Z,[39m
+[31m+     "lastFetchedAt": "2026-01-15T00:00:00.000Z",[39m
+[2m      "name": "Test Channel 1",[22m
+[2m      "thumbnailUrl": "https://example.com/thumb1.jpg",[22m
+[2m    },[22m
+[2m    {[22m
+[2m      "autoFetch": false,[22m
+[2m      "channelId": "UCtest456",[22m
+[32m-     "createdAt": 2026-01-02T00:00:00.000Z,[39m
+[31m+     "createdAt": "2026-01-02T00:00:00.000Z",[39m
+[2m      "feedUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UCtest456",[22m
+[2m      "fetchIntervalHours": 12,[22m
+[2m      "id": 2,[22m
+[2m      "lastFetchedAt": null,[22m
+[2m      "name": "Test Channel 2",[22m
+
+[36m [2m❯[22m src/app/api/channels/__tests__/route.test.ts:[2m74:18[22m[39m
+    [90m 72| [39m
+    [90m 73| [39m    [34mexpect[39m(response[33m.[39mstatus)[33m.[39m[34mtoBe[39m([34m200[39m)
+    [90m 74| [39m    [34mexpect[39m(data)[33m.[39m[34mtoEqual[39m(mockChannels)
+    [90m   | [39m                 [31m^[39m
+    [90m 75| [39m  })
+    [90m 76| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/app/api/channels/__tests__/route.test.ts[2m > [22mPOST /api/channels[2m > [22mcreates a new channel from valid URL
+[31m[1mAssertionError[22m: expected 500 to be 201 // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 201[39m
+[31m+ 500[39m
+
+[36m [2m❯[22m src/app/api/channels/__tests__/route.test.ts:[2m147:29[22m[39m
+    [90m145| [39m    [35mconst[39m data [33m=[39m [35mawait[39m response[33m.[39m[34mjson[39m()
+    [90m146| [39m
+    [90m147| [39m    [34mexpect[39m(response[33m.[39mstatus)[33m.[39m[34mtoBe[39m([34m201[39m)
+    [90m   | [39m                            [31m^[39m
+    [90m148| [39m    [34mexpect[39m(data)[33m.[39m[34mtoEqual[39m({ channel[33m:[39m mockInserted })
+    [90m149| [39m    expect(mockParseChannelUrl).toHaveBeenCalledWith('https://www.yout…
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/app/api/channels/__tests__/route.test.ts[2m > [22mPOST /api/channels[2m > [22mreturns 409 when channel already exists
+[31m[1mAssertionError[22m: expected 500 to be 409 // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 409[39m
+[31m+ 500[39m
+
+[36m [2m❯[22m src/app/api/channels/__tests__/route.test.ts:[2m253:29[22m[39m
+    [90m251| [39m    [35mconst[39m data [33m=[39m [35mawait[39m response[33m.[39m[34mjson[39m()
+    [90m252| [39m
+    [90m253| [39m    [34mexpect[39m(response[33m.[39mstatus)[33m.[39m[34mtoBe[39m([34m409[39m)
+    [90m   | [39m                            [31m^[39m
+    [90m254| [39m    [34mexpect[39m(data)[33m.[39m[34mtoEqual[39m({ error[33m:[39m [32m'Channel already followed'[39m })
+    [90m255| [39m  })
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/app/api/channels/__tests__/route.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/app/api/channels/__tests__/route.test.ts [2m([22m[2m11 tests[22m[2m | [22m[31m3 failed[39m[2m)[22m[32m 43[2mms[22m[39m
+[31m     [31m×[31m returns all followed channels[39m[32m 21[2mms[22m[39m
+     [32m✓[39m returns empty array when no channels followed[32m 1[2mms[22m[39m
+     [32m✓[39m returns 500 on database error[32m 3[2mms[22m[39m
+[31m     [31m×[31m creates a new channel from valid URL[39m[32m 7[2mms[22m[39m
+     [32m✓[39m returns 400 for invalid request body[32m 2[2mms[22m[39m
+     [32m✓[39m returns 400 for missing url field[32m 1[2mms[22m[39m
+     [32m✓[39m returns 400 for empty url string[32m 1[2mms[22m[39m
+     [32m✓[39m returns 400 for invalid URL format[32m 1[2mms[22m[39m
+     [32m✓[39m returns 400 when RSS feed fetch fails[32m 1[2mms[22m[39m
+[31m     [31m×[31m returns 409 when channel already exists[39m[32m 2[2mms[22m[39m
+     [32m✓[39m returns 500 on unexpected database error[32m 1[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m3 failed[39m[22m[2m | [22m[1m[32m8 passed[39m[22m[90m (11)[39m
+[2m   Start at [22m 14:27:28
+[2m   Duration [22m 4.16s[2m (transform 173ms, setup 298ms, import 1.17s, tests 43ms, environment 1.94s)[22m
+---
+timestamp: "2026-02-07 14:28:52"
+story: "2-discovery-following"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+(eval):1: no matches found: channels/\[id\]/__tests__/route.test.ts
