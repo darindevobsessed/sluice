@@ -1,4 +1,4 @@
-import { pgTable, serial, text, integer, timestamp, jsonb, vector, real, index, unique } from 'drizzle-orm/pg-core';
+import { pgTable, serial, text, integer, timestamp, jsonb, vector, real, index, unique, boolean } from 'drizzle-orm/pg-core';
 
 /**
  * Videos table - stores YouTube video metadata and transcripts
@@ -25,6 +25,10 @@ export const channels = pgTable('channels', {
   name: text('name').notNull(),
   thumbnailUrl: text('thumbnail_url'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
+  feedUrl: text('feed_url'),
+  autoFetch: boolean('auto_fetch').default(false),
+  lastFetchedAt: timestamp('last_fetched_at'),
+  fetchIntervalHours: integer('fetch_interval_hours').default(12),
 });
 
 /**
