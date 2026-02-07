@@ -2,13 +2,12 @@
 
 import { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { VideoPlayer } from '@/components/videos/VideoPlayer';
 import { VideoMetadata } from '@/components/videos/VideoMetadata';
 import { InsightsTabs } from '@/components/insights/InsightsTabs';
 import { EmbedButton } from '@/components/video/EmbedButton';
+import { usePageTitle } from '@/components/layout/PageTitleContext';
+import { Button } from '@/components/ui/button';
 import type { Video } from '@/lib/db/schema';
 
 interface VideoDetailPageProps {
@@ -24,6 +23,9 @@ export default function VideoDetailPage({ params }: VideoDetailPageProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [seekTime, setSeekTime] = useState<number | undefined>(undefined);
+
+  // Set page title
+  const { setPageTitle } = usePageTitle();
 
   // Fetch video data
   useEffect(() => {
@@ -64,6 +66,23 @@ export default function VideoDetailPage({ params }: VideoDetailPageProps) {
     fetchVideo();
   }, [id]);
 
+  // Set page title when video loads or on error
+  useEffect(() => {
+    if (video) {
+      setPageTitle({
+        title: video.title,
+        backHref: '/',
+        backLabel: 'Knowledge Bank',
+      })
+    } else if (error) {
+      setPageTitle({
+        title: 'Video Not Found',
+        backHref: '/',
+        backLabel: 'Knowledge Bank',
+      })
+    }
+  }, [video, error, setPageTitle]);
+
   // Handle seek from transcript
   const handleSeek = (seconds: number) => {
     setSeekTime(seconds);
@@ -73,8 +92,6 @@ export default function VideoDetailPage({ params }: VideoDetailPageProps) {
   if (isLoading) {
     return (
       <div className="p-6">
-        <div className="mb-8 h-8 w-48 animate-pulse rounded bg-muted" />
-        <div className="mb-4 h-10 w-full max-w-2xl animate-pulse rounded bg-muted" />
         <div className="mb-6 h-6 w-96 animate-pulse rounded bg-muted" />
         <div className="mx-auto mb-8 aspect-video w-full max-w-[800px] animate-pulse rounded-lg bg-muted" />
         <div className="h-[400px] w-full animate-pulse rounded-lg bg-muted" />
@@ -86,12 +103,6 @@ export default function VideoDetailPage({ params }: VideoDetailPageProps) {
   if (error || !video) {
     return (
       <div className="p-6">
-        <Link href="/">
-          <Button variant="ghost" size="sm" className="mb-6">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Knowledge Bank
-          </Button>
-        </Link>
         <div className="mx-auto max-w-2xl rounded-lg border border-destructive/50 bg-destructive/10 p-8 text-center">
           <h2 className="mb-2 text-xl font-semibold text-destructive">
             {error || 'Video not found'}
@@ -109,17 +120,6 @@ export default function VideoDetailPage({ params }: VideoDetailPageProps) {
 
   return (
     <div className="p-6">
-      {/* Back button */}
-      <Link href="/">
-        <Button variant="ghost" size="sm" className="mb-6">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Knowledge Bank
-        </Button>
-      </Link>
-
-      {/* Video title */}
-      <h1 className="mb-4 text-3xl font-semibold leading-tight">{video.title}</h1>
-
       {/* Metadata row */}
       <VideoMetadata video={video} className="mb-6" />
 

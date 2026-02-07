@@ -7,6 +7,7 @@ import { VideoGrid } from '@/components/videos/VideoGrid';
 import { EmptyState } from '@/components/videos/EmptyState';
 import { SearchResults } from '@/components/search/SearchResults';
 import { useSearch } from '@/hooks/useSearch';
+import { usePageTitle } from '@/components/layout/PageTitleContext';
 import type { Video } from '@/lib/db/schema';
 
 interface VideoStats {
@@ -25,8 +26,16 @@ export default function Home() {
   const [stats, setStats] = useState<VideoStats | null>(null);
   const [isLoadingVideos, setIsLoadingVideos] = useState(true);
 
+  // Set page title
+  const { setPageTitle } = usePageTitle();
+
   // Use the new search hook
   const { query, setQuery, results, isLoading: isSearching } = useSearch();
+
+  // Set page title on mount
+  useEffect(() => {
+    setPageTitle({ title: 'Knowledge Bank' });
+  }, [setPageTitle]);
 
   // Initial load of all videos (for stats and when not searching)
   useEffect(() => {
@@ -68,8 +77,6 @@ export default function Home() {
 
   return (
     <div className="p-6">
-      <h1 className="mb-8 text-3xl font-semibold">Knowledge Bank</h1>
-
       {/* Stats Header */}
       {isLoadingVideos && !stats ? (
         <StatsHeaderSkeleton />

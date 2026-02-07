@@ -5,6 +5,7 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { MainContent } from "@/components/layout/MainContent";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { AgentProvider } from "@/lib/agent/AgentProvider";
+import { FocusAreaProvider } from "@/components/providers/FocusAreaProvider";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -33,8 +34,10 @@ export default function RootLayout({
       >
         <ThemeProvider>
           <AgentProvider>
-            <Sidebar />
-            <MainContent>{children}</MainContent>
+            <FocusAreaProvider>
+              <Sidebar />
+              <MainContent>{children}</MainContent>
+            </FocusAreaProvider>
           </AgentProvider>
         </ThemeProvider>
       </body>
