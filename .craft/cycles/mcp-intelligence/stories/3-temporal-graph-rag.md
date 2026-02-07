@@ -8,8 +8,8 @@ updated: 2026-02-06
 cycle: mcp-intelligence
 story_number: 3
 chunks_total: 5
-chunks_complete: 4
-current_chunk: 5
+chunks_complete: 5
+current_chunk: 6
 ---
 
 # Story: Temporal Graph RAG
