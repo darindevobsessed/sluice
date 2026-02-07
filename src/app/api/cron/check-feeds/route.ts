@@ -1,0 +1,44 @@
+import { NextResponse } from 'next/server'
+import { fetchChannelFeed } from '@/lib/automation/rss'
+import { getChannelsForAutoFetch, updateChannelLastFetched } from '@/lib/automation/queries'
+import { findNewVideos, createVideoFromRSS } from '@/lib/automation/delta'
+import { enqueueJob } from '@/lib/automation/queue'
+
+export async function GET(request: Request) {
+  // Verify cron secret
+  const authHeader = request.headers.get('authorization')
+  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    return new Response('Unauthorized', { status: 401 })
+  }
+
+  try {
+    const channels = await getChannelsForAutoFetch()
+    let newVideosQueued = 0
+
+    for (const channel of channels) {
+      try {
+        const feed = await fetchChannelFeed(channel.channelId)
+        const newVideos = await findNewVideos(feed.videos)
+
+        for (const video of newVideos) {
+          const videoId = await createVideoFromRSS(video)
+          await enqueueJob('fetch_transcript', { videoId, youtubeId: video.youtubeId })
+          newVideosQueued++
+        }
+
+        await updateChannelLastFetched(channel.id)
+      } catch (error) {
+        // Log per-channel errors but continue processing other channels
+        console.error(`Error processing channel ${channel.channelId}:`, error)
+      }
+    }
+
+    return NextResponse.json({ checked: channels.length, queued: newVideosQueued })
+  } catch (error) {
+    console.error('Error in check-feeds cron:', error)
+    return NextResponse.json(
+      { error: 'Failed to check feeds' },
+      { status: 500 }
+    )
+  }
+}
