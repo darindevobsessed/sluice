@@ -506,4 +506,276 @@ describe('GET /api/search', () => {
     expect(typeof data.timing).toBe('number');
     expect(data.timing).toBeGreaterThanOrEqual(0);
   });
+
+  describe('temporal decay parameters', () => {
+    it('does not apply decay by default', async () => {
+      const db = testDb;
+
+      const now = new Date();
+      const oneYearAgo = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+
+      const [oldVideo] = await db
+        .insert(schema.videos)
+        .values({
+          youtubeId: 'old-vid',
+          title: 'Old Video',
+          channel: 'Test Channel',
+          transcript: 'Test transcript',
+          duration: 600,
+          publishedAt: oneYearAgo,
+        })
+        .returning();
+
+      const [newVideo] = await db
+        .insert(schema.videos)
+        .values({
+          youtubeId: 'new-vid',
+          title: 'New Video',
+          channel: 'Test Channel',
+          transcript: 'Test transcript',
+          duration: 600,
+          publishedAt: now,
+        })
+        .returning();
+
+      await db.insert(schema.chunks).values([
+        {
+          videoId: oldVideo!.id,
+          content: 'TypeScript programming old',
+          startTime: 0,
+          endTime: 10,
+          embedding: new Array(384).fill(0.7),
+        },
+        {
+          videoId: newVideo!.id,
+          content: 'TypeScript programming new',
+          startTime: 0,
+          endTime: 10,
+          embedding: new Array(384).fill(0.7),
+        },
+      ]);
+
+      const request = new Request('http://localhost:3000/api/search?q=TypeScript');
+
+      const response = await GET(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      // Without decay, both chunks should have similar scores
+      const oldChunk = data.chunks.find((c: any) => c.videoId === oldVideo!.id);
+      const newChunk = data.chunks.find((c: any) => c.videoId === newVideo!.id);
+
+      if (oldChunk && newChunk) {
+        // Scores should be very close (within 0.1)
+        expect(Math.abs(oldChunk.similarity - newChunk.similarity)).toBeLessThan(0.1);
+      }
+    });
+
+    it('applies temporal decay when temporalDecay=true', async () => {
+      const db = testDb;
+
+      const now = new Date();
+      const oneYearAgo = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+
+      const [oldVideo] = await db
+        .insert(schema.videos)
+        .values({
+          youtubeId: 'old-vid',
+          title: 'Old Video',
+          channel: 'Test Channel',
+          transcript: 'Test transcript',
+          duration: 600,
+          publishedAt: oneYearAgo,
+        })
+        .returning();
+
+      const [newVideo] = await db
+        .insert(schema.videos)
+        .values({
+          youtubeId: 'new-vid',
+          title: 'New Video',
+          channel: 'Test Channel',
+          transcript: 'Test transcript',
+          duration: 600,
+          publishedAt: now,
+        })
+        .returning();
+
+      await db.insert(schema.chunks).values([
+        {
+          videoId: oldVideo!.id,
+          content: 'TypeScript programming',
+          startTime: 0,
+          endTime: 10,
+          embedding: new Array(384).fill(0.7),
+        },
+        {
+          videoId: newVideo!.id,
+          content: 'TypeScript programming',
+          startTime: 0,
+          endTime: 10,
+          embedding: new Array(384).fill(0.7),
+        },
+      ]);
+
+      const request = new Request('http://localhost:3000/api/search?q=TypeScript&mode=keyword&temporalDecay=true');
+
+      const response = await GET(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+
+      const oldChunk = data.chunks.find((c: any) => c.videoId === oldVideo!.id);
+      const newChunk = data.chunks.find((c: any) => c.videoId === newVideo!.id);
+
+      expect(oldChunk).toBeDefined();
+      expect(newChunk).toBeDefined();
+
+      // New video should have higher score
+      expect(newChunk.similarity).toBeGreaterThan(oldChunk.similarity);
+
+      // Old video should have approximately half the score
+      expect(oldChunk.similarity).toBeLessThan(0.6);
+      expect(newChunk.similarity).toBeGreaterThan(0.9);
+    });
+
+    it('respects custom halfLifeDays parameter', async () => {
+      const db = testDb;
+
+      const now = new Date();
+      const sixMonthsAgo = new Date(now.getTime() - 180 * 24 * 60 * 60 * 1000);
+
+      const [oldVideo] = await db
+        .insert(schema.videos)
+        .values({
+          youtubeId: 'old-vid',
+          title: 'Old Video',
+          channel: 'Test Channel',
+          transcript: 'Test transcript',
+          duration: 600,
+          publishedAt: sixMonthsAgo,
+        })
+        .returning();
+
+      await db.insert(schema.chunks).values({
+        videoId: oldVideo!.id,
+        content: 'TypeScript programming',
+        startTime: 0,
+        endTime: 10,
+        embedding: new Array(384).fill(0.7),
+      });
+
+      const request = new Request(
+        'http://localhost:3000/api/search?q=TypeScript&mode=keyword&temporalDecay=true&halfLifeDays=180'
+      );
+
+      const response = await GET(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data.chunks.length).toBeGreaterThan(0);
+
+      // With 180-day half-life, 6-month-old content should have ~0.5 similarity
+      const chunk = data.chunks[0];
+      expect(chunk.similarity).toBeCloseTo(0.5, 1);
+    });
+
+    it('handles temporalDecay=false explicitly', async () => {
+      const db = testDb;
+
+      const now = new Date();
+      const oneYearAgo = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+
+      const [oldVideo] = await db
+        .insert(schema.videos)
+        .values({
+          youtubeId: 'old-vid',
+          title: 'Old Video',
+          channel: 'Test Channel',
+          transcript: 'Test transcript',
+          duration: 600,
+          publishedAt: oneYearAgo,
+        })
+        .returning();
+
+      await db.insert(schema.chunks).values({
+        videoId: oldVideo!.id,
+        content: 'TypeScript programming',
+        startTime: 0,
+        endTime: 10,
+        embedding: new Array(384).fill(0.7),
+      });
+
+      const request = new Request('http://localhost:3000/api/search?q=TypeScript&mode=keyword&temporalDecay=false');
+
+      const response = await GET(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data.chunks.length).toBeGreaterThan(0);
+
+      // Should have full similarity score (no decay)
+      const chunk = data.chunks[0];
+      expect(chunk.similarity).toBeCloseTo(1.0, 1);
+    });
+
+    it('ignores halfLifeDays when temporalDecay is false', async () => {
+      const db = testDb;
+
+      const now = new Date();
+      const oneYearAgo = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+
+      const [oldVideo] = await db
+        .insert(schema.videos)
+        .values({
+          youtubeId: 'old-vid',
+          title: 'Old Video',
+          channel: 'Test Channel',
+          transcript: 'Test transcript',
+          duration: 600,
+          publishedAt: oneYearAgo,
+        })
+        .returning();
+
+      await db.insert(schema.chunks).values({
+        videoId: oldVideo!.id,
+        content: 'TypeScript programming',
+        startTime: 0,
+        endTime: 10,
+        embedding: new Array(384).fill(0.7),
+      });
+
+      const request = new Request(
+        'http://localhost:3000/api/search?q=TypeScript&mode=keyword&temporalDecay=false&halfLifeDays=1'
+      );
+
+      const response = await GET(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      // halfLifeDays should be ignored when temporalDecay is false
+      const chunk = data.chunks[0];
+      expect(chunk.similarity).toBeCloseTo(1.0, 1);
+    });
+
+    it('handles invalid temporalDecay parameter', async () => {
+      const request = new Request('http://localhost:3000/api/search?q=test&temporalDecay=invalid');
+
+      const response = await GET(request);
+      const data = await response.json();
+
+      // Should not crash, should default to false
+      expect(response.status).toBe(200);
+    });
+
+    it('handles invalid halfLifeDays parameter', async () => {
+      const request = new Request('http://localhost:3000/api/search?q=test&temporalDecay=true&halfLifeDays=abc');
+
+      const response = await GET(request);
+      const data = await response.json();
+
+      // Should not crash, should use default half-life
+      expect(response.status).toBe(200);
+    });
+  });
 });

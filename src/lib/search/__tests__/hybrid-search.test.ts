@@ -514,4 +514,350 @@ describe('hybridSearch', () => {
       expect(results[0]?.content).toContain('TypeScript');
     });
   });
+
+  describe('temporal decay', () => {
+    it('does not apply decay when temporalDecay is false (default)', async () => {
+      const db = getTestDb();
+
+      const now = new Date();
+      const oneYearAgo = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+
+      const [oldVideo] = await db.insert(schema.videos).values({
+        youtubeId: 'old-vid',
+        title: 'Old Video',
+        channel: 'Test Channel',
+        transcript: 'Test transcript',
+        duration: 600,
+        publishedAt: oneYearAgo,
+      }).returning();
+
+      const [newVideo] = await db.insert(schema.videos).values({
+        youtubeId: 'new-vid',
+        title: 'New Video',
+        channel: 'Test Channel',
+        transcript: 'Test transcript',
+        duration: 600,
+        publishedAt: now,
+      }).returning();
+
+      await db.insert(schema.chunks).values([
+        {
+          videoId: oldVideo!.id,
+          content: 'TypeScript programming old',
+          startTime: 0,
+          endTime: 10,
+          embedding: new Array(384).fill(0.7),
+        },
+        {
+          videoId: newVideo!.id,
+          content: 'TypeScript programming new',
+          startTime: 0,
+          endTime: 10,
+          embedding: new Array(384).fill(0.7),
+        },
+      ]);
+
+      const results = await hybridSearch('TypeScript', { mode: 'keyword', limit: 10, temporalDecay: false }, db);
+
+      // Without decay, both should have same similarity
+      expect(results).toHaveLength(2);
+      expect(results[0]?.similarity).toBeCloseTo(results[1]?.similarity ?? 0, 2);
+    });
+
+    it('applies temporal decay when temporalDecay is true', async () => {
+      const db = getTestDb();
+
+      const now = new Date();
+      const oneYearAgo = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+
+      const [oldVideo] = await db.insert(schema.videos).values({
+        youtubeId: 'old-vid',
+        title: 'Old Video',
+        channel: 'Test Channel',
+        transcript: 'Test transcript',
+        duration: 600,
+        publishedAt: oneYearAgo,
+      }).returning();
+
+      const [newVideo] = await db.insert(schema.videos).values({
+        youtubeId: 'new-vid',
+        title: 'New Video',
+        channel: 'Test Channel',
+        transcript: 'Test transcript',
+        duration: 600,
+        publishedAt: now,
+      }).returning();
+
+      await db.insert(schema.chunks).values([
+        {
+          videoId: oldVideo!.id,
+          content: 'TypeScript programming',
+          startTime: 0,
+          endTime: 10,
+          embedding: new Array(384).fill(0.7),
+        },
+        {
+          videoId: newVideo!.id,
+          content: 'TypeScript programming',
+          startTime: 0,
+          endTime: 10,
+          embedding: new Array(384).fill(0.7),
+        },
+      ]);
+
+      const results = await hybridSearch('TypeScript', { mode: 'keyword', limit: 10, temporalDecay: true }, db);
+
+      expect(results).toHaveLength(2);
+
+      // New video should have higher score due to decay
+      const newResult = results.find(r => r.videoId === newVideo!.id);
+      const oldResult = results.find(r => r.videoId === oldVideo!.id);
+
+      expect(newResult).toBeDefined();
+      expect(oldResult).toBeDefined();
+      expect(newResult!.similarity).toBeGreaterThan(oldResult!.similarity);
+
+      // Old video should have ~0.5 of original score (1-year-old with 365-day half-life)
+      expect(oldResult!.similarity).toBeCloseTo(0.5, 1);
+      expect(newResult!.similarity).toBeCloseTo(1.0, 1);
+    });
+
+    it('respects custom halfLifeDays parameter', async () => {
+      const db = getTestDb();
+
+      const now = new Date();
+      const sixMonthsAgo = new Date(now.getTime() - 180 * 24 * 60 * 60 * 1000);
+
+      const [oldVideo] = await db.insert(schema.videos).values({
+        youtubeId: 'old-vid',
+        title: 'Old Video',
+        channel: 'Test Channel',
+        transcript: 'Test transcript',
+        duration: 600,
+        publishedAt: sixMonthsAgo,
+      }).returning();
+
+      await db.insert(schema.chunks).values({
+        videoId: oldVideo!.id,
+        content: 'TypeScript programming',
+        startTime: 0,
+        endTime: 10,
+        embedding: new Array(384).fill(0.7),
+      });
+
+      // Use 180-day half-life - 6-month-old content should have ~0.5 similarity
+      const results = await hybridSearch('TypeScript', {
+        mode: 'keyword',
+        limit: 10,
+        temporalDecay: true,
+        halfLifeDays: 180,
+      }, db);
+
+      expect(results).toHaveLength(1);
+      expect(results[0]?.similarity).toBeCloseTo(0.5, 1);
+    });
+
+    it('handles chunks from videos with null publishedAt', async () => {
+      const db = getTestDb();
+
+      const [videoNoDate] = await db.insert(schema.videos).values({
+        youtubeId: 'no-date-vid',
+        title: 'No Date Video',
+        channel: 'Test Channel',
+        transcript: 'Test transcript',
+        duration: 600,
+        publishedAt: null,
+      }).returning();
+
+      await db.insert(schema.chunks).values({
+        videoId: videoNoDate!.id,
+        content: 'TypeScript programming',
+        startTime: 0,
+        endTime: 10,
+        embedding: new Array(384).fill(0.7),
+      });
+
+      const results = await hybridSearch('TypeScript', {
+        mode: 'keyword',
+        limit: 10,
+        temporalDecay: true,
+      }, db);
+
+      expect(results).toHaveLength(1);
+      // No decay applied when publishedAt is null
+      expect(results[0]?.similarity).toBeCloseTo(1.0, 2);
+    });
+
+    it('re-sorts results after applying decay', async () => {
+      const db = getTestDb();
+
+      const now = new Date();
+      const twoYearsAgo = new Date(now.getTime() - 730 * 24 * 60 * 60 * 1000);
+
+      const [oldVideo] = await db.insert(schema.videos).values({
+        youtubeId: 'old-vid',
+        title: 'Old Video',
+        channel: 'Test Channel',
+        transcript: 'Test transcript',
+        duration: 600,
+        publishedAt: twoYearsAgo,
+      }).returning();
+
+      const [newVideo] = await db.insert(schema.videos).values({
+        youtubeId: 'new-vid',
+        title: 'New Video',
+        channel: 'Test Channel',
+        transcript: 'Test transcript',
+        duration: 600,
+        publishedAt: now,
+      }).returning();
+
+      // Old video has better keyword match (appears twice)
+      await db.insert(schema.chunks).values([
+        {
+          videoId: oldVideo!.id,
+          content: 'TypeScript TypeScript programming',
+          startTime: 0,
+          endTime: 10,
+          embedding: new Array(384).fill(0.7),
+        },
+        {
+          videoId: newVideo!.id,
+          content: 'TypeScript programming',
+          startTime: 0,
+          endTime: 10,
+          embedding: new Array(384).fill(0.7),
+        },
+      ]);
+
+      // Without decay, old content ranks first (better keyword match)
+      const resultsNoDecay = await hybridSearch('TypeScript', {
+        mode: 'keyword',
+        limit: 10,
+        temporalDecay: false,
+      }, db);
+
+      // With decay, new content should rank first
+      const resultsWithDecay = await hybridSearch('TypeScript', {
+        mode: 'keyword',
+        limit: 10,
+        temporalDecay: true,
+      }, db);
+
+      expect(resultsNoDecay[0]?.videoId).toBe(oldVideo!.id);
+      expect(resultsWithDecay[0]?.videoId).toBe(newVideo!.id);
+    });
+
+    it('applies decay in hybrid mode', async () => {
+      const db = getTestDb();
+
+      const now = new Date();
+      const oneYearAgo = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+
+      const [oldVideo] = await db.insert(schema.videos).values({
+        youtubeId: 'old-vid',
+        title: 'Old Video',
+        channel: 'Test Channel',
+        transcript: 'Test transcript',
+        duration: 600,
+        publishedAt: oneYearAgo,
+      }).returning();
+
+      const [newVideo] = await db.insert(schema.videos).values({
+        youtubeId: 'new-vid',
+        title: 'New Video',
+        channel: 'Test Channel',
+        transcript: 'Test transcript',
+        duration: 600,
+        publishedAt: now,
+      }).returning();
+
+      await db.insert(schema.chunks).values([
+        {
+          videoId: oldVideo!.id,
+          content: 'TypeScript programming',
+          startTime: 0,
+          endTime: 10,
+          embedding: new Array(384).fill(0.8),
+        },
+        {
+          videoId: newVideo!.id,
+          content: 'TypeScript programming',
+          startTime: 0,
+          endTime: 10,
+          embedding: new Array(384).fill(0.8),
+        },
+      ]);
+
+      const results = await hybridSearch('TypeScript', {
+        mode: 'hybrid',
+        limit: 10,
+        temporalDecay: true,
+      }, db);
+
+      expect(results).toHaveLength(2);
+
+      const newResult = results.find(r => r.videoId === newVideo!.id);
+      const oldResult = results.find(r => r.videoId === oldVideo!.id);
+
+      expect(newResult).toBeDefined();
+      expect(oldResult).toBeDefined();
+      expect(newResult!.similarity).toBeGreaterThan(oldResult!.similarity);
+    });
+
+    it('applies decay in vector mode', async () => {
+      const db = getTestDb();
+
+      const now = new Date();
+      const oneYearAgo = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+
+      const [oldVideo] = await db.insert(schema.videos).values({
+        youtubeId: 'old-vid',
+        title: 'Old Video',
+        channel: 'Test Channel',
+        transcript: 'Test transcript',
+        duration: 600,
+        publishedAt: oneYearAgo,
+      }).returning();
+
+      const [newVideo] = await db.insert(schema.videos).values({
+        youtubeId: 'new-vid',
+        title: 'New Video',
+        channel: 'Test Channel',
+        transcript: 'Test transcript',
+        duration: 600,
+        publishedAt: now,
+      }).returning();
+
+      await db.insert(schema.chunks).values([
+        {
+          videoId: oldVideo!.id,
+          content: 'Some content here',
+          startTime: 0,
+          endTime: 10,
+          embedding: new Array(384).fill(0.8),
+        },
+        {
+          videoId: newVideo!.id,
+          content: 'Different content',
+          startTime: 0,
+          endTime: 10,
+          embedding: new Array(384).fill(0.8),
+        },
+      ]);
+
+      const results = await hybridSearch('query', {
+        mode: 'vector',
+        limit: 10,
+        temporalDecay: true,
+      }, db);
+
+      const newResult = results.find(r => r.videoId === newVideo!.id);
+      const oldResult = results.find(r => r.videoId === oldVideo!.id);
+
+      if (newResult && oldResult) {
+        expect(newResult.similarity).toBeGreaterThan(oldResult.similarity);
+      }
+    });
+  });
 });

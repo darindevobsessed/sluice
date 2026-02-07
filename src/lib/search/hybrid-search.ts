@@ -5,6 +5,7 @@ import type * as schema from '@/lib/db/schema';
 import type { SearchResult } from './types';
 import { vectorSearch } from './vector-search';
 import { generateEmbedding } from '@/lib/embeddings/pipeline';
+import { calculateTemporalDecay } from '@/lib/temporal/decay';
 
 /**
  * Performs keyword search on chunk content using case-insensitive LIKE matching.
@@ -33,6 +34,7 @@ async function keywordSearch(
       channel: videos.channel,
       youtubeId: videos.youtubeId,
       thumbnail: videos.thumbnail,
+      publishedAt: videos.publishedAt,
     })
     .from(chunks)
     .innerJoin(videos, eq(chunks.videoId, videos.id))
@@ -96,6 +98,28 @@ function reciprocalRankFusion(
 }
 
 /**
+ * Applies temporal decay to search results based on video publication date.
+ *
+ * @param results - Search results to apply decay to
+ * @param halfLifeDays - Number of days for content to reach 50% relevance
+ * @returns Results with adjusted similarity scores, re-sorted by new scores
+ */
+function applyTemporalDecay(
+  results: SearchResult[],
+  halfLifeDays: number = 365
+): SearchResult[] {
+  return results
+    .map(result => {
+      const decay = calculateTemporalDecay(result.publishedAt, halfLifeDays);
+      return {
+        ...result,
+        similarity: result.similarity * decay,
+      };
+    })
+    .sort((a, b) => b.similarity - a.similarity);
+}
+
+/**
  * Performs hybrid search combining vector similarity and keyword matching.
  *
  * Supports three modes:
@@ -103,42 +127,64 @@ function reciprocalRankFusion(
  * - 'keyword': Pure keyword matching
  * - 'hybrid': Combines both using Reciprocal Rank Fusion (default)
  *
- * Hybrid mode fetches more results from each method (limit * 2) before
+ * Hybrid mode fetches more results (limit * 2) before
  * merging with RRF to ensure diverse results in the final set.
  *
+ * Optionally applies temporal decay to boost recent content.
+ *
  * @param query - Text query to search for
- * @param options - Search options (mode, limit)
+ * @param options - Search options (mode, limit, temporalDecay, halfLifeDays)
  * @param db - Database instance (optional, defaults to singleton)
  * @returns Array of search results ordered by relevance
  */
 export async function hybridSearch(
   query: string,
-  options: { mode?: 'vector' | 'keyword' | 'hybrid'; limit?: number } = {},
+  options: {
+    mode?: 'vector' | 'keyword' | 'hybrid';
+    limit?: number;
+    temporalDecay?: boolean;
+    halfLifeDays?: number;
+  } = {},
   db: NodePgDatabase<typeof schema> = defaultDb
 ): Promise<SearchResult[]> {
-  const { mode = 'hybrid', limit = 10 } = options;
+  const {
+    mode = 'hybrid',
+    limit = 10,
+    temporalDecay = false,
+    halfLifeDays = 365,
+  } = options;
+
+  let results: SearchResult[];
 
   // Pure keyword mode
   if (mode === 'keyword') {
-    return keywordSearch(query, limit, db);
+    results = await keywordSearch(query, limit, db);
   }
-
-  // Generate embedding for the query
-  const queryEmbedding = await generateEmbedding(query);
-  const embeddingArray = Array.from(queryEmbedding);
-
   // Pure vector mode
-  if (mode === 'vector') {
-    return vectorSearch(embeddingArray, limit, 0.3, db);
+  else if (mode === 'vector') {
+    const queryEmbedding = await generateEmbedding(query);
+    const embeddingArray = Array.from(queryEmbedding);
+    results = await vectorSearch(embeddingArray, limit, 0.3, db);
+  }
+  // Hybrid mode: combine both with RRF
+  else {
+    const queryEmbedding = await generateEmbedding(query);
+    const embeddingArray = Array.from(queryEmbedding);
+
+    // Fetch more results (limit * 2) from each method for better fusion
+    const [vectorResults, keywordResults] = await Promise.all([
+      vectorSearch(embeddingArray, limit * 2, 0.3, db),
+      keywordSearch(query, limit * 2, db),
+    ]);
+
+    // Apply RRF and take top results
+    results = reciprocalRankFusion(vectorResults, keywordResults).slice(0, limit);
   }
 
-  // Hybrid mode: combine both with RRF
-  // Fetch more results (limit * 2) from each method for better fusion
-  const [vectorResults, keywordResults] = await Promise.all([
-    vectorSearch(embeddingArray, limit * 2, 0.3, db),
-    keywordSearch(query, limit * 2, db),
-  ]);
+  // Apply temporal decay if requested
+  if (temporalDecay) {
+    results = applyTemporalDecay(results, halfLifeDays);
+  }
 
-  // Apply RRF and return top results
-  return reciprocalRankFusion(vectorResults, keywordResults).slice(0, limit);
+  return results;
 }

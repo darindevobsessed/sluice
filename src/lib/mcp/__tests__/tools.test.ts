@@ -80,6 +80,7 @@ describe('registerSearchRag', () => {
         channel: 'Dev Channel',
         youtubeId: 'abc123',
         thumbnail: 'https://example.com/thumb.jpg',
+        publishedAt: null,
       },
     ]
 
@@ -125,6 +126,7 @@ describe('registerSearchRag', () => {
         channel: 'Dev Channel',
         youtubeId: 'abc123',
         thumbnail: 'https://example.com/thumb1.jpg',
+        publishedAt: null,
       },
       {
         chunkId: 2,
@@ -137,6 +139,7 @@ describe('registerSearchRag', () => {
         channel: 'JS Channel',
         youtubeId: 'def456',
         thumbnail: 'https://example.com/thumb2.jpg',
+        publishedAt: null,
       },
     ]
 

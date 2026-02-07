@@ -50,6 +50,7 @@ export async function vectorSearch(
       channel: videos.channel,
       youtubeId: videos.youtubeId,
       thumbnail: videos.thumbnail,
+      publishedAt: videos.publishedAt,
     })
     .from(chunks)
     .innerJoin(videos, eq(chunks.videoId, videos.id))

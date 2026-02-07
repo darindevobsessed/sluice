@@ -4,3 +4,4 @@
 
 export type { TemporalMetadata, TemporalExtraction } from './types'
 export { extractTemporalMetadata } from './extract'
+export { calculateTemporalDecay } from './decay'

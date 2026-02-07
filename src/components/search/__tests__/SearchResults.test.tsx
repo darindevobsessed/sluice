@@ -16,6 +16,7 @@ const mockSearchResponse: SearchResponse = {
       channel: 'Test Channel',
       youtubeId: 'abc123',
       thumbnail: null,
+      publishedAt: null,
     },
   ],
   videos: [

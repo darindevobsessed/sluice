@@ -23,7 +23,7 @@ interface SearchResponse {
 }
 
 /**
- * GET /api/search?q=query&limit=10&mode=hybrid
+ * GET /api/search?q=query&limit=10&mode=hybrid&temporalDecay=true&halfLifeDays=365
  *
  * Performs hybrid search across chunk content and returns both
  * chunk-level and video-level results.
@@ -32,6 +32,8 @@ interface SearchResponse {
  * - q: Search query (required)
  * - limit: Max results per type (default: 10)
  * - mode: Search mode - vector, keyword, or hybrid (default: hybrid)
+ * - temporalDecay: Apply temporal decay to boost recent content (default: false)
+ * - halfLifeDays: Half-life for temporal decay in days (default: 365)
  *
  * Returns empty results if query is empty/missing.
  */
@@ -43,6 +45,11 @@ export async function GET(request: Request) {
   const mode = (modeParam === 'vector' || modeParam === 'keyword' || modeParam === 'hybrid'
     ? modeParam
     : 'hybrid') as SearchMode;
+
+  // Parse temporal decay parameters
+  const temporalDecayParam = searchParams.get('temporalDecay') || 'false';
+  const temporalDecay = temporalDecayParam === 'true';
+  const halfLifeDays = parseInt(searchParams.get('halfLifeDays') || '365', 10);
 
   const start = performance.now();
 
@@ -71,7 +78,12 @@ export async function GET(request: Request) {
   }
 
   // Run search - fetch more chunks (limit * 3) for better video aggregation
-  const chunkResults = await hybridSearch(query, { mode, limit: limit * 3 });
+  const chunkResults = await hybridSearch(query, {
+    mode,
+    limit: limit * 3,
+    temporalDecay,
+    halfLifeDays,
+  });
   const videoResults = aggregateByVideo(chunkResults);
 
   const timing = Math.round(performance.now() - start);

@@ -15,6 +15,7 @@ const mockChunk: SearchResult = {
   channel: 'Test Channel',
   youtubeId: 'abc123',
   thumbnail: 'https://example.com/thumb.jpg',
+  publishedAt: null,
 };
 
 describe('ChunkResult', () => {

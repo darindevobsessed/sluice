@@ -15,4 +15,5 @@ export interface SearchResult {
   channel: string;
   youtubeId: string;
   thumbnail: string | null;
+  publishedAt?: Date | null; // For temporal decay calculations
 }

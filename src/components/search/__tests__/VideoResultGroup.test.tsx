@@ -84,6 +84,7 @@ describe('VideoResultGroup', () => {
         channel: 'Test Channel',
         youtubeId: 'abc123',
         thumbnail: null,
+        publishedAt: null,
       },
       {
         chunkId: 2,
@@ -96,6 +97,7 @@ describe('VideoResultGroup', () => {
         channel: 'Test Channel',
         youtubeId: 'abc123',
         thumbnail: null,
+        publishedAt: null,
       },
     ];
 
@@ -126,6 +128,7 @@ describe('VideoResultGroup', () => {
         channel: 'Test Channel',
         youtubeId: 'abc123',
         thumbnail: null,
+        publishedAt: null,
       },
     ];
 
