@@ -1,15 +1,16 @@
 name: experience
 title: Experience
-status: planning
+status: active
 created: 2026-02-05
-updated: 2026-02-05
+updated: 2026-02-07
 target: Polished UI and advanced creator interactions
-focus: UI enhancements, discovery redesign, persona agents
+focus: UI enhancements, discovery, similar creators, persona agents
 
 goals:
-  - Improve content layout (insights first, tabbed focus areas)
-  - Redesign discovery with catch-up and similar creator suggestions
-  - Enable persona agents per creator and ensemble conversations
+  - Improve content layout (insights first, focus area dropdown in global top bar)
+  - Build discovery page with catch-up and channel following
+  - Add similar creator suggestions via RAG content similarity
+  - Enable persona agents per creator and search-style ensemble queries
   - Keep it agnostic — platform, not niche tool
 
 notes: |
@@ -23,9 +24,14 @@ notes: |
   > "I also want a I wanna talk to an ensemble."
 
   ## Key Decisions
-  - Chat sidebar: holding off for now
-  - Catch-up merges into discovery page
-  - Personas auto-created at transcript threshold
+  - Focus areas: user-defined categories in a global top bar dropdown (not auto-extracted)
+  - Discovery split into two stories: Following + Catch-up, then Similar Creators
+  - Catch-up: simple chronological ordering, not importance-ranked
+  - Similar creators: content-based via RAG embeddings
+  - Persona creation: auto-suggest at 30+ transcripts, user confirms
+  - Ensemble: search-style (extend search bar, side-by-side responses), NOT full chatbot
+  - MCP tools for external persona/ensemble access
+  - Chat sidebar: holding off
   - Keep agnostic: "Make it the knowledge base. Don't try to add too many agent things."
 
   ## Design Principle

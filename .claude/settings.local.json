@@ -26,7 +26,8 @@
       "WebFetch(domain:www.npmjs.com)",
       "WebFetch(domain:orm.drizzle.team)",
       "Bash(/Users/darindrobinski/.claude/plugins/cache/craft-local/craft/*/hooks/scripts/*)",
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "Bash(find:*)"
     ]
   }
 }
