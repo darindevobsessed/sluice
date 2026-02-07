@@ -798,3 +798,230 @@ npm error
 npm error To see a list of scripts, run:
 npm error   npm run
 npm error A complete log of this run can be found in: /Users/darindrobinski/.npm/_logs/2026-02-07T19_23_25_163Z-debug-0.log
+---
+timestamp: "2026-02-07 13:33:11"
+story: "1-ui-enhancements"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 3 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/app/api/videos/__tests__/route.test.ts[2m > [22mGET /api/videos[2m > [22mfilters videos by focusAreaId when provided
+[31m[1mAssertionError[22m: expected [ { id: 8414, …(9) }, …(1) ] to have a length of 1 but got 2[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 1[39m
+[31m+ 2[39m
+
+[36m [2m❯[22m src/app/api/videos/__tests__/route.test.ts:[2m245:25[22m[39m
+    [90m243| [39m
+    [90m244| [39m    [34mexpect[39m(response[33m.[39mstatus)[33m.[39m[34mtoBe[39m([34m200[39m)
+    [90m245| [39m    [34mexpect[39m(data[33m.[39mvideos)[33m.[39m[34mtoHaveLength[39m([34m1[39m)
+    [90m   | [39m                        [31m^[39m
+    [90m246| [39m    [34mexpect[39m(data[33m.[39mvideos[[34m0[39m][33m.[39myoutubeId)[33m.[39m[34mtoBe[39m([32m'video-1'[39m)
+    [90m247| [39m  })
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/app/api/videos/__tests__/route.test.ts[2m > [22mGET /api/videos[2m > [22mreturns empty list when focus area has no videos
+[31m[1mAssertionError[22m: expected [ { id: 8417, …(9) } ] to deeply equal [][39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- [][39m
+[31m+ [[39m
+[31m+   {[39m
+[31m+     "channel": "Test Channel",[39m
+[31m+     "createdAt": "2026-02-07T19:33:11.266Z",[39m
+[31m+     "duration": null,[39m
+[31m+     "id": 8417,[39m
+[31m+     "publishedAt": null,[39m
+[31m+     "thumbnail": null,[39m
+[31m+     "title": "Unassigned Video",[39m
+[31m+     "transcript": "Test content",[39m
+[31m+     "updatedAt": "2026-02-07T19:33:11.266Z",[39m
+[31m+     "youtubeId": "unassigned-video",[39m
+[31m+   },[39m
+[31m+ ][39m
+
+[36m [2m❯[22m src/app/api/videos/__tests__/route.test.ts:[2m306:25[22m[39m
+    [90m304| [39m
+    [90m305| [39m    [34mexpect[39m(response[33m.[39mstatus)[33m.[39m[34mtoBe[39m([34m200[39m)
+    [90m306| [39m    [34mexpect[39m(data[33m.[39mvideos)[33m.[39m[34mtoEqual[39m([])
+    [90m   | [39m                        [31m^[39m
+    [90m307| [39m  })
+    [90m308| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/app/api/videos/__tests__/route.test.ts[2m > [22mGET /api/videos[2m > [22mreturns 400 for invalid focusAreaId
+[31m[1mAssertionError[22m: expected 200 to be 400 // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 400[39m
+[31m+ 200[39m
+
+[36m [2m❯[22m src/app/api/videos/__tests__/route.test.ts:[2m314:29[22m[39m
+    [90m312| [39m    [35mconst[39m data [33m=[39m [35mawait[39m response[33m.[39m[34mjson[39m()
+    [90m313| [39m
+    [90m314| [39m    [34mexpect[39m(response[33m.[39mstatus)[33m.[39m[34mtoBe[39m([34m400[39m)
+    [90m   | [39m                            [31m^[39m
+    [90m315| [39m    [34mexpect[39m(data[33m.[39merror)[33m.[39m[34mtoBeDefined[39m()
+    [90m316| [39m  })
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/app/api/videos/__tests__/route.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/app/api/videos/__tests__/route.test.ts [2m([22m[2m11 tests[22m[2m | [22m[31m3 failed[39m[2m)[22m[33m 2051[2mms[22m[39m
+     [32m✓[39m creates video with publishedAt field[32m 217[2mms[22m[39m
+     [32m✓[39m creates video without publishedAt field (null)[32m 132[2mms[22m[39m
+     [32m✓[39m returns publishedAt in video response when querying[32m 168[2mms[22m[39m
+     [32m✓[39m handles invalid publishedAt format gracefully[32m 125[2mms[22m[39m
+     [32m✓[39m creates video successfully without publishedAt for backward compatibility[32m 131[2mms[22m[39m
+     [32m✓[39m returns empty list when no videos exist[32m 176[2mms[22m[39m
+     [32m✓[39m returns videos with all fields including publishedAt[32m 282[2mms[22m[39m
+[31m     [31m×[31m filters videos by focusAreaId when provided[39m[32m 157[2mms[22m[39m
+     [32m✓[39m returns all videos when no focusAreaId provided[32m 225[2mms[22m[39m
+[31m     [31m×[31m returns empty list when focus area has no videos[39m[32m 243[2mms[22m[39m
+[31m     [31m×[31m returns 400 for invalid focusAreaId[39m[32m 190[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m3 failed[39m[22m[2m | [22m[1m[32m8 passed[39m[22m[90m (11)[39m
+[2m   Start at [22m 13:33:00
+[2m   Duration [22m 10.65s[2m (transform 258ms, setup 918ms, import 2.57s, tests 2.05s, environment 4.48s)[22m
+---
+timestamp: "2026-02-07 13:33:56"
+story: "1-ui-enhancements"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 3 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/app/api/videos/__tests__/route.test.ts[2m > [22mGET /api/videos[2m > [22mfilters videos by focusAreaId when provided
+[31m[1mError[22m: Failed query: insert into "focus_areas" ("id", "name", "color", "created_at") values (default, $1, $2, default) returning "id", "name", "color", "created_at"
+params: React,#61dafb[39m
+[90m [2m❯[22m NodePgPreparedQuery.queryWithCache node_modules/drizzle-orm/pg-core/session.js:[2m41:15[22m[39m
+[90m [2m❯[22m node_modules/drizzle-orm/node-postgres/session.js:[2m117:22[22m[39m
+[36m [2m❯[22m src/app/api/videos/__tests__/route.test.ts:[2m213:25[22m[39m
+    [90m211| [39m  [34mit[39m([32m'filters videos by focusAreaId when provided'[39m[33m,[39m [35masync[39m () [33m=>[39m {
+    [90m212| [39m    [90m// Create focus area[39m
+    [90m213| [39m    [35mconst[39m [focusArea] [33m=[39m [35mawait[39m testDb[33m.[39m[34minsert[39m(schema[33m.[39mfocusAreas)[33m.[39m[34mvalues[39m({
+    [90m   | [39m                        [31m^[39m
+    [90m214| [39m      name[33m:[39m [32m'React'[39m[33m,[39m
+    [90m215| [39m      color[33m:[39m [32m'#61dafb'[39m[33m,[39m
+
+[31m[1mCaused by: error[22m: duplicate key value violates unique constraint "focus_areas_name_unique"[39m
+[90m [2m❯[22m node_modules/pg-pool/index.js:[2m45:11[22m[39m
+[90m [2m❯[22m node_modules/drizzle-orm/node-postgres/session.js:[2m124:18[22m[39m
+[90m [2m❯[22m NodePgPreparedQuery.queryWithCache node_modules/drizzle-orm/pg-core/session.js:[2m39:16[22m[39m
+[90m [2m❯[22m node_modules/drizzle-orm/node-postgres/session.js:[2m117:22[22m[39m
+[36m [2m❯[22m src/app/api/videos/__tests__/route.test.ts:[2m213:25[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[22m[39m
+[31m[1mSerialized Error:[22m[39m [90m{ length: 218, severity: 'ERROR', code: '23505', detail: 'Key (name)=(React) already exists.', hint: undefined, position: undefined, internalPosition: undefined, internalQuery: undefined, where: undefined, schema: 'public', table: 'focus_areas', dataType: undefined, constraint: 'focus_areas_name_unique', file: 'nbtinsert.c', routine: '_bt_check_unique' }[39m
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/app/api/videos/__tests__/route.test.ts[2m > [22mGET /api/videos[2m > [22mreturns all videos when no focusAreaId provided
+[31m[1mError[22m: Failed query: insert into "focus_areas" ("id", "name", "color", "created_at") values (default, $1, $2, default) returning "id", "name", "color", "created_at"
+params: JavaScript,#f7df1e[39m
+[90m [2m❯[22m NodePgPreparedQuery.queryWithCache node_modules/drizzle-orm/pg-core/session.js:[2m41:15[22m[39m
+[90m [2m❯[22m node_modules/drizzle-orm/node-postgres/session.js:[2m117:22[22m[39m
+[36m [2m❯[22m src/app/api/videos/__tests__/route.test.ts:[2m251:25[22m[39m
+    [90m249| [39m  [34mit[39m([32m'returns all videos when no focusAreaId provided'[39m[33m,[39m [35masync[39m () [33m=>[39m {
+    [90m250| [39m    [90m// Create focus area[39m
+    [90m251| [39m    [35mconst[39m [focusArea] [33m=[39m [35mawait[39m testDb[33m.[39m[34minsert[39m(schema[33m.[39mfocusAreas)[33m.[39m[34mvalues[39m({
+    [90m   | [39m                        [31m^[39m
+    [90m252| [39m      name[33m:[39m [32m'JavaScript'[39m[33m,[39m
+    [90m253| [39m      color[33m:[39m [32m'#f7df1e'[39m[33m,[39m
+
+[31m[1mCaused by: error[22m: duplicate key value violates unique constraint "focus_areas_name_unique"[39m
+[90m [2m❯[22m node_modules/pg-pool/index.js:[2m45:11[22m[39m
+[90m [2m❯[22m node_modules/drizzle-orm/node-postgres/session.js:[2m124:18[22m[39m
+[90m [2m❯[22m NodePgPreparedQuery.queryWithCache node_modules/drizzle-orm/pg-core/session.js:[2m39:16[22m[39m
+[90m [2m❯[22m node_modules/drizzle-orm/node-postgres/session.js:[2m117:22[22m[39m
+[36m [2m❯[22m src/app/api/videos/__tests__/route.test.ts:[2m251:25[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[22m[39m
+[31m[1mSerialized Error:[22m[39m [90m{ length: 223, severity: 'ERROR', code: '23505', detail: 'Key (name)=(JavaScript) already exists.', hint: undefined, position: undefined, internalPosition: undefined, internalQuery: undefined, where: undefined, schema: 'public', table: 'focus_areas', dataType: undefined, constraint: 'focus_areas_name_unique', file: 'nbtinsert.c', routine: '_bt_check_unique' }[39m
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/app/api/videos/__tests__/route.test.ts[2m > [22mGET /api/videos[2m > [22mreturns empty list when focus area has no videos
+[31m[1mError[22m: Failed query: insert into "focus_areas" ("id", "name", "color", "created_at") values (default, $1, $2, default) returning "id", "name", "color", "created_at"
+params: Empty Category,#cccccc[39m
+[90m [2m❯[22m NodePgPreparedQuery.queryWithCache node_modules/drizzle-orm/pg-core/session.js:[2m41:15[22m[39m
+[90m [2m❯[22m node_modules/drizzle-orm/node-postgres/session.js:[2m117:22[22m[39m
+[36m [2m❯[22m src/app/api/videos/__tests__/route.test.ts:[2m288:25[22m[39m
+    [90m286| [39m  [34mit[39m([32m'returns empty list when focus area has no videos'[39m[33m,[39m [35masync[39m () [33m=>[39m {
+    [90m287| [39m    [90m// Create focus area with no videos[39m
+    [90m288| [39m    [35mconst[39m [focusArea] [33m=[39m [35mawait[39m testDb[33m.[39m[34minsert[39m(schema[33m.[39mfocusAreas)[33m.[39m[34mvalues[39m({
+    [90m   | [39m                        [31m^[39m
+    [90m289| [39m      name[33m:[39m [32m'Empty Category'[39m[33m,[39m
+    [90m290| [39m      color[33m:[39m [32m'#cccccc'[39m[33m,[39m
+
+[31m[1mCaused by: error[22m: duplicate key value violates unique constraint "focus_areas_name_unique"[39m
+[90m [2m❯[22m node_modules/pg-pool/index.js:[2m45:11[22m[39m
+[90m [2m❯[22m node_modules/drizzle-orm/node-postgres/session.js:[2m124:18[22m[39m
+[90m [2m❯[22m NodePgPreparedQuery.queryWithCache node_modules/drizzle-orm/pg-core/session.js:[2m39:16[22m[39m
+[90m [2m❯[22m node_modules/drizzle-orm/node-postgres/session.js:[2m117:22[22m[39m
+[36m [2m❯[22m src/app/api/videos/__tests__/route.test.ts:[2m288:25[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[22m[39m
+[31m[1mSerialized Error:[22m[39m [90m{ length: 227, severity: 'ERROR', code: '23505', detail: 'Key (name)=(Empty Category) already exists.', hint: undefined, position: undefined, internalPosition: undefined, internalQuery: undefined, where: undefined, schema: 'public', table: 'focus_areas', dataType: undefined, constraint: 'focus_areas_name_unique', file: 'nbtinsert.c', routine: '_bt_check_unique' }[39m
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/app/api/videos/__tests__/route.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/app/api/videos/__tests__/route.test.ts [2m([22m[2m11 tests[22m[2m | [22m[31m3 failed[39m[2m)[22m[33m 2202[2mms[22m[39m
+     [33m[2m✓[22m[39m creates video with publishedAt field [33m 404[2mms[22m[39m
+     [32m✓[39m creates video without publishedAt field (null)[32m 158[2mms[22m[39m
+     [32m✓[39m returns publishedAt in video response when querying[32m 170[2mms[22m[39m
+     [32m✓[39m handles invalid publishedAt format gracefully[32m 149[2mms[22m[39m
+     [32m✓[39m creates video successfully without publishedAt for backward compatibility[32m 209[2mms[22m[39m
+     [32m✓[39m returns empty list when no videos exist[32m 254[2mms[22m[39m
+     [32m✓[39m returns videos with all fields including publishedAt[32m 166[2mms[22m[39m
+[31m     [31m×[31m filters videos by focusAreaId when provided[39m[32m 178[2mms[22m[39m
+[31m     [31m×[31m returns all videos when no focusAreaId provided[39m[32m 182[2mms[22m[39m
+[31m     [31m×[31m returns empty list when focus area has no videos[39m[32m 167[2mms[22m[39m
+     [32m✓[39m returns 400 for invalid focusAreaId[32m 159[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m3 failed[39m[22m[2m | [22m[1m[32m8 passed[39m[22m[90m (11)[39m
+[2m   Start at [22m 13:33:46
+[2m   Duration [22m 9.40s[2m (transform 497ms, setup 492ms, import 3.63s, tests 2.20s, environment 2.51s)[22m
+---
+timestamp: "2026-02-07 13:52:53"
+story: "1-ui-enhancements"
+chunk: "unknown"
+tool: "Read"
+error: |
+  File content (25891 tokens) exceeds maximum allowed tokens (25000). Please use offset and limit parameters to read specific portions of the file, or use the GrepTool to search for specific content.
+---
+timestamp: "2026-02-07 14:16:51"
+story: "1-ui-enhancements"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+(eval):1: no matches found: src/app/videos/[id]/page.tsx

@@ -8,6 +8,7 @@ import { EmptyState } from '@/components/videos/EmptyState';
 import { SearchResults } from '@/components/search/SearchResults';
 import { useSearch } from '@/hooks/useSearch';
 import { usePageTitle } from '@/components/layout/PageTitleContext';
+import { useFocusArea } from '@/components/providers/FocusAreaProvider';
 import type { Video } from '@/lib/db/schema';
 
 interface VideoStats {
@@ -29,20 +30,28 @@ export default function Home() {
   // Set page title
   const { setPageTitle } = usePageTitle();
 
+  // Focus area filtering
+  const { selectedFocusAreaId } = useFocusArea();
+
   // Use the new search hook
-  const { query, setQuery, results, isLoading: isSearching } = useSearch();
+  const { query, setQuery, results, isLoading: isSearching } = useSearch({ focusAreaId: selectedFocusAreaId });
 
   // Set page title on mount
   useEffect(() => {
     setPageTitle({ title: 'Knowledge Bank' });
   }, [setPageTitle]);
 
-  // Initial load of all videos (for stats and when not searching)
+  // Load videos (re-fetches when focus area changes)
   useEffect(() => {
     async function fetchVideos() {
       try {
         setIsLoadingVideos(true);
-        const response = await fetch('/api/videos');
+        const params = new URLSearchParams();
+        if (selectedFocusAreaId !== null) {
+          params.set('focusAreaId', String(selectedFocusAreaId));
+        }
+        const url = `/api/videos${params.toString() ? `?${params}` : ''}`;
+        const response = await fetch(url);
 
         if (!response.ok) {
           throw new Error('Failed to fetch videos');
@@ -69,7 +78,7 @@ export default function Home() {
     }
 
     fetchVideos();
-  }, []);
+  }, [selectedFocusAreaId]);
 
   // Show empty state only when no videos exist at all (not during search)
   const showEmptyState = !isLoadingVideos && stats?.count === 0 && !query;

@@ -165,7 +165,7 @@ describe('GET /api/videos', () => {
   })
 
   beforeEach(async () => {
-    await pool.query('TRUNCATE videos, insights, channels, settings, chunks CASCADE')
+    await pool.query('TRUNCATE videos, insights, channels, settings, chunks, focus_areas CASCADE')
   })
 
   afterAll(async () => {
@@ -206,5 +206,117 @@ describe('GET /api/videos', () => {
     })
     expect(data.videos[0].publishedAt).toBeDefined()
     expect(new Date(data.videos[0].publishedAt).getTime()).toBe(publishedDate.getTime())
+  })
+
+  it('filters videos by focusAreaId when provided', async () => {
+    // Create focus area
+    const focusAreaRows = await testDb.insert(schema.focusAreas).values({
+      name: 'React',
+      color: '#61dafb',
+    }).returning()
+    const focusArea = focusAreaRows[0]!
+
+    // Create videos
+    const video1Rows = await testDb.insert(schema.videos).values({
+      youtubeId: 'video-1',
+      title: 'React Tutorial',
+      channel: 'React Channel',
+      transcript: 'React content',
+    }).returning()
+    const video1 = video1Rows[0]!
+
+    await testDb.insert(schema.videos).values({
+      youtubeId: 'video-2',
+      title: 'Python Tutorial',
+      channel: 'Python Channel',
+      transcript: 'Python content',
+    }).returning()
+
+    // Assign only video1 to focus area
+    await testDb.insert(schema.videoFocusAreas).values({
+      videoId: video1.id,
+      focusAreaId: focusArea.id,
+    })
+
+    // Request with focusAreaId filter
+    const request = new Request(`http://localhost:3000/api/videos?focusAreaId=${focusArea.id}`)
+    const response = await GET(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(data.videos).toHaveLength(1)
+    expect(data.videos[0].youtubeId).toBe('video-1')
+  })
+
+  it('returns all videos when no focusAreaId provided', async () => {
+    // Create focus area
+    const focusAreaRows = await testDb.insert(schema.focusAreas).values({
+      name: 'JavaScript',
+      color: '#f7df1e',
+    }).returning()
+    const focusArea = focusAreaRows[0]!
+
+    // Create videos
+    const video1Rows = await testDb.insert(schema.videos).values({
+      youtubeId: 'video-a',
+      title: 'JS Tutorial',
+      channel: 'JS Channel',
+      transcript: 'JS content',
+    }).returning()
+    const video1 = video1Rows[0]!
+
+    await testDb.insert(schema.videos).values({
+      youtubeId: 'video-b',
+      title: 'General Tutorial',
+      channel: 'General Channel',
+      transcript: 'General content',
+    })
+
+    // Assign only video1 to focus area
+    await testDb.insert(schema.videoFocusAreas).values({
+      videoId: video1.id,
+      focusAreaId: focusArea.id,
+    })
+
+    // Request without focusAreaId - should return all videos
+    const request = new Request('http://localhost:3000/api/videos')
+    const response = await GET(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(data.videos).toHaveLength(2)
+  })
+
+  it('returns empty list when focus area has no videos', async () => {
+    // Create focus area with no videos
+    const focusAreaRows = await testDb.insert(schema.focusAreas).values({
+      name: 'Empty Category',
+      color: '#cccccc',
+    }).returning()
+    const focusArea = focusAreaRows[0]!
+
+    // Create a video but don't assign it
+    await testDb.insert(schema.videos).values({
+      youtubeId: 'unassigned-video',
+      title: 'Unassigned Video',
+      channel: 'Test Channel',
+      transcript: 'Test content',
+    })
+
+    const request = new Request(`http://localhost:3000/api/videos?focusAreaId=${focusArea.id}`)
+    const response = await GET(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(data.videos).toEqual([])
+  })
+
+  it('returns 400 for invalid focusAreaId', async () => {
+    const request = new Request('http://localhost:3000/api/videos?focusAreaId=invalid')
+    const response = await GET(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(400)
+    expect(data.error).toBeDefined()
   })
 })

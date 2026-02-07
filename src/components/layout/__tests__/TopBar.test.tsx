@@ -115,6 +115,6 @@ describe('TopBar', () => {
     )
 
     const titleElement = screen.getByText('Test Title')
-    expect(titleElement).toHaveClass('transition-opacity', 'duration-200')
+    expect(titleElement).toHaveClass('animate-in', 'fade-in', 'duration-200')
   })
 })

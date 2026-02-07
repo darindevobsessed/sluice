@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { sql } from 'drizzle-orm';
-import { db, chunks } from '@/lib/db';
+import { sql, eq } from 'drizzle-orm';
+import { db, chunks, videoFocusAreas } from '@/lib/db';
 import { hybridSearch } from '@/lib/search/hybrid-search';
 import { aggregateByVideo, type VideoResult } from '@/lib/search/aggregate';
 import type { SearchResult } from '@/lib/search/types';
@@ -46,6 +46,16 @@ export async function GET(request: Request) {
     ? modeParam
     : 'hybrid') as SearchMode;
 
+  // Parse focus area filter
+  const focusAreaIdParam = searchParams.get('focusAreaId');
+  let focusAreaId: number | null = null;
+  if (focusAreaIdParam) {
+    const parsed = parseInt(focusAreaIdParam, 10);
+    if (!isNaN(parsed)) {
+      focusAreaId = parsed;
+    }
+  }
+
   // Parse temporal decay parameters
   const temporalDecayParam = searchParams.get('temporalDecay') || 'false';
   const temporalDecay = temporalDecayParam === 'true';
@@ -78,12 +88,23 @@ export async function GET(request: Request) {
   }
 
   // Run search - fetch more chunks (limit * 3) for better video aggregation
-  const chunkResults = await hybridSearch(query, {
+  let chunkResults = await hybridSearch(query, {
     mode,
     limit: limit * 3,
     temporalDecay,
     halfLifeDays,
   });
+
+  // Filter by focus area if provided
+  if (focusAreaId !== null) {
+    const assignedVideos = await db
+      .select({ videoId: videoFocusAreas.videoId })
+      .from(videoFocusAreas)
+      .where(eq(videoFocusAreas.focusAreaId, focusAreaId));
+    const videoIds = new Set(assignedVideos.map(v => v.videoId));
+    chunkResults = chunkResults.filter(c => videoIds.has(c.videoId));
+  }
+
   const videoResults = aggregateByVideo(chunkResults);
 
   const timing = Math.round(performance.now() - start);

@@ -19,10 +19,15 @@ export interface SearchResponse {
   hasEmbeddings: boolean;
 }
 
+interface UseSearchOptions {
+  focusAreaId?: number | null;
+}
+
 /**
  * Hook for managing search state with debounced queries
  */
-export function useSearch() {
+export function useSearch(options: UseSearchOptions = {}) {
+  const { focusAreaId = null } = options;
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -58,7 +63,15 @@ export function useSearch() {
       setIsLoading(true);
       setError(null);
 
-      fetch(`/api/search?q=${encodeURIComponent(query)}&mode=${mode}`, {
+      const params = new URLSearchParams({
+        q: query,
+        mode,
+      });
+      if (focusAreaId !== null && focusAreaId !== undefined) {
+        params.set('focusAreaId', String(focusAreaId));
+      }
+
+      fetch(`/api/search?${params}`, {
         signal: controller.signal,
       })
         .then((res) => res.json())
@@ -83,7 +96,7 @@ export function useSearch() {
         abortControllerRef.current.abort();
       }
     };
-  }, [query, mode]);
+  }, [query, mode, focusAreaId]);
 
   return {
     query,

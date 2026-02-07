@@ -35,7 +35,7 @@ export function InsightsTabs({ video, onSeek, className }: InsightsTabsProps) {
   const panelStatus = state.overall === 'extracting' ? 'streaming' : state.overall;
 
   return (
-    <Tabs defaultValue="transcript" className={className}>
+    <Tabs defaultValue="insights" className={className}>
       <TabsList className="grid w-full grid-cols-3">
         <TabsTrigger value="transcript">Transcript</TabsTrigger>
         <TabsTrigger value="insights">Insights</TabsTrigger>

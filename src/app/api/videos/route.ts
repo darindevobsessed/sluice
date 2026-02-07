@@ -1,4 +1,4 @@
-import { db, videos, searchVideos, getVideoStats } from "@/lib/db";
+import { db, videos, searchVideos, getVideoStats, videoFocusAreas } from "@/lib/db";
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { z } from "zod";
@@ -18,15 +18,44 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const query = searchParams.get('q') || '';
+    const focusAreaIdParam = searchParams.get('focusAreaId');
+
+    // Validate focusAreaId if provided
+    let focusAreaId: number | null = null;
+    if (focusAreaIdParam) {
+      const parsed = parseInt(focusAreaIdParam, 10);
+      if (isNaN(parsed)) {
+        return NextResponse.json({ error: 'Invalid focus area ID' }, { status: 400 });
+      }
+      focusAreaId = parsed;
+    }
 
     // Search videos (empty query returns all videos)
-    const videos = await searchVideos(query);
+    let videoResults = await searchVideos(query);
+
+    // Filter by focus area if provided
+    if (focusAreaId !== null) {
+      // Get video IDs assigned to this focus area
+      const assignedVideos = await db
+        .select({ videoId: videoFocusAreas.videoId })
+        .from(videoFocusAreas)
+        .where(eq(videoFocusAreas.focusAreaId, focusAreaId));
+
+      const videoIds = assignedVideos.map(v => v.videoId);
+
+      // Filter videos to only those assigned to the focus area
+      if (videoIds.length === 0) {
+        videoResults = [];
+      } else {
+        videoResults = videoResults.filter(v => videoIds.includes(v.id));
+      }
+    }
 
     // Get stats
     const stats = await getVideoStats();
 
     return NextResponse.json(
-      { videos, stats },
+      { videos: videoResults, stats },
       { status: 200 }
     );
   } catch (error) {

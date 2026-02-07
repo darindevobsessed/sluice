@@ -6,6 +6,7 @@ import { VideoPlayer } from '@/components/videos/VideoPlayer';
 import { VideoMetadata } from '@/components/videos/VideoMetadata';
 import { InsightsTabs } from '@/components/insights/InsightsTabs';
 import { EmbedButton } from '@/components/video/EmbedButton';
+import { FocusAreaAssignment } from '@/components/video/FocusAreaAssignment';
 import { usePageTitle } from '@/components/layout/PageTitleContext';
 import { Button } from '@/components/ui/button';
 import type { Video } from '@/lib/db/schema';
@@ -135,6 +136,9 @@ export default function VideoDetailPage({ params }: VideoDetailPageProps) {
         videoId={video.id}
         hasTranscript={!!video.transcript}
       />
+
+      {/* Focus area assignment */}
+      <FocusAreaAssignment videoId={video.id} />
 
       {/* Tabs with Transcript and Insights */}
       <InsightsTabs video={video} onSeek={handleSeek} className="mt-8" />

@@ -35,7 +35,12 @@ export function VideoGrid({ videos, isLoading = false }: VideoGridProps) {
   return (
     <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {videos.map((video) => (
-        <VideoCard key={video.id} video={video} />
+        <div
+          key={video.id}
+          className="animate-in fade-in duration-300"
+        >
+          <VideoCard video={video} />
+        </div>
       ))}
     </div>
   );

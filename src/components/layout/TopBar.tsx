@@ -32,8 +32,9 @@ export function TopBar({ title, backHref, backLabel, children, className }: TopB
           </Link>
         )}
         <h1
+          key={title}
           data-testid="page-title"
-          className="text-lg font-semibold transition-opacity duration-200 ease-in-out"
+          className="text-lg font-semibold animate-in fade-in duration-200"
         >
           {title}
         </h1>
