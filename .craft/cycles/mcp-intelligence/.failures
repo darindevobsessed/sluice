@@ -2124,3 +2124,122 @@ npm notice New minor version of npm available! 11.6.1 -> 11.9.0
 npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.9.0
 npm notice To update run: npm install -g npm@11.9.0
 npm notice
+---
+timestamp: "2026-02-06 19:38:51"
+story: "4-automation"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Suites 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/lib/automation/__tests__/rss.test.ts[2m [ src/lib/automation/__tests__/rss.test.ts ][22m
+[31m[1mError[22m: Failed to resolve import "../rss" from "src/lib/automation/__tests__/rss.test.ts". Does the file exist?[39m
+  Plugin: [35mvite:import-analysis[39m
+  File: [36m/Users/darindrobinski/dev/repos/gold-miner/src/lib/automation/__tests__/rss.test.ts[39m:2:45
+[33m  1  |  import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
+  2  |  import { fetchChannelFeed, getFeedUrl } from "../rss";
+     |                                                ^
+  3  |  global.fetch = vi.fn();
+  4  |  const mockFetch = vi.mocked(global.fetch);[39m
+[90m [2m❯[22m TransformPluginContext._formatLog node_modules/vite/dist/node/chunks/config.js:[2m28999:43[22m[39m
+[90m [2m❯[22m TransformPluginContext.error node_modules/vite/dist/node/chunks/config.js:[2m28996:14[22m[39m
+[90m [2m❯[22m normalizeUrl node_modules/vite/dist/node/chunks/config.js:[2m27119:18[22m[39m
+[90m [2m❯[22m node_modules/vite/dist/node/chunks/config.js:[2m27177:32[22m[39m
+[90m [2m❯[22m TransformPluginContext.transform node_modules/vite/dist/node/chunks/config.js:[2m27145:4[22m[39m
+[90m [2m❯[22m EnvironmentPluginContainer.transform node_modules/vite/dist/node/chunks/config.js:[2m28797:14[22m[39m
+[90m [2m❯[22m loadAndTransform node_modules/vite/dist/node/chunks/config.js:[2m22670:26[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/lib/automation/__tests__/rss.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/lib/automation/__tests__/rss.test.ts [2m([22m[2m0 test[22m[2m)[22m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [2mno tests[22m
+[2m   Start at [22m 19:38:48
+[2m   Duration [22m 2.40s[2m (transform 43ms, setup 367ms, import 0ms, tests 0ms, environment 1.51s)[22m
+---
+timestamp: "2026-02-06 19:39:40"
+story: "4-automation"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+> gold-miner@0.1.0 lint
+> eslint
+
+
+/Users/darindrobinski/dev/repos/gold-miner/src/app/api/search/__tests__/route.test.ts
+  565:45  error    Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+  566:45  error    Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+  628:45  error    Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+  629:45  error    Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+  765:13  warning  'data' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  775:13  warning  'data' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/darindrobinski/dev/repos/gold-miner/src/components/add-video/__tests__/AddVideoPage.test.tsx
+  15:36  warning  '_videoId' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/darindrobinski/dev/repos/gold-miner/src/components/search/ChunkResult.tsx
+  5:17  warning  'Video' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/darindrobinski/dev/repos/gold-miner/src/components/search/FreshnessBadge.tsx
+  24:6  error  Error: Cannot call impure function during render
+
+`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+/Users/darindrobinski/dev/repos/gold-miner/src/components/search/FreshnessBadge.tsx:24:6
+  22 |
+  23 |   const ageInDays = Math.floor(
+> 24 |     (Date.now() - new Date(publishedAt).getTime()) / (1000 * 60 * 60 * 24)
+     |      ^^^^^^^^^^ Cannot call impure function
+  25 |   )
+  26 |
+  27 |   // Fresh: < 90 days  react-hooks/purity
+
+/Users/darindrobinski/dev/repos/gold-miner/src/components/search/__tests__/ChunkResult.test.tsx
+  1:32  warning  'vi' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/darindrobinski/dev/repos/gold-miner/src/hooks/useSearch.ts
+  48:7  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/darindrobinski/dev/repos/gold-miner/src/hooks/useSearch.ts:48:7
+  46 |     // Clear results if query is empty
+  47 |     if (!query.trim()) {
+> 48 |       setResults(null);
+     |       ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  49 |       setError(null);
+  50 |       return;
+  51 |     }  react-hooks/set-state-in-effect
+
+/Users/darindrobinski/dev/repos/gold-miner/src/lib/agent/__tests__/AgentProvider.test.tsx
+  11:32  warning  'callback' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/darindrobinski/dev/repos/gold-miner/src/lib/embeddings/__tests__/pipeline.test.ts
+  6:66  warning  '_text' is defined but never used     @typescript-eslint/no-unused-vars
+  6:81  warning  '_options' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/darindrobinski/dev/repos/gold-miner/src/lib/mcp/__tests__/types.test.ts
+   93:27  warning  '_params' is defined but never used    @typescript-eslint/no-unused-vars
+  101:27  warning  '_response' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/darindrobinski/dev/repos/gold-miner/src/lib/temporal/__tests__/decay.test.ts
+  75:57  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+✖ 17 problems (7 errors, 10 warnings)

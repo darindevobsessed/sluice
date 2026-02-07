@@ -26,6 +26,7 @@
     "concurrently": "^9.2.1",
     "drizzle-kit": "^0.31.8",
     "drizzle-orm": "^0.45.1",
+    "fast-xml-parser": "^5.3.4",
     "lucide-react": "^0.563.0",
     "mcp-handler": "^1.0.7",
     "nanoid": "^5.1.6",
