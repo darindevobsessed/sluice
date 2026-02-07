@@ -742,3 +742,59 @@ npm error
 npm error To see a list of scripts, run:
 npm error   npm run
 npm error A complete log of this run can be found in: /Users/darindrobinski/.npm/_logs/2026-02-07T19_06_32_924Z-debug-0.log
+---
+timestamp: "2026-02-07 13:20:40"
+story: "1-ui-enhancements"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Suites 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/components/layout/__tests__/ManageFocusAreasModal.test.tsx[2m [ src/components/layout/__tests__/ManageFocusAreasModal.test.tsx ][22m
+[31m[1mError[22m: Failed to resolve import "../ManageFocusAreasModal" from "src/components/layout/__tests__/ManageFocusAreasModal.test.tsx". Does the file exist?[39m
+  Plugin: [35mvite:import-analysis[39m
+  File: [36m/Users/darindrobinski/dev/repos/gold-miner/src/components/layout/__tests__/ManageFocusAreasModal.test.tsx[39m:4:38
+[33m  3  |  import { render, screen, waitFor } from "@testing-library/react";
+  4  |  import userEvent from "@testing-library/user-event";
+  5  |  import { ManageFocusAreasModal } from "../ManageFocusAreasModal";
+     |                                         ^
+  6  |  import { FocusAreaProvider } from "@/components/providers/FocusAreaProvider";
+  7  |  const mockFetch = vi.fn();[39m
+[90m [2m❯[22m TransformPluginContext._formatLog node_modules/vite/dist/node/chunks/config.js:[2m28999:43[22m[39m
+[90m [2m❯[22m TransformPluginContext.error node_modules/vite/dist/node/chunks/config.js:[2m28996:14[22m[39m
+[90m [2m❯[22m normalizeUrl node_modules/vite/dist/node/chunks/config.js:[2m27119:18[22m[39m
+[90m [2m❯[22m node_modules/vite/dist/node/chunks/config.js:[2m27177:32[22m[39m
+[90m [2m❯[22m TransformPluginContext.transform node_modules/vite/dist/node/chunks/config.js:[2m27145:4[22m[39m
+[90m [2m❯[22m EnvironmentPluginContainer.transform node_modules/vite/dist/node/chunks/config.js:[2m28797:14[22m[39m
+[90m [2m❯[22m loadAndTransform node_modules/vite/dist/node/chunks/config.js:[2m22670:26[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/components/layout/__tests__/ManageFocusAreasModal.test.tsx
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/components/layout/__tests__/ManageFocusAreasModal.test.tsx [2m([22m[2m0 test[22m[2m)[22m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [2mno tests[22m
+[2m   Start at [22m 13:20:34
+[2m   Duration [22m 5.63s[2m (transform 88ms, setup 635ms, import 0ms, tests 0ms, environment 3.98s)[22m
+---
+timestamp: "2026-02-07 13:23:25"
+story: "1-ui-enhancements"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+npm error Missing script: "typecheck"
+npm error
+npm error To see a list of scripts, run:
+npm error   npm run
+npm error A complete log of this run can be found in: /Users/darindrobinski/.npm/_logs/2026-02-07T19_23_25_163Z-debug-0.log
