@@ -60,15 +60,19 @@ export function AddVideoPage() {
     setTranscriptFetchError(null);
 
     try {
-      const url = `/api/youtube/transcript?videoId=${videoId}${forceRefresh ? '&forceRefresh=true' : ''}`;
-      const response = await fetch(url, { signal: controller.signal });
+      const response = await fetch('/api/youtube/transcript', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ videoId, forceRefresh: forceRefresh || undefined }),
+        signal: controller.signal,
+      });
 
-      if (!response.ok) {
-        const data = await response.json();
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
         throw new Error(data.error || 'Failed to fetch transcript');
       }
 
-      const data = await response.json();
       setTranscript(data.transcript);
       setTranscriptSource("auto");
       setTranscriptFetchError(null);

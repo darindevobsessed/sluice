@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface TranscriptInstructionsProps {
   collapsed?: boolean;
@@ -10,6 +10,13 @@ export function TranscriptInstructions({ collapsed = false }: TranscriptInstruct
   // When collapsed=true: start closed, show small link
   // When collapsed=false: start open, show normal toggle
   const [isOpen, setIsOpen] = useState(!collapsed);
+
+  // Close instructions when collapsed prop changes to true (e.g. auto-fetch completes)
+  useEffect(() => {
+    if (collapsed) {
+      setIsOpen(false);
+    }
+  }, [collapsed]);
 
   if (collapsed && !isOpen) {
     return (

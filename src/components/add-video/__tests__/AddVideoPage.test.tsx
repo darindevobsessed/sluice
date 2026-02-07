@@ -44,7 +44,8 @@ describe('AddVideoPage - Transcript Auto-fetch', () => {
 
     // Should not fetch immediately (before debounce completes)
     expect(mockFetch).not.toHaveBeenCalledWith(
-      expect.stringMatching(/\/api\/youtube\/transcript/)
+      '/api/youtube/transcript',
+      expect.anything()
     );
 
     // Wait just 400ms - still before the 500ms debounce
@@ -52,7 +53,8 @@ describe('AddVideoPage - Transcript Auto-fetch', () => {
 
     // Still should not have fetched
     expect(mockFetch).not.toHaveBeenCalledWith(
-      expect.stringMatching(/\/api\/youtube\/transcript/)
+      '/api/youtube/transcript',
+      expect.anything()
     );
   }, 10000);
 
@@ -63,7 +65,7 @@ describe('AddVideoPage - Transcript Auto-fetch', () => {
     // Mock successful transcript fetch
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      json: async () => ({ transcript: 'Test transcript content' }),
+      json: async () => ({ success: true, transcript: 'Test transcript content' }),
     } as Response);
 
     render(<AddVideoPage />);
@@ -78,11 +80,14 @@ describe('AddVideoPage - Transcript Auto-fetch', () => {
       expect(screen.getByText(/test video title/i)).toBeInTheDocument();
     }, { timeout: 3000 });
 
-    // Should now fetch transcript
+    // Should now fetch transcript via POST
     await waitFor(() => {
       expect(mockFetch).toHaveBeenCalledWith(
-        expect.stringMatching(/\/api\/youtube\/transcript\?videoId=abc123/),
+        '/api/youtube/transcript',
         expect.objectContaining({
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ videoId: 'abc123' }),
           signal: expect.any(AbortSignal),
         })
       );
@@ -99,7 +104,7 @@ describe('AddVideoPage - Transcript Auto-fetch', () => {
         setTimeout(() => {
           resolve({
             ok: true,
-            json: async () => ({ transcript: 'Test transcript' }),
+            json: async () => ({ success: true, transcript: 'Test transcript' }),
           } as Response);
         }, 2000);
       })
@@ -126,7 +131,7 @@ describe('AddVideoPage - Transcript Auto-fetch', () => {
 
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      json: async () => ({ transcript: 'Test transcript content' }),
+      json: async () => ({ success: true, transcript: 'Test transcript content' }),
     } as Response);
 
     render(<AddVideoPage />);
@@ -186,7 +191,7 @@ describe('AddVideoPage - Transcript Auto-fetch', () => {
         setTimeout(() => {
           resolve({
             ok: true,
-            json: async () => ({ transcript: 'Test transcript' }),
+            json: async () => ({ success: true, transcript: 'Test transcript' }),
           } as Response);
         }, 2000);
       });
@@ -219,7 +224,7 @@ describe('AddVideoPage - Transcript Auto-fetch', () => {
 
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      json: async () => ({ transcript: 'Auto-fetched transcript' }),
+      json: async () => ({ success: true, transcript: 'Auto-fetched transcript' }),
     } as Response);
 
     render(<AddVideoPage />);

@@ -1,4 +1,4 @@
-import { YoutubeTranscript } from 'youtube-transcript';
+import { YoutubeTranscript } from '@danielxceron/youtube-transcript';
 import type { TranscriptSegment } from '@/lib/transcript/types';
 
 export interface TranscriptFetchResult {
@@ -57,8 +57,8 @@ export async function fetchTranscript(
 
     // Convert to our segment format
     const segments: TranscriptSegment[] = items.map((item) => ({
-      timestamp: formatTimestamp(item.offset / 1000),
-      seconds: Math.floor(item.offset / 1000),
+      timestamp: formatTimestamp(item.offset),
+      seconds: Math.floor(item.offset),
       text: item.text.trim(),
     }));
 

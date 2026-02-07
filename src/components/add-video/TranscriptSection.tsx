@@ -31,7 +31,7 @@ export function TranscriptSection({
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <Label htmlFor="transcript" className="text-base">
-            Now paste the transcript:
+            {source === "auto" ? "Transcript:" : "Now paste the transcript:"}
           </Label>
           {isFetching && (
             <span className="flex items-center gap-2 text-sm text-muted-foreground">

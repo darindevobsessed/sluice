@@ -1,14 +1,14 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { fetchTranscript, clearTranscriptCache } from '../transcript';
 
-// Mock the youtube-transcript package
-vi.mock('youtube-transcript', () => ({
+// Mock the @danielxceron/youtube-transcript package
+vi.mock('@danielxceron/youtube-transcript', () => ({
   YoutubeTranscript: {
     fetchTranscript: vi.fn(),
   },
 }));
 
-import { YoutubeTranscript } from 'youtube-transcript';
+import { YoutubeTranscript } from '@danielxceron/youtube-transcript';
 
 const mockFetchTranscript = vi.mocked(YoutubeTranscript.fetchTranscript);
 
@@ -25,9 +25,9 @@ describe('fetchTranscript', () => {
   it('returns transcript data on success', async () => {
     // Mock successful response
     mockFetchTranscript.mockResolvedValueOnce([
-      { text: 'Hello world', offset: 0, duration: 2000 },
-      { text: 'This is a test', offset: 2000, duration: 3000 },
-      { text: 'Great video', offset: 5000, duration: 2000 },
+      { text: 'Hello world', offset: 0, duration: 2 },
+      { text: 'This is a test', offset: 2, duration: 3 },
+      { text: 'Great video', offset: 5, duration: 2 },
     ]);
 
     const result = await fetchTranscript('test-video-id');
@@ -53,9 +53,9 @@ describe('fetchTranscript', () => {
 
   it('formats timestamps correctly for hours', async () => {
     mockFetchTranscript.mockResolvedValueOnce([
-      { text: 'Start', offset: 0, duration: 1000 },
-      { text: 'One hour mark', offset: 3600000, duration: 1000 },
-      { text: 'Hour and half', offset: 5445000, duration: 1000 },
+      { text: 'Start', offset: 0, duration: 1 },
+      { text: 'One hour mark', offset: 3600, duration: 1 },
+      { text: 'Hour and half', offset: 5445, duration: 1 },
     ]);
 
     const result = await fetchTranscript('long-video');
@@ -121,7 +121,7 @@ describe('fetchTranscript', () => {
 
   it('caches successful results', async () => {
     mockFetchTranscript.mockResolvedValueOnce([
-      { text: 'Cached content', offset: 0, duration: 1000 },
+      { text: 'Cached content', offset: 0, duration: 1 },
     ]);
 
     // First call
@@ -157,10 +157,10 @@ describe('fetchTranscript', () => {
   it('cache expires after TTL', async () => {
     mockFetchTranscript
       .mockResolvedValueOnce([
-        { text: 'First fetch', offset: 0, duration: 1000 },
+        { text: 'First fetch', offset: 0, duration: 1 },
       ])
       .mockResolvedValueOnce([
-        { text: 'Second fetch', offset: 0, duration: 1000 },
+        { text: 'Second fetch', offset: 0, duration: 1 },
       ]);
 
     // First call
@@ -181,8 +181,8 @@ describe('fetchTranscript', () => {
 
   it('trims whitespace from text segments', async () => {
     mockFetchTranscript.mockResolvedValueOnce([
-      { text: '  Hello world  ', offset: 0, duration: 1000 },
-      { text: '\n\nTest\n\n', offset: 1000, duration: 1000 },
+      { text: '  Hello world  ', offset: 0, duration: 1 },
+      { text: '\n\nTest\n\n', offset: 1, duration: 1 },
     ]);
 
     const result = await fetchTranscript('whitespace-video');
@@ -206,10 +206,10 @@ describe('clearTranscriptCache', () => {
   it('clears cache for specific video', async () => {
     mockFetchTranscript
       .mockResolvedValueOnce([
-        { text: 'Original', offset: 0, duration: 1000 },
+        { text: 'Original', offset: 0, duration: 1 },
       ])
       .mockResolvedValueOnce([
-        { text: 'After clear', offset: 0, duration: 1000 },
+        { text: 'After clear', offset: 0, duration: 1 },
       ]);
 
     // First fetch and cache
@@ -231,8 +231,8 @@ describe('clearTranscriptCache', () => {
 
   it('only clears specified video cache', async () => {
     mockFetchTranscript
-      .mockResolvedValueOnce([{ text: 'Video 1', offset: 0, duration: 1000 }])
-      .mockResolvedValueOnce([{ text: 'Video 2', offset: 0, duration: 1000 }]);
+      .mockResolvedValueOnce([{ text: 'Video 1', offset: 0, duration: 1 }])
+      .mockResolvedValueOnce([{ text: 'Video 2', offset: 0, duration: 1 }]);
 
     // Cache two videos
     await fetchTranscript('video1');
@@ -248,7 +248,7 @@ describe('clearTranscriptCache', () => {
 
     // video1 should fetch again
     mockFetchTranscript.mockResolvedValueOnce([
-      { text: 'Video 1 new', offset: 0, duration: 1000 },
+      { text: 'Video 1 new', offset: 0, duration: 1 },
     ]);
     await fetchTranscript('video1');
     expect(mockFetchTranscript).toHaveBeenCalledTimes(3);
