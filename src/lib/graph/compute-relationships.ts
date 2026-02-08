@@ -123,7 +123,7 @@ export async function computeRelationships(
  * @param b - Second vector
  * @returns Cosine similarity score
  */
-function cosineSimilarity(a: number[], b: number[]): number {
+export function cosineSimilarity(a: number[], b: number[]): number {
   if (a.length !== b.length) {
     throw new Error(`Vector dimension mismatch: ${a.length} vs ${b.length}`)
   }
