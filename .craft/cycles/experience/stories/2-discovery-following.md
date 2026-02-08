@@ -1,15 +1,15 @@
 ---
 name: discovery-following
 title: Discovery & Following
-status: active
+status: complete
 priority: high
 created: 2026-02-05
 updated: 2026-02-07
 cycle: experience
 story_number: 2
 chunks_total: 5
-chunks_complete: 4
-current_chunk: 5
+chunks_complete: 5
+current_chunk: 6
 ---
 
 # Story: Discovery & Following
