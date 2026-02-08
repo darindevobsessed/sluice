@@ -3594,3 +3594,11 @@ npm error
 npm error To see a list of scripts, run:
 npm error   npm run
 npm error A complete log of this run can be found in: /Users/darindrobinski/.npm/_logs/2026-02-08T03_31_37_440Z-debug-0.log
+---
+timestamp: "2026-02-08 10:17:00"
+story: "3-similar-creators"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 2
+src/app/api/channels/similar/follow/__tests__/route.test.ts(162,24): error TS18048: 'insertCall' is possibly 'undefined'.

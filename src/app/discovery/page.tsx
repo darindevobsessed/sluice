@@ -7,6 +7,7 @@ import { RefreshCw } from 'lucide-react'
 import { FollowChannelInput } from '@/components/discovery/FollowChannelInput'
 import { ChannelSection } from '@/components/discovery/ChannelSection'
 import { CatchUpSection } from '@/components/discovery/CatchUpSection'
+import { SimilarCreatorsSection } from '@/components/discovery/SimilarCreatorsSection'
 
 interface Channel {
   id: number
@@ -149,6 +150,9 @@ export default function Discovery() {
               refreshTrigger={refreshTrigger}
             />
           ))}
+
+          {/* Discover Similar Creators section */}
+          <SimilarCreatorsSection />
         </div>
       )}
     </div>

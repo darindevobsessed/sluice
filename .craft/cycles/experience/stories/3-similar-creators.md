@@ -8,8 +8,8 @@ updated: 2026-02-08
 cycle: experience
 story_number: 3
 chunks_total: 4
-chunks_complete: 2
-current_chunk: 3
+chunks_complete: 3
+current_chunk: 4
 ---
 
 # Story: Similar Creators
