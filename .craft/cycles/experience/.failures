@@ -4135,3 +4135,66 @@ tool: "Bash"
 error: |
   Exit code 1
 ls: /Users/darindrobinski/dev/repos/gold-miner/init-db.sql: No such file or directory
+---
+timestamp: "2026-02-08 12:07:49"
+story: "4-personas-ensemble"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/lib/personas/__tests__/ensemble.test.ts[2m > [22mstreamEnsembleResponse[2m > [22mshould emit persona_done events for each persona
+[31m[1mAssertionError[22m: expected 1 to be 2 // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 2[39m
+[31m+ 1[39m
+
+[36m [2m❯[22m src/lib/personas/__tests__/ensemble.test.ts:[2m289:30[22m[39m
+    [90m287| [39m    const personaDoneCount = (allText.match(/persona_done/g) || []).le…
+    [90m288| [39m
+    [90m289| [39m    [34mexpect[39m(personaDoneCount)[33m.[39m[34mtoBe[39m(mockPersonas[33m.[39mlength)
+    [90m   | [39m                             [31m^[39m
+    [90m290| [39m  })
+    [90m291| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/lib/personas/__tests__/ensemble.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/lib/personas/__tests__/ensemble.test.ts [2m([22m[2m20 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 786[2mms[22m[39m
+     [32m✓[39m should generate embedding for the question[32m 4[2mms[22m[39m
+     [32m✓[39m should return personas sorted by similarity score[32m 2[2mms[22m[39m
+     [32m✓[39m should skip personas without expertise embeddings[32m 1[2mms[22m[39m
+     [32m✓[39m should limit results to specified limit[32m 1[2mms[22m[39m
+     [32m✓[39m should return empty array if no personas provided[32m 0[2mms[22m[39m
+     [32m✓[39m should return empty array if no personas have embeddings[32m 0[2mms[22m[39m
+     [32m✓[39m should handle questions with empty string[32m 0[2mms[22m[39m
+     [32m✓[39m should default limit to 3[32m 2[2mms[22m[39m
+     [32m✓[39m should return a ReadableStream[32m 2[2mms[22m[39m
+     [32m✓[39m should emit best_match event first[32m 2[2mms[22m[39m
+     [32m✓[39m should emit persona_start events for each persona[32m 103[2mms[22m[39m
+     [32m✓[39m should emit delta events with personaId[32m 102[2mms[22m[39m
+[31m     [31m×[31m should emit persona_done events for each persona[39m[32m 107[2mms[22m[39m
+     [32m✓[39m should emit all_done event at the end[32m 102[2mms[22m[39m
+     [32m✓[39m should fetch context for each persona channel[32m 102[2mms[22m[39m
+     [32m✓[39m should call streamPersonaResponse for each persona[32m 101[2mms[22m[39m
+     [32m✓[39m should handle abort signal[32m 50[2mms[22m[39m
+     [32m✓[39m should emit persona_error if one stream fails[32m 101[2mms[22m[39m
+     [32m✓[39m should handle empty personas array[32m 0[2mms[22m[39m
+     [32m✓[39m should include sources in persona_done event[32m 2[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m19 passed[39m[22m[90m (20)[39m
+[2m   Start at [22m 12:07:45
+[2m   Duration [22m 3.31s[2m (transform 171ms, setup 156ms, import 957ms, tests 786ms, environment 1.09s)[22m
