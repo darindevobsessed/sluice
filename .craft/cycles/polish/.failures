@@ -402,3 +402,15 @@ Received: [31m"idle"[39m
 [2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m10 passed[39m[22m[90m (11)[39m
 [2m   Start at [22m 17:23:45
 [2m   Duration [22m 4.98s[2m (transform 206ms, setup 420ms, import 623ms, tests 1.23s, environment 2.12s)[22m
+---
+timestamp: "2026-02-08 17:44:57"
+story: "1-extraction-persistence"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+On branch main
+Your branch is ahead of 'origin/main' by 4 commits.
+  (use "git push" to publish your local commits)
+
+nothing to commit, working tree clean
