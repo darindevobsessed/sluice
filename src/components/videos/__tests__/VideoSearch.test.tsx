@@ -7,7 +7,7 @@ describe('VideoSearch', () => {
     const onSearch = vi.fn();
     render(<VideoSearch onSearch={onSearch} />);
 
-    const input = screen.getByPlaceholderText('Search videos and transcripts...');
+    const input = screen.getByPlaceholderText('Ask a question or search...');
     expect(input).toBeInTheDocument();
   });
 
@@ -32,7 +32,7 @@ describe('VideoSearch', () => {
 
     render(<VideoSearch onSearch={onSearch} />);
 
-    const input = screen.getByPlaceholderText('Search videos and transcripts...');
+    const input = screen.getByPlaceholderText('Ask a question or search...');
 
     // Type into input
     fireEvent.change(input, { target: { value: 'react' } });
@@ -54,7 +54,7 @@ describe('VideoSearch', () => {
 
     render(<VideoSearch onSearch={onSearch} />);
 
-    const input = screen.getByPlaceholderText('Search videos and transcripts...');
+    const input = screen.getByPlaceholderText('Ask a question or search...');
 
     // Initially no clear button
     expect(screen.queryByLabelText('Clear search')).not.toBeInTheDocument();
@@ -71,7 +71,7 @@ describe('VideoSearch', () => {
 
     render(<VideoSearch onSearch={onSearch} />);
 
-    const input = screen.getByPlaceholderText('Search videos and transcripts...');
+    const input = screen.getByPlaceholderText('Ask a question or search...');
 
     // Type something
     fireEvent.change(input, { target: { value: 'react' } });
@@ -97,7 +97,7 @@ describe('VideoSearch', () => {
 
     render(<VideoSearch onSearch={onSearch} />);
 
-    const input = screen.getByPlaceholderText('Search videos and transcripts...');
+    const input = screen.getByPlaceholderText('Ask a question or search...');
 
     // Type rapidly with multiple changes
     fireEvent.change(input, { target: { value: 'r' } });
@@ -124,7 +124,7 @@ describe('VideoSearch', () => {
 
     render(<VideoSearch onSearch={onSearch} />);
 
-    const input = screen.getByPlaceholderText('Search videos and transcripts...');
+    const input = screen.getByPlaceholderText('Ask a question or search...');
 
     // Type first value
     fireEvent.change(input, { target: { value: 'react' } });

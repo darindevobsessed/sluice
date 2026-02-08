@@ -1,15 +1,26 @@
-'use client';
+'use client'
 
-import { useEffect, useState } from 'react';
-import { StatsHeader, StatsHeaderSkeleton } from '@/components/videos/StatsHeader';
-import { VideoSearch } from '@/components/videos/VideoSearch';
-import { VideoGrid } from '@/components/videos/VideoGrid';
-import { EmptyState } from '@/components/videos/EmptyState';
-import { SearchResults } from '@/components/search/SearchResults';
-import { useSearch } from '@/hooks/useSearch';
-import { usePageTitle } from '@/components/layout/PageTitleContext';
-import { useFocusArea } from '@/components/providers/FocusAreaProvider';
-import type { Video } from '@/lib/db/schema';
+import { useEffect, useState } from 'react'
+import { StatsHeader, StatsHeaderSkeleton } from '@/components/videos/StatsHeader'
+import { VideoSearch } from '@/components/videos/VideoSearch'
+import { VideoGrid } from '@/components/videos/VideoGrid'
+import { EmptyState } from '@/components/videos/EmptyState'
+import { SearchResults } from '@/components/search/SearchResults'
+import { PersonaPanel } from '@/components/personas/PersonaPanel'
+import { useSearch } from '@/hooks/useSearch'
+import { useEnsemble } from '@/hooks/useEnsemble'
+import { usePageTitle } from '@/components/layout/PageTitleContext'
+import { useFocusArea } from '@/components/providers/FocusAreaProvider'
+import type { Video } from '@/lib/db/schema'
+
+/**
+ * Detects if a query string looks like a question
+ */
+function isQuestion(query: string): boolean {
+  const trimmed = query.trim()
+  if (trimmed.endsWith('?')) return true
+  return /^(how|what|why|when|where|who|which|can|should|is|are|do|does)\b/i.test(trimmed)
+}
 
 interface VideoStats {
   count: number;
@@ -34,7 +45,14 @@ export default function Home() {
   const { selectedFocusAreaId } = useFocusArea();
 
   // Use the new search hook
-  const { query, setQuery, results, isLoading: isSearching } = useSearch({ focusAreaId: selectedFocusAreaId });
+  const { query, setQuery, results, isLoading: isSearching } = useSearch({ focusAreaId: selectedFocusAreaId })
+
+  // Detect if query is a question (with 3+ words)
+  const wordCount = query.trim().split(/\s+/).filter(Boolean).length
+  const isQueryQuestion = isQuestion(query) && wordCount >= 3
+
+  // Use ensemble hook when query is a question
+  const { state: ensembleState } = useEnsemble(isQueryQuestion ? query : null)
 
   // Set page title on mount
   useEffect(() => {
@@ -81,8 +99,9 @@ export default function Home() {
   }, [selectedFocusAreaId]);
 
   // Show empty state only when no videos exist at all (not during search)
-  const showEmptyState = !isLoadingVideos && stats?.count === 0 && !query;
-  const showSearchResults = query.trim().length > 0;
+  const showEmptyState = !isLoadingVideos && stats?.count === 0 && !query
+  const showSearchResults = query.trim().length > 0
+  const showPanel = isQueryQuestion && query.trim().length > 0
 
   return (
     <div className="p-6">
@@ -105,11 +124,15 @@ export default function Home() {
         <>
           {/* Search Bar */}
           <div className="mb-8">
-            <VideoSearch
-              onSearch={setQuery}
-              placeholder="Search videos and transcripts..."
-            />
+            <VideoSearch onSearch={setQuery} />
           </div>
+
+          {/* Persona Panel - shows above search results when question detected */}
+          {showPanel && (
+            <div className="mb-8">
+              <PersonaPanel question={query} state={ensembleState} />
+            </div>
+          )}
 
           {/* Content: either search results or video grid */}
           {showSearchResults ? (

@@ -12,7 +12,7 @@ interface VideoSearchProps {
 
 export function VideoSearch({
   onSearch,
-  placeholder = 'Search videos and transcripts...',
+  placeholder = 'Ask a question or search...',
 }: VideoSearchProps) {
   const [value, setValue] = useState('');
   const abortControllerRef = useRef<AbortController | null>(null);
