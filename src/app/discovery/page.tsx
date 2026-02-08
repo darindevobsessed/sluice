@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import { usePageTitle } from '@/components/layout/PageTitleContext'
+import { Button } from '@/components/ui/button'
+import { RefreshCw } from 'lucide-react'
 import { FollowChannelInput } from '@/components/discovery/FollowChannelInput'
 import { ChannelSection } from '@/components/discovery/ChannelSection'
 import { CatchUpSection } from '@/components/discovery/CatchUpSection'
@@ -23,6 +25,7 @@ export default function Discovery() {
   const [channels, setChannels] = useState<Channel[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [refreshTrigger, setRefreshTrigger] = useState(0)
 
   useEffect(() => {
     setPageTitle({ title: 'Discovery' })
@@ -72,6 +75,10 @@ export default function Discovery() {
     }
   }
 
+  const handleRefresh = () => {
+    setRefreshTrigger((prev) => prev + 1)
+  }
+
   if (isLoading) {
     return (
       <div className="p-6">
@@ -90,8 +97,23 @@ export default function Discovery() {
 
   return (
     <div className="p-6 space-y-6">
-      {/* Follow channel input */}
-      <FollowChannelInput onChannelFollowed={handleChannelFollowed} />
+      {/* Header with follow input and refresh button */}
+      <div className="flex items-start gap-3">
+        <div className="flex-1">
+          <FollowChannelInput onChannelFollowed={handleChannelFollowed} />
+        </div>
+        {channels.length > 0 && (
+          <Button
+            variant="outline"
+            size="default"
+            onClick={handleRefresh}
+            aria-label="Refresh all channels"
+          >
+            <RefreshCw className="size-4" />
+            Refresh
+          </Button>
+        )}
+      </div>
 
       {/* Catch-up section - only when channels exist */}
       {channels.length > 0 && (
@@ -123,6 +145,7 @@ export default function Discovery() {
               key={channel.id}
               channel={channel}
               onUnfollow={handleUnfollow}
+              refreshTrigger={refreshTrigger}
             />
           ))}
         </div>

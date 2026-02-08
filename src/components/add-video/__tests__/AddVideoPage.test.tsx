@@ -1,26 +1,32 @@
-import { render, screen, waitFor } from '@testing-library/react';
-import { userEvent } from '@testing-library/user-event';
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { AddVideoPage } from '../AddVideoPage';
+import { render, screen, waitFor } from '@testing-library/react'
+import { userEvent } from '@testing-library/user-event'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { AddVideoPage } from '../AddVideoPage'
+
+// Mock next/navigation for useSearchParams
+const mockSearchParams = new URLSearchParams()
+vi.mock('next/navigation', () => ({
+  useSearchParams: () => mockSearchParams,
+}))
 
 // Mock the youtube module
 vi.mock('@/lib/youtube', () => ({
   parseYouTubeUrl: vi.fn((url: string) => {
     if (url.includes('youtube.com/watch?v=')) {
-      const videoId = url.split('v=')[1]?.split('&')[0];
-      return { isValid: true, videoId };
+      const videoId = url.split('v=')[1]?.split('&')[0]
+      return { isValid: true, videoId }
     }
-    return { isValid: false, videoId: null };
+    return { isValid: false, videoId: null }
   }),
   fetchVideoMetadata: vi.fn(async (_videoId: string) => ({
     title: 'Test Video Title',
     author_name: 'Test Channel',
     thumbnail_url: 'https://example.com/thumb.jpg',
   })),
-}));
+}))
 
 // Mock fetch for transcript API
-global.fetch = vi.fn();
+global.fetch = vi.fn()
 
 describe('AddVideoPage - Transcript Auto-fetch', () => {
   beforeEach(() => {
@@ -263,6 +269,125 @@ describe('AddVideoPage - Transcript Auto-fetch', () => {
     await new Promise(resolve => setTimeout(resolve, 500));
 
     // Should not show error for aborted requests
-    expect(screen.queryByText(/failed/i)).not.toBeInTheDocument();
-  }, 10000);
-});
+    expect(screen.queryByText(/failed/i)).not.toBeInTheDocument()
+  }, 10000)
+})
+
+describe('AddVideoPage - URL Prefill from Query Param', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockSearchParams.delete('url')
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
+  it('should prefill URL input when url query param is present', async () => {
+    const mockFetch = vi.mocked(global.fetch)
+
+    // Set the URL param
+    mockSearchParams.set('url', 'https://youtube.com/watch?v=prefilled123')
+
+    // Mock transcript fetch
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ success: true, transcript: 'Prefilled transcript' }),
+    } as Response)
+
+    render(<AddVideoPage />)
+
+    // Should show URL in input
+    const input = screen.getByLabelText(/what video would you like to add/i)
+    await waitFor(() => {
+      expect(input).toHaveValue('https://youtube.com/watch?v=prefilled123')
+    }, { timeout: 3000 })
+  }, 10000)
+
+  it('should auto-fetch metadata when url query param is present', async () => {
+    const mockFetch = vi.mocked(global.fetch)
+
+    // Set the URL param
+    mockSearchParams.set('url', 'https://youtube.com/watch?v=prefilled456')
+
+    // Mock transcript fetch
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ success: true, transcript: 'Prefilled transcript' }),
+    } as Response)
+
+    render(<AddVideoPage />)
+
+    // Should show video metadata after debounce
+    await waitFor(() => {
+      expect(screen.getByText(/test video title/i)).toBeInTheDocument()
+    }, { timeout: 3000 })
+  }, 10000)
+
+  it('should auto-fetch transcript when url query param is present', async () => {
+    const mockFetch = vi.mocked(global.fetch)
+
+    // Set the URL param
+    mockSearchParams.set('url', 'https://youtube.com/watch?v=prefilled789')
+
+    // Mock transcript fetch
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ success: true, transcript: 'Prefilled transcript content' }),
+    } as Response)
+
+    render(<AddVideoPage />)
+
+    // Should trigger transcript fetch
+    await waitFor(() => {
+      expect(mockFetch).toHaveBeenCalledWith(
+        '/api/youtube/transcript',
+        expect.objectContaining({
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ videoId: 'prefilled789' }),
+        })
+      )
+    }, { timeout: 3000 })
+  }, 10000)
+
+  it('should not prefill when url query param is empty', async () => {
+    const mockFetch = vi.mocked(global.fetch)
+
+    // No URL param set
+    render(<AddVideoPage />)
+
+    const input = screen.getByLabelText(/what video would you like to add/i)
+
+    // Should be empty
+    expect(input).toHaveValue('')
+
+    // Should not fetch
+    await new Promise(resolve => setTimeout(resolve, 600))
+    expect(mockFetch).not.toHaveBeenCalled()
+  }, 10000)
+
+  it('should handle invalid URL in query param gracefully', async () => {
+    const mockFetch = vi.mocked(global.fetch)
+
+    // Set invalid URL param
+    mockSearchParams.set('url', 'not-a-valid-url')
+
+    render(<AddVideoPage />)
+
+    const input = screen.getByLabelText(/what video would you like to add/i)
+
+    // Should show URL in input
+    await waitFor(() => {
+      expect(input).toHaveValue('not-a-valid-url')
+    })
+
+    // Should show error
+    await waitFor(() => {
+      expect(screen.getByText(/please enter a valid youtube url/i)).toBeInTheDocument()
+    }, { timeout: 3000 })
+
+    // Should not fetch metadata or transcript
+    expect(mockFetch).not.toHaveBeenCalled()
+  }, 10000)
+})

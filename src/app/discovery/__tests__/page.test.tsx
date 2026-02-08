@@ -200,4 +200,93 @@ describe('Discovery Page', () => {
       expect(screen.queryByText('Test Channel')).not.toBeInTheDocument()
     })
   })
+
+  it('should render refresh button when channels exist', async () => {
+    const mockChannel = {
+      id: 1,
+      channelId: 'UCtest',
+      name: 'Test Channel',
+      createdAt: new Date().toISOString(),
+    }
+
+    // Mock channels fetch
+    ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ok: true,
+      json: async () => [mockChannel],
+    })
+
+    // Mock videos fetch
+    ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
+      ok: true,
+      json: async () => [],
+    })
+
+    render(<Discovery />)
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /refresh all channels/i })).toBeInTheDocument()
+    })
+  })
+
+  it('should not render refresh button when no channels exist', async () => {
+    ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ok: true,
+      json: async () => [],
+    })
+
+    render(<Discovery />)
+
+    await waitFor(() => {
+      expect(screen.queryByRole('button', { name: /refresh all channels/i })).not.toBeInTheDocument()
+    })
+  })
+
+  it('should refresh all channels when refresh button is clicked', async () => {
+    const user = userEvent.setup()
+
+    const mockChannel = {
+      id: 1,
+      channelId: 'UCtest',
+      name: 'Test Channel',
+      createdAt: new Date().toISOString(),
+    }
+
+    // Initial channels fetch
+    ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ok: true,
+      json: async () => [mockChannel],
+    })
+
+    // Mock initial videos fetch
+    ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ok: true,
+      json: async () => [],
+    })
+
+    render(<Discovery />)
+
+    await waitFor(() => {
+      expect(screen.getByText('Test Channel')).toBeInTheDocument()
+    })
+
+    // Clear previous fetch calls
+    vi.clearAllMocks()
+
+    // Mock refresh videos fetch
+    ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ok: true,
+      json: async () => [],
+    })
+
+    // Click refresh button (the page-level one, not the per-channel one)
+    const refreshButton = screen.getByRole('button', { name: /refresh all channels/i })
+    await user.click(refreshButton)
+
+    // Should re-fetch channel videos
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalledWith(
+        `/api/channels/${mockChannel.id}/videos`
+      )
+    })
+  })
 })

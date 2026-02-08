@@ -144,4 +144,86 @@ describe('ChannelSection', () => {
       expect(screen.getByText(/no videos found/i)).toBeInTheDocument()
     })
   })
+
+  it('should re-fetch videos when refreshTrigger changes', async () => {
+    // Initial fetch
+    ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ok: true,
+      json: async () => mockVideos,
+    })
+
+    const { rerender } = render(
+      <ChannelSection channel={mockChannel} onUnfollow={vi.fn()} refreshTrigger={0} />
+    )
+
+    await waitFor(() => {
+      expect(screen.getByText('Video 1')).toBeInTheDocument()
+    })
+
+    // Clear mocks to track new calls
+    vi.clearAllMocks()
+
+    // Mock second fetch
+    ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ok: true,
+      json: async () => mockVideos,
+    })
+
+    // Trigger refresh by changing refreshTrigger prop
+    rerender(
+      <ChannelSection channel={mockChannel} onUnfollow={vi.fn()} refreshTrigger={1} />
+    )
+
+    // Should re-fetch videos
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalledWith(`/api/channels/${mockChannel.id}/videos`)
+    })
+  })
+
+  it('should render per-channel refresh button', () => {
+    ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ok: true,
+      json: async () => mockVideos,
+    })
+
+    render(<ChannelSection channel={mockChannel} onUnfollow={vi.fn()} />)
+
+    // Should have a refresh button in the channel header
+    const refreshButtons = screen.getAllByRole('button', { name: /refresh/i })
+    expect(refreshButtons.length).toBeGreaterThan(0)
+  })
+
+  it('should re-fetch videos when per-channel refresh button is clicked', async () => {
+    const user = userEvent.setup()
+
+    // Initial fetch
+    ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ok: true,
+      json: async () => mockVideos,
+    })
+
+    render(<ChannelSection channel={mockChannel} onUnfollow={vi.fn()} />)
+
+    await waitFor(() => {
+      expect(screen.getByText('Video 1')).toBeInTheDocument()
+    })
+
+    // Clear mocks
+    vi.clearAllMocks()
+
+    // Mock refresh fetch
+    ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ok: true,
+      json: async () => mockVideos,
+    })
+
+    // Click per-channel refresh button
+    const refreshButtons = screen.getAllByRole('button', { name: /refresh/i })
+    await user.click(refreshButtons[0]!)
+
+    // Should re-fetch
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalledWith(`/api/channels/${mockChannel.id}/videos`)
+    })
+  })
 })

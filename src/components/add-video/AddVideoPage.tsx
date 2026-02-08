@@ -1,51 +1,53 @@
-"use client";
+"use client"
 
-import { useState, useCallback, useRef, useEffect } from "react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { VideoPreviewCard } from "./VideoPreviewCard";
-import { TranscriptSection } from "./TranscriptSection";
-import { OptionalFields } from "./OptionalFields";
-import { SuccessState } from "./SuccessState";
-import { parseYouTubeUrl, fetchVideoMetadata } from "@/lib/youtube";
-import type { VideoMetadata } from "@/lib/youtube";
+import { useState, useCallback, useRef, useEffect } from "react"
+import { useSearchParams } from "next/navigation"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button"
+import { VideoPreviewCard } from "./VideoPreviewCard"
+import { TranscriptSection } from "./TranscriptSection"
+import { OptionalFields } from "./OptionalFields"
+import { SuccessState } from "./SuccessState"
+import { parseYouTubeUrl, fetchVideoMetadata } from "@/lib/youtube"
+import type { VideoMetadata } from "@/lib/youtube"
 
 export function AddVideoPage() {
-  const [url, setUrl] = useState("");
-  const [metadata, setMetadata] = useState<VideoMetadata | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [showManualFallback, setShowManualFallback] = useState(false);
-  const [manualTitle, setManualTitle] = useState("");
-  const [manualChannel, setManualChannel] = useState("");
-  const [transcript, setTranscript] = useState("");
-  const [tags, setTags] = useState("");
-  const [notes, setNotes] = useState("");
-  const [submitting, setSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-  const [submitError, setSubmitError] = useState<string | null>(null);
+  const searchParams = useSearchParams()
+  const [url, setUrl] = useState("")
+  const [metadata, setMetadata] = useState<VideoMetadata | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [showManualFallback, setShowManualFallback] = useState(false)
+  const [manualTitle, setManualTitle] = useState("")
+  const [manualChannel, setManualChannel] = useState("")
+  const [transcript, setTranscript] = useState("")
+  const [tags, setTags] = useState("")
+  const [notes, setNotes] = useState("")
+  const [submitting, setSubmitting] = useState(false)
+  const [submitted, setSubmitted] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
   // Transcript auto-fetch state
-  const [transcriptFetching, setTranscriptFetching] = useState(false);
-  const [transcriptFetchError, setTranscriptFetchError] = useState<string | null>(null);
-  const [transcriptSource, setTranscriptSource] = useState<"auto" | "manual" | null>(null);
+  const [transcriptFetching, setTranscriptFetching] = useState(false)
+  const [transcriptFetchError, setTranscriptFetchError] = useState<string | null>(null)
+  const [transcriptSource, setTranscriptSource] = useState<"auto" | "manual" | null>(null)
 
   // Refs for cleanup
-  const abortControllerRef = useRef<AbortController | null>(null);
-  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const abortControllerRef = useRef<AbortController | null>(null)
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null)
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
       if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
+        abortControllerRef.current.abort()
       }
       if (debounceTimerRef.current) {
-        clearTimeout(debounceTimerRef.current);
+        clearTimeout(debounceTimerRef.current)
       }
-    };
-  }, []);
+    }
+  }, [])
 
   const fetchTranscript = useCallback(async (videoId: string, forceRefresh = false) => {
     // Cancel any pending fetch
@@ -153,9 +155,17 @@ export function AddVideoPage() {
   }, [fetchTranscript]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    handleUrlChange(value);
-  };
+    const value = e.target.value
+    handleUrlChange(value)
+  }
+
+  // Prefill URL from query param on mount
+  useEffect(() => {
+    const urlParam = searchParams.get('url')
+    if (urlParam) {
+      handleUrlChange(urlParam)
+    }
+  }, [searchParams, handleUrlChange])
 
   const handleSubmit = async () => {
     setSubmitError(null);
