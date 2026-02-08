@@ -21,9 +21,10 @@ interface DiscoveryVideo {
 interface DiscoveryVideoCardProps {
   video: DiscoveryVideo
   className?: string
+  isNew?: boolean
 }
 
-export function DiscoveryVideoCard({ video, className }: DiscoveryVideoCardProps) {
+export function DiscoveryVideoCard({ video, className, isNew = false }: DiscoveryVideoCardProps) {
   const publishedDate = new Date(video.publishedAt)
   const relativeTime = formatRelativeTime(publishedDate)
   const thumbnailUrl = `https://i.ytimg.com/vi/${video.youtubeId}/mqdefault.jpg`
@@ -45,6 +46,10 @@ export function DiscoveryVideoCard({ video, className }: DiscoveryVideoCardProps
           className="object-cover transition-transform duration-200 group-hover:scale-105"
           unoptimized
         />
+        {/* Green "new" dot */}
+        {isNew && (
+          <div className="absolute top-2 left-2 size-3 rounded-full bg-[#059669]" aria-label="New video" />
+        )}
       </div>
 
       {/* Content */}

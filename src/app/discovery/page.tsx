@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { usePageTitle } from '@/components/layout/PageTitleContext'
 import { FollowChannelInput } from '@/components/discovery/FollowChannelInput'
 import { ChannelSection } from '@/components/discovery/ChannelSection'
+import { CatchUpSection } from '@/components/discovery/CatchUpSection'
 
 interface Channel {
   id: number
@@ -91,6 +92,11 @@ export default function Discovery() {
     <div className="p-6 space-y-6">
       {/* Follow channel input */}
       <FollowChannelInput onChannelFollowed={handleChannelFollowed} />
+
+      {/* Catch-up section - only when channels exist */}
+      {channels.length > 0 && (
+        <CatchUpSection />
+      )}
 
       {/* Channel sections */}
       {channels.length === 0 ? (
