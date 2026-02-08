@@ -66,10 +66,10 @@ export function SearchResults({
           Generate embeddings to enable semantic search
         </p>
         <Link
-          href="/videos"
+          href="/"
           className="text-sm text-primary hover:underline"
         >
-          Go to videos to generate embeddings
+          Go to Knowledge Bank to generate embeddings
         </Link>
       </div>
     );

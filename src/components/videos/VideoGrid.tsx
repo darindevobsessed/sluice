@@ -6,9 +6,11 @@ import type { Video } from '@/lib/db/schema';
 interface VideoGridProps {
   videos: Video[];
   isLoading?: boolean;
+  emptyMessage?: string;
+  emptyHint?: string;
 }
 
-export function VideoGrid({ videos, isLoading = false }: VideoGridProps) {
+export function VideoGrid({ videos, isLoading = false, emptyMessage, emptyHint }: VideoGridProps) {
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -23,10 +25,10 @@ export function VideoGrid({ videos, isLoading = false }: VideoGridProps) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
         <p className="text-lg font-medium text-muted-foreground">
-          No results found
+          {emptyMessage || 'No results found'}
         </p>
         <p className="text-sm text-muted-foreground">
-          Try adjusting your search terms
+          {emptyHint || 'Try adjusting your search terms'}
         </p>
       </div>
     );

@@ -67,10 +67,21 @@ export async function POST(request: Request) {
     }
 
     if (personasToQuery.length === 0) {
-      return NextResponse.json(
-        { error: 'No personas found' },
-        { status: 404 }
-      )
+      // Return an SSE stream with just an all_done event so the client
+      // can show the "no personas" empty state instead of an error
+      const emptyStream = new ReadableStream({
+        start(controller) {
+          controller.enqueue(new TextEncoder().encode('data: {"type":"all_done"}\n\n'))
+          controller.close()
+        },
+      })
+      return new Response(emptyStream, {
+        headers: {
+          'content-type': 'text/event-stream',
+          'cache-control': 'no-cache',
+          'connection': 'keep-alive',
+        },
+      })
     }
 
     // Find best matching personas (top 3)
