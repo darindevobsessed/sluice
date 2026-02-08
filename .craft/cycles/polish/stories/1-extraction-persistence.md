@@ -8,7 +8,7 @@ created: 2026-02-08
 updated: 2026-02-08
 priority: high
 chunks_total: 4
-chunks_complete: 0
+chunks_complete: 1
 ---
 
 # Story: Persist Insights Extraction Progress Across Navigation

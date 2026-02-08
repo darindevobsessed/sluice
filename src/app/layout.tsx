@@ -5,6 +5,7 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { MainContent } from "@/components/layout/MainContent";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { AgentProvider } from "@/lib/agent/AgentProvider";
+import { ExtractionProvider } from "@/components/providers/ExtractionProvider";
 import { FocusAreaProvider } from "@/components/providers/FocusAreaProvider";
 
 const inter = Inter({
@@ -34,10 +35,12 @@ export default function RootLayout({
       >
         <ThemeProvider>
           <AgentProvider>
-            <FocusAreaProvider>
-              <Sidebar />
-              <MainContent>{children}</MainContent>
-            </FocusAreaProvider>
+            <ExtractionProvider>
+              <FocusAreaProvider>
+                <Sidebar />
+                <MainContent>{children}</MainContent>
+              </FocusAreaProvider>
+            </ExtractionProvider>
           </AgentProvider>
         </ThemeProvider>
       </body>
