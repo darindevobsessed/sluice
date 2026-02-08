@@ -96,10 +96,10 @@ export default function Discovery() {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 sm:p-6 space-y-6">
       {/* Header with follow input and refresh button */}
-      <div className="flex items-start gap-3">
-        <div className="flex-1">
+      <div className="flex flex-col sm:flex-row items-start gap-3">
+        <div className="flex-1 w-full">
           <FollowChannelInput onChannelFollowed={handleChannelFollowed} />
         </div>
         {channels.length > 0 && (
@@ -108,6 +108,7 @@ export default function Discovery() {
             size="default"
             onClick={handleRefresh}
             aria-label="Refresh all channels"
+            className="w-full sm:w-auto"
           >
             <RefreshCw className="size-4" />
             Refresh

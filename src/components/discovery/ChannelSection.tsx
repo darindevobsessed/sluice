@@ -85,7 +85,7 @@ export function ChannelSection({ channel, onUnfollow, refreshTrigger }: ChannelS
   return (
     <div className="space-y-3">
       {/* Channel header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h2 className="text-lg font-semibold">{channel.name}</h2>
           <p className="text-sm text-muted-foreground">@{channel.channelId}</p>
@@ -113,7 +113,7 @@ export function ChannelSection({ channel, onUnfollow, refreshTrigger }: ChannelS
       {/* Videos horizontal scroll */}
       <div
         data-testid="channel-videos-container"
-        className="overflow-x-auto scroll-snap-type-x mandatory pb-2 -mx-6 px-6"
+        className="overflow-x-auto pb-2 -mx-4 px-4 sm:-mx-6 sm:px-6 scroll-smooth"
         style={{ scrollSnapType: 'x mandatory' }}
       >
         {isLoading ? (

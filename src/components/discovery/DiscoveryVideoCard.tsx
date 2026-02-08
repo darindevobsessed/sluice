@@ -63,7 +63,7 @@ export function DiscoveryVideoCard({ video, className, isNew = false }: Discover
 
         {/* Action: Add to Bank or In Bank badge */}
         {video.inBank ? (
-          <Badge variant="secondary" className="bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300">
+          <Badge variant="secondary" className="bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300 transition-opacity duration-200">
             <svg
               className="size-3"
               fill="none"

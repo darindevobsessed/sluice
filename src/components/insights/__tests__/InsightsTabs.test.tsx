@@ -96,7 +96,7 @@ describe('InsightsTabs', () => {
     expect(screen.getByRole('tab', { name: /insights/i })).toBeInTheDocument();
   });
 
-  it('shows Transcript tab content by default', () => {
+  it('shows Insights tab content by default', () => {
     const onSeek = vi.fn();
     render(
       <AgentProvider>
@@ -104,11 +104,11 @@ describe('InsightsTabs', () => {
       </AgentProvider>
     );
 
-    // TranscriptView should be visible
-    expect(screen.getByText('Intro')).toBeInTheDocument();
+    // Insights tab should be active by default
+    expect(screen.getByRole('tab', { name: /insights/i })).toHaveAttribute('data-state', 'active');
   });
 
-  it('switches to Insights tab when clicked', async () => {
+  it('switches to Transcript tab when clicked', async () => {
     const user = userEvent.setup();
     const onSeek = vi.fn();
     render(
@@ -117,20 +117,25 @@ describe('InsightsTabs', () => {
       </AgentProvider>
     );
 
-    const insightsTab = screen.getByRole('tab', { name: /insights/i });
-    await user.click(insightsTab);
+    const transcriptTab = screen.getByRole('tab', { name: /transcript/i });
+    await user.click(transcriptTab);
 
-    // Should show empty state by default
-    expect(screen.getByText('No insights generated yet')).toBeInTheDocument();
+    // Transcript content should be visible
+    expect(screen.getByText('Intro')).toBeInTheDocument();
   });
 
-  it('passes video transcript to TranscriptView', () => {
+  it('passes video transcript to TranscriptView', async () => {
+    const user = userEvent.setup();
     const onSeek = vi.fn();
     render(
       <AgentProvider>
         <InsightsTabs video={mockVideo} onSeek={onSeek} />
       </AgentProvider>
     );
+
+    // Switch to Transcript tab first (Insights is default)
+    const transcriptTab = screen.getByRole('tab', { name: /transcript/i });
+    await user.click(transcriptTab);
 
     // Content from transcript should be visible
     expect(screen.getByText('Intro')).toBeInTheDocument();
@@ -146,6 +151,10 @@ describe('InsightsTabs', () => {
       </AgentProvider>
     );
 
+    // Switch to Transcript tab first (Insights is default)
+    const transcriptTab = screen.getByRole('tab', { name: /transcript/i });
+    await user.click(transcriptTab);
+
     // Click on a timestamp button
     const timestampButton = screen.getByRole('button', { name: '0:00' });
     await user.click(timestampButton);
@@ -153,7 +162,8 @@ describe('InsightsTabs', () => {
     expect(onSeek).toHaveBeenCalledWith(0);
   });
 
-  it('handles video with no transcript', () => {
+  it('handles video with no transcript', async () => {
+    const user = userEvent.setup();
     const onSeek = vi.fn();
     const videoNoTranscript: Video = {
       ...mockVideo,
@@ -164,6 +174,10 @@ describe('InsightsTabs', () => {
         <InsightsTabs video={videoNoTranscript} onSeek={onSeek} />
       </AgentProvider>
     );
+
+    // Switch to Transcript tab first (Insights is default)
+    const transcriptTab = screen.getByRole('tab', { name: /transcript/i });
+    await user.click(transcriptTab);
 
     expect(screen.getByText('No transcript available')).toBeInTheDocument();
   });
@@ -177,17 +191,17 @@ describe('InsightsTabs', () => {
       </AgentProvider>
     );
 
-    // Start on Transcript tab
-    expect(screen.getByText('Intro')).toBeInTheDocument();
+    // Start on Insights tab (default)
+    expect(screen.getByRole('tab', { name: /insights/i })).toHaveAttribute('data-state', 'active');
 
-    // Switch to Insights
-    const insightsTab = screen.getByRole('tab', { name: /insights/i });
-    await user.click(insightsTab);
-    expect(screen.getByText('No insights generated yet')).toBeInTheDocument();
-
-    // Switch back to Transcript
+    // Switch to Transcript
     const transcriptTab = screen.getByRole('tab', { name: /transcript/i });
     await user.click(transcriptTab);
     expect(screen.getByText('Intro')).toBeInTheDocument();
+
+    // Switch back to Insights
+    const insightsTab = screen.getByRole('tab', { name: /insights/i });
+    await user.click(insightsTab);
+    expect(screen.getByRole('tab', { name: /insights/i })).toHaveAttribute('data-state', 'active');
   });
 });

@@ -129,7 +129,8 @@ describe('ChannelSection', () => {
 
     const container = screen.getByTestId('channel-videos-container')
     expect(container).toHaveClass('overflow-x-auto')
-    expect(container).toHaveClass('scroll-snap-type-x')
+    expect(container).toHaveClass('scroll-smooth')
+    expect(container).toHaveStyle({ scrollSnapType: 'x mandatory' })
   })
 
   it('should show empty state when channel has no videos', async () => {
