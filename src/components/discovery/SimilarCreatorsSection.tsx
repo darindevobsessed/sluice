@@ -1,6 +1,8 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
+import { RefreshCw } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import { ChannelRecommendationCard } from './ChannelRecommendationCard'
 import type { SimilarChannel } from '@/lib/channels/similarity'
 
@@ -9,40 +11,43 @@ export function SimilarCreatorsSection() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
+  const fetchSimilarChannels = useCallback(async (signal?: AbortSignal) => {
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      const response = await fetch('/api/channels/similar', {
+        signal,
+      })
+
+      if (!response.ok) {
+        setError('Failed to load suggestions')
+        return
+      }
+
+      const data = await response.json()
+      setChannels(data.suggestions || [])
+    } catch (err) {
+      if (err instanceof Error && err.name !== 'AbortError') {
+        setError('Failed to load suggestions')
+      }
+    } finally {
+      setIsLoading(false)
+    }
+  }, [])
+
   useEffect(() => {
     const abortController = new AbortController()
-
-    const fetchSimilarChannels = async () => {
-      setIsLoading(true)
-      setError(null)
-
-      try {
-        const response = await fetch('/api/channels/similar', {
-          signal: abortController.signal,
-        })
-
-        if (!response.ok) {
-          setError('Failed to load suggestions')
-          return
-        }
-
-        const data = await response.json()
-        setChannels(data.suggestions || [])
-      } catch (err) {
-        if (err instanceof Error && err.name !== 'AbortError') {
-          setError('Failed to load suggestions')
-        }
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    fetchSimilarChannels()
+    fetchSimilarChannels(abortController.signal)
 
     return () => {
       abortController.abort()
     }
-  }, [])
+  }, [fetchSimilarChannels])
+
+  const handleRefresh = () => {
+    fetchSimilarChannels()
+  }
 
   // Loading state
   if (isLoading) {
@@ -102,10 +107,22 @@ export function SimilarCreatorsSection() {
   // Render channels in horizontal scroll
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-semibold">Discover Similar Creators</h2>
+      {/* Header with title and refresh button */}
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="text-xl font-semibold">Discover Similar Creators</h2>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={handleRefresh}
+          disabled={isLoading}
+          aria-label="Refresh suggestions"
+        >
+          <RefreshCw className={`size-4 ${isLoading ? 'animate-spin' : ''}`} />
+        </Button>
+      </div>
 
       {/* Horizontal scroll container */}
-      <div className="flex gap-3 overflow-x-auto pb-2 snap-x">
+      <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 sm:-mx-6 sm:px-6 scroll-smooth" style={{ scrollSnapType: 'x mandatory' }}>
         {channels.map((channel) => (
           <ChannelRecommendationCard
             key={channel.channelName}

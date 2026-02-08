@@ -86,7 +86,7 @@ export function ChannelRecommendationCard({ channel, className }: ChannelRecomme
         </h3>
 
         {/* Similarity badge */}
-        <Badge variant="secondary">
+        <Badge variant="secondary" className="transition-opacity duration-200">
           {similarityPercentage}% match
         </Badge>
 
@@ -118,7 +118,7 @@ export function ChannelRecommendationCard({ channel, className }: ChannelRecomme
         <div className="space-y-2">
           {/* Follow button / Following badge */}
           {isFollowing ? (
-            <Badge variant="secondary" className="w-full justify-center">
+            <Badge variant="secondary" className="w-full justify-center transition-all duration-200">
               Following
             </Badge>
           ) : (
@@ -127,7 +127,7 @@ export function ChannelRecommendationCard({ channel, className }: ChannelRecomme
               disabled={isFollowLoading}
               variant="outline"
               size="sm"
-              className="w-full"
+              className="w-full transition-all duration-200"
             >
               {isFollowLoading ? 'Following...' : 'Follow'}
             </Button>
@@ -140,7 +140,7 @@ export function ChannelRecommendationCard({ channel, className }: ChannelRecomme
               disabled={isCronLoading}
               variant="outline"
               size="sm"
-              className="w-full"
+              className="w-full transition-all duration-200"
             >
               {isCronLoading ? 'Adding...' : 'Add to Cron'}
             </Button>

@@ -72,6 +72,7 @@ export async function computeChannelCentroid(
  * @param options - Optional configuration
  * @param options.threshold - Minimum similarity score (0-1) to include (default: 0.6)
  * @param options.limit - Maximum number of similar channels to return (default: 10)
+ * @param options.timeout - Maximum time in ms for computation (default: 5000). Returns partial results if exceeded.
  * @param db - Database instance (defaults to singleton)
  * @returns Array of similar channels, sorted by similarity (highest first)
  */
@@ -80,11 +81,13 @@ export async function findSimilarChannels(
   options?: {
     threshold?: number
     limit?: number
+    timeout?: number
   },
   db: NodePgDatabase<typeof schema> = database
 ): Promise<SimilarChannel[]> {
   const threshold = options?.threshold ?? 0.6
   const limit = options?.limit ?? 10
+  const timeout = options?.timeout ?? 5000
 
   // Early return if no followed channels
   if (followedChannels.length === 0) {
@@ -128,8 +131,13 @@ export async function findSimilarChannels(
 
   // Compute similarity for each candidate channel
   const similarChannels: SimilarChannel[] = []
+  const startTime = Date.now()
 
   for (const candidateChannelName of candidateChannels) {
+    // Performance guard: return partial results if computation exceeds timeout
+    if (Date.now() - startTime > timeout) {
+      break
+    }
     // Get video count with embeddings for this channel
     const videoCountResult = await db
       .selectDistinct({

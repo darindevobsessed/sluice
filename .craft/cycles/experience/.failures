@@ -3602,3 +3602,184 @@ tool: "Bash"
 error: |
   Exit code 2
 src/app/api/channels/similar/follow/__tests__/route.test.ts(162,24): error TS18048: 'insertCall' is possibly 'undefined'.
+---
+timestamp: "2026-02-08 10:21:43"
+story: "3-similar-creators"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+npm error Missing script: "typecheck"
+npm error
+npm error To see a list of scripts, run:
+npm error   npm run
+npm error A complete log of this run can be found in: /Users/darindrobinski/.npm/_logs/2026-02-08T16_21_43_518Z-debug-0.log
+---
+timestamp: "2026-02-08 10:22:04"
+story: "3-similar-creators"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+> gold-miner@0.1.0 lint
+> eslint
+
+
+/Users/darindrobinski/dev/repos/gold-miner/src/app/api/channels/[id]/__tests__/route.test.ts
+  3:14  warning  'channels' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/darindrobinski/dev/repos/gold-miner/src/app/api/channels/[id]/automation/__tests__/route.test.ts
+  244:11  warning  'data' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/darindrobinski/dev/repos/gold-miner/src/app/api/channels/[id]/videos/__tests__/route.test.ts
+  3:14  warning  'channels' is defined but never used  @typescript-eslint/no-unused-vars
+  3:24  warning  'videos' is defined but never used    @typescript-eslint/no-unused-vars
+
+/Users/darindrobinski/dev/repos/gold-miner/src/app/api/channels/__tests__/route.test.ts
+  3:14  warning  'channels' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/darindrobinski/dev/repos/gold-miner/src/app/api/channels/similar/follow/__tests__/route.test.ts
+  3:24  warning  'videos' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/darindrobinski/dev/repos/gold-miner/src/app/api/channels/videos/__tests__/route.test.ts
+  3:14  warning  'channels' is defined but never used  @typescript-eslint/no-unused-vars
+  3:24  warning  'videos' is defined but never used    @typescript-eslint/no-unused-vars
+
+/Users/darindrobinski/dev/repos/gold-miner/src/app/api/search/__tests__/route.test.ts
+  565:45  error    Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+  566:45  error    Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+  628:45  error    Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+  629:45  error    Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+  765:13  warning  'data' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  775:13  warning  'data' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/darindrobinski/dev/repos/gold-miner/src/components/add-video/TranscriptInstructions.tsx
+  17:7  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/darindrobinski/dev/repos/gold-miner/src/components/add-video/TranscriptInstructions.tsx:17:7
+  15 |   useEffect(() => {
+  16 |     if (collapsed) {
+> 17 |       setIsOpen(false);
+     |       ^^^^^^^^^ Avoid calling setState() directly within an effect
+  18 |     }
+  19 |   }, [collapsed]);
+  20 |  react-hooks/set-state-in-effect
+
+/Users/darindrobinski/dev/repos/gold-miner/src/components/add-video/__tests__/AddVideoPage.test.tsx
+  21:36  warning  '_videoId' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/darindrobinski/dev/repos/gold-miner/src/components/search/ChunkResult.tsx
+  5:17  warning  'Video' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/darindrobinski/dev/repos/gold-miner/src/components/search/FreshnessBadge.tsx
+  24:6  error  Error: Cannot call impure function during render
+
+`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+/Users/darindrobinski/dev/repos/gold-miner/src/components/search/FreshnessBadge.tsx:24:6
+  22 |
+  23 |   const ageInDays = Math.floor(
+> 24 |     (Date.now() - new Date(publishedAt).getTime()) / (1000 * 60 * 60 * 24)
+     |      ^^^^^^^^^^ Cannot call impure function
+  25 |   )
+  26 |
+  27 |   // Fresh: < 90 days  react-hooks/purity
+
+/Users/darindrobinski/dev/repos/gold-miner/src/components/search/__tests__/ChunkResult.test.tsx
+  1:32  warning  'vi' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/darindrobinski/dev/repos/gold-miner/src/hooks/useSearch.ts
+  53:7  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/darindrobinski/dev/repos/gold-miner/src/hooks/useSearch.ts:53:7
+  51 |     // Clear results if query is empty
+  52 |     if (!query.trim()) {
+> 53 |       setResults(null);
+     |       ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  54 |       setError(null);
+  55 |       return;
+  56 |     }  react-hooks/set-state-in-effect
+
+/Users/darindrobinski/dev/repos/gold-miner/src/lib/agent/__tests__/AgentProvider.test.tsx
+  11:32  warning  'callback' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/darindrobinski/dev/repos/gold-miner/src/lib/embeddings/__tests__/pipeline.test.ts
+  6:66  warning  '_text' is defined but never used     @typescript-eslint/no-unused-vars
+  6:81  warning  '_options' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/darindrobinski/dev/repos/gold-miner/src/lib/mcp/__tests__/types.test.ts
+   93:27  warning  '_params' is defined but never used    @typescript-eslint/no-unused-vars
+  101:27  warning  '_response' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/darindrobinski/dev/repos/gold-miner/src/lib/temporal/__tests__/decay.test.ts
+  75:57  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+✖ 26 problems (8 errors, 18 warnings)
+---
+timestamp: "2026-02-08 10:22:24"
+story: "3-similar-creators"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 2
+src/components/discovery/ChannelRecommendationCard.tsx(4,22): error TS2307: Cannot find module '@/components/ui/card' or its corresponding type declarations.
+src/components/discovery/ChannelRecommendationCard.tsx(5,23): error TS2307: Cannot find module '@/components/ui/badge' or its corresponding type declarations.
+src/components/discovery/ChannelRecommendationCard.tsx(6,24): error TS2307: Cannot find module '@/components/ui/button' or its corresponding type declarations.
+src/components/discovery/ChannelRecommendationCard.tsx(7,20): error TS2307: Cannot find module '@/lib/utils' or its corresponding type declarations.
+src/components/discovery/ChannelRecommendationCard.tsx(8,37): error TS2307: Cannot find module '@/lib/channels/similarity' or its corresponding type declarations.
+src/components/discovery/ChannelRecommendationCard.tsx(76,5): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/components/discovery/ChannelRecommendationCard.tsx(82,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/components/discovery/ChannelRecommendationCard.tsx(84,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/components/discovery/ChannelRecommendationCard.tsx(89,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/components/discovery/ChannelRecommendationCard.tsx(94,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/components/discovery/ChannelRecommendationCard.tsx(99,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/components/discovery/ChannelRecommendationCard.tsx(101,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/components/discovery/ChannelRecommendationCard.tsx(112,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/components/discovery/ChannelRecommendationCard.tsx(118,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/components/discovery/ChannelRecommendationCard.tsx(121,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/components/discovery/ChannelRecommendationCard.tsx(125,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/components/discovery/ChannelRecommendationCard.tsx(138,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/components/discovery/SimilarCreatorsSection.tsx(5,24): error TS2307: Cannot find module '@/components/ui/button' or its corresponding type declarations.
+src/components/discovery/SimilarCreatorsSection.tsx(6,43): error TS6142: Module './ChannelRecommendationCard' was resolved to '/Users/darindrobinski/dev/repos/gold-miner/src/components/discovery/ChannelRecommendationCard.tsx', but '--jsx' is not set.
+src/components/discovery/SimilarCreatorsSection.tsx(7,37): error TS2307: Cannot find module '@/lib/channels/similarity' or its corresponding type declarations.
+src/components/discovery/SimilarCreatorsSection.tsx(55,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/components/discovery/SimilarCreatorsSection.tsx(56,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/components/discovery/SimilarCreatorsSection.tsx(57,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/components/discovery/SimilarCreatorsSection.tsx(59,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/components/discovery/SimilarCreatorsSection.tsx(61,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/components/discovery/SimilarCreatorsSection.tsx(65,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/components/discovery/SimilarCreatorsSection.tsx(66,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/components/discovery/SimilarCreatorsSection.tsx(67,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/components/discovery/SimilarCreatorsSection.tsx(68,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/components/discovery/SimilarCreatorsSection.tsx(69,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/components/discovery/SimilarCreatorsSection.tsx(70,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/components/discovery/SimilarCreatorsSection.tsx(72,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/components/discovery/SimilarCreatorsSection.tsx(83,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/components/discovery/SimilarCreatorsSection.tsx(84,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/components/discovery/SimilarCreatorsSection.tsx(85,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/components/discovery/SimilarCreatorsSection.tsx(98,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/components/discovery/SimilarCreatorsSection.tsx(99,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/components/discovery/SimilarCreatorsSection.tsx(100,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/components/discovery/SimilarCreatorsSection.tsx(109,5): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/components/discovery/SimilarCreatorsSection.tsx(111,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/components/discovery/SimilarCreatorsSection.tsx(112,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/components/discovery/SimilarCreatorsSection.tsx(113,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/components/discovery/SimilarCreatorsSection.tsx(120,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/components/discovery/SimilarCreatorsSection.tsx(125,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/components/discovery/SimilarCreatorsSection.tsx(127,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/lib/channels/similarity.ts(3,58): error TS2307: Cannot find module '@/lib/db' or its corresponding type declarations.
+src/lib/channels/similarity.ts(4,30): error TS2307: Cannot find module '@/lib/db/schema' or its corresponding type declarations.
+src/lib/channels/similarity.ts(5,34): error TS2307: Cannot find module '@/lib/graph/compute-relationships' or its corresponding type declarations.

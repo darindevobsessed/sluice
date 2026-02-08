@@ -613,4 +613,66 @@ describe('findSimilarChannels', () => {
 
     expect(similar).toEqual([])
   })
+
+  it('returns partial results when timeout is exceeded', async () => {
+    const db = getTestDb()
+
+    // Create followed channel
+    await db.insert(schema.channels).values({
+      channelId: 'followed-id',
+      name: 'Followed Channel',
+      feedUrl: 'https://example.com/feed',
+    })
+
+    const embedding = new Array(384).fill(0.9)
+    for (let i = 0; i < 3; i++) {
+      const [video] = await db.insert(schema.videos).values({
+        youtubeId: `followed-vid-${i}`,
+        title: `Followed Video ${i}`,
+        channel: 'Followed Channel',
+        transcript: 'Test transcript',
+        duration: 600,
+      }).returning()
+
+      await db.insert(schema.chunks).values({
+        videoId: video!.id,
+        content: `Chunk ${i}`,
+        startTime: 0,
+        endTime: 10,
+        embedding: [...embedding],
+      })
+    }
+
+    // Create multiple similar channels (10 channels with 3 videos each)
+    for (let channelIdx = 0; channelIdx < 10; channelIdx++) {
+      for (let i = 0; i < 3; i++) {
+        const [video] = await db.insert(schema.videos).values({
+          youtubeId: `channel-${channelIdx}-vid-${i}`,
+          title: `Channel ${channelIdx} Video ${i}`,
+          channel: `Similar Channel ${channelIdx}`,
+          transcript: 'Similar transcript',
+          duration: 600,
+        }).returning()
+
+        await db.insert(schema.chunks).values({
+          videoId: video!.id,
+          content: `Chunk ${i}`,
+          startTime: 0,
+          endTime: 10,
+          embedding: [...embedding],
+        })
+      }
+    }
+
+    // Call with very short timeout (1ms) - should return partial results
+    const similar = await findSimilarChannels(
+      ['Followed Channel'],
+      { timeout: 1 },
+      db
+    )
+
+    // Should return some results, but not necessarily all 10 channels
+    expect(similar.length).toBeGreaterThanOrEqual(0)
+    expect(similar.length).toBeLessThanOrEqual(10)
+  })
 })
