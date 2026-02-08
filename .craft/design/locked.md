@@ -476,6 +476,29 @@ Each action type gets a card with three states:
 
 ---
 
+### Global Extraction Store
+
+**Locked:** 2026-02-08
+**Location:** New `ExtractionProvider` context + refactored `useExtraction` hook
+
+**Decision:** Lift extraction state from component-level `useState` into an app-level `ExtractionProvider` context so insight generation progress survives navigation.
+
+**Key elements:**
+- `ExtractionProvider` wraps app alongside existing `AgentProvider`
+- Global store: `Map<videoId, ExtractionState>` holding overall status, per-section status, partial results
+- `useExtraction(videoId)` reads/writes from context instead of local state
+- WebSocket callbacks update the global store even when the video page is unmounted
+- Cleanup: evict entry from store after DB persistence succeeds
+
+**Rationale:** Option A chosen over lightweight activity tracker (loses streaming UX on return) and persist-and-resume (overkill DB schema changes for sub-30s extractions).
+
+**Not Allowed:**
+- Component-level state for extraction progress (won't survive navigation)
+- Polling-based "is it done yet?" approach (loses live streaming feel)
+- DB-backed partial persistence (unnecessary complexity for this use case)
+
+---
+
 ## How to Use These Locks
 
 1. **During implementation:** Reference these decisions, don't deviate

@@ -27,7 +27,8 @@
       "WebFetch(domain:orm.drizzle.team)",
       "Bash(/Users/darindrobinski/.claude/plugins/cache/craft-local/craft/*/hooks/scripts/*)",
       "Bash(tree:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(curl:*)"
     ]
   }
 }

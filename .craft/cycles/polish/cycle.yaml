@@ -1,0 +1,10 @@
+name: polish
+title: Polish & Reliability
+status: active
+created: 2026-02-08
+goal: Fix UX friction and reliability gaps discovered through real usage
+
+stories:
+  - name: insights-extraction-persistence
+    title: Persist Insights Extraction Progress Across Navigation
+    status: ready
