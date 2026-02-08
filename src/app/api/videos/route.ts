@@ -1,5 +1,5 @@
-import { db, videos, searchVideos, getVideoStats, videoFocusAreas } from "@/lib/db";
-import { eq } from "drizzle-orm";
+import { db, videos, searchVideos, getVideoStats, videoFocusAreas, focusAreas } from "@/lib/db";
+import { eq, inArray } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -54,8 +54,30 @@ export async function GET(request: Request) {
     // Get stats
     const stats = await getVideoStats();
 
+    // Build focus area map for all returned videos
+    const videoIds = videoResults.map(v => v.id);
+    const focusAreaMap: Record<number, { id: number; name: string; color: string | null }[]> = {};
+
+    if (videoIds.length > 0) {
+      const assignments = await db
+        .select({
+          videoId: videoFocusAreas.videoId,
+          id: focusAreas.id,
+          name: focusAreas.name,
+          color: focusAreas.color,
+        })
+        .from(videoFocusAreas)
+        .innerJoin(focusAreas, eq(videoFocusAreas.focusAreaId, focusAreas.id))
+        .where(inArray(videoFocusAreas.videoId, videoIds));
+
+      for (const row of assignments) {
+        const list = focusAreaMap[row.videoId] ?? (focusAreaMap[row.videoId] = []);
+        list.push({ id: row.id, name: row.name, color: row.color });
+      }
+    }
+
     return NextResponse.json(
-      { videos: videoResults, stats },
+      { videos: videoResults, stats, focusAreaMap },
       { status: 200 }
     );
   } catch (error) {

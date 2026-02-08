@@ -72,8 +72,8 @@ export function FocusAreaAssignment({ videoId }: FocusAreaAssignmentProps) {
   }
 
   return (
-    <div className="mt-6">
-      <h3 className="mb-3 text-sm font-medium text-muted-foreground">Focus Areas</h3>
+    <div className="mb-6 rounded-lg border bg-card/50 p-4">
+      <h3 className="mb-3 text-sm font-semibold">Focus Areas</h3>
       <div className="flex flex-wrap gap-2">
         {isLoading ? (
           <>

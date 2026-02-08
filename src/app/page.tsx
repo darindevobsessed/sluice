@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { StatsHeader, StatsHeaderSkeleton } from '@/components/videos/StatsHeader'
 import { VideoSearch } from '@/components/videos/VideoSearch'
 import { VideoGrid } from '@/components/videos/VideoGrid'
@@ -12,7 +12,7 @@ import { useSearch } from '@/hooks/useSearch'
 import { useEnsemble } from '@/hooks/useEnsemble'
 import { usePageTitle } from '@/components/layout/PageTitleContext'
 import { useFocusArea } from '@/components/providers/FocusAreaProvider'
-import type { Video } from '@/lib/db/schema'
+import type { Video, FocusArea } from '@/lib/db/schema'
 
 /**
  * Detects if a query string looks like a question
@@ -29,21 +29,25 @@ interface VideoStats {
   channels: number;
 }
 
+type FocusAreaMapEntry = Pick<FocusArea, 'id' | 'name' | 'color'>
+
 interface ApiResponse {
   videos: Video[];
   stats: VideoStats;
+  focusAreaMap: Record<number, FocusAreaMapEntry[]>;
 }
 
 export default function Home() {
   const [videos, setVideos] = useState<Video[]>([]);
   const [stats, setStats] = useState<VideoStats | null>(null);
   const [isLoadingVideos, setIsLoadingVideos] = useState(true);
+  const [focusAreaMap, setFocusAreaMap] = useState<Record<number, FocusAreaMapEntry[]>>({});
 
   // Set page title
   const { setPageTitle } = usePageTitle();
 
   // Focus area filtering
-  const { selectedFocusAreaId } = useFocusArea();
+  const { selectedFocusAreaId, focusAreas } = useFocusArea();
 
   // Use the new search hook
   const { query, setQuery, results, isLoading: isSearching } = useSearch({ focusAreaId: selectedFocusAreaId })
@@ -87,10 +91,12 @@ export default function Home() {
 
         setVideos(mappedVideos);
         setStats(data.stats);
+        setFocusAreaMap(data.focusAreaMap || {});
       } catch (error) {
         console.error('Error fetching videos:', error);
         setVideos([]);
         setStats({ count: 0, totalHours: 0, channels: 0 });
+        setFocusAreaMap({});
       } finally {
         setIsLoadingVideos(false);
       }
@@ -98,6 +104,57 @@ export default function Home() {
 
     fetchVideos();
   }, [selectedFocusAreaId]);
+
+  // Optimistic toggle handler for focus area assignment
+  const handleToggleFocusArea = useCallback(async (videoId: number, focusAreaId: number) => {
+    const current = focusAreaMap[videoId] ?? []
+    const isAssigned = current.some(fa => fa.id === focusAreaId)
+    const area = focusAreas.find(fa => fa.id === focusAreaId)
+
+    // Optimistic update
+    if (isAssigned) {
+      setFocusAreaMap(prev => ({
+        ...prev,
+        [videoId]: (prev[videoId] ?? []).filter(fa => fa.id !== focusAreaId),
+      }))
+    } else if (area) {
+      setFocusAreaMap(prev => ({
+        ...prev,
+        [videoId]: [...(prev[videoId] ?? []), { id: area.id, name: area.name, color: area.color }],
+      }))
+    }
+
+    try {
+      if (isAssigned) {
+        const response = await fetch(
+          `/api/videos/${videoId}/focus-areas?focusAreaId=${focusAreaId}`,
+          { method: 'DELETE' }
+        )
+        if (!response.ok) throw new Error('Failed to remove')
+      } else {
+        const response = await fetch(`/api/videos/${videoId}/focus-areas`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ focusAreaId }),
+        })
+        if (!response.ok && response.status !== 201) throw new Error('Failed to assign')
+      }
+    } catch (error) {
+      console.error('Failed to toggle focus area:', error)
+      // Revert optimistic update
+      if (isAssigned && area) {
+        setFocusAreaMap(prev => ({
+          ...prev,
+          [videoId]: [...(prev[videoId] ?? []), { id: area.id, name: area.name, color: area.color }],
+        }))
+      } else {
+        setFocusAreaMap(prev => ({
+          ...prev,
+          [videoId]: (prev[videoId] ?? []).filter(fa => fa.id !== focusAreaId),
+        }))
+      }
+    }
+  }, [focusAreaMap, focusAreas])
 
   // Show empty state only when no videos exist at all (not during search)
   const showEmptyState = !isLoadingVideos && stats?.count === 0 && !query
@@ -150,7 +207,10 @@ export default function Home() {
               videos={videos}
               isLoading={isLoadingVideos}
               emptyMessage={selectedFocusAreaId ? 'No videos in this focus area' : undefined}
-              emptyHint={selectedFocusAreaId ? 'Assign videos from their detail page' : undefined}
+              emptyHint={selectedFocusAreaId ? 'Assign videos from their detail page or use the tag icon on cards' : undefined}
+              focusAreaMap={focusAreaMap}
+              allFocusAreas={focusAreas}
+              onToggleFocusArea={handleToggleFocusArea}
             />
           )}
         </>

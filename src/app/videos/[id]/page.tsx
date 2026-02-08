@@ -124,6 +124,9 @@ export default function VideoDetailPage({ params }: VideoDetailPageProps) {
       {/* Metadata row */}
       <VideoMetadata video={video} className="mb-6" />
 
+      {/* Focus area assignment */}
+      <FocusAreaAssignment videoId={video.id} />
+
       {/* Video player */}
       <VideoPlayer
         youtubeId={video.youtubeId}
@@ -136,9 +139,6 @@ export default function VideoDetailPage({ params }: VideoDetailPageProps) {
         videoId={video.id}
         hasTranscript={!!video.transcript}
       />
-
-      {/* Focus area assignment */}
-      <FocusAreaAssignment videoId={video.id} />
 
       {/* Tabs with Transcript and Insights */}
       <InsightsTabs video={video} onSeek={handleSeek} className="mt-8" />

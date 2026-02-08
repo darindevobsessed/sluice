@@ -1,16 +1,27 @@
 'use client';
 
 import { VideoCard, VideoCardSkeleton } from '@/components/videos/VideoCard';
-import type { Video } from '@/lib/db/schema';
+import type { Video, FocusArea } from '@/lib/db/schema';
 
 interface VideoGridProps {
   videos: Video[];
   isLoading?: boolean;
   emptyMessage?: string;
   emptyHint?: string;
+  focusAreaMap?: Record<number, Pick<FocusArea, 'id' | 'name' | 'color'>[]>;
+  allFocusAreas?: FocusArea[];
+  onToggleFocusArea?: (videoId: number, focusAreaId: number) => void;
 }
 
-export function VideoGrid({ videos, isLoading = false, emptyMessage, emptyHint }: VideoGridProps) {
+export function VideoGrid({
+  videos,
+  isLoading = false,
+  emptyMessage,
+  emptyHint,
+  focusAreaMap,
+  allFocusAreas,
+  onToggleFocusArea,
+}: VideoGridProps) {
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -41,7 +52,12 @@ export function VideoGrid({ videos, isLoading = false, emptyMessage, emptyHint }
           key={video.id}
           className="animate-in fade-in duration-300"
         >
-          <VideoCard video={video} />
+          <VideoCard
+            video={video}
+            focusAreas={focusAreaMap?.[video.id]}
+            allFocusAreas={allFocusAreas}
+            onToggleFocusArea={onToggleFocusArea ? (faId) => onToggleFocusArea(video.id, faId) : undefined}
+          />
         </div>
       ))}
     </div>
