@@ -9,12 +9,6 @@ const querySchema = z.object({
   question: z.string().min(1, 'Question is required'),
 })
 
-interface RouteParams {
-  params: {
-    id: string
-  }
-}
-
 /**
  * POST /api/personas/[id]/query
  *
@@ -26,10 +20,11 @@ interface RouteParams {
  * Request body: { question: string }
  * Response: text/event-stream with SSE events
  */
-export async function POST(request: Request, { params }: RouteParams) {
+export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params
     // Validate ID
-    const personaId = parseInt(params.id, 10)
+    const personaId = parseInt(id, 10)
     if (isNaN(personaId)) {
       return NextResponse.json({ error: 'Invalid persona ID' }, { status: 400 })
     }

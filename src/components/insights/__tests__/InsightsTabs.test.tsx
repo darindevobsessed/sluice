@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { InsightsTabs } from '../InsightsTabs';
 import { AgentProvider } from '@/lib/agent/AgentProvider';
+import { ExtractionProvider } from '@/components/providers/ExtractionProvider';
 import type { Video } from '@/lib/db/schema';
 
 // Mock fetch for agent token
@@ -59,6 +60,16 @@ const mockVideo: Video = {
   publishedAt: null,
 };
 
+function Wrapper({ children }: { children: React.ReactNode }) {
+  return (
+    <AgentProvider>
+      <ExtractionProvider>
+        {children}
+      </ExtractionProvider>
+    </AgentProvider>
+  );
+}
+
 describe('InsightsTabs', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -87,9 +98,9 @@ describe('InsightsTabs', () => {
   it('renders both tabs', () => {
     const onSeek = vi.fn();
     render(
-      <AgentProvider>
+      <Wrapper>
         <InsightsTabs video={mockVideo} onSeek={onSeek} />
-      </AgentProvider>
+      </Wrapper>
     );
 
     expect(screen.getByRole('tab', { name: /transcript/i })).toBeInTheDocument();
@@ -99,9 +110,9 @@ describe('InsightsTabs', () => {
   it('shows Insights tab content by default', () => {
     const onSeek = vi.fn();
     render(
-      <AgentProvider>
+      <Wrapper>
         <InsightsTabs video={mockVideo} onSeek={onSeek} />
-      </AgentProvider>
+      </Wrapper>
     );
 
     // Insights tab should be active by default
@@ -112,9 +123,9 @@ describe('InsightsTabs', () => {
     const user = userEvent.setup();
     const onSeek = vi.fn();
     render(
-      <AgentProvider>
+      <Wrapper>
         <InsightsTabs video={mockVideo} onSeek={onSeek} />
-      </AgentProvider>
+      </Wrapper>
     );
 
     const transcriptTab = screen.getByRole('tab', { name: /transcript/i });
@@ -128,9 +139,9 @@ describe('InsightsTabs', () => {
     const user = userEvent.setup();
     const onSeek = vi.fn();
     render(
-      <AgentProvider>
+      <Wrapper>
         <InsightsTabs video={mockVideo} onSeek={onSeek} />
-      </AgentProvider>
+      </Wrapper>
     );
 
     // Switch to Transcript tab first (Insights is default)
@@ -146,9 +157,9 @@ describe('InsightsTabs', () => {
     const user = userEvent.setup();
     const onSeek = vi.fn();
     render(
-      <AgentProvider>
+      <Wrapper>
         <InsightsTabs video={mockVideo} onSeek={onSeek} />
-      </AgentProvider>
+      </Wrapper>
     );
 
     // Switch to Transcript tab first (Insights is default)
@@ -170,9 +181,9 @@ describe('InsightsTabs', () => {
       transcript: null,
     };
     render(
-      <AgentProvider>
+      <Wrapper>
         <InsightsTabs video={videoNoTranscript} onSeek={onSeek} />
-      </AgentProvider>
+      </Wrapper>
     );
 
     // Switch to Transcript tab first (Insights is default)
@@ -186,9 +197,9 @@ describe('InsightsTabs', () => {
     const user = userEvent.setup();
     const onSeek = vi.fn();
     render(
-      <AgentProvider>
+      <Wrapper>
         <InsightsTabs video={mockVideo} onSeek={onSeek} />
-      </AgentProvider>
+      </Wrapper>
     );
 
     // Start on Insights tab (default)

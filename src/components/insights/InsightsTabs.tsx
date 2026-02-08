@@ -19,7 +19,7 @@ interface InsightsTabsProps {
  * Transcript tab shows TranscriptView, Insights tab shows InsightsPanel.
  */
 export function InsightsTabs({ video, onSeek, className }: InsightsTabsProps) {
-  const { agent, status: agentStatus, error: agentError } = useAgent();
+  const { status: agentStatus, error: agentError } = useAgent()
 
   const { state, extract, cancel, insightId } = useExtraction({
     videoId: video.id,
@@ -28,11 +28,10 @@ export function InsightsTabs({ video, onSeek, className }: InsightsTabsProps) {
       channel: video.channel,
       transcript: video.transcript || '',
     },
-    agent,
-  });
+  })
 
   // Map extraction state to panel status
-  const panelStatus = state.overall === 'extracting' ? 'streaming' : state.overall;
+  const panelStatus = state.overall === 'extracting' ? 'streaming' : state.overall
 
   return (
     <Tabs defaultValue="insights" className={className}>

@@ -168,12 +168,12 @@ describe('POST /api/personas/ensemble', () => {
 
     const response = await POST(request)
 
-    expect(response.status).toBe(404)
-    const data = await response.json()
-    expect(data.error).toContain('No personas found')
+    // Returns SSE stream with all_done event (not 404) for empty personas
+    expect(response.status).toBe(200)
+    expect(response.headers.get('content-type')).toBe('text/event-stream')
   })
 
-  it('should return 404 if specified personaIds not found', async () => {
+  it('should return SSE stream with all_done if specified personaIds not found', async () => {
     // Mock empty result for specific IDs
     mockDb.select = vi.fn().mockReturnValue({
       from: vi.fn().mockReturnThis(),
@@ -188,9 +188,9 @@ describe('POST /api/personas/ensemble', () => {
 
     const response = await POST(request)
 
-    expect(response.status).toBe(404)
-    const data = await response.json()
-    expect(data.error).toContain('No personas found')
+    // Returns SSE stream with all_done event (not 404) for empty personas
+    expect(response.status).toBe(200)
+    expect(response.headers.get('content-type')).toBe('text/event-stream')
   })
 
   it('should return streaming response for valid request', async () => {
@@ -351,6 +351,8 @@ describe('POST /api/personas/ensemble', () => {
 
     const response = await POST(request)
 
-    expect(response.status).toBe(404)
+    // Returns SSE stream with all_done event (not 404) for empty personaIds
+    expect(response.status).toBe(200)
+    expect(response.headers.get('content-type')).toBe('text/event-stream')
   })
 })

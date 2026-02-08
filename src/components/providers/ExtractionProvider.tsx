@@ -35,6 +35,7 @@ interface ExtractionContextValue {
   startExtraction: (videoId: number, video: VideoData) => void
   cancelExtraction: (videoId: number) => void
   getState: (videoId: number) => ExtractionEntry | undefined
+  stateMap: Map<number, ExtractionEntry>
 }
 
 const ExtractionContext = createContext<ExtractionContextValue | undefined>(undefined)
@@ -251,6 +252,7 @@ export function ExtractionProvider({ children }: { children: React.ReactNode }) 
         startExtraction,
         cancelExtraction,
         getState,
+        stateMap,
       }}
     >
       {children}
