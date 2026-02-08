@@ -18,7 +18,7 @@ vi.mock('@/lib/youtube', () => ({
     }
     return { isValid: false, videoId: null }
   }),
-  fetchVideoMetadata: vi.fn(async (_videoId: string) => ({
+  fetchVideoMetadata: vi.fn(async () => ({
     title: 'Test Video Title',
     author_name: 'Test Channel',
     thumbnail_url: 'https://example.com/thumb.jpg',

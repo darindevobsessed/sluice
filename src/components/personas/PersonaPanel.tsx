@@ -3,14 +3,44 @@
 import type { EnsembleState } from '@/hooks/useEnsemble'
 import { PersonaColumn } from './PersonaColumn'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { AlertCircle, Users } from 'lucide-react'
 
 interface PersonaPanelProps {
   question: string
   state: EnsembleState
+  onRetry?: () => void
 }
 
-export function PersonaPanel({ question, state }: PersonaPanelProps) {
+function PanelSkeleton() {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {[1, 2, 3].map((i) => (
+        <div
+          key={i}
+          data-testid="persona-skeleton"
+          className="flex flex-col gap-3 rounded-lg border bg-card p-4"
+        >
+          {/* Name shimmer */}
+          <div className="h-5 w-24 rounded bg-muted animate-pulse" />
+          {/* Text shimmer lines */}
+          <div className="space-y-2 flex-1">
+            <div className="h-3 w-full rounded bg-muted animate-pulse" />
+            <div className="h-3 w-5/6 rounded bg-muted animate-pulse" />
+            <div className="h-3 w-4/6 rounded bg-muted animate-pulse" />
+            <div className="h-3 w-3/4 rounded bg-muted animate-pulse" />
+          </div>
+          {/* Source shimmer */}
+          <div className="h-4 w-16 rounded bg-muted animate-pulse" />
+        </div>
+      ))}
+    </div>
+  )
+}
+
+export function PersonaPanel({ question, state, onRetry }: PersonaPanelProps) {
   const personaArray = Array.from(state.personas.values())
+  const hasNoPersonas = state.isAllDone && personaArray.length === 0 && !state.error
 
   return (
     <div className="bg-card border rounded-lg p-6">
@@ -19,24 +49,41 @@ export function PersonaPanel({ question, state }: PersonaPanelProps) {
 
       {/* Best Match Badge */}
       {state.bestMatch && (
-        <div className="mb-4">
+        <div className="mb-4 animate-in fade-in duration-500">
           <Badge variant="secondary" className="text-yellow-600 dark:text-yellow-400">
             ★ Best: @{state.bestMatch.personaName}
           </Badge>
         </div>
       )}
 
-      {/* Loading Skeleton */}
-      {state.isLoading && personaArray.length === 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {[1, 2, 3].map((i) => (
-            <div
-              key={i}
-              data-testid="persona-skeleton"
-              className="h-48 rounded-lg border bg-muted animate-pulse"
-            />
-          ))}
+      {/* Error State */}
+      {state.error && (
+        <div className="flex flex-col items-center gap-3 py-8 text-center">
+          <AlertCircle className="size-8 text-destructive" />
+          <p className="text-sm text-muted-foreground">
+            Something went wrong fetching persona responses.
+          </p>
+          {onRetry && (
+            <Button variant="outline" size="sm" onClick={onRetry}>
+              Try again
+            </Button>
+          )}
         </div>
+      )}
+
+      {/* No Personas Empty State */}
+      {hasNoPersonas && (
+        <div className="flex flex-col items-center gap-3 py-8 text-center">
+          <Users className="size-8 text-muted-foreground" />
+          <p className="text-sm text-muted-foreground">
+            Follow creators and build your knowledge bank to unlock persona queries.
+          </p>
+        </div>
+      )}
+
+      {/* Loading Skeleton */}
+      {state.isLoading && personaArray.length === 0 && !state.error && (
+        <PanelSkeleton />
       )}
 
       {/* Persona Columns */}

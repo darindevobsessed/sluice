@@ -3,7 +3,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 // Mock the @huggingface/transformers module
 vi.mock('@huggingface/transformers', () => {
   // Create a mock function that returns an embedding when called
-  const mockPipelineFunction = vi.fn().mockImplementation(async (_text: string, _options?: unknown) => {
+  const mockPipelineFunction = vi.fn().mockImplementation(async () => {
     // Return a mock embedding array of 384 dimensions
     return {
       data: new Float32Array(384).fill(0.1),

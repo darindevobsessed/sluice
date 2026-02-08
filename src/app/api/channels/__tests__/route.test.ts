@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
 import { GET, POST } from '../route'
-import { db, channels } from '@/lib/db'
+import { db } from '@/lib/db'
 import { fetchChannelFeed } from '@/lib/automation/rss'
 import { parseChannelUrl } from '@/lib/youtube/channel-parser'
 

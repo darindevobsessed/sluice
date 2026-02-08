@@ -38,23 +38,36 @@ describe('PersonaColumn', () => {
   })
 
   it('renders loading state when not done and no error', () => {
-    const persona = createPersonaState({ isDone: false, isError: false })
+    const persona = createPersonaState({ isDone: false, isError: false, text: '' })
     render(<PersonaColumn persona={persona} isBestMatch={false} />)
 
-    // Should have some loading indicator (pulse animation class or loading text)
-    const element = screen.getByTestId('persona-column')
-    expect(element.className).toMatch(/animate-pulse|loading/)
+    // Should have shimmer skeleton lines while waiting
+    const element = screen.getByTestId('persona-text')
+    const shimmerLines = element.querySelectorAll('.animate-pulse')
+    expect(shimmerLines.length).toBeGreaterThan(0)
   })
 
-  it('renders streaming text', () => {
-    const persona = createPersonaState({ text: 'React Server Components are...' })
+  it('renders streaming text with cursor', () => {
+    const persona = createPersonaState({ text: 'React Server Components are...', isDone: false })
     render(<PersonaColumn persona={persona} isBestMatch={false} />)
 
-    expect(screen.getByText('React Server Components are...')).toBeInTheDocument()
+    expect(screen.getByText(/React Server Components are\.\.\./)).toBeInTheDocument()
+    // Should have typewriter cursor
+    expect(screen.getByText('▌')).toBeInTheDocument()
   })
 
-  it('displays source count when sources are available', () => {
+  it('removes cursor when done', () => {
+    const persona = createPersonaState({ text: 'Complete response.', isDone: true })
+    render(<PersonaColumn persona={persona} isBestMatch={false} />)
+
+    expect(screen.getByText('Complete response.')).toBeInTheDocument()
+    expect(screen.queryByText('▌')).not.toBeInTheDocument()
+  })
+
+  it('displays source count when sources are available and done', () => {
     const persona = createPersonaState({
+      isDone: true,
+      text: 'Response text',
       sources: [
         { chunkId: 1, content: 'Content 1', videoTitle: 'Video 1' },
         { chunkId: 2, content: 'Content 2', videoTitle: 'Video 2' },
@@ -68,11 +81,26 @@ describe('PersonaColumn', () => {
 
   it('handles singular source count', () => {
     const persona = createPersonaState({
+      isDone: true,
+      text: 'Response text',
       sources: [{ chunkId: 1, content: 'Content 1', videoTitle: 'Video 1' }],
     })
     render(<PersonaColumn persona={persona} isBestMatch={false} />)
 
     expect(screen.getByText(/1 source/i)).toBeInTheDocument()
+  })
+
+  it('hides sources while still streaming', () => {
+    const persona = createPersonaState({
+      isDone: false,
+      text: 'Streaming...',
+      sources: [
+        { chunkId: 1, content: 'Content 1', videoTitle: 'Video 1' },
+      ],
+    })
+    render(<PersonaColumn persona={persona} isBestMatch={false} />)
+
+    expect(screen.queryByText(/1 source/i)).not.toBeInTheDocument()
   })
 
   it('renders error state when isError is true', () => {

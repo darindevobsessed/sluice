@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
 import { GET } from '../route'
-import { db, channels, videos } from '@/lib/db'
+import { db } from '@/lib/db'
 import { fetchChannelFeed } from '@/lib/automation/rss'
 
 // Mock dependencies

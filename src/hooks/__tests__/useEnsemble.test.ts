@@ -323,7 +323,7 @@ describe('useEnsemble', () => {
 
     mockFetch.mockResolvedValue(mockResponse)
 
-    const { result, rerender } = renderHook(
+    const { rerender } = renderHook(
       ({ question }) => useEnsemble(question),
       { initialProps: { question: 'First question' } }
     )
@@ -345,7 +345,7 @@ describe('useEnsemble', () => {
     const mockResponse = {
       ok: true,
       body: new ReadableStream({
-        start(controller) {
+        start() {
           // Never completes
         },
       }),
@@ -353,7 +353,7 @@ describe('useEnsemble', () => {
 
     mockFetch.mockResolvedValue(mockResponse)
 
-    const { result, unmount } = renderHook(() => useEnsemble('What is TypeScript?'))
+    const { unmount } = renderHook(() => useEnsemble('What is TypeScript?'))
 
     expect(mockFetch).toHaveBeenCalledTimes(1)
 

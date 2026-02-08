@@ -1,29 +1,30 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useCallback, useState } from "react";
 
 interface TranscriptInstructionsProps {
   collapsed?: boolean;
 }
 
 export function TranscriptInstructions({ collapsed = false }: TranscriptInstructionsProps) {
-  // When collapsed=true: start closed, show small link
-  // When collapsed=false: start open, show normal toggle
-  const [isOpen, setIsOpen] = useState(!collapsed);
+  // Track whether the user has manually toggled (overrides the collapsed prop)
+  const [userToggled, setUserToggled] = useState(false);
+  const [userOpen, setUserOpen] = useState(false);
 
-  // Close instructions when collapsed prop changes to true (e.g. auto-fetch completes)
-  useEffect(() => {
-    if (collapsed) {
-      setIsOpen(false);
-    }
-  }, [collapsed]);
+  // Effective open state: user toggle takes precedence, otherwise derive from prop
+  const isOpen = userToggled ? userOpen : !collapsed;
+
+  const handleToggle = useCallback((open: boolean) => {
+    setUserToggled(true);
+    setUserOpen(open);
+  }, []);
 
   if (collapsed && !isOpen) {
     return (
       <div className="space-y-2">
         <button
           type="button"
-          onClick={() => setIsOpen(true)}
+          onClick={() => handleToggle(true)}
           className="text-xs text-muted-foreground hover:text-foreground transition-colors underline decoration-dotted"
         >
           How to get a transcript manually
@@ -36,7 +37,7 @@ export function TranscriptInstructions({ collapsed = false }: TranscriptInstruct
     <div className="space-y-2">
       <button
         type="button"
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => handleToggle(!isOpen)}
         className="text-sm text-primary hover:text-primary-hover transition-colors"
       >
         How do I get this?

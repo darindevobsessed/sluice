@@ -241,7 +241,7 @@ describe('PATCH /api/channels/[id]/automation', () => {
     })
 
     const response = await PATCH(request, { params })
-    const data = await response.json()
+    await response.json()
 
     expect(response.status).toBe(200)
     expect(mockUpdateChannelAutomation).toHaveBeenCalledWith(1, {

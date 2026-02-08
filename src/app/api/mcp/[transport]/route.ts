@@ -1,6 +1,6 @@
 import { createMcpHandler } from 'mcp-handler'
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
-import { registerSearchRag, registerGetListOfCreators } from '@/lib/mcp/tools'
+import { registerSearchRag, registerGetListOfCreators, registerChatWithPersona, registerEnsembleQuery } from '@/lib/mcp/tools'
 import { validateMcpAuth } from '@/lib/mcp/auth'
 
 /**
@@ -12,6 +12,8 @@ import { validateMcpAuth } from '@/lib/mcp/auth'
  * Available tools:
  * - search_rag: Search the knowledge base with optional creator filtering
  * - get_list_of_creators: List all creators with video counts
+ * - chat_with_persona: Ask a question to a specific creator persona
+ * - ensemble_query: Ask a question to all personas with "who's best" routing
  */
 
 /**
@@ -21,6 +23,8 @@ import { validateMcpAuth } from '@/lib/mcp/auth'
 async function initializeServer(server: McpServer): Promise<void> {
   registerSearchRag(server)
   registerGetListOfCreators(server)
+  registerChatWithPersona(server)
+  registerEnsembleQuery(server)
 }
 
 /**

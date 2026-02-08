@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 
@@ -18,10 +19,13 @@ interface FreshnessBadgeProps {
  * @param className - Additional CSS classes
  */
 export function FreshnessBadge({ publishedAt, className }: FreshnessBadgeProps) {
+  // Capture "now" once per mount to avoid impure Date.now() calls during render
+  const [now] = useState(() => Date.now())
+
   if (!publishedAt) return null
 
   const ageInDays = Math.floor(
-    (Date.now() - new Date(publishedAt).getTime()) / (1000 * 60 * 60 * 24)
+    (now - new Date(publishedAt).getTime()) / (1000 * 60 * 60 * 24)
   )
 
   // Fresh: < 90 days

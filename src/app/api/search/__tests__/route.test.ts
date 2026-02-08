@@ -562,8 +562,8 @@ describe('GET /api/search', () => {
 
       expect(response.status).toBe(200);
       // Without decay, both chunks should have similar scores
-      const oldChunk = data.chunks.find((c: any) => c.videoId === oldVideo!.id);
-      const newChunk = data.chunks.find((c: any) => c.videoId === newVideo!.id);
+      const oldChunk = data.chunks.find((c: { videoId: number }) => c.videoId === oldVideo!.id);
+      const newChunk = data.chunks.find((c: { videoId: number }) => c.videoId === newVideo!.id);
 
       if (oldChunk && newChunk) {
         // Scores should be very close (within 0.1)
@@ -625,8 +625,8 @@ describe('GET /api/search', () => {
 
       expect(response.status).toBe(200);
 
-      const oldChunk = data.chunks.find((c: any) => c.videoId === oldVideo!.id);
-      const newChunk = data.chunks.find((c: any) => c.videoId === newVideo!.id);
+      const oldChunk = data.chunks.find((c: { videoId: number }) => c.videoId === oldVideo!.id);
+      const newChunk = data.chunks.find((c: { videoId: number }) => c.videoId === newVideo!.id);
 
       expect(oldChunk).toBeDefined();
       expect(newChunk).toBeDefined();
@@ -762,7 +762,7 @@ describe('GET /api/search', () => {
       const request = new Request('http://localhost:3000/api/search?q=test&temporalDecay=invalid');
 
       const response = await GET(request);
-      const data = await response.json();
+      await response.json();
 
       // Should not crash, should default to false
       expect(response.status).toBe(200);
@@ -772,7 +772,7 @@ describe('GET /api/search', () => {
       const request = new Request('http://localhost:3000/api/search?q=test&temporalDecay=true&halfLifeDays=abc');
 
       const response = await GET(request);
-      const data = await response.json();
+      await response.json();
 
       // Should not crash, should use default half-life
       expect(response.status).toBe(200);

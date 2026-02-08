@@ -89,19 +89,15 @@ describe('MCP Types', () => {
 
   describe('Type exports', () => {
     it('exports SearchRagParams type', () => {
-      // This test verifies the type can be imported
-      const assertType = (_params: SearchRagParams): void => {
-        // Type assertion test
-      }
-      expect(assertType).toBeDefined()
+      // This test verifies the type can be imported and used
+      const value: SearchRagParams = { topic: 'test' }
+      expect(value.topic).toBe('test')
     })
 
     it('exports CreatorListResponse type', () => {
-      // This test verifies the type can be imported
-      const assertType = (_response: CreatorListResponse): void => {
-        // Type assertion test
-      }
-      expect(assertType).toBeDefined()
+      // This test verifies the type can be imported and used
+      const value: CreatorListResponse = { creators: [] }
+      expect(value).toBeDefined()
     })
   })
 })

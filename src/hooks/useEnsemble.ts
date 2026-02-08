@@ -36,6 +36,7 @@ export function useEnsemble(question: string | null) {
     error: null,
   })
 
+  const [retryCount, setRetryCount] = useState(0)
   const abortControllerRef = useRef<AbortController | null>(null)
 
   const reset = useCallback(() => {
@@ -47,6 +48,11 @@ export function useEnsemble(question: string | null) {
       error: null,
     })
   }, [])
+
+  const retry = useCallback(() => {
+    reset()
+    setRetryCount((c) => c + 1)
+  }, [reset])
 
   useEffect(() => {
     // Abort previous request if any
@@ -260,10 +266,11 @@ export function useEnsemble(question: string | null) {
         abortControllerRef.current.abort()
       }
     }
-  }, [question, reset])
+  }, [question, reset, retryCount])
 
   return {
     state,
     reset,
+    retry,
   }
 }

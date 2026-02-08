@@ -8,8 +8,7 @@ vi.mock('../connection', () => {
   return {
     AgentConnection: vi.fn().mockImplementation(() => {
       return {
-        onStatusChange: vi.fn((callback) => {
-          // Store callback for later invocation
+        onStatusChange: vi.fn(() => {
           return () => {};
         }),
         connect: vi.fn().mockResolvedValue(undefined),

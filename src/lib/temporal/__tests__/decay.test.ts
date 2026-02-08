@@ -72,6 +72,7 @@ describe('calculateTemporalDecay', () => {
     })
 
     it('returns 1.0 when publishedAt is undefined', () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- testing runtime guard for undefined input
       const decay = calculateTemporalDecay(undefined as any)
 
       expect(decay).toBe(1.0)

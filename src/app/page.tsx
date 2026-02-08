@@ -7,6 +7,7 @@ import { VideoGrid } from '@/components/videos/VideoGrid'
 import { EmptyState } from '@/components/videos/EmptyState'
 import { SearchResults } from '@/components/search/SearchResults'
 import { PersonaPanel } from '@/components/personas/PersonaPanel'
+import { PersonaSuggestion } from '@/components/personas/PersonaSuggestion'
 import { useSearch } from '@/hooks/useSearch'
 import { useEnsemble } from '@/hooks/useEnsemble'
 import { usePageTitle } from '@/components/layout/PageTitleContext'
@@ -52,7 +53,7 @@ export default function Home() {
   const isQueryQuestion = isQuestion(query) && wordCount >= 3
 
   // Use ensemble hook when query is a question
-  const { state: ensembleState } = useEnsemble(isQueryQuestion ? query : null)
+  const { state: ensembleState, retry: retryEnsemble } = useEnsemble(isQueryQuestion ? query : null)
 
   // Set page title on mount
   useEffect(() => {
@@ -117,6 +118,13 @@ export default function Home() {
         />
       ) : null}
 
+      {/* Persona Suggestion Banner */}
+      {!showEmptyState && (
+        <div className="mb-4">
+          <PersonaSuggestion />
+        </div>
+      )}
+
       {/* Empty State - only show when no videos exist at all */}
       {showEmptyState ? (
         <EmptyState />
@@ -130,7 +138,7 @@ export default function Home() {
           {/* Persona Panel - shows above search results when question detected */}
           {showPanel && (
             <div className="mb-8">
-              <PersonaPanel question={query} state={ensembleState} />
+              <PersonaPanel question={query} state={ensembleState} onRetry={retryEnsemble} />
             </div>
           )}
 
@@ -138,7 +146,12 @@ export default function Home() {
           {showSearchResults ? (
             <SearchResults results={results} isLoading={isSearching} />
           ) : (
-            <VideoGrid videos={videos} isLoading={isLoadingVideos} />
+            <VideoGrid
+              videos={videos}
+              isLoading={isLoadingVideos}
+              emptyMessage={selectedFocusAreaId ? 'No videos in this focus area' : undefined}
+              emptyHint={selectedFocusAreaId ? 'Assign videos from their detail page' : undefined}
+            />
           )}
         </>
       )}

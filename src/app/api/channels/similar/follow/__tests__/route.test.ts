@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
 import { POST } from '../route'
-import { db, channels, videos } from '@/lib/db'
+import { db, channels } from '@/lib/db'
 
 // Mock the database
 vi.mock('@/lib/db', () => ({

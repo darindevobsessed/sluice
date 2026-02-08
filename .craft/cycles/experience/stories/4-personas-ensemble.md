@@ -1,14 +1,14 @@
 ---
 name: personas-ensemble
 title: Personas & Ensemble
-status: active
+status: complete
 priority: medium
 created: 2026-02-05
 updated: 2026-02-08
 cycle: experience
 story_number: 4
 chunks_total: 6
-chunks_complete: 4
+chunks_complete: 6
 current_chunk: 5
 ---
 

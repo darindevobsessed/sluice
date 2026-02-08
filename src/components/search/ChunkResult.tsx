@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Clock, Video } from 'lucide-react';
+import { Clock } from 'lucide-react';
 import type { SearchResult } from '@/lib/search/types';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';

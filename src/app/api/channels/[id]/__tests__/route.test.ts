@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
 import { DELETE } from '../route'
-import { db, channels } from '@/lib/db'
+import { db } from '@/lib/db'
 
 // Mock dependencies
 vi.mock('@/lib/db', async () => {

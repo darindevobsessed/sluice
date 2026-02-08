@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import type { SearchResult } from '@/lib/search/types';
 import type { VideoResult } from '@/lib/search/aggregate';
 
@@ -28,7 +28,7 @@ interface UseSearchOptions {
  */
 export function useSearch(options: UseSearchOptions = {}) {
   const { focusAreaId = null } = options;
-  const [query, setQuery] = useState('');
+  const [query, setQueryRaw] = useState('');
   const [results, setResults] = useState<SearchResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -36,6 +36,15 @@ export function useSearch(options: UseSearchOptions = {}) {
 
   const abortControllerRef = useRef<AbortController | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Wrap setQuery to clear results immediately when query is emptied
+  const setQuery = useCallback((newQuery: string) => {
+    setQueryRaw(newQuery);
+    if (!newQuery.trim()) {
+      setResults(null);
+      setError(null);
+    }
+  }, []);
 
   useEffect(() => {
     // Clear existing timeout
@@ -48,10 +57,8 @@ export function useSearch(options: UseSearchOptions = {}) {
       abortControllerRef.current.abort();
     }
 
-    // Clear results if query is empty
+    // Nothing to fetch if query is empty
     if (!query.trim()) {
-      setResults(null);
-      setError(null);
       return;
     }
 
