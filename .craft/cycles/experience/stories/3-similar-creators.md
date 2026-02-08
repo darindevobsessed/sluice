@@ -1,7 +1,7 @@
 ---
 name: similar-creators
 title: Similar Creators
-status: active
+status: complete
 priority: medium
 created: 2026-02-07
 updated: 2026-02-08
