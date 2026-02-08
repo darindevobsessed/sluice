@@ -157,6 +157,21 @@ export const videoFocusAreas = pgTable('video_focus_areas', {
   focusAreaIdx: index('video_focus_areas_focus_area_idx').on(table.focusAreaId),
 }));
 
+/**
+ * Personas table - AI-generated personas from YouTube creators
+ * One persona per channel, created after 30+ videos are processed
+ */
+export const personas = pgTable('personas', {
+  id: serial('id').primaryKey(),
+  channelName: text('channel_name').notNull().unique(),
+  name: text('name').notNull(), // Display name for the persona
+  systemPrompt: text('system_prompt').notNull(), // Generated from content analysis
+  expertiseTopics: jsonb('expertise_topics'), // Array of topic strings
+  expertiseEmbedding: vector('expertise_embedding', { dimensions: 384 }), // Centroid of expertise chunks
+  transcriptCount: integer('transcript_count').notNull(), // Cached count at creation
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
 // Type exports for use in application code
 export type Video = typeof videos.$inferSelect;
 export type NewVideo = typeof videos.$inferInsert;
@@ -187,3 +202,6 @@ export type NewFocusArea = typeof focusAreas.$inferInsert;
 
 export type VideoFocusArea = typeof videoFocusAreas.$inferSelect;
 export type NewVideoFocusArea = typeof videoFocusAreas.$inferInsert;
+
+export type Persona = typeof personas.$inferSelect;
+export type NewPersona = typeof personas.$inferInsert;

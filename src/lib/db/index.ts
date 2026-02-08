@@ -26,7 +26,7 @@ export const db = drizzle(pool, { schema });
 export { pool };
 
 // Re-export schema
-export * from './schema';
+export * from './schema'
 
 // Re-export search functions
-export { searchVideos, getVideoStats } from './search';
+export { searchVideos, getVideoStats } from './search'

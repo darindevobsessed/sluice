@@ -3783,3 +3783,130 @@ src/components/discovery/SimilarCreatorsSection.tsx(127,11): error TS17004: Cann
 src/lib/channels/similarity.ts(3,58): error TS2307: Cannot find module '@/lib/db' or its corresponding type declarations.
 src/lib/channels/similarity.ts(4,30): error TS2307: Cannot find module '@/lib/db/schema' or its corresponding type declarations.
 src/lib/channels/similarity.ts(5,34): error TS2307: Cannot find module '@/lib/graph/compute-relationships' or its corresponding type declarations.
+---
+timestamp: "2026-02-08 11:06:49"
+story: "4-personas-ensemble"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+> gold-miner@0.1.0 test
+> vitest run src/app/api/personas/__tests__/route.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+[90mstderr[2m | src/app/api/personas/__tests__/route.test.ts[2m > [22m[2mGET /api/personas[2m > [22m[2mreturns 500 on database error
+[22m[39mError fetching personas: Error: Database error
+    at [90m/Users/darindrobinski/dev/repos/gold-miner/[39msrc/app/api/personas/__tests__/route.test.ts:85:39
+    at [90mfile:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:145:11
+    at [90mfile:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:915:26
+    at [90mfile:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1243:20
+    at new Promise (<anonymous>)
+    at runWithTimeout [90m(file:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1209:10[90m)[39m
+    at [90mfile:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1653:37
+    at Traces.$ [90m(file:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4mvitest[24m/dist/chunks/traces.CCmnQaNT.js:142:27[90m)[39m
+    at trace [90m(file:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4mvitest[24m/dist/chunks/test.B8ej_ZHS.js:239:21[90m)[39m
+    at runTest [90m(file:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1653:12[90m)[39m
+
+[90mstderr[2m | src/app/api/personas/__tests__/route.test.ts[2m > [22m[2mPOST /api/personas[2m > [22m[2mreturns 500 on other errors
+[22m[39mError creating persona: Error: Unknown error
+    at [90m/Users/darindrobinski/dev/repos/gold-miner/[39msrc/app/api/personas/__tests__/route.test.ts:213:41
+    at [90mfile:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:145:11
+    at [90mfile:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:915:26
+    at [90mfile:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1243:20
+    at new Promise (<anonymous>)
+    at runWithTimeout [90m(file:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1209:10[90m)[39m
+    at [90mfile:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1653:37
+    at Traces.$ [90m(file:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4mvitest[24m/dist/chunks/traces.CCmnQaNT.js:142:27[90m)[39m
+    at trace [90m(file:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4mvitest[24m/dist/chunks/test.B8ej_ZHS.js:239:21[90m)[39m
+    at runTest [90m(file:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1653:12[90m)[39m
+
+ [31m❯[39m src/app/api/personas/__tests__/route.test.ts [2m([22m[2m10 tests[22m[2m | [22m[31m2 failed[39m[2m)[22m[32m 52[2mms[22m[39m
+[31m     [31m×[31m returns all personas[39m[32m 29[2mms[22m[39m
+     [32m✓[39m returns empty array when no personas exist[32m 1[2mms[22m[39m
+     [32m✓[39m returns 500 on database error[32m 3[2mms[22m[39m
+[31m     [31m×[31m creates a new persona[39m[32m 8[2mms[22m[39m
+     [32m✓[39m returns 400 when channelName is missing[32m 2[2mms[22m[39m
+     [32m✓[39m returns 400 when channelName is empty string[32m 1[2mms[22m[39m
+     [32m✓[39m returns 400 when body is invalid JSON[32m 1[2mms[22m[39m
+     [32m✓[39m returns 409 when persona already exists for channel[32m 1[2mms[22m[39m
+     [32m✓[39m returns 404 when channel has no videos[32m 1[2mms[22m[39m
+     [32m✓[39m returns 500 on other errors[32m 2[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 2 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/app/api/personas/__tests__/route.test.ts[2m > [22mGET /api/personas[2m > [22mreturns all personas
+[31m[1mAssertionError[22m: expected [ { id: 1, …(7) }, { id: 2, …(7) } ] to deeply equal [ { id: 1, …(7) }, { id: 2, …(7) } ][39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[33m@@ -1,9 +1,9 @@[39m
+[2m  [[22m
+[2m    {[22m
+[2m      "channelName": "Test Creator 1",[22m
+[32m-     "createdAt": 2026-01-01T00:00:00.000Z,[39m
+[31m+     "createdAt": "2026-01-01T00:00:00.000Z",[39m
+[2m      "expertiseEmbedding": [[22m
+[2m        0.5,[22m
+[2m        0.5,[22m
+[2m        0.5,[22m
+[2m        0.5,[22m
+[33m@@ -397,11 +397,11 @@[39m
+[2m      "systemPrompt": "You are Test Creator 1...",[22m
+[2m      "transcriptCount": 50,[22m
+[2m    },[22m
+[2m    {[22m
+[2m      "channelName": "Test Creator 2",[22m
+[32m-     "createdAt": 2026-01-02T00:00:00.000Z,[39m
+[31m+     "createdAt": "2026-01-02T00:00:00.000Z",[39m
+[2m      "expertiseEmbedding": [[22m
+[2m        0.3,[22m
+[2m        0.3,[22m
+[2m        0.3,[22m
+[2m        0.3,[22m
+
+[36m [2m❯[22m src/app/api/personas/__tests__/route.test.ts:[2m66:18[22m[39m
+    [90m 64| [39m
+    [90m 65| [39m    [34mexpect[39m(response[33m.[39mstatus)[33m.[39m[34mtoBe[39m([34m200[39m)
+    [90m 66| [39m    [34mexpect[39m(data)[33m.[39m[34mtoEqual[39m(mockPersonas)
+    [90m   | [39m                 [31m^[39m
+    [90m 67| [39m    [34mexpect[39m(mockDb[33m.[39mselect)[33m.[39m[34mtoHaveBeenCalled[39m()
+    [90m 68| [39m  })
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/app/api/personas/__tests__/route.test.ts[2m > [22mPOST /api/personas[2m > [22mcreates a new persona
+[31m[1mAssertionError[22m: expected { id: 1, …(7) } to deeply equal { id: 1, …(7) }[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[33m@@ -1,8 +1,8 @@[39m
+[2m  {[22m
+[2m    "channelName": "Test Creator",[22m
+[32m-   "createdAt": 2026-02-08T17:06:49.426Z,[39m
+[31m+   "createdAt": "2026-02-08T17:06:49.426Z",[39m
+[2m    "expertiseEmbedding": [[22m
+[2m      0.5,[22m
+[2m      0.5,[22m
+[2m      0.5,[22m
+[2m      0.5,[22m
+
+[36m [2m❯[22m src/app/api/personas/__tests__/route.test.ts:[2m130:26[22m[39m
+    [90m128| [39m
+    [90m129| [39m    [34mexpect[39m(response[33m.[39mstatus)[33m.[39m[34mtoBe[39m([34m201[39m)
+    [90m130| [39m    [34mexpect[39m(data[33m.[39mpersona)[33m.[39m[34mtoEqual[39m(mockPersona)
+    [90m   | [39m                         [31m^[39m
+    [90m131| [39m    [34mexpect[39m(mockCreatePersona)[33m.[39m[34mtoHaveBeenCalledWith[39m([32m'Test Creator'[39m)
+    [90m132| [39m  })
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m8 passed[39m[22m[90m (10)[39m
+[2m   Start at [22m 11:06:46
+[2m   Duration [22m 2.98s[2m (transform 199ms, setup 188ms, import 1.15s, tests 52ms, environment 1.14s)[22m
