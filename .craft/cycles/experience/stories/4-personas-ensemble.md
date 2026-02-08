@@ -8,8 +8,8 @@ updated: 2026-02-08
 cycle: experience
 story_number: 4
 chunks_total: 6
-chunks_complete: 1
-current_chunk: 2
+chunks_complete: 2
+current_chunk: 3
 ---
 
 # Story: Personas & Ensemble

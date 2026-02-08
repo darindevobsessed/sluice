@@ -1,0 +1,204 @@
+import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { POST } from '../route'
+import { db } from '@/lib/db'
+import { getPersonaContext } from '@/lib/personas/context'
+import { streamPersonaResponse } from '@/lib/personas/streaming'
+import type { Persona } from '@/lib/db/schema'
+
+// Mock dependencies
+vi.mock('@/lib/db', async () => {
+  const actual = await vi.importActual('@/lib/db')
+  return {
+    ...actual,
+    db: {
+      select: vi.fn(),
+    },
+  }
+})
+
+vi.mock('@/lib/personas/context', () => ({
+  getPersonaContext: vi.fn(),
+}))
+
+vi.mock('@/lib/personas/streaming', () => ({
+  streamPersonaResponse: vi.fn(),
+}))
+
+const mockDb = vi.mocked(db)
+const mockGetPersonaContext = vi.mocked(getPersonaContext)
+const mockStreamPersonaResponse = vi.mocked(streamPersonaResponse)
+
+describe('POST /api/personas/[id]/query', () => {
+  const mockPersona: Persona = {
+    id: 1,
+    channelName: 'Test Channel',
+    name: 'Test Creator',
+    systemPrompt: 'You are Test Creator.',
+    expertiseTopics: ['programming', 'typescript'],
+    expertiseEmbedding: null,
+    transcriptCount: 30,
+    createdAt: new Date(),
+  }
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+
+    // Default mock: successful persona lookup
+    mockDb.select = vi.fn().mockReturnValue({
+      from: vi.fn().mockReturnThis(),
+      where: vi.fn().mockReturnThis(),
+      limit: vi.fn().mockResolvedValue([mockPersona]),
+    })
+
+    // Default mock: return empty context
+    mockGetPersonaContext.mockResolvedValue([])
+
+    // Default mock: return streaming response
+    mockStreamPersonaResponse.mockResolvedValue(
+      new ReadableStream({
+        start(controller) {
+          const encoder = new TextEncoder()
+          controller.enqueue(encoder.encode('data: {"type":"delta","text":"Hello"}\n\n'))
+          controller.enqueue(encoder.encode('data: {"type":"done"}\n\n'))
+          controller.close()
+        },
+      })
+    )
+  })
+
+  it('should return 400 if request body is invalid', async () => {
+    const request = new Request('http://localhost/api/personas/1/query', {
+      method: 'POST',
+      body: JSON.stringify({}), // Missing question
+    })
+
+    const response = await POST(request, { params: { id: '1' } })
+
+    expect(response.status).toBe(400)
+    const data = await response.json()
+    expect(data.error).toBeTruthy()
+  })
+
+  it('should return 400 if id is not a valid number', async () => {
+    const request = new Request('http://localhost/api/personas/abc/query', {
+      method: 'POST',
+      body: JSON.stringify({ question: 'What is TypeScript?' }),
+    })
+
+    const response = await POST(request, { params: { id: 'abc' } })
+
+    expect(response.status).toBe(400)
+    const data = await response.json()
+    expect(data.error).toContain('Invalid persona ID')
+  })
+
+  it('should return 404 if persona not found', async () => {
+    // Mock empty result
+    mockDb.select = vi.fn().mockReturnValue({
+      from: vi.fn().mockReturnThis(),
+      where: vi.fn().mockReturnThis(),
+      limit: vi.fn().mockResolvedValue([]),
+    })
+
+    const request = new Request('http://localhost/api/personas/999/query', {
+      method: 'POST',
+      body: JSON.stringify({ question: 'What is TypeScript?' }),
+    })
+
+    const response = await POST(request, { params: { id: '999' } })
+
+    expect(response.status).toBe(404)
+    const data = await response.json()
+    expect(data.error).toContain('Persona not found')
+  })
+
+  it('should return streaming response for valid request', async () => {
+    const request = new Request('http://localhost/api/personas/1/query', {
+      method: 'POST',
+      body: JSON.stringify({ question: 'What is TypeScript?' }),
+    })
+
+    const response = await POST(request, { params: { id: '1' } })
+
+    expect(response.status).toBe(200)
+    expect(response.headers.get('content-type')).toBe('text/event-stream')
+    expect(response.headers.get('cache-control')).toBe('no-cache')
+    expect(response.headers.get('connection')).toBe('keep-alive')
+  })
+
+  it('should fetch context for persona channel', async () => {
+    const request = new Request('http://localhost/api/personas/1/query', {
+      method: 'POST',
+      body: JSON.stringify({ question: 'What is TypeScript?' }),
+    })
+
+    await POST(request, { params: { id: '1' } })
+
+    expect(mockGetPersonaContext).toHaveBeenCalledWith('Test Channel', 'What is TypeScript?')
+  })
+
+  it('should handle empty question', async () => {
+    const request = new Request('http://localhost/api/personas/1/query', {
+      method: 'POST',
+      body: JSON.stringify({ question: '' }),
+    })
+
+    const response = await POST(request, { params: { id: '1' } })
+
+    expect(response.status).toBe(400)
+    const data = await response.json()
+    expect(data.error).toBeTruthy()
+  })
+
+  it('should handle questions with special characters', async () => {
+    const request = new Request('http://localhost/api/personas/1/query', {
+      method: 'POST',
+      body: JSON.stringify({ question: "What's the difference between 'let' and 'const'?" }),
+    })
+
+    const response = await POST(request, { params: { id: '1' } })
+
+    expect(response.status).toBe(200)
+  })
+
+  it('should return 500 if streaming fails', async () => {
+    mockStreamPersonaResponse.mockRejectedValueOnce(new Error('API error'))
+
+    const request = new Request('http://localhost/api/personas/1/query', {
+      method: 'POST',
+      body: JSON.stringify({ question: 'What is TypeScript?' }),
+    })
+
+    const response = await POST(request, { params: { id: '1' } })
+
+    expect(response.status).toBe(500)
+    const data = await response.json()
+    expect(data.error).toBeTruthy()
+  })
+
+  it('should validate question is a string', async () => {
+    const request = new Request('http://localhost/api/personas/1/query', {
+      method: 'POST',
+      body: JSON.stringify({ question: 123 }),
+    })
+
+    const response = await POST(request, { params: { id: '1' } })
+
+    expect(response.status).toBe(400)
+    const data = await response.json()
+    expect(data.error).toBeTruthy()
+  })
+
+  it('should handle malformed JSON', async () => {
+    const request = new Request('http://localhost/api/personas/1/query', {
+      method: 'POST',
+      body: 'invalid json',
+    })
+
+    const response = await POST(request, { params: { id: '1' } })
+
+    expect(response.status).toBe(400)
+    const data = await response.json()
+    expect(data.error).toBeTruthy()
+  })
+})

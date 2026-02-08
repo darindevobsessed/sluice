@@ -3910,3 +3910,228 @@ error: |
 [2m      Tests [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m8 passed[39m[22m[90m (10)[39m
 [2m   Start at [22m 11:06:46
 [2m   Duration [22m 2.98s[2m (transform 199ms, setup 188ms, import 1.15s, tests 52ms, environment 1.14s)[22m
+---
+timestamp: "2026-02-08 11:23:30"
+story: "4-personas-ensemble"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Suites 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/lib/personas/__tests__/context.test.ts[2m [ src/lib/personas/__tests__/context.test.ts ][22m
+[31m[1mError[22m: Failed to resolve import "../context" from "src/lib/personas/__tests__/context.test.ts". Does the file exist?[39m
+  Plugin: [35mvite:import-analysis[39m
+  File: [36m/Users/darindrobinski/dev/repos/gold-miner/src/lib/personas/__tests__/context.test.ts[39m:2:58
+[33m  1  |  import { describe, it, expect } from "vitest";
+  2  |  import { getPersonaContext, formatContextForPrompt } from "../context";
+     |                                                             ^
+  3  |  describe("getPersonaContext", () => {
+  4  |    it("should return filtered search results for a specific channel", async () => {[39m
+[90m [2m❯[22m TransformPluginContext._formatLog node_modules/vite/dist/node/chunks/config.js:[2m28999:43[22m[39m
+[90m [2m❯[22m TransformPluginContext.error node_modules/vite/dist/node/chunks/config.js:[2m28996:14[22m[39m
+[90m [2m❯[22m normalizeUrl node_modules/vite/dist/node/chunks/config.js:[2m27119:18[22m[39m
+[90m [2m❯[22m node_modules/vite/dist/node/chunks/config.js:[2m27177:32[22m[39m
+[90m [2m❯[22m TransformPluginContext.transform node_modules/vite/dist/node/chunks/config.js:[2m27145:4[22m[39m
+[90m [2m❯[22m EnvironmentPluginContainer.transform node_modules/vite/dist/node/chunks/config.js:[2m28797:14[22m[39m
+[90m [2m❯[22m loadAndTransform node_modules/vite/dist/node/chunks/config.js:[2m22670:26[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/lib/personas/__tests__/context.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/lib/personas/__tests__/context.test.ts [2m([22m[2m0 test[22m[2m)[22m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [2mno tests[22m
+[2m   Start at [22m 11:23:28
+[2m   Duration [22m 2.40s[2m (transform 42ms, setup 307ms, import 0ms, tests 0ms, environment 1.73s)[22m
+---
+timestamp: "2026-02-08 11:23:51"
+story: "4-personas-ensemble"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+> gold-miner@0.1.0 test
+> vitest run src/lib/personas/__tests__/context.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+[90mstderr[2m | src/lib/personas/__tests__/context.test.ts[2m > [22m[2mgetPersonaContext[2m > [22m[2mshould return filtered search results for a specific channel
+[22m[39mdtype not specified for "model". Using the default dtype (fp32) for this device (cpu).
+
+[90mstderr[2m | src/lib/personas/__tests__/context.test.ts[2m > [22m[2mgetPersonaContext[2m > [22m[2mshould return filtered search results for a specific channel
+[22m[39mAn error occurred during model execution: "TypeError: A float32 tensor's data must be type of function Float32Array() { [native code] }".
+Inputs given to model: {
+  input_ids: {
+    type: [32m'int64'[39m,
+    dims: [ [33m1[39m, [33m7[39m ],
+    location: [32m'cpu'[39m,
+    data: BigInt64Array(7) [
+        [33m101n[39m, [33m2054n[39m,
+       [33m2003n[39m, [33m4127n[39m,
+      [33m23235n[39m, [33m1029n[39m,
+        [33m102n[39m
+    ]
+  },
+  attention_mask: {
+    type: [32m'int64'[39m,
+    dims: [ [33m1[39m, [33m7[39m ],
+    location: [32m'cpu'[39m,
+    data: BigInt64Array(7) [
+      [33m1n[39m, [33m1n[39m, [33m1n[39m, [33m1n[39m,
+      [33m1n[39m, [33m1n[39m, [33m1n[39m
+    ]
+  },
+  token_type_ids: {
+    type: [32m'int64'[39m,
+    dims: [ [33m1[39m, [33m7[39m ],
+    location: [32m'cpu'[39m,
+    data: BigInt64Array(7) [
+      [33m0n[39m, [33m0n[39m, [33m0n[39m, [33m0n[39m,
+      [33m0n[39m, [33m0n[39m, [33m0n[39m
+    ]
+  }
+}
+
+[90mstderr[2m | src/lib/personas/__tests__/context.test.ts[2m > [22m[2mgetPersonaContext[2m > [22m[2mshould limit results to 10 chunks
+[22m[39mAn error occurred during model execution: "TypeError: A float32 tensor's data must be type of function Float32Array() { [native code] }".
+Inputs given to model: {
+  input_ids: {
+    type: [32m'int64'[39m,
+    dims: [ [33m1[39m, [33m4[39m ],
+    location: [32m'cpu'[39m,
+    data: BigInt64Array(4) [ [33m101n[39m, [33m2759n[39m, [33m8476n[39m, [33m102n[39m ]
+  },
+  attention_mask: {
+    type: [32m'int64'[39m,
+    dims: [ [33m1[39m, [33m4[39m ],
+    location: [32m'cpu'[39m,
+    data: BigInt64Array(4) [ [33m1n[39m, [33m1n[39m, [33m1n[39m, [33m1n[39m ]
+  },
+  token_type_ids: {
+    type: [32m'int64'[39m,
+    dims: [ [33m1[39m, [33m4[39m ],
+    location: [32m'cpu'[39m,
+    data: BigInt64Array(4) [ [33m0n[39m, [33m0n[39m, [33m0n[39m, [33m0n[39m ]
+  }
+}
+
+[90mstderr[2m | src/lib/personas/__tests__/context.test.ts[2m > [22m[2mgetPersonaContext[2m > [22m[2mshould use hybrid search mode
+[22m[39mAn error occurred during model execution: "TypeError: A float32 tensor's data must be type of function Float32Array() { [native code] }".
+Inputs given to model: {
+  input_ids: {
+    type: [32m'int64'[39m,
+    dims: [ [33m1[39m, [33m4[39m ],
+    location: [32m'cpu'[39m,
+    data: BigInt64Array(4) [ [33m101n[39m, [33m3231n[39m, [33m23032n[39m, [33m102n[39m ]
+  },
+  attention_mask: {
+    type: [32m'int64'[39m,
+    dims: [ [33m1[39m, [33m4[39m ],
+    location: [32m'cpu'[39m,
+    data: BigInt64Array(4) [ [33m1n[39m, [33m1n[39m, [33m1n[39m, [33m1n[39m ]
+  },
+  token_type_ids: {
+    type: [32m'int64'[39m,
+    dims: [ [33m1[39m, [33m4[39m ],
+    location: [32m'cpu'[39m,
+    data: BigInt64Array(4) [ [33m0n[39m, [33m0n[39m, [33m0n[39m, [33m0n[39m ]
+  }
+}
+
+[90mstderr[2m | src/lib/personas/__tests__/context.test.ts[2m > [22m[2mgetPersonaContext[2m > [22m[2mshould handle empty results gracefully
+[22m[39mAn error occurred during model execution: "TypeError: A float32 tensor's data must be type of function Float32Array() { [native code] }".
+Inputs given to model: {
+  input_ids: {
+    type: [32m'int64'[39m,
+    dims: [ [33m1[39m, [33m3[39m ],
+    location: [32m'cpu'[39m,
+    data: BigInt64Array(3) [ [33m101n[39m, [33m23032n[39m, [33m102n[39m ]
+  },
+  attention_mask: {
+    type: [32m'int64'[39m,
+    dims: [ [33m1[39m, [33m3[39m ],
+    location: [32m'cpu'[39m,
+    data: BigInt64Array(3) [ [33m1n[39m, [33m1n[39m, [33m1n[39m ]
+  },
+  token_type_ids: {
+    type: [32m'int64'[39m,
+    dims: [ [33m1[39m, [33m3[39m ],
+    location: [32m'cpu'[39m,
+    data: BigInt64Array(3) [ [33m0n[39m, [33m0n[39m, [33m0n[39m ]
+  }
+}
+
+[90mstderr[2m | src/lib/personas/__tests__/context.test.ts[2m > [22m[2mgetPersonaContext[2m > [22m[2mshould handle special characters in channel name
+[22m[39mAn error occurred during model execution: "TypeError: A float32 tensor's data must be type of function Float32Array() { [native code] }".
+Inputs given to model: {
+  input_ids: {
+    type: [32m'int64'[39m,
+    dims: [ [33m1[39m, [33m3[39m ],
+    location: [32m'cpu'[39m,
+    data: BigInt64Array(3) [ [33m101n[39m, [33m3231n[39m, [33m102n[39m ]
+  },
+  attention_mask: {
+    type: [32m'int64'[39m,
+    dims: [ [33m1[39m, [33m3[39m ],
+    location: [32m'cpu'[39m,
+    data: BigInt64Array(3) [ [33m1n[39m, [33m1n[39m, [33m1n[39m ]
+  },
+  token_type_ids: {
+    type: [32m'int64'[39m,
+    dims: [ [33m1[39m, [33m3[39m ],
+    location: [32m'cpu'[39m,
+    data: BigInt64Array(3) [ [33m0n[39m, [33m0n[39m, [33m0n[39m ]
+  }
+}
+
+ [31m❯[39m src/lib/personas/__tests__/context.test.ts [2m([22m[2m11 tests[22m[2m | [22m[31m5 failed[39m[2m)[22m[33m 440[2mms[22m[39m
+[31m     [31m×[31m should return filtered search results for a specific channel[39m[33m 433[2mms[22m[39m
+[31m     [31m×[31m should limit results to 10 chunks[39m[32m 1[2mms[22m[39m
+[31m     [31m×[31m should use hybrid search mode[39m[32m 1[2mms[22m[39m
+[31m     [31m×[31m should handle empty results gracefully[39m[32m 1[2mms[22m[39m
+[31m     [31m×[31m should handle special characters in channel name[39m[32m 1[2mms[22m[39m
+     [32m✓[39m should format results as numbered context blocks[32m 1[2mms[22m[39m
+     [32m✓[39m should include video titles[32m 0[2mms[22m[39m
+     [32m✓[39m should include timestamps when available[32m 0[2mms[22m[39m
+     [32m✓[39m should handle null timestamps[32m 0[2mms[22m[39m
+     [32m✓[39m should return empty string for empty results[32m 1[2mms[22m[39m
+     [32m✓[39m should handle long content gracefully[32m 0[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 5 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/lib/personas/__tests__/context.test.ts[2m > [22mgetPersonaContext[2m > [22mshould return filtered search results for a specific channel
+[41m[1m FAIL [22m[49m src/lib/personas/__tests__/context.test.ts[2m > [22mgetPersonaContext[2m > [22mshould limit results to 10 chunks
+[41m[1m FAIL [22m[49m src/lib/personas/__tests__/context.test.ts[2m > [22mgetPersonaContext[2m > [22mshould use hybrid search mode
+[41m[1m FAIL [22m[49m src/lib/personas/__tests__/context.test.ts[2m > [22mgetPersonaContext[2m > [22mshould handle empty results gracefully
+[41m[1m FAIL [22m[49m src/lib/personas/__tests__/context.test.ts[2m > [22mgetPersonaContext[2m > [22mshould handle special characters in channel name
+[31m[1mTypeError[22m: A float32 tensor's data must be type of function Float32Array() { [native code] }[39m
+[90m [2m❯[22m new Tensor node_modules/onnxruntime-common/dist/cjs/tensor-impl.js:[2m171:31[22m[39m
+[90m [2m❯[22m Immediate.<anonymous> node_modules/onnxruntime-node/dist/backend.js:[2m48:108[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m5 failed[39m[22m[2m | [22m[1m[32m6 passed[39m[22m[90m (11)[39m
+[2m   Start at [22m 11:23:48
+[2m   Duration [22m 3.22s[2m (transform 148ms, setup 206ms, import 1.07s, tests 440ms, environment 1.14s)[22m
+---
+timestamp: "2026-02-08 11:33:02"
+story: "4-personas-ensemble"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+ls: /Users/darindrobinski/dev/repos/gold-miner/init-db.sql: No such file or directory
