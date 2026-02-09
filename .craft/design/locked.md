@@ -509,6 +509,44 @@ Each action type gets a card with three states:
 
 ---
 
+### Nullable Channel for Transcripts
+
+**Locked:** 2026-02-09
+**Decision:** Keep DB column named `channel` but make it nullable
+**Applies to:** `videos.channel` column, API validation, add-transcript form, all display locations
+
+**Specification:**
+- `channel` column becomes nullable in schema
+- For `sourceType: 'transcript'`, `channel` is optional in Zod validation
+- For `sourceType: 'youtube'`, `channel` remains required
+- When a transcript has no source (NULL channel), display nothing where channel would appear
+- Features like "similar creators" and personas naturally skip NULL-channel entries
+
+**Not Allowed:**
+- Renaming the column (too many touchpoints across the codebase)
+- Displaying "Unknown" or placeholder text for NULL channel
+- Auto-filling with a default string
+
+---
+
+### Transcript SVG Thumbnail Icon
+
+**Locked:** 2026-02-09
+**Decision:** Use a transcript SVG icon everywhere thumbnails appear for transcript-type entries
+**Applies to:** Knowledge Bank grid, success state, discovery, search results — all thumbnail locations
+
+**Specification:**
+- Transcript entries display a document/transcript SVG icon instead of blank/null thumbnail
+- Icon appears wherever YouTube thumbnails would normally appear
+- Consistent sizing and styling across all locations
+
+**Not Allowed:**
+- Blank/empty space where thumbnail would be
+- Text-based avatars (letter from title)
+- Different icons per location
+
+---
+
 ## How to Use These Locks
 
 1. **During implementation:** Reference these decisions, don't deviate

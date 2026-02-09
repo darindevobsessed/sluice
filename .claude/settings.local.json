@@ -30,7 +30,8 @@
       "Bash(find:*)",
       "Bash(curl:*)",
       "Bash(/Users/darindrobinski/.claude-max/plugins/cache/craft-local/craft/0.30.0/hooks/scripts/start-story.sh:*)",
-      "Bash(/Users/darindrobinski/.claude-max/plugins/cache/craft-local/craft/0.30.0/hooks/scripts/complete-chunk.sh)"
+      "Bash(/Users/darindrobinski/.claude-max/plugins/cache/craft-local/craft/0.30.0/hooks/scripts/complete-chunk.sh)",
+      "Bash(python3:*)"
     ]
   }
 }
