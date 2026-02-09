@@ -1,12 +1,12 @@
 ---
 name: discovery-video-grid
 title: Discovery Page Video Grid Redesign
-status: active
+status: complete
 priority: medium
 created: 2026-02-08
 updated: 2026-02-09
 chunks_total: 4
-chunks_complete: 3
+chunks_complete: 4
 ---
 
 # Story: Discovery Page Video Grid Redesign
