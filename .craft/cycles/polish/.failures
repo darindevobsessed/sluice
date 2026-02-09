@@ -1763,3 +1763,563 @@ npm error
 npm error To see a list of scripts, run:
 npm error   npm run
 npm error A complete log of this run can be found in: /Users/darindrobinski/.npm/_logs/2026-02-09T04_13_50_168Z-debug-0.log
+---
+timestamp: "2026-02-09 09:01:52"
+story: "3-discovery-video-grid"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Suites 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/components/discovery/__tests__/DiscoveryVideoGrid.test.tsx[2m [ src/components/discovery/__tests__/DiscoveryVideoGrid.test.tsx ][22m
+[31m[1mError[22m: Failed to resolve import "../DiscoveryVideoGrid" from "src/components/discovery/__tests__/DiscoveryVideoGrid.test.tsx". Does the file exist?[39m
+  Plugin: [35mvite:import-analysis[39m
+  File: [36m/Users/darindrobinski/dev/repos/gold-miner/src/components/discovery/__tests__/DiscoveryVideoGrid.test.tsx[39m:4:0
+[33m  19 |  const __vi_import_1__ = await import("@testing-library/react");
+  20 |  const __vi_import_2__ = await import("@testing-library/user-event");
+  21 |  const __vi_import_3__ = await import("../DiscoveryVideoGrid");
+     |                                       ^
+  22 |  
+  23 |  import { describe, it, expect, vi, beforeEach } from "vitest";[39m
+[90m [2m❯[22m TransformPluginContext._formatLog node_modules/vite/dist/node/chunks/config.js:[2m28999:43[22m[39m
+[90m [2m❯[22m TransformPluginContext.error node_modules/vite/dist/node/chunks/config.js:[2m28996:14[22m[39m
+[90m [2m❯[22m normalizeUrl node_modules/vite/dist/node/chunks/config.js:[2m27119:18[22m[39m
+[90m [2m❯[22m node_modules/vite/dist/node/chunks/config.js:[2m27177:32[22m[39m
+[90m [2m❯[22m TransformPluginContext.transform node_modules/vite/dist/node/chunks/config.js:[2m27145:4[22m[39m
+[90m [2m❯[22m EnvironmentPluginContainer.transform node_modules/vite/dist/node/chunks/config.js:[2m28797:14[22m[39m
+[90m [2m❯[22m loadAndTransform node_modules/vite/dist/node/chunks/config.js:[2m22670:26[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/components/discovery/__tests__/DiscoveryVideoGrid.test.tsx
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/components/discovery/__tests__/DiscoveryVideoGrid.test.tsx [2m([22m[2m0 test[22m[2m)[22m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [2mno tests[22m
+[2m   Start at [22m 09:01:50
+[2m   Duration [22m 1.77s[2m (transform 36ms, setup 174ms, import 0ms, tests 0ms, environment 1.08s)[22m
+---
+timestamp: "2026-02-09 09:04:36"
+story: "3-discovery-video-grid"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+[90mstderr[2m | src/components/discovery/__tests__/DiscoveryVideoGrid.test.tsx[2m > [22m[2mDiscoveryVideoGrid[2m > [22m[2mshould render videos in responsive grid layout
+[22m[39mReceived `true` for a non-boolean attribute `fill`.
+
+If you want to write it to the DOM, pass a string instead: fill="true" or fill={value.toString()}.
+Received `true` for a non-boolean attribute `unoptimized`.
+
+If you want to write it to the DOM, pass a string instead: unoptimized="true" or unoptimized={value.toString()}.
+
+[90mstderr[2m | src/components/discovery/__tests__/DiscoveryVideoGrid.test.tsx[2m > [22m[2mDiscoveryVideoGrid[2m > [22m[2mshould render video cards for each video
+[22m[39mEncountered two children with the same key, `abc123`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version.
+Encountered two children with the same key, `abc123`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version.
+
+[90mstderr[2m | src/components/discovery/__tests__/DiscoveryVideoGrid.test.tsx[2m > [22m[2mDiscoveryVideoGrid[2m > [22m[2mshould sort videos by publishedAt descending (newest first)
+[22m[39mEncountered two children with the same key, `abc123`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version.
+Encountered two children with the same key, `abc123`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version.
+
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/components/discovery/__tests__/DiscoveryVideoGrid.test.tsx[2m > [22mDiscoveryVideoGrid[2m > [22mshould reset to page 1 when videos prop changes
+[31m[1mTestingLibraryElementError[22m[39m: Unable to find an element with the text: New Video 0. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"bg-card text-card-foreground flex flex-col gap-6 rounded-xl border shadow-sm group overflow-hidden p-0 transition-all duration-200 hover:shadow-lg hover:scale-[1.02]"[39m
+          [33mdata-slot[39m=[32m"card"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"relative aspect-video w-full overflow-hidden"[39m
+          [36m>[39m
+            [36m<img[39m
+              [33malt[39m=[32m"New Video 24"[39m
+              [33mclass[39m=[32m"object-cover transition-transform duration-200 group-hover:scale-105"[39m
+              [33msrc[39m=[32m"https://i.ytimg.com/vi/video24/mqdefault.jpg"[39m
+            [36m/>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"p-3 space-y-2"[39m
+          [36m>[39m
+            [36m<h3[39m
+              [33mclass[39m=[32m"line-clamp-2 font-semibold leading-tight text-sm"[39m
+            [36m>[39m
+              [0mNew Video 24[0m
+            [36m</h3>[39m
+            [36m<p[39m
+              [33mclass[39m=[32m"text-xs text-muted-foreground"[39m
+            [36m>[39m
+              [0m3w ago[0m
+            [36m</p>[39m
+            [36m<a[39m
+              [33mhref[39m=[32m"/add?url=https://youtube.com/watch?v=video24"[39m
+            [36m>[39m
+              [0mAdd to Bank[0m
+            [36m</a>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"bg-card text-card-foreground flex flex-col gap-6 rounded-xl border shadow-sm group overflow-hidden p-0 transition-all duration-200 hover:shadow-lg hover:scale-[1.02]"[39m
+          [33mdata-slot[39m=[32m"card"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"relative aspect-video w-full overflow-hidden"[39m
+          [36m>[39m
+            [36m<img[39m
+              [33malt[39m=[32m"New Video 25"[39m
+              [33mclass[39m=[32m"object-cover transition-transform duration-200 group-hover:scale-105"[39m
+              [33msrc[39m=[32m"https://i.ytimg.com/vi/video25/mqdefault.jpg"[39m
+            [36m/>[39m
+          [36m</div>[39m
+     
+
+... [2701 characters truncated] ...
+
+ideo 27"[39m
+              [33mclass[39m=[32m"object-cover transition-transform duration-200 group-hover:scale-105"[39m
+              [33msrc[39m=[32m"https://i.ytimg.com/vi/video27/mqdefault.jpg"[39m
+            [36m/>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"p-3 space-y-2"[39m
+          [36m>[39m
+            [36m<h3[39m
+              [33mclass[39m=[32m"line-clamp-2 font-semibold leading-tight text-sm"[39m
+            [36m>[39m
+              [0mNew Video 27[0m
+            [36m</h3>[39m
+            [36m<p[39m
+              [33mclass[39m=[32m"text-xs text-muted-foreground"[39m
+            [36m>[39m
+              [0m3w ago[0m
+            [36m</p>[39m
+            [36m<a[39m
+              [33mhref[39m=[32m"/add?url=https://youtube.com/watch?v=video27"[39m
+            [36m>[39m
+              [0mAdd to Bank[0m
+            [36m</a>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"bg-card text-card-foreground flex flex-col gap-6 rounded-xl border shadow-sm group overflow-hidden p-0 transition-all duration-200 hover:shadow-lg hover:scale-[1.02]"[39m
+          [33mdata-slot[39m=[32m"card"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"relative aspect-video w-full overflow-hidden"[39m
+          [36m>[39m
+            [36m<img[39m
+              [33malt[39m=[32m"New Video 28"[39m
+              [33mclass[39m=[32m"object-cover transition-transform duration-200 group-hover:scale-105"[39m
+              [33msrc[39m=[32m"https://i.ytimg.com/vi/video28/mqdefault.jpg"[39m
+            [36m/>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"p-3 space-y-2"[39m
+          [36m>[...
+[90m [2m❯[22m Object.getElementError node_modules/@testing-library/dom/dist/config.js:[2m37:19[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m76:38[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m52:17[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m95:19[22m[39m
+[36m [2m❯[22m src/components/discovery/__tests__/DiscoveryVideoGrid.test.tsx:[2m272:19[22m[39m
+    [90m270| [39m
+    [90m271| [39m    [90m// Should show first page of new videos[39m
+    [90m272| [39m    [34mexpect[39m(screen[33m.[39m[34mgetByText[39m([32m'New Video 0'[39m))[33m.[39m[34mtoBeInTheDocument[39m()
+    [90m   | [39m                  [31m^[39m
+    [90m273| [39m  })
+    [90m274| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/components/discovery/__tests__/DiscoveryVideoGrid.test.tsx
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/components/discovery/__tests__/DiscoveryVideoGrid.test.tsx [2m([22m[2m18 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 1130[2mms[22m[39m
+     [32m✓[39m should render videos in responsive grid layout[32m 74[2mms[22m[39m
+     [32m✓[39m should render video cards for each video[32m 26[2mms[22m[39m
+     [32m✓[39m should sort videos by publishedAt descending (newest first)[32m 198[2mms[22m[39m
+     [32m✓[39m should display only 24 videos per page[32m 162[2mms[22m[39m
+     [32m✓[39m should show pagination when totalPages > 1[32m 40[2mms[22m[39m
+     [32m✓[39m should not show pagination when totalPages <= 1[32m 23[2mms[22m[39m
+     [32m✓[39m should navigate to next page and show correct videos[32m 109[2mms[22m[39m
+     [32m✓[39m should scroll to top on page change[32m 72[2mms[22m[39m
+     [32m✓[39m should render loading state with 24 skeletons[32m 16[2mms[22m[39m
+     [32m✓[39m should render loading state in grid layout[32m 15[2mms[22m[39m
+     [32m✓[39m should render empty state when no videos and not loading[32m 2[2mms[22m[39m
+     [32m✓[39m should not render pagination in empty state[32m 2[2mms[22m[39m
+     [32m✓[39m should pass focusAreas to video cards from focusAreaMap[32m 16[2mms[22m[39m
+     [32m✓[39m should handle missing focusAreaMap gracefully[32m 3[2mms[22m[39m
+     [32m✓[39m should handle focusAreaMap with no matching videos[32m 3[2mms[22m[39m
+     [32m✓[39m should maintain current page state across pagination[32m 114[2mms[22m[39m
+[31m     [31m×[31m should reset to page 1 when videos prop changes[39m[32m 71[2mms[22m[39m
+     [32m✓[39m should calculate totalPages correctly[32m 178[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m17 passed[39m[22m[90m (18)[39m
+[2m   Start at [22m 09:04:32
+[2m   Duration [22m 3.86s[2m (transform 225ms, setup 225ms, import 924ms, tests 1.13s, environment 1.09s)[22m
+---
+timestamp: "2026-02-09 09:05:00"
+story: "3-discovery-video-grid"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+[90mstderr[2m | src/components/discovery/__tests__/DiscoveryVideoGrid.test.tsx[2m > [22m[2mDiscoveryVideoGrid[2m > [22m[2mshould render videos in responsive grid layout
+[22m[39mReceived `true` for a non-boolean attribute `fill`.
+
+If you want to write it to the DOM, pass a string instead: fill="true" or fill={value.toString()}.
+Received `true` for a non-boolean attribute `unoptimized`.
+
+If you want to write it to the DOM, pass a string instead: unoptimized="true" or unoptimized={value.toString()}.
+
+[90mstderr[2m | src/components/discovery/__tests__/DiscoveryVideoGrid.test.tsx[2m > [22m[2mDiscoveryVideoGrid[2m > [22m[2mshould render video cards for each video
+[22m[39mEncountered two children with the same key, `abc123`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version.
+Encountered two children with the same key, `abc123`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version.
+
+[90mstderr[2m | src/components/discovery/__tests__/DiscoveryVideoGrid.test.tsx[2m > [22m[2mDiscoveryVideoGrid[2m > [22m[2mshould sort videos by publishedAt descending (newest first)
+[22m[39mEncountered two children with the same key, `abc123`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version.
+Encountered two children with the same key, `abc123`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version.
+
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/components/discovery/__tests__/DiscoveryVideoGrid.test.tsx[2m > [22mDiscoveryVideoGrid[2m > [22mshould reset to page 1 when videos prop changes
+[31m[1mTestingLibraryElementError[22m[39m: Unable to find an element with the text: New Video 0. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"bg-card text-card-foreground flex flex-col gap-6 rounded-xl border shadow-sm group overflow-hidden p-0 transition-all duration-200 hover:shadow-lg hover:scale-[1.02]"[39m
+          [33mdata-slot[39m=[32m"card"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"relative aspect-video w-full overflow-hidden"[39m
+          [36m>[39m
+            [36m<img[39m
+              [33malt[39m=[32m"New Video 24"[39m
+              [33mclass[39m=[32m"object-cover transition-transform duration-200 group-hover:scale-105"[39m
+              [33msrc[39m=[32m"https://i.ytimg.com/vi/video24/mqdefault.jpg"[39m
+            [36m/>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"p-3 space-y-2"[39m
+          [36m>[39m
+            [36m<h3[39m
+              [33mclass[39m=[32m"line-clamp-2 font-semibold leading-tight text-sm"[39m
+            [36m>[39m
+              [0mNew Video 24[0m
+            [36m</h3>[39m
+            [36m<p[39m
+              [33mclass[39m=[32m"text-xs text-muted-foreground"[39m
+            [36m>[39m
+              [0m3w ago[0m
+            [36m</p>[39m
+            [36m<a[39m
+              [33mhref[39m=[32m"/add?url=https://youtube.com/watch?v=video24"[39m
+            [36m>[39m
+              [0mAdd to Bank[0m
+            [36m</a>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"bg-card text-card-foreground flex flex-col gap-6 rounded-xl border shadow-sm group overflow-hidden p-0 transition-all duration-200 hover:shadow-lg hover:scale-[1.02]"[39m
+          [33mdata-slot[39m=[32m"card"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"relative aspect-video w-full overflow-hidden"[39m
+          [36m>[39m
+            [36m<img[39m
+              [33malt[39m=[32m"New Video 25"[39m
+              [33mclass[39m=[32m"object-cover transition-transform duration-200 group-hover:scale-105"[39m
+              [33msrc[39m=[32m"https://i.ytimg.com/vi/video25/mqdefault.jpg"[39m
+            [36m/>[39m
+          [36m</div>[39m
+     
+
+... [2702 characters truncated] ...
+
+deo 27"[39m
+              [33mclass[39m=[32m"object-cover transition-transform duration-200 group-hover:scale-105"[39m
+              [33msrc[39m=[32m"https://i.ytimg.com/vi/video27/mqdefault.jpg"[39m
+            [36m/>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"p-3 space-y-2"[39m
+          [36m>[39m
+            [36m<h3[39m
+              [33mclass[39m=[32m"line-clamp-2 font-semibold leading-tight text-sm"[39m
+            [36m>[39m
+              [0mNew Video 27[0m
+            [36m</h3>[39m
+            [36m<p[39m
+              [33mclass[39m=[32m"text-xs text-muted-foreground"[39m
+            [36m>[39m
+              [0m3w ago[0m
+            [36m</p>[39m
+            [36m<a[39m
+              [33mhref[39m=[32m"/add?url=https://youtube.com/watch?v=video27"[39m
+            [36m>[39m
+              [0mAdd to Bank[0m
+            [36m</a>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"bg-card text-card-foreground flex flex-col gap-6 rounded-xl border shadow-sm group overflow-hidden p-0 transition-all duration-200 hover:shadow-lg hover:scale-[1.02]"[39m
+          [33mdata-slot[39m=[32m"card"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"relative aspect-video w-full overflow-hidden"[39m
+          [36m>[39m
+            [36m<img[39m
+              [33malt[39m=[32m"New Video 28"[39m
+              [33mclass[39m=[32m"object-cover transition-transform duration-200 group-hover:scale-105"[39m
+              [33msrc[39m=[32m"https://i.ytimg.com/vi/video28/mqdefault.jpg"[39m
+            [36m/>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"p-3 space-y-2"[39m
+          [36m>[...
+[90m [2m❯[22m Object.getElementError node_modules/@testing-library/dom/dist/config.js:[2m37:19[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m76:38[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m52:17[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m95:19[22m[39m
+[36m [2m❯[22m src/components/discovery/__tests__/DiscoveryVideoGrid.test.tsx:[2m272:19[22m[39m
+    [90m270| [39m
+    [90m271| [39m    [90m// Should show first page of new videos[39m
+    [90m272| [39m    [34mexpect[39m(screen[33m.[39m[34mgetByText[39m([32m'New Video 0'[39m))[33m.[39m[34mtoBeInTheDocument[39m()
+    [90m   | [39m                  [31m^[39m
+    [90m273| [39m  })
+    [90m274| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/components/discovery/__tests__/DiscoveryVideoGrid.test.tsx
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/components/discovery/__tests__/DiscoveryVideoGrid.test.tsx [2m([22m[2m18 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 1303[2mms[22m[39m
+     [32m✓[39m should render videos in responsive grid layout[32m 74[2mms[22m[39m
+     [32m✓[39m should render video cards for each video[32m 22[2mms[22m[39m
+     [32m✓[39m should sort videos by publishedAt descending (newest first)[32m 195[2mms[22m[39m
+     [32m✓[39m should display only 24 videos per page[32m 168[2mms[22m[39m
+     [32m✓[39m should show pagination when totalPages > 1[32m 44[2mms[22m[39m
+     [32m✓[39m should not show pagination when totalPages <= 1[32m 29[2mms[22m[39m
+     [32m✓[39m should navigate to next page and show correct videos[32m 129[2mms[22m[39m
+     [32m✓[39m should scroll to top on page change[32m 97[2mms[22m[39m
+     [32m✓[39m should render loading state with 24 skeletons[32m 20[2mms[22m[39m
+     [32m✓[39m should render loading state in grid layout[32m 15[2mms[22m[39m
+     [32m✓[39m should render empty state when no videos and not loading[32m 2[2mms[22m[39m
+     [32m✓[39m should not render pagination in empty state[32m 1[2mms[22m[39m
+     [32m✓[39m should pass focusAreas to video cards from focusAreaMap[32m 12[2mms[22m[39m
+     [32m✓[39m should handle missing focusAreaMap gracefully[32m 3[2mms[22m[39m
+     [32m✓[39m should handle focusAreaMap with no matching videos[32m 3[2mms[22m[39m
+     [32m✓[39m should maintain current page state across pagination[32m 124[2mms[22m[39m
+[31m     [31m×[31m should reset to page 1 when videos prop changes[39m[32m 137[2mms[22m[39m
+     [32m✓[39m should calculate totalPages correctly[32m 225[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m17 passed[39m[22m[90m (18)[39m
+[2m   Start at [22m 09:04:56
+[2m   Duration [22m 3.87s[2m (transform 195ms, setup 176ms, import 870ms, tests 1.30s, environment 1.07s)[22m
+---
+timestamp: "2026-02-09 09:05:21"
+story: "3-discovery-video-grid"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+[90mstderr[2m | src/components/discovery/__tests__/DiscoveryVideoGrid.test.tsx[2m > [22m[2mDiscoveryVideoGrid[2m > [22m[2mshould render videos in responsive grid layout
+[22m[39mReceived `true` for a non-boolean attribute `fill`.
+
+If you want to write it to the DOM, pass a string instead: fill="true" or fill={value.toString()}.
+Received `true` for a non-boolean attribute `unoptimized`.
+
+If you want to write it to the DOM, pass a string instead: unoptimized="true" or unoptimized={value.toString()}.
+
+[90mstderr[2m | src/components/discovery/__tests__/DiscoveryVideoGrid.test.tsx[2m > [22m[2mDiscoveryVideoGrid[2m > [22m[2mshould render video cards for each video
+[22m[39mEncountered two children with the same key, `abc123`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version.
+Encountered two children with the same key, `abc123`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version.
+
+[90mstderr[2m | src/components/discovery/__tests__/DiscoveryVideoGrid.test.tsx[2m > [22m[2mDiscoveryVideoGrid[2m > [22m[2mshould sort videos by publishedAt descending (newest first)
+[22m[39mEncountered two children with the same key, `abc123`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version.
+Encountered two children with the same key, `abc123`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version.
+
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/components/discovery/__tests__/DiscoveryVideoGrid.test.tsx[2m > [22mDiscoveryVideoGrid[2m > [22mshould reset to page 1 when videos prop changes
+[31m[1mTestingLibraryElementError[22m[39m: Unable to find an element with the text: New Video 0. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"bg-card text-card-foreground flex flex-col gap-6 rounded-xl border shadow-sm group overflow-hidden p-0 transition-all duration-200 hover:shadow-lg hover:scale-[1.02]"[39m
+          [33mdata-slot[39m=[32m"card"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"relative aspect-video w-full overflow-hidden"[39m
+          [36m>[39m
+            [36m<img[39m
+              [33malt[39m=[32m"New Video 24"[39m
+              [33mclass[39m=[32m"object-cover transition-transform duration-200 group-hover:scale-105"[39m
+              [33msrc[39m=[32m"https://i.ytimg.com/vi/video24/mqdefault.jpg"[39m
+            [36m/>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"p-3 space-y-2"[39m
+          [36m>[39m
+            [36m<h3[39m
+              [33mclass[39m=[32m"line-clamp-2 font-semibold leading-tight text-sm"[39m
+            [36m>[39m
+              [0mNew Video 24[0m
+            [36m</h3>[39m
+            [36m<p[39m
+              [33mclass[39m=[32m"text-xs text-muted-foreground"[39m
+            [36m>[39m
+              [0m3w ago[0m
+            [36m</p>[39m
+            [36m<a[39m
+              [33mhref[39m=[32m"/add?url=https://youtube.com/watch?v=video24"[39m
+            [36m>[39m
+              [0mAdd to Bank[0m
+            [36m</a>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"bg-card text-card-foreground flex flex-col gap-6 rounded-xl border shadow-sm group overflow-hidden p-0 transition-all duration-200 hover:shadow-lg hover:scale-[1.02]"[39m
+          [33mdata-slot[39m=[32m"card"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"relative aspect-video w-full overflow-hidden"[39m
+          [36m>[39m
+            [36m<img[39m
+              [33malt[39m=[32m"New Video 25"[39m
+              [33mclass[39m=[32m"object-cover transition-transform duration-200 group-hover:scale-105"[39m
+              [33msrc[39m=[32m"https://i.ytimg.com/vi/video25/mqdefault.jpg"[39m
+            [36m/>[39m
+          [36m</div>[39m
+     
+
+... [9799 characters truncated] ...
+
+ct-cover transition-transform duration-200 group-hover:scale-105"[39m
+              [33msrc[39m=[32m"https://i.ytimg.com/vi/video27/mqdefault.jpg"[39m
+            [36m/>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"p-3 space-y-2"[39m
+          [36m>[39m
+            [36m<h3[39m
+              [33mclass[39m=[32m"line-clamp-2 font-semibold leading-tight text-sm"[39m
+            [36m>[39m
+              [0mNew Video 27[0m
+            [36m</h3>[39m
+            [36m<p[39m
+              [33mclass[39m=[32m"text-xs text-muted-foreground"[39m
+            [36m>[39m
+              [0m3w ago[0m
+            [36m</p>[39m
+            [36m<a[39m
+              [33mhref[39m=[32m"/add?url=https://youtube.com/watch?v=video27"[39m
+            [36m>[39m
+              [0mAdd to Bank[0m
+            [36m</a>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"bg-card text-card-foreground flex flex-col gap-6 rounded-xl border shadow-sm group overflow-hidden p-0 transition-all duration-200 hover:shadow-lg hover:scale-[1.02]"[39m
+          [33mdata-slot[39m=[32m"card"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"relative aspect-video w-full overflow-hidden"[39m
+          [36m>[39m
+            [36m<img[39m
+              [33malt[39m=[32m"New Video 28"[39m
+              [33mclass[39m=[32m"object-cover transition-transform duration-200 group-hover:scale-105"[39m
+              [33msrc[39m=[32m"https://i.ytimg.com/vi/video28/mqdefault.jpg"[39m
+            [36m/>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"p-3 space-y-2"[39m
+          [36m>[...
+[90m [2m❯[22m waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:[2m163:27[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m86:33[22m[39m
+[36m [2m❯[22m src/components/discovery/__tests__/DiscoveryVideoGrid.test.tsx:[2m275:18[22m[39m
+    [90m273| [39m
+    [90m274| [39m    [90m// Should show first page of new videos (wait for effect to run)[39m
+    [90m275| [39m    [35mawait[39m screen[33m.[39m[34mfindByText[39m([32m'New Video 0'[39m)
+    [90m   | [39m                 [31m^[39m
+    [90m276| [39m    [34mexpect[39m(screen[33m.[39m[34mgetByText[39m([32m'New Video 0'[39m))[33m.[39m[34mtoBeInTheDocument[39m()
+    [90m277| [39m    [34mexpect[39m(screen[33m.[39m[34mqueryByText[39m([32m'New Video 24'[39m))[33m.[39mnot[33m.[39m[34mtoBeInTheDocument[39m()
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/components/discovery/__tests__/DiscoveryVideoGrid.test.tsx
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/components/discovery/__tests__/DiscoveryVideoGrid.test.tsx [2m([22m[2m18 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 2311[2mms[22m[39m
+     [32m✓[39m should render videos in responsive grid layout[32m 128[2mms[22m[39m
+     [32m✓[39m should render video cards for each video[32m 24[2mms[22m[39m
+     [32m✓[39m should sort videos by publishedAt descending (newest first)[32m 236[2mms[22m[39m
+     [32m✓[39m should display only 24 videos per page[32m 180[2mms[22m[39m
+     [32m✓[39m should show pagination when totalPages > 1[32m 46[2mms[22m[39m
+     [32m✓[39m should not show pagination when totalPages <= 1[32m 35[2mms[22m[39m
+     [32m✓[39m should navigate to next page and show correct videos[32m 131[2mms[22m[39m
+     [32m✓[39m should scroll to top on page change[32m 81[2mms[22m[39m
+     [32m✓[39m should render loading state with 24 skeletons[32m 21[2mms[22m[39m
+     [32m✓[39m should render loading state in grid layout[32m 17[2mms[22m[39m
+     [32m✓[39m should render empty state when no videos and not loading[32m 2[2mms[22m[39m
+     [32m✓[39m should not render pagination in empty state[32m 2[2mms[22m[39m
+     [32m✓[39m should pass focusAreas to video cards from focusAreaMap[32m 15[2mms[22m[39m
+     [32m✓[39m should handle missing focusAreaMap gracefully[32m 4[2mms[22m[39m
+     [32m✓[39m should handle focusAreaMap with no matching videos[32m 4[2mms[22m[39m
+     [32m✓[39m should maintain current page state across pagination[32m 144[2mms[22m[39m
+[31m     [31m×[31m should reset to page 1 when videos prop changes[39m[33m 1068[2mms[22m[39m
+     [32m✓[39m should calculate totalPages correctly[32m 170[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m17 passed[39m[22m[90m (18)[39m
+[2m   Start at [22m 09:05:16
+[2m   Duration [22m 5.06s[2m (transform 209ms, setup 199ms, import 925ms, tests 2.31s, environment 1.14s)[22m

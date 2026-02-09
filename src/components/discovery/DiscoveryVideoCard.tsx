@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { formatRelativeTime } from '@/lib/time-utils'
 
-interface DiscoveryVideo {
+export interface DiscoveryVideo {
   youtubeId: string
   title: string
   channelId: string
@@ -101,7 +101,7 @@ export function DiscoveryVideoCard({ video, className, isNew = false, focusAreas
 
 export function DiscoveryVideoCardSkeleton() {
   return (
-    <div className="overflow-hidden rounded-xl border bg-card">
+    <div className="overflow-hidden rounded-xl border bg-card" data-testid="discovery-video-card-skeleton">
       {/* Thumbnail skeleton */}
       <div className="aspect-video w-full animate-pulse bg-muted" />
 
