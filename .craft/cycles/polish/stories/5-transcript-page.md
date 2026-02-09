@@ -8,7 +8,7 @@ created: 2026-02-09
 updated: 2026-02-09
 priority: high
 chunks_total: 5
-chunks_complete: 0
+chunks_complete: 1
 ---
 
 # Story: Add Transcript Page for Non-YouTube Sources

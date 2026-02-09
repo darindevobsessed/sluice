@@ -1,11 +1,13 @@
-import { pgTable, serial, text, integer, timestamp, jsonb, vector, real, index, unique, boolean } from 'drizzle-orm/pg-core';
+import { pgTable, serial, text, integer, timestamp, jsonb, vector, real, index, unique, uniqueIndex, boolean } from 'drizzle-orm/pg-core'
+import { sql } from 'drizzle-orm'
 
 /**
  * Videos table - stores YouTube video metadata and transcripts
  */
 export const videos = pgTable('videos', {
   id: serial('id').primaryKey(),
-  youtubeId: text('youtube_id').notNull().unique(),
+  youtubeId: text('youtube_id'),
+  sourceType: text('source_type').notNull().default('youtube'),
   title: text('title').notNull(),
   channel: text('channel').notNull(),
   thumbnail: text('thumbnail'),
@@ -14,7 +16,9 @@ export const videos = pgTable('videos', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
   publishedAt: timestamp('published_at'), // nullable for existing videos
-});
+}, (table) => ({
+  youtubeIdUnique: uniqueIndex('youtube_id_unique').on(table.youtubeId).where(sql`${table.youtubeId} IS NOT NULL`),
+}));
 
 /**
  * Channels table - stores YouTube channel information for discovery

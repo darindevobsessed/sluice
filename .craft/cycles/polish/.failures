@@ -2753,3 +2753,326 @@ npm error
 npm error To see a list of scripts, run:
 npm error   npm run
 npm error A complete log of this run can be found in: /Users/darindrobinski/.npm/_logs/2026-02-09T18_13_56_615Z-debug-0.log
+---
+timestamp: "2026-02-09 12:23:00"
+story: "5-transcript-page"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 5 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/lib/db/__tests__/schema.test.ts[2m > [22mVideos table schema (nullable youtubeId + sourceType)[2m > [22mallows null youtubeId
+[31m[1mError[22m: Failed query: insert into "videos" ("id", "youtube_id", "title", "channel", "thumbnail", "duration", "transcript", "created_at", "updated_at", "published_at") values (default, $1, $2, $3, default, default, $4, default, default, default) returning "id", "youtube_id", "title", "channel", "thumbnail", "duration", "transcript", "created_at", "updated_at", "published_at"
+params: ,Non-YouTube Video,Manual Entry,Some text[39m
+[90m [2m❯[22m NodePgPreparedQuery.queryWithCache node_modules/drizzle-orm/pg-core/session.js:[2m41:15[22m[39m
+[90m [2m❯[22m node_modules/drizzle-orm/node-postgres/session.js:[2m117:22[22m[39m
+[36m [2m❯[22m src/lib/db/__tests__/schema.test.ts:[2m17:21[22m[39m
+    [90m 15| [39m
+    [90m 16| [39m    [90m// Should succeed: create video with null youtubeId[39m
+    [90m 17| [39m    [35mconst[39m [video] [33m=[39m [35mawait[39m db
+    [90m   | [39m                    [31m^[39m
+    [90m 18| [39m      [33m.[39m[34minsert[39m(schema[33m.[39mvideos)
+    [90m 19| [39m      [33m.[39m[34mvalues[39m({
+
+[31m[1mCaused by: error[22m: null value in column "youtube_id" of relation "videos" violates not-null constraint[39m
+[90m [2m❯[22m node_modules/pg-pool/index.js:[2m45:11[22m[39m
+[90m [2m❯[22m node_modules/drizzle-orm/node-postgres/session.js:[2m124:18[22m[39m
+[90m [2m❯[22m NodePgPreparedQuery.queryWithCache node_modules/drizzle-orm/pg-core/session.js:[2m39:16[22m[39m
+[90m [2m❯[22m node_modules/drizzle-orm/node-postgres/session.js:[2m117:22[22m[39m
+[36m [2m❯[22m src/lib/db/__tests__/schema.test.ts:[2m17:21[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[22m[39m
+[31m[1mSerialized Error:[22m[39m [90m{ length: 328, severity: 'ERROR', code: '23502', detail: 'Failing row contains (1663, null, Non-YouTube Video, Manual Entry, null, null, Some text, 2026-02-09 12:23:00.546295, 2026-02-09 12:23:00.546295, null).', hint: undefined, position: undefined, internalPosition: undefined, internalQuery: undefined, where: undefined, schema: 'public', table: 'videos', dataType: undefined, constraint: undefined, file: 'execMain.c', routine: 'ExecConstraints' }[39m
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/lib/db/__tests__/schema.test.ts[2m > [22mVideos table schema (nullable youtubeId + sourceType)[2m > [22mapplies default sourceType of youtube
+[31m[1mAssertionError[22m: expected undefined to be 'youtube' // Object.is equality[39m
+
+[32m- Expected:[39m 
+"youtube"
+
+[31m+ Received:[39m 
+undefined
+
+[36m [2m❯[22m src/lib/db/__tests__/schema.test.ts:[2m46:31[22m[39m
+    [90m 44| [39m
+    [90m 45| [39m    [34mexpect[39m(video)[33m.[39m[34mtoBeDefined[39m()
+    [90m 46| [39m    [34mexpect[39m(video[33m![39m[33m.[39msourceType)[33m.[39m[34mtoBe[39m([32m'youtube'[39m)
+    [90m   | [39m                              [31m^[39m
+    [90m 47| [39m  })
+    [90m 48| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/lib/db/__tests__/schema.test.ts[2m > [22mVideos table schema (nullable youtubeId + sourceType)[2m > [22mallows explicit sourceType
+[31m[1mError[22m: Failed query: insert into "videos" ("id", "youtube_id", "title", "channel", "thumbnail", "duration", "transcript", "created_at", "updated_at", "published_at") values (default, $1, $2, $3, default, default, $4, default, default, default) returning "id", "youtube_id", "title", "channel", "thumbnail", "duration", "transcript", "created_at", "updated_at", "published_at"
+params: ,Manual Video,Manual Channel,Manual transcript[39m
+[90m [2m❯[22m NodePgPreparedQuery.queryWithCache node_modules/drizzle-orm/pg-core/session.js:[2m41:15[22m[39m
+[90m [2m❯[22m node_modules/drizzle-orm/node-postgres/session.js:[2m117:22[22m[39m
+[36m [2m❯[22m src/lib/db/__tests__/schema.test.ts:[2m52:21[22m[39m
+    [90m 50| [39m    [35mconst[39m db [33m=[39m [34mgetTestDb[39m()
+    [90m 51| [39m
+    [90m 52| [39m    [35mconst[39m [video] [33m=[39m [35mawait[39m db
+    [90m   | [39m                    [31m^[39m
+    [90m 53| [39m      [33m.[39m[34minsert[39m(schema[33m.[39mvideos)
+    [90m 54| [39m      [33m.[39m[34mvalues[39m({
+
+[31m[1mCaused by: error[22m: null value in column "youtube_id" of relation "videos" violates not-null constraint[39m
+[90m [2m❯[22m node_modules/pg-pool/index.js:[2m45:11[22m[39m
+[90m [2m❯[22m node_modules/drizzle-orm/node-postgres/session.js:[2m124:18[22m[39m
+[90m [2m❯[22m NodePgPreparedQuery.queryWithCache node_modules/drizzle-orm/pg-core/session.js:[2m39:16[22m[39m
+[90m [2m❯[22m node_modules/drizzle-orm/node-postgres/session.js:[2m117:2
+
+... [240 characters truncated] ...
+
+ing row contains (1665, null, Manual Video, Manual Channel, null, null, Manual transcript, 2026-02-09 12:23:00.688448, 2026-02-09 12:23:00.688448, null).', hint: undefined, position: undefined, internalPosition: undefined, internalQuery: undefined, where: undefined, schema: 'public', table: 'videos', dataType: undefined, constraint: undefined, file: 'execMain.c', routine: 'ExecConstraints' }[39m
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/lib/db/__tests__/schema.test.ts[2m > [22mVideos table schema (nullable youtubeId + sourceType)[2m > [22menforces unique youtubeId when not null
+[31m[1mAssertionError[22m: expected [Function] to throw error matching /duplicate key/ but got 'Failed query: insert into "videos" ("…'[39m
+
+[32m- Expected:[39m 
+/duplicate key/
+
+[31m+ Received:[39m 
+"Failed query: insert into \"videos\" (\"id\", \"youtube_id\", \"title\", \"channel\", \"thumbnail\", \"duration\", \"transcript\", \"created_at\", \"updated_at\", \"published_at\") values (default, $1, $2, $3, default, default, $4, default, default, default)
+params: unique123,Video 2,Channel,Transcript"
+
+[36m [2m❯[22m src/lib/db/__tests__/schema.test.ts:[2m81:5[22m[39m
+    [90m 79| [39m
+    [90m 80| [39m    [90m// Second insert with same youtubeId should fail[39m
+    [90m 81| [39m    [35mawait[39m [34mexpect[39m(
+    [90m   | [39m    [31m^[39m
+    [90m 82| [39m      db
+    [90m 83| [39m        [33m.[39m[34minsert[39m(schema[33m.[39mvideos)
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/lib/db/__tests__/schema.test.ts[2m > [22mVideos table schema (nullable youtubeId + sourceType)[2m > [22mallows multiple null youtubeIds (partial unique index)
+[31m[1mError[22m: Failed query: insert into "videos" ("id", "youtube_id", "title", "channel", "thumbnail", "duration", "transcript", "created_at", "updated_at", "published_at") values (default, $1, $2, $3, default, default, $4, default, default, default) returning "id", "youtube_id", "title", "channel", "thumbnail", "duration", "transcript", "created_at", "updated_at", "published_at"
+params: ,Manual Video 1,Channel 1,Transcript 1[39m
+[90m [2m❯[22m NodePgPreparedQuery.queryWithCache node_modules/drizzle-orm/pg-core/session.js:[2m41:15[22m[39m
+[90m [2m❯[22m node_modules/drizzle-orm/node-postgres/session.js:[2m117:22[22m[39m
+[36m [2m❯[22m src/lib/db/__tests__/schema.test.ts:[2m97:22[22m[39m
+    [90m 95| [39m
+    [90m 96| [39m    [90m// First null youtubeId[39m
+    [90m 97| [39m    [35mconst[39m [video1] [33m=[39m [35mawait[39m db
+    [90m   | [39m                     [31m^[39m
+    [90m 98| [39m      [33m.[39m[34minsert[39m(schema[33m.[39mvideos)
+    [90m 99| [39m      [33m.[39m[34mvalues[39m({
+
+[31m[1mCaused by: error[22m: null value in column "youtube_id" of relation "videos" violates not-null constraint[39m
+[90m [2m❯[22m node_modules/pg-pool/index.js:[2m45:11[22m[39m
+[90m [2m❯[22m node_modules/drizzle-orm/node-postgres/session.js:[2m124:18[22m[39m
+[90m [2m❯[22m NodePgPreparedQuery.queryWithCache node_modules/drizzle-orm/pg-core/session.js:[2m39:16[22m[39m
+[90m [2m❯[22m node_modules/drizzle-orm/node-postgres/session.js:[2m117:22[22m[39m
+[36m [2m❯[22m src/lib/db/__tests__/schema.test.ts:[2m97:22[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[22m[39m
+[31m[1mSerialized Error:[22m[39m [90m{ length: 325, severity: 'ERROR', code: '23502', detail: 'Failing row contains (1668, null, Manual Video 1, Channel 1, null, null, Transcript 1, 2026-02-09 12:23:00.856011, 2026-02-09 12:23:00.856011, null).', hint: undefined, position: undefined, internalPosition: undefined, internalQuery: undefined, where: undefined, schema: 'public', table: 'videos', dataType: undefined, constraint: undefined, file: 'execMain.c', routine: 'ExecConstraints' }[39m
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/lib/db/__tests__/schema.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/lib/db/__tests__/schema.test.ts [2m([22m[2m5 tests[22m[2m | [22m[31m5 failed[39m[2m)[22m[33m 410[2mms[22m[39m
+[31m     [31m×[31m allows null youtubeId[39m[32m 103[2mms[22m[39m
+[31m     [31m×[31m applies default sourceType of youtube[39m[32m 76[2mms[22m[39m
+[31m     [31m×[31m allows explicit sourceType[39m[32m 61[2mms[22m[39m
+[31m     [31m×[31m enforces unique youtubeId when not null[39m[32m 75[2mms[22m[39m
+[31m     [31m×[31m allows multiple null youtubeIds (partial unique index)[39m[32m 92[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m5 failed[39m[22m[90m (5)[39m
+[2m   Start at [22m 12:22:58
+[2m   Duration [22m 2.32s[2m (transform 69ms, setup 145ms, import 539ms, tests 410ms, environment 864ms)[22m
+---
+timestamp: "2026-02-09 12:23:53"
+story: "5-transcript-page"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 5 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/lib/db/__tests__/schema.test.ts[2m > [22mVideos table schema (nullable youtubeId + sourceType)[2m > [22mallows null youtubeId
+[31m[1mError[22m: Failed query: insert into "videos" ("id", "youtube_id", "source_type", "title", "channel", "thumbnail", "duration", "transcript", "created_at", "updated_at", "published_at") values (default, $1, default, $2, $3, default, default, $4, default, default, default) returning "id", "youtube_id", "source_type", "title", "channel", "thumbnail", "duration", "transcript", "created_at", "updated_at", "published_at"
+params: ,Non-YouTube Video,Manual Entry,Some text[39m
+[90m [2m❯[22m NodePgPreparedQuery.queryWithCache node_modules/drizzle-orm/pg-core/session.js:[2m41:15[22m[39m
+[90m [2m❯[22m node_modules/drizzle-orm/node-postgres/session.js:[2m117:22[22m[39m
+[36m [2m❯[22m src/lib/db/__tests__/schema.test.ts:[2m17:21[22m[39m
+    [90m 15| [39m
+    [90m 16| [39m    [90m// Should succeed: create video with null youtubeId[39m
+    [90m 17| [39m    [35mconst[39m [video] [33m=[39m [35mawait[39m db
+    [90m   | [39m                    [31m^[39m
+    [90m 18| [39m      [33m.[39m[34minsert[39m(schema[33m.[39mvideos)
+    [90m 19| [39m      [33m.[39m[34mvalues[39m({
+
+[31m[1mCaused by: error[22m: column "source_type" of relation "videos" does not exist[39m
+[90m [2m❯[22m node_modules/pg-pool/index.js:[2m45:11[22m[39m
+[90m [2m❯[22m node_modules/drizzle-orm/node-postgres/session.js:[2m124:18[22m[39m
+[90m [2m❯[22m NodePgPreparedQuery.queryWithCache node_modules/drizzle-orm/pg-core/session.js:[2m39:16[22m[39m
+[90m [2m❯[22m node_modules/drizzle-orm/node-postgres/session.js:[2m117:22[22m[39m
+[36m [2m❯[22m src/lib/db/__tests__/schema.test.ts:[2m17:21[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[22m[39m
+[31m[1mSerialized Error:[22m[39m [90m{ length: 130, severity: 'ERROR', code: '42703', detail: undefined, hint: undefined, position: '43', internalPosition: undefined, internalQuery: undefined, where: undefined, schema: undefined, table: undefined, dataType: undefined, constraint: undefined, file: 'parse_target.c', routine: 'checkInsertTargets' }[39m
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/lib/db/__tests__/schema.test.ts[2m > [22mVideos table schema (nullable youtubeId + sourceType)[2m > [22mapplies default sourceType of youtube
+[31m[1mError[22m: Failed query: insert into "videos" ("id", "youtube_id", "source_type", "title", "channel", "thumbnail", "duration", "transcript", "created_at", "updated_at", "published_at") values (default, $1, default, $2, $3, default, default, $4, default, default, default) returning "id", "youtube_id", "source_type", "title", "channel", "thumbnail", "duration", "transcript", "created_at", "updated_at", "published_at"
+params: abc123,Test Video,Test Channel,Test transcript[39m
+[90m [2m❯[22m NodePgPreparedQuery.queryWithCache node_modules/drizzle-orm/pg-core/session.js:[2m41:15[22m[39m
+[90m [2m❯[22m node_modules/drizzle-orm/node-postgres/session.js:[2m117:22[22m[39m
+[36m [2m❯[22m src/lib/db/__tests__/schema.test.ts:[2m35:21[22m[39m
+    [90m 33| [39m
+    [90m 34| [39m    [90m// Insert without sourceType specified[39m
+    [90m 35| [39m    [35mconst[39m [video] [33m=[39m [35mawait[39m db
+    [90m   | [39m                    [31m^[39m
+    [90m 36| [39m      [33m.[39m[34minsert[39m(schema[33m.[39mvideos)
+    [90m 37| [39m      [33m.[39m[34mvalues[39m({
+
+[31m[1mCaused by: error[22m: column "source_type" of relation "videos" does not exist[39m
+[90m [2m❯[22m node_modules/pg-pool/index.js:[2m45:11[22m[39m
+[90m [2m❯[22m node_modules/drizzle-orm/node-postgres/session.js:[2m124:18[22m[39m
+[90m [2m❯[22m NodePgPreparedQuery.queryWithCache node_modules/drizzle-orm/pg-core/session.js:[2m39:16[22m[39m
+[90m [2m❯[22m node_modules/drizzle-orm/node-postgres/session.js:[2m117:22[22m[39m
+[36m [2m❯[22m src/lib/db/__tests__/schema.test.ts:[2m35:21[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[22m[39m
+[31m[1mSerialized Error:[22m[39m [90m{ length: 130, severity: 'ERROR', code: '42703', detail: undefined, hint: undefined, position: '43', internalPosition: undefined, internalQuery: undefined, where: undefined, schema: undefined, table: undefined, dataType: undefined, constraint: undefined, file: 'parse_target.c', routine: 'checkInsertTargets' }[39m
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/lib/db/__tests__/schema.test.ts[2m > [22mVideos table schema (nullable youtubeId + sourceType)[2m > [22mallows explicit sourceType
+[31m[1mError[22m: Failed query: insert into "videos" ("id", "youtube_id", "source_type", "title", "channel", "thumbnail", "duration", "transcript", "created_at", "updated_at", "published_at"
+
+... [2112 characters truncated] ...
+
+[22m: Failed query: insert into "videos" ("id", "youtube_id", "source_type", "title", "channel", "thumbnail", "duration", "transcript", "created_at", "updated_at", "published_at") values (default, $1, default, $2, $3, default, default, $4, default, default, default)
+params: unique123,Video 1,Channel,Transcript[39m
+[90m [2m❯[22m NodePgPreparedQuery.queryWithCache node_modules/drizzle-orm/pg-core/session.js:[2m41:15[22m[39m
+[36m [2m❯[22m src/lib/db/__tests__/schema.test.ts:[2m71:5[22m[39m
+    [90m 69| [39m
+    [90m 70| [39m    [90m// First insert succeeds[39m
+    [90m 71| [39m    [35mawait[39m db
+    [90m   | [39m    [31m^[39m
+    [90m 72| [39m      [33m.[39m[34minsert[39m(schema[33m.[39mvideos)
+    [90m 73| [39m      [33m.[39m[34mvalues[39m({
+
+[31m[1mCaused by: error[22m: column "source_type" of relation "videos" does not exist[39m
+[90m [2m❯[22m node_modules/pg-pool/index.js:[2m45:11[22m[39m
+[90m [2m❯[22m node_modules/drizzle-orm/node-postgres/session.js:[2m113:20[22m[39m
+[90m [2m❯[22m NodePgPreparedQuery.queryWithCache node_modules/drizzle-orm/pg-core/session.js:[2m39:16[22m[39m
+[36m [2m❯[22m src/lib/db/__tests__/schema.test.ts:[2m71:5[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[22m[39m
+[31m[1mSerialized Error:[22m[39m [90m{ length: 130, severity: 'ERROR', code: '42703', detail: undefined, hint: undefined, position: '43', internalPosition: undefined, internalQuery: undefined, where: undefined, schema: undefined, table: undefined, dataType: undefined, constraint: undefined, file: 'parse_target.c', routine: 'checkInsertTargets' }[39m
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/lib/db/__tests__/schema.test.ts[2m > [22mVideos table schema (nullable youtubeId + sourceType)[2m > [22mallows multiple null youtubeIds (partial unique index)
+[31m[1mError[22m: Failed query: insert into "videos" ("id", "youtube_id", "source_type", "title", "channel", "thumbnail", "duration", "transcript", "created_at", "updated_at", "published_at") values (default, $1, $2, $3, $4, default, default, $5, default, default, default) returning "id", "youtube_id", "source_type", "title", "channel", "thumbnail", "duration", "transcript", "created_at", "updated_at", "published_at"
+params: ,manual,Manual Video 1,Channel 1,Transcript 1[39m
+[90m [2m❯[22m NodePgPreparedQuery.queryWithCache node_modules/drizzle-orm/pg-core/session.js:[2m41:15[22m[39m
+[90m [2m❯[22m node_modules/drizzle-orm/node-postgres/session.js:[2m117:22[22m[39m
+[36m [2m❯[22m src/lib/db/__tests__/schema.test.ts:[2m97:22[22m[39m
+    [90m 95| [39m
+    [90m 96| [39m    [90m// First null youtubeId[39m
+    [90m 97| [39m    [35mconst[39m [video1] [33m=[39m [35mawait[39m db
+    [90m   | [39m                     [31m^[39m
+    [90m 98| [39m      [33m.[39m[34minsert[39m(schema[33m.[39mvideos)
+    [90m 99| [39m      [33m.[39m[34mvalues[39m({
+
+[31m[1mCaused by: error[22m: column "source_type" of relation "videos" does not exist[39m
+[90m [2m❯[22m node_modules/pg-pool/index.js:[2m45:11[22m[39m
+[90m [2m❯[22m node_modules/drizzle-orm/node-postgres/session.js:[2m124:18[22m[39m
+[90m [2m❯[22m NodePgPreparedQuery.queryWithCache node_modules/drizzle-orm/pg-core/session.js:[2m39:16[22m[39m
+[90m [2m❯[22m node_modules/drizzle-orm/node-postgres/session.js:[2m117:22[22m[39m
+[36m [2m❯[22m src/lib/db/__tests__/schema.test.ts:[2m97:22[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[22m[39m
+[31m[1mSerialized Error:[22m[39m [90m{ length: 130, severity: 'ERROR', code: '42703', detail: undefined, hint: undefined, position: '43', internalPosition: undefined, internalQuery: undefined, where: undefined, schema: undefined, table: undefined, dataType: undefined, constraint: undefined, file: 'parse_target.c', routine: 'checkInsertTargets' }[39m
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/lib/db/__tests__/schema.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/lib/db/__tests__/schema.test.ts [2m([22m[2m5 tests[22m[2m | [22m[31m5 failed[39m[2m)[22m[33m 526[2mms[22m[39m
+[31m     [31m×[31m allows null youtubeId[39m[32m 108[2mms[22m[39m
+[31m     [31m×[31m applies default sourceType of youtube[39m[32m 141[2mms[22m[39m
+[31m     [31m×[31m allows explicit sourceType[39m[32m 88[2mms[22m[39m
+[31m     [31m×[31m enforces unique youtubeId when not null[39m[32m 106[2mms[22m[39m
+[31m     [31m×[31m allows multiple null youtubeIds (partial unique index)[39m[32m 80[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m5 failed[39m[22m[90m (5)[39m
+[2m   Start at [22m 12:23:50
+[2m   Duration [22m 2.59s[2m (transform 82ms, setup 143ms, import 678ms, tests 526ms, environment 862ms)[22m
+---
+timestamp: "2026-02-09 12:26:07"
+story: "5-transcript-page"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/lib/db/__tests__/schema.test.ts[2m > [22mVideos table schema (nullable youtubeId + sourceType)[2m > [22menforces unique youtubeId when not null
+[31m[1mAssertionError[22m: expected [Function] to throw error matching /duplicate key/ but got 'Failed query: insert into "videos" ("…'[39m
+
+[32m- Expected:[39m 
+/duplicate key/
+
+[31m+ Received:[39m 
+"Failed query: insert into \"videos\" (\"id\", \"youtube_id\", \"source_type\", \"title\", \"channel\", \"thumbnail\", \"duration\", \"transcript\", \"created_at\", \"updated_at\", \"published_at\") values (default, $1, default, $2, $3, default, default, $4, default, default, default)
+params: unique123,Video 2,Channel,Transcript"
+
+[36m [2m❯[22m src/lib/db/__tests__/schema.test.ts:[2m81:5[22m[39m
+    [90m 79| [39m
+    [90m 80| [39m    [90m// Second insert with same youtubeId should fail[39m
+    [90m 81| [39m    [35mawait[39m [34mexpect[39m(
+    [90m   | [39m    [31m^[39m
+    [90m 82| [39m      db
+    [90m 83| [39m        [33m.[39m[34minsert[39m(schema[33m.[39mvideos)
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/lib/db/__tests__/schema.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/lib/db/__tests__/schema.test.ts [2m([22m[2m5 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 374[2mms[22m[39m
+     [32m✓[39m allows null youtubeId[32m 96[2mms[22m[39m
+     [32m✓[39m applies default sourceType of youtube[32m 60[2mms[22m[39m
+     [32m✓[39m allows explicit sourceType[32m 63[2mms[22m[39m
+[31m     [31m×[31m enforces unique youtubeId when not null[39m[32m 68[2mms[22m[39m
+     [32m✓[39m allows multiple null youtubeIds (partial unique index)[32m 85[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m4 passed[39m[22m[90m (5)[39m
+[2m   Start at [22m 12:26:05
+[2m   Duration [22m 2.16s[2m (transform 63ms, setup 120ms, import 541ms, tests 374ms, environment 805ms)[22m
+---
+timestamp: "2026-02-09 12:58:21"
+story: "5-transcript-page"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
