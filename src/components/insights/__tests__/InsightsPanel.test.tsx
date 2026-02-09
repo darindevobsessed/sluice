@@ -25,6 +25,7 @@ const mockExtractionResult: ExtractionResult = {
     longTerm: ['Do this later'],
     resources: [{ name: 'Resource', description: 'Description' }],
   },
+  knowledgePrompt: 'This video teaches specific techniques for optimizing database queries. Key techniques include: using EXPLAIN ANALYZE to identify slow queries, adding appropriate indexes on foreign key columns, and using connection pooling with a max of 20 connections. The presenter demonstrates these with concrete examples from a production Rails app.',
   claudeCode: {
     applicable: false,
     skills: [],
@@ -263,6 +264,125 @@ describe('InsightsPanel', () => {
       await user.click(button);
 
       expect(onExtract).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('Knowledge Prompt Section', () => {
+    it('shows knowledge prompt section when knowledgePrompt is present', () => {
+      const onExtract = vi.fn();
+      render(
+        <InsightsPanel
+          status="done"
+          extractionData={mockExtractionResult}
+          sectionStatuses={{
+            summary: 'done',
+            insights: 'done',
+            actions: 'done',
+            claudeCode: 'done',
+            knowledgePrompt: 'done',
+          }}
+          onExtract={onExtract}
+        />
+      );
+
+      expect(screen.getByText('Knowledge Prompt')).toBeInTheDocument();
+    });
+
+    it('displays knowledge prompt content', () => {
+      const onExtract = vi.fn();
+      render(
+        <InsightsPanel
+          status="done"
+          extractionData={mockExtractionResult}
+          sectionStatuses={{
+            summary: 'done',
+            insights: 'done',
+            actions: 'done',
+            claudeCode: 'done',
+            knowledgePrompt: 'done',
+          }}
+          onExtract={onExtract}
+        />
+      );
+
+      expect(screen.getByText(/This video teaches specific techniques/i)).toBeInTheDocument();
+    });
+
+    it('does not show knowledge prompt section when knowledgePrompt is undefined', () => {
+      const onExtract = vi.fn();
+      const dataWithoutKnowledgePrompt: ExtractionResult = {
+        ...mockExtractionResult,
+        knowledgePrompt: undefined,
+      };
+
+      render(
+        <InsightsPanel
+          status="done"
+          extractionData={dataWithoutKnowledgePrompt}
+          sectionStatuses={{
+            summary: 'done',
+            insights: 'done',
+            actions: 'done',
+            claudeCode: 'done',
+            knowledgePrompt: 'done',
+          }}
+          onExtract={onExtract}
+        />
+      );
+
+      expect(screen.queryByText('Knowledge Prompt')).not.toBeInTheDocument();
+    });
+
+    it('shows working status during streaming when knowledge prompt is being generated', () => {
+      const onExtract = vi.fn();
+      const partialData: Partial<ExtractionResult> = {
+        ...mockExtractionResult,
+        knowledgePrompt: 'This video teaches',
+      };
+
+      render(
+        <InsightsPanel
+          status="streaming"
+          extractionData={partialData}
+          sectionStatuses={{
+            summary: 'done',
+            insights: 'done',
+            actions: 'done',
+            claudeCode: 'done',
+            knowledgePrompt: 'working',
+          }}
+          onExtract={onExtract}
+        />
+      );
+
+      expect(screen.getByText('Knowledge Prompt')).toBeInTheDocument();
+      // Check for working status indicator
+      const section = screen.getByText('Knowledge Prompt').closest('div');
+      expect(section).toBeInTheDocument();
+    });
+
+    it('shows pending status when knowledge prompt has not started yet', () => {
+      const onExtract = vi.fn();
+      const partialData: Partial<ExtractionResult> = {
+        summary: mockExtractionResult.summary,
+      };
+
+      render(
+        <InsightsPanel
+          status="streaming"
+          extractionData={partialData}
+          sectionStatuses={{
+            summary: 'done',
+            insights: 'working',
+            actions: 'pending',
+            claudeCode: 'pending',
+            knowledgePrompt: 'pending',
+          }}
+          onExtract={onExtract}
+        />
+      );
+
+      expect(screen.getByText('Knowledge Prompt')).toBeInTheDocument();
     });
   });
 });

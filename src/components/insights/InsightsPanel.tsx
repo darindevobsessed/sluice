@@ -1,6 +1,6 @@
 'use client';
 
-import { Sparkles, FileText, Lightbulb, CheckSquare, AlertCircle, X, WifiOff, Loader2 } from 'lucide-react';
+import { Sparkles, FileText, Lightbulb, CheckSquare, AlertCircle, X, WifiOff, Loader2, Brain } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { InsightSection } from './InsightSection';
 import { ClaudeCodeSection } from './ClaudeCodeSection';
@@ -16,6 +16,7 @@ interface InsightsPanelProps {
     insights: SectionStatus;
     actions: SectionStatus;
     claudeCode: SectionStatus;
+    knowledgePrompt: SectionStatus;
   };
   error?: string;
   onExtract: () => void;
@@ -113,7 +114,7 @@ export function InsightsPanel({
   }
 
   // Use provided section statuses or fallback to simple logic
-  const getSectionStatus = (section: 'summary' | 'insights' | 'actions' | 'claudeCode') => {
+  const getSectionStatus = (section: 'summary' | 'insights' | 'actions' | 'claudeCode' | 'knowledgePrompt') => {
     if (sectionStatuses) {
       return sectionStatuses[section];
     }
@@ -158,7 +159,7 @@ export function InsightsPanel({
 
   // Calculate progress for streaming state
   const getProgress = () => {
-    if (!sectionStatuses) return { done: 0, total: 4 };
+    if (!sectionStatuses) return { done: 0, total: 5 };
     const statuses = Object.values(sectionStatuses);
     const done = statuses.filter(s => s === 'done').length;
     return { done, total: statuses.length };
@@ -215,6 +216,16 @@ export function InsightsPanel({
           status={getSectionStatus('actions')}
           content={getActionsContent()}
         />
+
+        {/* Knowledge Prompt Section - show during streaming or if present */}
+        {(status === 'streaming' || extractionData?.knowledgePrompt) && (
+          <InsightSection
+            title="Knowledge Prompt"
+            icon={Brain}
+            status={getSectionStatus('knowledgePrompt')}
+            content={extractionData?.knowledgePrompt || ''}
+          />
+        )}
 
         {/* Claude Code Section - only if applicable */}
         {extractionData?.claudeCode?.applicable && (

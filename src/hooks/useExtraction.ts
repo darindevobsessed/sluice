@@ -13,6 +13,7 @@ export interface ExtractionState {
     insights: SectionStatus
     actions: SectionStatus
     claudeCode: SectionStatus
+    knowledgePrompt: SectionStatus
   }
   partial: Partial<ExtractionResult>
   error: string | null
@@ -41,6 +42,7 @@ const initialState: ExtractionState = {
     insights: 'pending',
     actions: 'pending',
     claudeCode: 'pending',
+    knowledgePrompt: 'pending',
   },
   partial: {},
   error: null,
@@ -84,6 +86,7 @@ export function useExtraction({
               insights: 'done',
               actions: 'done',
               claudeCode: 'done',
+              knowledgePrompt: 'done',
             },
             partial: data.extraction,
             error: null,
