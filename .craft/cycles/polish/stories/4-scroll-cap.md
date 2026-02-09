@@ -1,14 +1,14 @@
 ---
 name: transcript-scroll-cap
 title: Cap Transcript Textarea Height with Inner Scroll
-status: active
+status: complete
 cycle: polish
 story_number: 4
 created: 2026-02-09
 updated: 2026-02-09
 priority: high
 chunks_total: 1
-chunks_complete: 0
+chunks_complete: 1
 ---
 
 # Story: Cap Transcript Textarea Height with Inner Scroll

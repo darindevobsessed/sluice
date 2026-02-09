@@ -1,7 +1,7 @@
 ---
 name: add-transcript-page
 title: Add Transcript Page for Non-YouTube Sources
-status: ready
+status: active
 cycle: polish
 story_number: 5
 created: 2026-02-09

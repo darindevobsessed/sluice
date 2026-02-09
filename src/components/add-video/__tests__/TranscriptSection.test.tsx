@@ -97,4 +97,19 @@ describe('TranscriptSection', () => {
 
     expect(screen.getByText(/11 characters?/i)).toBeInTheDocument();
   });
+
+  it('applies max height and overflow classes to textarea for long content scrolling', () => {
+    render(<TranscriptSection {...defaultProps} />);
+
+    const textarea = screen.getByRole('textbox');
+
+    // Verify existing min-height class
+    expect(textarea).toHaveClass('min-h-[300px]');
+
+    // Verify new max-height class (caps growth at 500px)
+    expect(textarea).toHaveClass('max-h-[500px]');
+
+    // Verify overflow scroll class (enables inner scrolling)
+    expect(textarea).toHaveClass('overflow-y-auto');
+  });
 });

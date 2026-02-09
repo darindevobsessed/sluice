@@ -75,7 +75,7 @@ export function TranscriptSection({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder="Paste the full video transcript here..."
-        className="min-h-[300px] text-base leading-relaxed"
+        className="min-h-[300px] max-h-[500px] overflow-y-auto text-base leading-relaxed"
         disabled={isFetching}
       />
 

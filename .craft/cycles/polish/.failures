@@ -2690,3 +2690,66 @@ npm error
 npm error To see a list of scripts, run:
 npm error   npm run
 npm error A complete log of this run can be found in: /Users/darindrobinski/.npm/_logs/2026-02-09T15_52_16_596Z-debug-0.log
+---
+timestamp: "2026-02-09 12:13:38"
+story: "4-scroll-cap"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/components/add-video/__tests__/TranscriptSection.test.tsx[2m > [22mTranscriptSection[2m > [22mapplies max height and overflow classes to textarea for long content scrolling
+[31m[1mError[22m: [2mexpect([22m[31melement[31m[2m).toHaveClass([22m[32m[32m"max-h-[500px]"[32m[31m[2m)[22m
+
+Expected the element to have class:
+[32m  max-h-[500px][31m
+Received:
+[31m  border-input placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 flex field-sizing-content w-full rounded-md border bg-transparent px-3 py-2 shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 md:text-sm min-h-[300px] text-base leading-relaxed[31m[39m
+[36m [2m❯[22m src/components/add-video/__tests__/TranscriptSection.test.tsx:[2m110:22[22m[39m
+    [90m108| [39m
+    [90m109| [39m    [90m// Verify new max-height class (caps growth at 500px)[39m
+    [90m110| [39m    [34mexpect[39m(textarea)[33m.[39m[34mtoHaveClass[39m([32m'max-h-[500px]'[39m)[33m;[39m
+    [90m   | [39m                     [31m^[39m
+    [90m111| [39m
+    [90m112| [39m    [90m// Verify overflow scroll class (enables inner scrolling)[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run TranscriptSection.test.tsx
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/components/add-video/__tests__/TranscriptSection.test.tsx [2m([22m[2m10 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 444[2mms[22m[39m
+     [32m✓[39m renders textarea with value and change handler[32m 263[2mms[22m[39m
+     [32m✓[39m shows loading spinner when isFetching is true[32m 9[2mms[22m[39m
+     [32m✓[39m shows auto-fetched badge when source is auto[32m 8[2mms[22m[39m
+     [32m✓[39m shows error alert with retry button when fetchError exists[32m 38[2mms[22m[39m
+     [32m✓[39m calls onRetryFetch when retry button is clicked[32m 50[2mms[22m[39m
+     [32m✓[39m collapses instructions when source is auto[32m 15[2mms[22m[39m
+     [32m✓[39m shows expanded instructions when source is manual or null[32m 14[2mms[22m[39m
+     [32m✓[39m disables textarea when fetching[32m 14[2mms[22m[39m
+     [32m✓[39m shows character count[32m 8[2mms[22m[39m
+[31m     [31m×[31m applies max height and overflow classes to textarea for long content scrolling[39m[32m 23[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m9 passed[39m[22m[90m (10)[39m
+[2m   Start at [22m 12:13:32
+[2m   Duration [22m 5.00s[2m (transform 149ms, setup 354ms, import 1.42s, tests 444ms, environment 2.15s)[22m
+---
+timestamp: "2026-02-09 12:13:56"
+story: "4-scroll-cap"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+npm error Missing script: "typecheck"
+npm error
+npm error To see a list of scripts, run:
+npm error   npm run
+npm error A complete log of this run can be found in: /Users/darindrobinski/.npm/_logs/2026-02-09T18_13_56_615Z-debug-0.log
