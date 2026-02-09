@@ -282,6 +282,33 @@ describe('buildExtractionPrompt', () => {
     expect(result).toContain('This is the transcript.')
   })
 
+  it('includes knowledgePrompt field in the JSON schema', () => {
+    const video = {
+      title: 'Test Video',
+      channel: 'Test Channel',
+      transcript: 'This is the transcript.',
+    }
+
+    const result = buildExtractionPrompt(video)
+
+    expect(result).toContain('"knowledgePrompt"')
+  })
+
+  it('includes instructions for generating knowledge transfer prompt', () => {
+    const video = {
+      title: 'Test Video',
+      channel: 'Test Channel',
+      transcript: 'This is the transcript.',
+    }
+
+    const result = buildExtractionPrompt(video)
+
+    expect(result).toContain('knowledge transfer prompt')
+    expect(result).toContain('teaching another AI assistant')
+    expect(result).toContain('specific techniques')
+    expect(result).toContain('act on this knowledge immediately')
+  })
+
   it('includes instructions for content classification', () => {
     const video = {
       title: 'Any Video',

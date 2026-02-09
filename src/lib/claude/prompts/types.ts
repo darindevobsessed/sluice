@@ -17,6 +17,7 @@ export interface ExtractionResult {
     longTerm: string[]
     resources: Array<{ name: string; description: string }>
   }
+  knowledgePrompt?: string
   claudeCode: {
     applicable: boolean
     skills: ClaudeSkill[]
