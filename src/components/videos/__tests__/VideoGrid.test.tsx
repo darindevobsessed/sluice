@@ -22,6 +22,7 @@ const mockVideos: Video[] = [
   {
     id: 1,
     youtubeId: 'abc123',
+    sourceType: 'youtube',
     title: 'React Tutorial',
     channel: 'Fireship',
     thumbnail: 'https://i.ytimg.com/vi/abc123/hqdefault.jpg',
@@ -34,6 +35,7 @@ const mockVideos: Video[] = [
   {
     id: 2,
     youtubeId: 'def456',
+    sourceType: 'youtube',
     title: 'TypeScript Tips',
     channel: 'ThePrimeagen',
     thumbnail: 'https://i.ytimg.com/vi/def456/hqdefault.jpg',

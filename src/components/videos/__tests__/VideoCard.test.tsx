@@ -20,6 +20,7 @@ vi.mock('next/link', () => ({
 const mockVideo = {
   id: 1,
   youtubeId: 'abc123',
+  sourceType: 'youtube',
   title: 'React Tutorial for Beginners',
   channel: 'Fireship',
   thumbnail: 'https://i.ytimg.com/vi/abc123/hqdefault.jpg',

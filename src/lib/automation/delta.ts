@@ -1,5 +1,6 @@
 import { db as defaultDb } from '@/lib/db'
 import { videos } from '@/lib/db/schema'
+import { isNotNull } from 'drizzle-orm'
 import type { RSSVideo } from './types'
 
 /**
@@ -11,9 +12,10 @@ export async function findNewVideos(
 ): Promise<RSSVideo[]> {
   if (rssVideos.length === 0) return []
 
-  // Get existing youtubeIds from database
+  // Get existing youtubeIds from database (filter out null values)
   const existing = await dbInstance.select({ youtubeId: videos.youtubeId })
     .from(videos)
+    .where(isNotNull(videos.youtubeId))
 
   const existingIds = new Set(existing.map(v => v.youtubeId))
 

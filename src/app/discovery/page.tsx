@@ -88,7 +88,7 @@ export default function Discovery() {
       const youtubeIdMap: Record<string, { id: number; name: string; color: string }[]> = {}
       for (const video of bankData.videos) {
         const areas = bankData.focusAreaMap[video.id]
-        if (areas && areas.length > 0) {
+        if (areas && areas.length > 0 && video.youtubeId) {
           youtubeIdMap[video.youtubeId] = areas.map(fa => ({
             id: fa.id,
             name: fa.name,

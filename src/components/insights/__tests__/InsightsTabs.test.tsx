@@ -50,6 +50,7 @@ vi.mock('@/lib/agent/connection', () => {
 const mockVideo: Video = {
   id: 1,
   youtubeId: 'test123',
+  sourceType: 'youtube',
   title: 'Test Video',
   channel: 'Test Channel',
   thumbnail: 'https://example.com/thumb.jpg',

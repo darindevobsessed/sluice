@@ -56,10 +56,12 @@ describe('findNewVideos', () => {
 
     // Mock database returning video1 and video2 as existing
     mockDb.select.mockReturnValue({
-      from: vi.fn().mockResolvedValue([
-        { youtubeId: 'video1' },
-        { youtubeId: 'video2' },
-      ]),
+      from: vi.fn().mockReturnValue({
+        where: vi.fn().mockResolvedValue([
+          { youtubeId: 'video1' },
+          { youtubeId: 'video2' },
+        ]),
+      }),
     })
 
     const newVideos = await findNewVideos(rssVideos, mockDb as unknown as typeof import('@/lib/db').db)
@@ -90,7 +92,9 @@ describe('findNewVideos', () => {
 
     // Mock database returning no existing videos
     mockDb.select.mockReturnValue({
-      from: vi.fn().mockResolvedValue([]),
+      from: vi.fn().mockReturnValue({
+        where: vi.fn().mockResolvedValue([]),
+      }),
     })
 
     const newVideos = await findNewVideos(rssVideos, mockDb as unknown as typeof import('@/lib/db').db)
@@ -113,9 +117,11 @@ describe('findNewVideos', () => {
 
     // Mock database returning all videos as existing
     mockDb.select.mockReturnValue({
-      from: vi.fn().mockResolvedValue([
-        { youtubeId: 'video1' },
-      ]),
+      from: vi.fn().mockReturnValue({
+        where: vi.fn().mockResolvedValue([
+          { youtubeId: 'video1' },
+        ]),
+      }),
     })
 
     const newVideos = await findNewVideos(rssVideos, mockDb as unknown as typeof import('@/lib/db').db)
