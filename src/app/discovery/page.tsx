@@ -1,13 +1,12 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { usePageTitle } from '@/components/layout/PageTitleContext'
 import { Button } from '@/components/ui/button'
 import { RefreshCw } from 'lucide-react'
 import { FollowChannelInput } from '@/components/discovery/FollowChannelInput'
-import { ChannelSection } from '@/components/discovery/ChannelSection'
-import { CatchUpSection } from '@/components/discovery/CatchUpSection'
-import { SimilarCreatorsSection } from '@/components/discovery/SimilarCreatorsSection'
+import { DiscoveryVideoGrid } from '@/components/discovery/DiscoveryVideoGrid'
+import type { DiscoveryVideo } from '@/components/discovery/DiscoveryVideoCard'
 
 interface Channel {
   id: number
@@ -21,17 +20,94 @@ interface Channel {
   createdAt: Date
 }
 
+interface BankVideo {
+  id: number
+  youtubeId: string
+  title: string
+  channel: string
+  transcript: string
+  thumbnail: string | null
+  publishedAt: Date | null
+  createdAt: Date
+}
+
+interface FocusArea {
+  id: number
+  name: string
+  color: string | null
+}
+
+interface VideosAPIResponse {
+  videos: BankVideo[]
+  stats: Record<string, unknown>
+  focusAreaMap: Record<number, FocusArea[]>
+}
+
 export default function Discovery() {
   const { setPageTitle } = usePageTitle()
   const [channels, setChannels] = useState<Channel[]>([])
+  const [discoveryVideos, setDiscoveryVideos] = useState<DiscoveryVideo[]>([])
+  const [focusAreaMap, setFocusAreaMap] = useState<Record<string, { id: number; name: string; color: string }[]>>({})
   const [isLoading, setIsLoading] = useState(true)
+  const [isLoadingVideos, setIsLoadingVideos] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [refreshTrigger, setRefreshTrigger] = useState(0)
 
   useEffect(() => {
     setPageTitle({ title: 'Discovery' })
   }, [setPageTitle])
 
+  // Fetch videos and focus area map
+  const fetchVideos = useCallback(async () => {
+    setIsLoadingVideos(true)
+    try {
+      // Fetch all discovery videos
+      const videosResponse = await fetch('/api/channels/videos')
+
+      if (!videosResponse.ok) {
+        console.error('Failed to fetch discovery videos')
+        setDiscoveryVideos([])
+        setFocusAreaMap({})
+        return
+      }
+
+      const videos: DiscoveryVideo[] = await videosResponse.json()
+      setDiscoveryVideos(videos)
+
+      // Fetch bank videos to get focus area map
+      const bankResponse = await fetch('/api/videos')
+
+      if (!bankResponse.ok) {
+        console.error('Failed to fetch bank videos')
+        setFocusAreaMap({})
+        return
+      }
+
+      const bankData: VideosAPIResponse = await bankResponse.json()
+
+      // Remap focusAreaMap from DB id to youtubeId
+      const youtubeIdMap: Record<string, { id: number; name: string; color: string }[]> = {}
+      for (const video of bankData.videos) {
+        const areas = bankData.focusAreaMap[video.id]
+        if (areas && areas.length > 0) {
+          youtubeIdMap[video.youtubeId] = areas.map(fa => ({
+            id: fa.id,
+            name: fa.name,
+            color: fa.color ?? '',
+          }))
+        }
+      }
+
+      setFocusAreaMap(youtubeIdMap)
+    } catch (err) {
+      console.error('Failed to fetch videos:', err)
+      setDiscoveryVideos([])
+      setFocusAreaMap({})
+    } finally {
+      setIsLoadingVideos(false)
+    }
+  }, [])
+
+  // Initial load: fetch channels
   useEffect(() => {
     const fetchChannels = async () => {
       try {
@@ -44,6 +120,11 @@ export default function Discovery() {
         }
 
         setChannels(data)
+
+        // If channels exist, fetch videos
+        if (Array.isArray(data) && data.length > 0) {
+          await fetchVideos()
+        }
       } catch {
         setError('Failed to load channels')
       } finally {
@@ -52,38 +133,28 @@ export default function Discovery() {
     }
 
     fetchChannels()
-  }, [])
+  }, [fetchVideos])
 
-  const handleChannelFollowed = (newChannel: Channel) => {
+  const handleChannelFollowed = async (newChannel: Channel) => {
     setChannels((prev) => [newChannel, ...prev])
+    // Refetch videos after following a new channel
+    await fetchVideos()
   }
 
-  const handleUnfollow = async (channelId: number) => {
-    try {
-      const response = await fetch(`/api/channels/${channelId}`, {
-        method: 'DELETE',
-      })
-
-      if (!response.ok) {
-        console.error('Failed to unfollow channel')
-        return
-      }
-
-      // Remove from local state
-      setChannels((prev) => prev.filter((ch) => ch.id !== channelId))
-    } catch (err) {
-      console.error('Failed to unfollow channel:', err)
-    }
-  }
-
-  const handleRefresh = () => {
-    setRefreshTrigger((prev) => prev + 1)
+  const handleRefresh = async () => {
+    await fetchVideos()
   }
 
   if (isLoading) {
+    // Show skeleton grid while loading initial data
     return (
-      <div className="p-6">
-        <p className="text-muted-foreground">Loading channels...</p>
+      <div className="p-4 sm:p-6 space-y-6">
+        <div className="flex flex-col sm:flex-row items-start gap-3">
+          <div className="flex-1 w-full">
+            <div className="h-10 w-full animate-pulse rounded bg-muted" />
+          </div>
+        </div>
+        <DiscoveryVideoGrid videos={[]} isLoading={true} />
       </div>
     )
   }
@@ -117,12 +188,7 @@ export default function Discovery() {
         )}
       </div>
 
-      {/* Catch-up section - only when channels exist */}
-      {channels.length > 0 && (
-        <CatchUpSection />
-      )}
-
-      {/* Channel sections */}
+      {/* Empty state or video grid */}
       {channels.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-12 text-center">
           <div className="max-w-md space-y-4">
@@ -141,19 +207,11 @@ export default function Discovery() {
           </div>
         </div>
       ) : (
-        <div className="space-y-8">
-          {channels.map((channel) => (
-            <ChannelSection
-              key={channel.id}
-              channel={channel}
-              onUnfollow={handleUnfollow}
-              refreshTrigger={refreshTrigger}
-            />
-          ))}
-
-          {/* Discover Similar Creators section */}
-          <SimilarCreatorsSection />
-        </div>
+        <DiscoveryVideoGrid
+          videos={discoveryVideos}
+          isLoading={isLoadingVideos}
+          focusAreaMap={focusAreaMap}
+        />
       )}
     </div>
   )
