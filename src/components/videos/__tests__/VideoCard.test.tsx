@@ -77,6 +77,13 @@ describe('VideoCard', () => {
     // Should show formatted date - timezone independent check
     expect(screen.getByText(/Jan \d{1,2}, 2026/)).toBeInTheDocument();
   });
+
+  it('handles null thumbnail with fallback message', () => {
+    const noThumbnailVideo = { ...mockVideo, thumbnail: null };
+    render(<VideoCard video={noThumbnailVideo} />);
+    expect(screen.getByText('No thumbnail')).toBeInTheDocument();
+    expect(screen.getByText('React Tutorial for Beginners')).toBeInTheDocument();
+  });
 });
 
 describe('VideoCardSkeleton', () => {
