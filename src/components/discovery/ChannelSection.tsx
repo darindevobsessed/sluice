@@ -133,7 +133,11 @@ export function ChannelSection({ channel, onUnfollow, refreshTrigger }: ChannelS
         ) : (
           <div className="flex gap-4">
             {videos.map((video) => (
-              <DiscoveryVideoCard key={video.youtubeId} video={video} />
+              <DiscoveryVideoCard
+                key={video.youtubeId}
+                video={video}
+                className="min-w-[240px] snap-start shrink-0"
+              />
             ))}
           </div>
         )}

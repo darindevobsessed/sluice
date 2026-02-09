@@ -22,9 +22,10 @@ interface DiscoveryVideoCardProps {
   video: DiscoveryVideo
   className?: string
   isNew?: boolean
+  focusAreas?: { id: number; name: string; color: string }[]
 }
 
-export function DiscoveryVideoCard({ video, className, isNew = false }: DiscoveryVideoCardProps) {
+export function DiscoveryVideoCard({ video, className, isNew = false, focusAreas }: DiscoveryVideoCardProps) {
   const publishedDate = new Date(video.publishedAt)
   const relativeTime = formatRelativeTime(publishedDate)
   const thumbnailUrl = `https://i.ytimg.com/vi/${video.youtubeId}/mqdefault.jpg`
@@ -33,7 +34,7 @@ export function DiscoveryVideoCard({ video, className, isNew = false }: Discover
   return (
     <Card
       className={cn(
-        'group overflow-hidden p-0 transition-all duration-200 hover:shadow-lg hover:scale-[1.02] min-w-[240px] snap-start shrink-0',
+        'group overflow-hidden p-0 transition-all duration-200 hover:shadow-lg hover:scale-[1.02]',
         className
       )}
     >
@@ -60,6 +61,17 @@ export function DiscoveryVideoCard({ video, className, isNew = false }: Discover
         <p className="text-xs text-muted-foreground">
           {relativeTime}
         </p>
+
+        {/* Focus area badges */}
+        {focusAreas && focusAreas.length > 0 && (
+          <div className="flex flex-wrap gap-1">
+            {focusAreas.map((fa) => (
+              <Badge key={fa.id} variant="secondary" className="text-[10px] px-1.5 py-0">
+                {fa.name}
+              </Badge>
+            ))}
+          </div>
+        )}
 
         {/* Action: Add to Bank or In Bank badge */}
         {video.inBank ? (
@@ -89,7 +101,7 @@ export function DiscoveryVideoCard({ video, className, isNew = false }: Discover
 
 export function DiscoveryVideoCardSkeleton() {
   return (
-    <div className="overflow-hidden rounded-xl border bg-card min-w-[240px] snap-start shrink-0">
+    <div className="overflow-hidden rounded-xl border bg-card">
       {/* Thumbnail skeleton */}
       <div className="aspect-video w-full animate-pulse bg-muted" />
 

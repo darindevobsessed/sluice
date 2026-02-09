@@ -65,6 +65,68 @@ describe('DiscoveryVideoCard', () => {
     const card = container.querySelector('[data-slot="card"]')
     expect(card).toHaveClass('overflow-hidden')
   })
+
+  it('should not have scroll classes by default', () => {
+    const { container } = render(<DiscoveryVideoCard video={mockVideo} />)
+    const card = container.querySelector('[data-slot="card"]')
+    expect(card).not.toHaveClass('min-w-[240px]')
+    expect(card).not.toHaveClass('snap-start')
+    expect(card).not.toHaveClass('shrink-0')
+  })
+
+  it('should accept custom className prop', () => {
+    const { container } = render(
+      <DiscoveryVideoCard video={mockVideo} className="min-w-[240px] snap-start shrink-0" />
+    )
+    const card = container.querySelector('[data-slot="card"]')
+    expect(card).toHaveClass('min-w-[240px]')
+    expect(card).toHaveClass('snap-start')
+    expect(card).toHaveClass('shrink-0')
+  })
+
+  it('should render focus area badges when provided', () => {
+    const focusAreas = [
+      { id: 1, name: 'AI', color: '#FF0000' },
+      { id: 2, name: 'Web Dev', color: '#00FF00' },
+    ]
+    render(<DiscoveryVideoCard video={mockVideo} focusAreas={focusAreas} />)
+    expect(screen.getByText('AI')).toBeInTheDocument()
+    expect(screen.getByText('Web Dev')).toBeInTheDocument()
+  })
+
+  it('should not render focus area badges when not provided', () => {
+    render(<DiscoveryVideoCard video={mockVideo} />)
+    // Should not have a .flex.flex-wrap.gap-1 container for badges
+    const { container } = render(<DiscoveryVideoCard video={mockVideo} />)
+    const badgeContainer = container.querySelector('.flex.flex-wrap.gap-1')
+    expect(badgeContainer).not.toBeInTheDocument()
+  })
+
+  it('should not render focus area badges when empty array provided', () => {
+    const { container } = render(<DiscoveryVideoCard video={mockVideo} focusAreas={[]} />)
+    const badgeContainer = container.querySelector('.flex.flex-wrap.gap-1')
+    expect(badgeContainer).not.toBeInTheDocument()
+  })
+
+  it('should render focus area badges below the date', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2024-01-15T12:00:00Z'))
+
+    const focusAreas = [{ id: 1, name: 'AI', color: '#FF0000' }]
+    const { container } = render(<DiscoveryVideoCard video={mockVideo} focusAreas={focusAreas} />)
+
+    // Find the date element
+    const dateElement = screen.getByText('5d ago')
+    // Find the badge
+    const badge = screen.getByText('AI')
+
+    // Badge should be rendered after date in DOM order
+    const datePosition = Array.from(container.querySelectorAll('*')).indexOf(dateElement.closest('p')!)
+    const badgePosition = Array.from(container.querySelectorAll('*')).indexOf(badge.closest('div')!)
+    expect(badgePosition).toBeGreaterThan(datePosition)
+
+    vi.useRealTimers()
+  })
 })
 
 describe('DiscoveryVideoCardSkeleton', () => {
