@@ -1,7 +1,7 @@
 ---
 name: knowledge-transfer-prompts
 title: Knowledge Transfer Prompts from Video Insights
-status: active
+status: complete
 priority: high
 created: 2026-02-08
 updated: 2026-02-08
