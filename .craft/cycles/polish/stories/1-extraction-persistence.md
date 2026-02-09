@@ -1,7 +1,7 @@
 ---
 name: insights-extraction-persistence
 title: Persist Insights Extraction Progress Across Navigation
-status: active
+status: complete
 cycle: polish
 story_number: 1
 created: 2026-02-08
