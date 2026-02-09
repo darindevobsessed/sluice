@@ -7,9 +7,10 @@ interface SuccessStateProps {
   title: string;
   thumbnail?: string | null;
   onReset: () => void;
+  description?: string;
 }
 
-export function SuccessState({ title, thumbnail, onReset }: SuccessStateProps) {
+export function SuccessState({ title, thumbnail, onReset, description }: SuccessStateProps) {
   return (
     <div className="mx-auto max-w-2xl animate-fadeIn">
       <div className="rounded-lg border border-border bg-card p-8 text-center">
@@ -23,11 +24,11 @@ export function SuccessState({ title, thumbnail, onReset }: SuccessStateProps) {
           Added to your Knowledge Bank!
         </h2>
         <p className="mb-8 text-muted-foreground">
-          Your video is ready to explore and generate plugin ideas.
+          {description || 'Your video is ready to explore and generate plugin ideas.'}
         </p>
 
-        {/* Video preview */}
-        {thumbnail && (
+        {/* Content preview */}
+        {thumbnail ? (
           <div className="mb-8 flex items-center justify-center gap-4">
             <Image
               src={thumbnail}
@@ -37,6 +38,10 @@ export function SuccessState({ title, thumbnail, onReset }: SuccessStateProps) {
               className="h-16 w-28 rounded-md object-cover"
             />
             <p className="max-w-md text-left text-sm font-medium">{title}</p>
+          </div>
+        ) : (
+          <div className="mb-8">
+            <p className="max-w-md mx-auto text-sm font-medium">{title}</p>
           </div>
         )}
 
