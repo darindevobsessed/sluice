@@ -156,6 +156,150 @@ describe('POST /api/videos', () => {
     expect(data.video).toBeDefined()
     expect(data.video.youtubeId).toBe('test-backward-compat')
   })
+
+  it('creates transcript-type video without youtubeId', async () => {
+    const request = new Request('http://localhost:3000/api/videos', {
+      method: 'POST',
+      body: JSON.stringify({
+        sourceType: 'transcript',
+        title: 'Manual Transcript Entry',
+        channel: 'Test Channel',
+        transcript: 'This is a manually entered transcript with enough characters to pass validation rules',
+      }),
+    })
+
+    const response = await POST(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(201)
+    expect(data.video).toBeDefined()
+    expect(data.video.sourceType).toBe('transcript')
+    expect(data.video.youtubeId).toBeNull()
+    expect(data.video.title).toBe('Manual Transcript Entry')
+  })
+
+  it('returns 400 when youtube-type video is missing youtubeId', async () => {
+    const request = new Request('http://localhost:3000/api/videos', {
+      method: 'POST',
+      body: JSON.stringify({
+        sourceType: 'youtube',
+        title: 'YouTube Video Without ID',
+        channel: 'Test Channel',
+        transcript: 'This should fail because youtubeId is required for youtube sourceType',
+      }),
+    })
+
+    const response = await POST(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(400)
+    expect(data.error).toBeDefined()
+    expect(data.error).toContain('YouTube ID is required')
+  })
+
+  it('returns 400 when transcript-type video is missing title', async () => {
+    const request = new Request('http://localhost:3000/api/videos', {
+      method: 'POST',
+      body: JSON.stringify({
+        sourceType: 'transcript',
+        title: '', // Empty string to trigger the min(1) validation
+        channel: 'Test Channel',
+        transcript: 'This should fail because title is required for all video types',
+      }),
+    })
+
+    const response = await POST(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(400)
+    expect(data.error).toBeDefined()
+    expect(data.error).toContain('Title is required')
+  })
+
+  it('defaults to youtube sourceType when not provided', async () => {
+    const request = new Request('http://localhost:3000/api/videos', {
+      method: 'POST',
+      body: JSON.stringify({
+        youtubeId: 'test-default-type',
+        title: 'Default Type Video',
+        channel: 'Test Channel',
+        transcript: 'This should default to youtube sourceType for backward compatibility',
+      }),
+    })
+
+    const response = await POST(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(201)
+    expect(data.video).toBeDefined()
+    expect(data.video.sourceType).toBe('youtube')
+    expect(data.video.youtubeId).toBe('test-default-type')
+  })
+
+  it('still checks for duplicate youtubeId on youtube-type videos', async () => {
+    // First, create a YouTube video
+    const firstRequest = new Request('http://localhost:3000/api/videos', {
+      method: 'POST',
+      body: JSON.stringify({
+        youtubeId: 'duplicate-test-123',
+        title: 'First Video',
+        channel: 'Test Channel',
+        transcript: 'This is the first video with this YouTube ID and enough characters to pass validation',
+      }),
+    })
+    await POST(firstRequest)
+
+    // Try to create another with the same youtubeId
+    const secondRequest = new Request('http://localhost:3000/api/videos', {
+      method: 'POST',
+      body: JSON.stringify({
+        youtubeId: 'duplicate-test-123',
+        title: 'Second Video',
+        channel: 'Test Channel',
+        transcript: 'This is a duplicate attempt with enough characters to pass validation rules',
+      }),
+    })
+
+    const response = await POST(secondRequest)
+    const data = await response.json()
+
+    expect(response.status).toBe(409)
+    expect(data.error).toContain('already been added')
+  })
+
+  it('skips duplicate check for transcript-type videos', async () => {
+    // Create two transcript-type videos with same title - should both succeed
+    const firstRequest = new Request('http://localhost:3000/api/videos', {
+      method: 'POST',
+      body: JSON.stringify({
+        sourceType: 'transcript',
+        title: 'Same Title Different Transcript',
+        channel: 'Test Channel',
+        transcript: 'This is the first transcript with enough characters to pass validation rules',
+      }),
+    })
+    const firstResponse = await POST(firstRequest)
+    const firstData = await firstResponse.json()
+
+    expect(firstResponse.status).toBe(201)
+    expect(firstData.video).toBeDefined()
+
+    const secondRequest = new Request('http://localhost:3000/api/videos', {
+      method: 'POST',
+      body: JSON.stringify({
+        sourceType: 'transcript',
+        title: 'Same Title Different Transcript',
+        channel: 'Test Channel',
+        transcript: 'This is a different transcript with enough characters to pass validation rules',
+      }),
+    })
+    const secondResponse = await POST(secondRequest)
+    const secondData = await secondResponse.json()
+
+    expect(secondResponse.status).toBe(201)
+    expect(secondData.video).toBeDefined()
+    expect(secondData.video.id).not.toBe(firstData.video.id)
+  })
 })
 
 describe('GET /api/videos', () => {

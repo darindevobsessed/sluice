@@ -13,7 +13,7 @@ export interface SearchResult {
   videoId: number;
   videoTitle: string;
   channel: string;
-  youtubeId: string;
+  youtubeId: string | null;
   thumbnail: string | null;
   publishedAt?: Date | null; // For temporal decay calculations
 }

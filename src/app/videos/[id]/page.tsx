@@ -127,12 +127,14 @@ export default function VideoDetailPage({ params }: VideoDetailPageProps) {
       {/* Focus area assignment */}
       <FocusAreaAssignment videoId={video.id} />
 
-      {/* Video player */}
-      <VideoPlayer
-        youtubeId={video.youtubeId}
-        seekTime={seekTime}
-        className="mb-8"
-      />
+      {/* Video player - only for YouTube videos */}
+      {video.sourceType === 'youtube' && video.youtubeId && (
+        <VideoPlayer
+          youtubeId={video.youtubeId}
+          seekTime={seekTime}
+          className="mb-8"
+        />
+      )}
 
       {/* Embedding status and generation */}
       <EmbedButton

@@ -4,7 +4,8 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 
 const videoSchema = z.object({
-  youtubeId: z.string().min(1, "YouTube ID is required"),
+  youtubeId: z.string().min(1).optional(),
+  sourceType: z.enum(['youtube', 'transcript']).default('youtube'),
   title: z.string().min(1, "Title is required"),
   channel: z.string().min(1, "Channel is required"),
   thumbnail: z.string().optional(),
@@ -104,27 +105,38 @@ export async function POST(request: Request) {
       );
     }
 
-    const { youtubeId, title, channel, thumbnail, transcript } = validationResult.data;
+    const { youtubeId, sourceType, title, channel, thumbnail, transcript } = validationResult.data;
 
-    // Check if video already exists
-    const existingVideo = await db
-      .select()
-      .from(videos)
-      .where(eq(videos.youtubeId, youtubeId))
-      .limit(1);
-
-    if (existingVideo.length > 0) {
+    // Conditional validation: YouTube type requires youtubeId
+    if (sourceType === 'youtube' && !youtubeId) {
       return NextResponse.json(
-        { error: "This video has already been added to your Knowledge Bank" },
-        { status: 409 }
+        { error: "YouTube ID is required for YouTube videos" },
+        { status: 400 }
       );
+    }
+
+    // Check for duplicate only for YouTube videos
+    if (sourceType === 'youtube' && youtubeId) {
+      const existingVideo = await db
+        .select()
+        .from(videos)
+        .where(eq(videos.youtubeId, youtubeId))
+        .limit(1);
+
+      if (existingVideo.length > 0) {
+        return NextResponse.json(
+          { error: "This video has already been added to your Knowledge Bank" },
+          { status: 409 }
+        );
+      }
     }
 
     // Insert video into database
     const result = await db
       .insert(videos)
       .values({
-        youtubeId,
+        youtubeId: youtubeId || null,
+        sourceType,
         title,
         channel,
         thumbnail: thumbnail || null,

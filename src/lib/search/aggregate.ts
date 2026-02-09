@@ -5,7 +5,7 @@ import type { SearchResult } from './types';
  */
 export interface VideoResult {
   videoId: number;
-  youtubeId: string;
+  youtubeId: string | null;
   title: string;
   channel: string;
   thumbnail: string | null;
