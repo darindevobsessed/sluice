@@ -102,9 +102,10 @@ Save videos • Search transcripts • Extract insights
 
 ### Discovery Feed
 **Type:** layout
-**Choice:** cards (grouped by channel)
+**Choice:** unified video grid
 **Locked:** 2026-02-03
-**Context:** "Inline Add with Quick Actions" — clear mental model, easy scanning, no modals
+**Updated:** 2026-02-08
+**Context:** "Inline Add with Quick Actions" — clear mental model, easy scanning, no modals. Unlocked grid layout and pagination for better browsing experience.
 
 **Specification:**
 
@@ -119,11 +120,12 @@ Save videos • Search transcripts • Extract insights
 - Accepts: @handle, /channel/ID, /c/name formats
 - Shows preview with channel name before confirming
 
-**Channel Sections:**
-- Channels listed vertically, most recently updated first
-- Each channel has header: Channel name, @handle, "Last updated X ago", [Unfollow]
-- Below header: horizontal scroll row of 3-5 latest video cards
-- Scroll indicator arrow when more videos available
+**Video Grid:**
+- Unified responsive grid of all discovery videos (not grouped by channel)
+- Responsive columns: 1 col mobile → 2 col sm → 3 col md → 4 col lg → 5 col xl
+- Gap-6 spacing between cards
+- Client-side pagination: 24 videos per page
+- Videos sorted by publishedAt descending (newest first)
 
 **Video Cards (Discovery):**
 - Thumbnail (16:9, rounded-lg)
@@ -132,6 +134,14 @@ Save videos • Search transcripts • Extract insights
 - Published date ("3 days ago")
 - "Add to Bank" button
 - "✓ In Bank" badge if already added
+- Focus area badges for videos already in Knowledge Bank (read-only, no quick-assign)
+
+**Pagination:**
+- Appears at bottom when more than one page
+- Page numbers with prev/next buttons
+- Max ~7 visible page buttons with ellipsis for large page counts
+- Current page highlighted with primary color
+- Disabled state for prev/next at bounds
 
 **"Add to Bank" Flow:**
 - Click → Navigate to `/add?url=VIDEO_URL`
@@ -159,13 +169,13 @@ Examples:
 ```
 
 **Density Note:**
-Discovery is a "browse" page — denser layout is acceptable. Horizontal scroll keeps each channel section scannable even with many channels.
+Discovery is a "browse" page — denser layout is acceptable. Grid layout with pagination keeps the page scannable while handling many videos across multiple channels.
 
 **Not Allowed:**
 - Modal for channel management
-- Grid layout for videos (use horizontal scroll)
 - Inline transcript paste (use Add Video page)
-- Pagination or "show more" for channels (show all)
+- Server-side pagination for Discovery videos (client-side only)
+- Focus area quick-assign dropdown on Discovery cards (badges only)
 
 ### Settings Page
 **Type:** layout
