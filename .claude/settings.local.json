@@ -28,7 +28,8 @@
       "Bash(/Users/darindrobinski/.claude/plugins/cache/craft-local/craft/*/hooks/scripts/*)",
       "Bash(tree:*)",
       "Bash(find:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(/Users/darindrobinski/.claude-max/plugins/cache/craft-local/craft/0.30.0/hooks/scripts/start-story.sh:*)"
     ]
   }
 }
