@@ -274,4 +274,116 @@ describe('ExtractionProvider', () => {
       expect(state.error).toBe('Test error')
     })
   })
+
+  it('tracks knowledgePrompt section status during streaming', async () => {
+    let capturedCallbacks: InsightCallbacks | undefined
+
+    ;(mockAgent.generateInsight as ReturnType<typeof vi.fn>)?.mockImplementation((options, callbacks) => {
+      capturedCallbacks = callbacks
+      return 'insight-123'
+    })
+
+    const { getByText } = render(
+      <AgentProvider>
+        <ExtractionProvider>
+          <TestConsumer />
+        </ExtractionProvider>
+      </AgentProvider>
+    )
+
+    const startButton = getByText('Start')
+    startButton.click()
+
+    await waitFor(() => {
+      expect(capturedCallbacks).toBeDefined()
+    })
+
+    // Initially all sections are pending
+    await waitFor(() => {
+      const state = JSON.parse(screen.getByTestId('state').textContent || 'null')
+      expect(state.sections.knowledgePrompt).toBe('pending')
+    })
+
+    // After claudeCode is done, knowledgePrompt should be working
+    capturedCallbacks?.onText?.(JSON.stringify({
+      contentType: 'dev',
+      summary: { tldr: 'Test', overview: 'Test', keyPoints: [] },
+      insights: [],
+      actionItems: { immediate: [], shortTerm: [], longTerm: [], resources: [] },
+      claudeCode: { applicable: false, skills: [], commands: [], agents: [], hooks: [], rules: [] },
+    }))
+
+    await waitFor(() => {
+      const state = JSON.parse(screen.getByTestId('state').textContent || 'null')
+      expect(state.sections.claudeCode).toBe('done')
+      expect(state.sections.knowledgePrompt).toBe('working')
+    })
+
+    // After knowledgePrompt is present, section should be done
+    capturedCallbacks?.onText?.(', "knowledgePrompt": "Test knowledge prompt"')
+
+    await waitFor(() => {
+      const state = JSON.parse(screen.getByTestId('state').textContent || 'null')
+      expect(state.sections.knowledgePrompt).toBe('done')
+      expect(state.partial.knowledgePrompt).toBe('Test knowledge prompt')
+    })
+  })
+
+  it('includes knowledgePrompt in completeness check', async () => {
+    let capturedCallbacks: InsightCallbacks | undefined
+
+    ;(mockAgent.generateInsight as ReturnType<typeof vi.fn>)?.mockImplementation((options, callbacks) => {
+      capturedCallbacks = callbacks
+      return 'insight-123'
+    })
+
+    ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
+      ok: true,
+      json: async () => ({ success: true }),
+    })
+
+    const { getByText } = render(
+      <AgentProvider>
+        <ExtractionProvider>
+          <TestConsumer />
+        </ExtractionProvider>
+      </AgentProvider>
+    )
+
+    const startButton = getByText('Start')
+    startButton.click()
+
+    await waitFor(() => {
+      expect(capturedCallbacks).toBeDefined()
+    })
+
+    // Complete extraction with knowledgePrompt
+    const completeJSON = JSON.stringify({
+      contentType: 'dev',
+      summary: { tldr: 'Test', overview: 'Test overview', keyPoints: ['Point 1'] },
+      insights: [{ title: 'Insight 1', timestamp: '00:00', explanation: 'Test', actionable: 'Do this' }],
+      actionItems: { immediate: [], shortTerm: [], longTerm: [], resources: [] },
+      knowledgePrompt: 'Knowledge prompt content',
+      claudeCode: { applicable: false, skills: [], commands: [], agents: [], hooks: [], rules: [] },
+    })
+
+    capturedCallbacks?.onDone?.(completeJSON)
+
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalledWith(
+        '/api/videos/1/insights',
+        expect.objectContaining({
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: expect.stringContaining('knowledgePrompt'),
+        })
+      )
+    })
+
+    // State should be evicted after successful persist
+    await waitFor(() => {
+      const state = JSON.parse(screen.getByTestId('state').textContent || 'null')
+      expect(state).toBeNull()
+    })
+  })
 })

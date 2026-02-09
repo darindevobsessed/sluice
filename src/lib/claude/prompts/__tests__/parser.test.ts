@@ -171,6 +171,82 @@ describe('parsePartialJSON', () => {
       expect(result?.insights).toBeDefined();
       expect(result?.actionItems).toBeUndefined(); // Incomplete
     });
+
+    it('should extract knowledgePrompt string from partial JSON', () => {
+      const partial = `{
+        "contentType": "dev",
+        "knowledgePrompt": "This is a knowledge transfer prompt with specific techniques and actionable details.",
+        "claudeCode": {`;
+
+      const result = parsePartialJSON(partial);
+      expect(result).toBeDefined();
+      expect(result?.knowledgePrompt).toBe('This is a knowledge transfer prompt with specific techniques and actionable details.');
+    });
+
+    it('should extract knowledgePrompt with escaped quotes and newlines', () => {
+      const partial = `{
+        "contentType": "dev",
+        "knowledgePrompt": "He said \\"hello\\" and\\nthen continued.",
+        "claudeCode": {`;
+
+      const result = parsePartialJSON(partial);
+      expect(result).toBeDefined();
+      expect(result?.knowledgePrompt).toBe('He said "hello" and\nthen continued.');
+    });
+
+    it('should extract knowledgePrompt from complete JSON', () => {
+      const completeJSON = JSON.stringify({
+        contentType: 'dev',
+        summary: {
+          tldr: 'Test',
+          overview: 'Test',
+          keyPoints: [],
+        },
+        insights: [],
+        actionItems: {
+          immediate: [],
+          shortTerm: [],
+          longTerm: [],
+          resources: [],
+        },
+        knowledgePrompt: 'Knowledge prompt content here.',
+        claudeCode: {
+          applicable: false,
+          skills: [],
+          commands: [],
+          agents: [],
+          hooks: [],
+          rules: [],
+        },
+      } satisfies ExtractionResult);
+
+      const result = parsePartialJSON(completeJSON);
+      expect(result).toBeDefined();
+      expect(result?.knowledgePrompt).toBe('Knowledge prompt content here.');
+    });
+
+    it('should handle missing knowledgePrompt gracefully', () => {
+      const partial = `{
+        "contentType": "dev",
+        "summary": {
+          "tldr": "Test",
+          "overview": "Test",
+          "keyPoints": []
+        },
+        "claudeCode": {
+          "applicable": false,
+          "skills": [],
+          "commands": [],
+          "agents": [],
+          "hooks": [],
+          "rules": []
+        }
+      }`;
+
+      const result = parsePartialJSON(partial);
+      expect(result).toBeDefined();
+      expect(result?.knowledgePrompt).toBeUndefined();
+    });
   });
 
   describe('edge cases', () => {

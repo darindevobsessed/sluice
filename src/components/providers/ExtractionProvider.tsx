@@ -15,6 +15,7 @@ interface ExtractionState {
     insights: SectionStatus
     actions: SectionStatus
     claudeCode: SectionStatus
+    knowledgePrompt: SectionStatus
   }
   partial: Partial<ExtractionResult>
   error: string | null
@@ -47,6 +48,7 @@ const initialState: ExtractionState = {
     insights: 'pending',
     actions: 'pending',
     claudeCode: 'pending',
+    knowledgePrompt: 'pending',
   },
   partial: {},
   error: null,
@@ -100,6 +102,12 @@ export function ExtractionProvider({ children }: { children: React.ReactNode }) 
     // Claude Code: done if present
     if (parsed.claudeCode) {
       sections.claudeCode = 'done'
+      sections.knowledgePrompt = 'working'
+    }
+
+    // Knowledge Prompt: done if present
+    if (parsed.knowledgePrompt) {
+      sections.knowledgePrompt = 'done'
     }
 
     return sections
@@ -190,6 +198,7 @@ export function ExtractionProvider({ children }: { children: React.ReactNode }) 
                 insights: parsed.insights ? 'done' : 'pending',
                 actions: parsed.actionItems ? 'done' : 'pending',
                 claudeCode: parsed.claudeCode?.applicable ? 'done' : 'pending',
+                knowledgePrompt: parsed.knowledgePrompt ? 'done' : 'pending',
               },
               partial: parsed,
               error: null,

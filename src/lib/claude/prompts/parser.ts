@@ -100,6 +100,18 @@ function parsePartialJSONContent(cleaned: string): Partial<ExtractionResult> | n
     }
   }
 
+  // Extract knowledgePrompt (simple string field, same pattern as contentType)
+  const knowledgePromptMatch = cleaned.match(/"knowledgePrompt"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+  if (knowledgePromptMatch?.[1]) {
+    try {
+      // Parse the string value to handle escaped characters
+      const knowledgePromptStr = JSON.parse(`"${knowledgePromptMatch[1]}"`);
+      result.knowledgePrompt = knowledgePromptStr;
+    } catch {
+      // Invalid knowledgePrompt, skip
+    }
+  }
+
   // Extract claudeCode object - handle nested braces in string content
   const claudeCodeStart = cleaned.indexOf('"claudeCode"');
   if (claudeCodeStart !== -1) {
