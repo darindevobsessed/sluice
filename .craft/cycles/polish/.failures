@@ -1477,3 +1477,99 @@ npm error
 npm error To see a list of scripts, run:
 npm error   npm run
 npm error A complete log of this run can be found in: /Users/darindrobinski/.npm/_logs/2026-02-09T02_39_08_446Z-debug-0.log
+---
+timestamp: "2026-02-08 20:50:40"
+story: "2-knowledge-transfer-prompts"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/lib/mcp/__tests__/tools.test.ts[2m > [22mregisterSearchRag[2m > [22mincludes knowledgePrompt in results when available
+[31m[1mAssertionError[22m: expected '[\n  {\n    "videoId": 1,\n    "youtu…' to contain 'TypeScript best practices'[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- TypeScript best practices[39m
+[31m+ [[39m
+[31m+   {[39m
+[31m+     "videoId": 1,[39m
+[31m+     "youtubeId": "abc123",[39m
+[31m+     "title": "TypeScript Basics",[39m
+[31m+     "channel": "Dev Channel",[39m
+[31m+     "thumbnail": "https://example.com/thumb.jpg",[39m
+[31m+     "score": 0.9,[39m
+[31m+     "matchedChunks": 1,[39m
+[31m+     "bestChunk": {[39m
+[31m+       "content": "TypeScript is great",[39m
+[31m+       "startTime": 0,[39m
+[31m+       "similarity": 0.9[39m
+[31m+     }[39m
+[31m+   }[39m
+[31m+ ][39m
+
+[36m [2m❯[22m src/lib/mcp/__tests__/tools.test.ts:[2m419:37[22m[39m
+    [90m417| [39m    [35mconst[39m result [33m=[39m [35mawait[39m [34mtoolHandler[39m({ topic[33m:[39m [32m'TypeScript'[39m })
+    [90m418| [39m
+    [90m419| [39m    expect(result.content[0]?.text).toContain('TypeScript best practic…
+    [90m   | [39m                                    [31m^[39m
+    [90m420| [39m    [34mexpect[39m(result[33m.[39mcontent[[34m0[39m][33m?.[39mtext)[33m.[39m[34mtoContain[39m([32m'Knowledge Prompt'[39m)
+    [90m421| [39m  })
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/lib/mcp/__tests__/tools.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/lib/mcp/__tests__/tools.test.ts [2m([22m[2m18 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 59[2mms[22m[39m
+     [32m✓[39m registers search_rag tool with correct configuration[32m 11[2mms[22m[39m
+     [32m✓[39m searches knowledge base with topic only[32m 3[2mms[22m[39m
+     [32m✓[39m filters by creator when provided[32m 3[2mms[22m[39m
+     [32m✓[39m filters by creator case-insensitively[32m 1[2mms[22m[39m
+     [32m✓[39m respects custom limit parameter[32m 1[2mms[22m[39m
+     [32m✓[39m uses default limit of 10 when not provided[32m 1[2mms[22m[39m
+     [32m✓[39m handles empty search results[32m 1[2mms[22m[39m
+     [32m✓[39m filters out all results when creator does not match[32m 1[2mms[22m[39m
+     [32m✓[39m handles null thumbnail gracefully[32m 1[2mms[22m[39m
+     [32m✓[39m handles null startTime gracefully[32m 1[2mms[22m[39m
+[31m     [31m×[31m includes knowledgePrompt in results when available[39m[32m 26[2mms[22m[39m
+     [32m✓[39m handles videos without knowledgePrompt gracefully[32m 1[2mms[22m[39m
+     [32m✓[39m handles videos with no extraction data gracefully[32m 1[2mms[22m[39m
+     [32m✓[39m registers get_list_of_creators tool with correct configuration[32m 2[2mms[22m[39m
+     [32m✓[39m returns creators with video counts sorted by count descending[32m 1[2mms[22m[39m
+     [32m✓[39m returns empty array when no videos exist[32m 1[2mms[22m[39m
+     [32m✓[39m handles single creator correctly[32m 0[2mms[22m[39m
+     [32m✓[39m preserves exact order from database query[32m 0[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m17 passed[39m[22m[90m (18)[39m
+[2m   Start at [22m 20:50:37
+[2m   Duration [22m 2.61s[2m (transform 233ms, setup 209ms, import 657ms, tests 59ms, environment 1.20s)[22m
+---
+timestamp: "2026-02-08 20:53:50"
+story: "2-knowledge-transfer-prompts"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+npm error Missing script: "typecheck"
+npm error
+npm error To see a list of scripts, run:
+npm error   npm run
+npm error A complete log of this run can be found in: /Users/darindrobinski/.npm/_logs/2026-02-09T02_53_49_758Z-debug-0.log
+---
+timestamp: "2026-02-08 21:01:39"
+story: "2-knowledge-transfer-prompts"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+tail: /private/tmp/claude-501/-Users-darindrobinski-dev-repos-gold-miner/tasks/b117518.output: No such file or directory

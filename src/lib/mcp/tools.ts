@@ -6,12 +6,14 @@ import { getDistinctChannels } from '@/lib/db/search'
 import { db, personas } from '@/lib/db'
 import { getPersonaContext, formatContextForPrompt } from '@/lib/personas/context'
 import { findBestPersonas } from '@/lib/personas/ensemble'
+import { getExtractionForVideo } from '@/lib/db/insights'
 
 /**
  * Register the search_rag tool with the MCP server.
  *
  * This tool searches the Gold Miner knowledge base for relevant content
  * from YouTube videos. It supports filtering by creator/channel name.
+ * Includes knowledge prompts from video extractions when available.
  *
  * @param server - MCP server instance to register the tool with
  */
@@ -39,9 +41,36 @@ export function registerSearchRag(server: McpServer): void {
       // Aggregate results by video
       const videos = aggregateByVideo(filtered)
 
+      // Enrich with knowledge prompts from insights
+      const enrichedVideos = await Promise.all(
+        videos.map(async (video) => {
+          const extraction = await getExtractionForVideo(video.videoId)
+
+          if (extraction?.extraction?.knowledgePrompt) {
+            return {
+              ...video,
+              knowledgePrompt: extraction.extraction.knowledgePrompt,
+            }
+          }
+
+          return video
+        })
+      )
+
+      // Format response with knowledge prompts clearly labeled
+      let responseText = JSON.stringify(enrichedVideos, null, 2)
+
+      // If any videos have knowledge prompts, add a helpful header
+      const hasKnowledgePrompts = enrichedVideos.some(v => 'knowledgePrompt' in v)
+      if (hasKnowledgePrompts) {
+        responseText = '# Search Results with Knowledge Prompts\n\n' +
+          'Videos with a `knowledgePrompt` field contain distilled learnings and actionable techniques from the content.\n\n' +
+          responseText
+      }
+
       // Return formatted response
       return {
-        content: [{ type: 'text', text: JSON.stringify(videos, null, 2) }],
+        content: [{ type: 'text', text: responseText }],
       }
     }
   )

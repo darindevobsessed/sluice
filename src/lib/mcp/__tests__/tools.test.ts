@@ -27,6 +27,10 @@ vi.mock('@/lib/embeddings/pipeline', () => ({
   generateEmbedding: vi.fn(),
 }))
 
+vi.mock('@/lib/db/insights', () => ({
+  getExtractionForVideo: vi.fn(),
+}))
+
 // Import mocked functions
 import { hybridSearch } from '@/lib/search/hybrid-search'
 import { aggregateByVideo } from '@/lib/search/aggregate'
@@ -351,6 +355,179 @@ describe('registerSearchRag', () => {
     const result = await toolHandler({ topic: 'test' })
 
     expect(result.content[0]?.text).toContain('"startTime": null')
+  })
+
+  it('includes knowledgePrompt in results when available', async () => {
+    const mockSearchResults: SearchResult[] = [
+      {
+        chunkId: 1,
+        content: 'TypeScript is great',
+        startTime: 0,
+        endTime: 10,
+        similarity: 0.9,
+        videoId: 1,
+        videoTitle: 'TypeScript Basics',
+        channel: 'Dev Channel',
+        youtubeId: 'abc123',
+        thumbnail: 'https://example.com/thumb.jpg',
+        publishedAt: null,
+      },
+    ]
+
+    const mockVideoResults: VideoResult[] = [
+      {
+        videoId: 1,
+        youtubeId: 'abc123',
+        title: 'TypeScript Basics',
+        channel: 'Dev Channel',
+        thumbnail: 'https://example.com/thumb.jpg',
+        score: 0.9,
+        matchedChunks: 1,
+        bestChunk: {
+          content: 'TypeScript is great',
+          startTime: 0,
+          similarity: 0.9,
+        },
+      },
+    ]
+
+    const mockExtraction = {
+      id: 'test-id',
+      videoId: 1,
+      contentType: 'dev',
+      extraction: {
+        contentType: 'dev' as const,
+        summary: { tldr: 'Test', overview: 'Test', keyPoints: [] },
+        insights: [],
+        actionItems: { immediate: [], shortTerm: [], longTerm: [], resources: [] },
+        knowledgePrompt: 'This video teaches TypeScript best practices. Key techniques include: using strict mode, leveraging type inference, and avoiding any types. The presenter demonstrates with real examples from production code.',
+        claudeCode: { applicable: false, skills: [], commands: [], agents: [], hooks: [], rules: [] },
+      },
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }
+
+    ;(hybridSearch as Mock).mockResolvedValue(mockSearchResults)
+    ;(aggregateByVideo as Mock).mockReturnValue(mockVideoResults)
+
+    // Mock getExtractionForVideo
+    const { getExtractionForVideo } = await import('@/lib/db/insights')
+    vi.mocked(getExtractionForVideo).mockResolvedValue(mockExtraction)
+
+    const result = await toolHandler({ topic: 'TypeScript' })
+
+    expect(result.content[0]?.text).toContain('TypeScript best practices')
+    expect(result.content[0]?.text).toContain('Knowledge Prompt')
+  })
+
+  it('handles videos without knowledgePrompt gracefully', async () => {
+    const mockSearchResults: SearchResult[] = [
+      {
+        chunkId: 1,
+        content: 'Content',
+        startTime: 0,
+        endTime: 10,
+        similarity: 0.9,
+        videoId: 1,
+        videoTitle: 'Old Video',
+        channel: 'Channel',
+        youtubeId: 'abc123',
+        thumbnail: null,
+        publishedAt: null,
+      },
+    ]
+
+    const mockVideoResults: VideoResult[] = [
+      {
+        videoId: 1,
+        youtubeId: 'abc123',
+        title: 'Old Video',
+        channel: 'Channel',
+        thumbnail: null,
+        score: 0.9,
+        matchedChunks: 1,
+        bestChunk: {
+          content: 'Content',
+          startTime: 0,
+          similarity: 0.9,
+        },
+      },
+    ]
+
+    const mockExtraction = {
+      id: 'test-id',
+      videoId: 1,
+      contentType: 'dev',
+      extraction: {
+        contentType: 'dev' as const,
+        summary: { tldr: 'Test', overview: 'Test', keyPoints: [] },
+        insights: [],
+        actionItems: { immediate: [], shortTerm: [], longTerm: [], resources: [] },
+        // No knowledgePrompt field (old extraction)
+        claudeCode: { applicable: false, skills: [], commands: [], agents: [], hooks: [], rules: [] },
+      },
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }
+
+    ;(hybridSearch as Mock).mockResolvedValue(mockSearchResults)
+    ;(aggregateByVideo as Mock).mockReturnValue(mockVideoResults)
+
+    const { getExtractionForVideo } = await import('@/lib/db/insights')
+    vi.mocked(getExtractionForVideo).mockResolvedValue(mockExtraction)
+
+    const result = await toolHandler({ topic: 'test' })
+
+    // Should not crash, just skip the knowledge prompt
+    expect(result.content[0]?.text).toBeDefined()
+    expect(result.content[0]?.text).not.toContain('Knowledge Prompt')
+  })
+
+  it('handles videos with no extraction data gracefully', async () => {
+    const mockSearchResults: SearchResult[] = [
+      {
+        chunkId: 1,
+        content: 'Content',
+        startTime: 0,
+        endTime: 10,
+        similarity: 0.9,
+        videoId: 1,
+        videoTitle: 'Video',
+        channel: 'Channel',
+        youtubeId: 'abc123',
+        thumbnail: null,
+        publishedAt: null,
+      },
+    ]
+
+    const mockVideoResults: VideoResult[] = [
+      {
+        videoId: 1,
+        youtubeId: 'abc123',
+        title: 'Video',
+        channel: 'Channel',
+        thumbnail: null,
+        score: 0.9,
+        matchedChunks: 1,
+        bestChunk: {
+          content: 'Content',
+          startTime: 0,
+          similarity: 0.9,
+        },
+      },
+    ]
+
+    ;(hybridSearch as Mock).mockResolvedValue(mockSearchResults)
+    ;(aggregateByVideo as Mock).mockReturnValue(mockVideoResults)
+
+    const { getExtractionForVideo } = await import('@/lib/db/insights')
+    vi.mocked(getExtractionForVideo).mockResolvedValue(null)
+
+    const result = await toolHandler({ topic: 'test' })
+
+    // Should not crash, just return results without knowledge prompts
+    expect(result.content[0]?.text).toBeDefined()
+    expect(result.content[0]?.text).not.toContain('Knowledge Prompt')
   })
 })
 
