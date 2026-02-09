@@ -1,7 +1,7 @@
 ---
 name: discovery-video-grid
 title: Discovery Page Video Grid Redesign
-status: ready
+status: active
 priority: medium
 created: 2026-02-08
 updated: 2026-02-08
