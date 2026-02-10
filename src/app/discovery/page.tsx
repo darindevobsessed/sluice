@@ -1,11 +1,12 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useMemo } from 'react'
 import { usePageTitle } from '@/components/layout/PageTitleContext'
 import { Button } from '@/components/ui/button'
 import { RefreshCw } from 'lucide-react'
 import { FollowChannelInput } from '@/components/discovery/FollowChannelInput'
 import { DiscoveryVideoGrid } from '@/components/discovery/DiscoveryVideoGrid'
+import { ChannelFilterDropdown } from '@/components/discovery/ChannelFilterDropdown'
 import type { DiscoveryVideo } from '@/components/discovery/DiscoveryVideoCard'
 
 interface Channel {
@@ -51,6 +52,7 @@ export default function Discovery() {
   const [isLoading, setIsLoading] = useState(true)
   const [isLoadingVideos, setIsLoadingVideos] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [selectedChannelId, setSelectedChannelId] = useState<string | null>(null)
 
   useEffect(() => {
     setPageTitle({ title: 'Discovery' })
@@ -145,6 +147,14 @@ export default function Discovery() {
     await fetchVideos()
   }
 
+  // Filter videos by selected channel
+  const filteredVideos = useMemo(() => {
+    if (selectedChannelId === null) {
+      return discoveryVideos
+    }
+    return discoveryVideos.filter((video) => video.channelId === selectedChannelId)
+  }, [discoveryVideos, selectedChannelId])
+
   if (isLoading) {
     // Show skeleton grid while loading initial data
     return (
@@ -169,22 +179,29 @@ export default function Discovery() {
 
   return (
     <div className="p-4 sm:p-6 space-y-6">
-      {/* Header with follow input and refresh button */}
+      {/* Header with follow input, filter, and refresh button */}
       <div className="flex flex-col sm:flex-row items-start gap-3">
         <div className="flex-1 w-full">
           <FollowChannelInput onChannelFollowed={handleChannelFollowed} />
         </div>
         {channels.length > 0 && (
-          <Button
-            variant="outline"
-            size="default"
-            onClick={handleRefresh}
-            aria-label="Refresh all channels"
-            className="w-full sm:w-auto"
-          >
-            <RefreshCw className="size-4" />
-            Refresh
-          </Button>
+          <>
+            <ChannelFilterDropdown
+              channels={channels}
+              selectedChannelId={selectedChannelId}
+              onChannelChange={setSelectedChannelId}
+            />
+            <Button
+              variant="outline"
+              size="default"
+              onClick={handleRefresh}
+              aria-label="Refresh all channels"
+              className="w-full sm:w-auto"
+            >
+              <RefreshCw className="size-4" />
+              Refresh
+            </Button>
+          </>
         )}
       </div>
 
@@ -208,7 +225,7 @@ export default function Discovery() {
         </div>
       ) : (
         <DiscoveryVideoGrid
-          videos={discoveryVideos}
+          videos={filteredVideos}
           isLoading={isLoadingVideos}
           focusAreaMap={focusAreaMap}
         />

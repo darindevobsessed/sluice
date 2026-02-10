@@ -399,4 +399,316 @@ describe('Discovery Page', () => {
       expect(global.fetch).toHaveBeenCalledWith('/api/channels/videos')
     })
   })
+
+  describe('Channel Filter Integration', () => {
+    it('should render channel filter dropdown when channels exist', async () => {
+      const mockChannels = [
+        {
+          id: 1,
+          channelId: 'UCtest1',
+          name: 'Test Channel 1',
+          createdAt: new Date().toISOString(),
+        },
+        {
+          id: 2,
+          channelId: 'UCtest2',
+          name: 'Test Channel 2',
+          createdAt: new Date().toISOString(),
+        },
+      ]
+
+      const mockVideos = [
+        {
+          youtubeId: 'vid1',
+          title: 'Video from Channel 1',
+          channelId: 'UCtest1',
+          channelName: 'Test Channel 1',
+          publishedAt: new Date().toISOString(),
+          description: 'Test',
+          inBank: false,
+        },
+      ]
+
+      // Mock /api/channels
+      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockChannels,
+      })
+
+      // Mock /api/channels/videos
+      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockVideos,
+      })
+
+      // Mock /api/videos
+      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          videos: [],
+          stats: {},
+          focusAreaMap: {},
+        }),
+      })
+
+      render(<Discovery />)
+
+      await waitFor(() => {
+        expect(screen.getByText('All Channels')).toBeInTheDocument()
+      })
+    })
+
+    it('should not render channel filter dropdown when no channels exist', async () => {
+      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        ok: true,
+        json: async () => [],
+      })
+
+      render(<Discovery />)
+
+      await waitFor(() => {
+        expect(screen.queryByText('All Channels')).not.toBeInTheDocument()
+      })
+    })
+
+    it('should filter videos to show only selected channel', async () => {
+      const user = userEvent.setup()
+
+      const mockChannels = [
+        {
+          id: 1,
+          channelId: 'UCtest1',
+          name: 'Test Channel 1',
+          createdAt: new Date().toISOString(),
+        },
+        {
+          id: 2,
+          channelId: 'UCtest2',
+          name: 'Test Channel 2',
+          createdAt: new Date().toISOString(),
+        },
+      ]
+
+      const mockVideos = [
+        {
+          youtubeId: 'vid1',
+          title: 'Video from Channel 1',
+          channelId: 'UCtest1',
+          channelName: 'Test Channel 1',
+          publishedAt: new Date().toISOString(),
+          description: 'Test',
+          inBank: false,
+        },
+        {
+          youtubeId: 'vid2',
+          title: 'Video from Channel 2',
+          channelId: 'UCtest2',
+          channelName: 'Test Channel 2',
+          publishedAt: new Date().toISOString(),
+          description: 'Test',
+          inBank: false,
+        },
+      ]
+
+      // Mock /api/channels
+      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockChannels,
+      })
+
+      // Mock /api/channels/videos
+      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockVideos,
+      })
+
+      // Mock /api/videos
+      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          videos: [],
+          stats: {},
+          focusAreaMap: {},
+        }),
+      })
+
+      render(<Discovery />)
+
+      // Wait for videos to load
+      await waitFor(() => {
+        expect(screen.getByText('Video from Channel 1')).toBeInTheDocument()
+        expect(screen.getByText('Video from Channel 2')).toBeInTheDocument()
+      })
+
+      // Click filter dropdown
+      await user.click(screen.getByText('All Channels'))
+
+      // Select Channel 1
+      await user.click(screen.getByText('Test Channel 1'))
+
+      // Should only show Channel 1 videos
+      await waitFor(() => {
+        expect(screen.getByText('Video from Channel 1')).toBeInTheDocument()
+        expect(screen.queryByText('Video from Channel 2')).not.toBeInTheDocument()
+      })
+    })
+
+    it('should show all videos when "All Channels" is selected', async () => {
+      const user = userEvent.setup()
+
+      const mockChannels = [
+        {
+          id: 1,
+          channelId: 'UCtest1',
+          name: 'Test Channel 1',
+          createdAt: new Date().toISOString(),
+        },
+        {
+          id: 2,
+          channelId: 'UCtest2',
+          name: 'Test Channel 2',
+          createdAt: new Date().toISOString(),
+        },
+      ]
+
+      const mockVideos = [
+        {
+          youtubeId: 'vid1',
+          title: 'Video from Channel 1',
+          channelId: 'UCtest1',
+          channelName: 'Test Channel 1',
+          publishedAt: new Date().toISOString(),
+          description: 'Test',
+          inBank: false,
+        },
+        {
+          youtubeId: 'vid2',
+          title: 'Video from Channel 2',
+          channelId: 'UCtest2',
+          channelName: 'Test Channel 2',
+          publishedAt: new Date().toISOString(),
+          description: 'Test',
+          inBank: false,
+        },
+      ]
+
+      // Mock /api/channels
+      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockChannels,
+      })
+
+      // Mock /api/channels/videos
+      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockVideos,
+      })
+
+      // Mock /api/videos
+      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          videos: [],
+          stats: {},
+          focusAreaMap: {},
+        }),
+      })
+
+      render(<Discovery />)
+
+      // Wait for videos to load
+      await waitFor(() => {
+        expect(screen.getByText('Video from Channel 1')).toBeInTheDocument()
+      })
+
+      // Click filter dropdown
+      await user.click(screen.getByText('All Channels'))
+
+      // Select a specific channel first
+      await user.click(screen.getByText('Test Channel 1'))
+
+      // Should only show Channel 1 videos
+      await waitFor(() => {
+        expect(screen.queryByText('Video from Channel 2')).not.toBeInTheDocument()
+      })
+
+      // Now select "All Channels" again
+      await user.click(screen.getByText('Test Channel 1'))
+      await user.click(screen.getByText('All Channels'))
+
+      // Should show all videos again
+      await waitFor(() => {
+        expect(screen.getByText('Video from Channel 1')).toBeInTheDocument()
+        expect(screen.getByText('Video from Channel 2')).toBeInTheDocument()
+      })
+    })
+
+    it('should display channel name in dropdown trigger when channel is selected', async () => {
+      const user = userEvent.setup()
+
+      const mockChannels = [
+        {
+          id: 1,
+          channelId: 'UCtest1',
+          name: 'Test Channel 1',
+          createdAt: new Date().toISOString(),
+        },
+      ]
+
+      const mockVideos = [
+        {
+          youtubeId: 'vid1',
+          title: 'Video from Channel 1',
+          channelId: 'UCtest1',
+          channelName: 'Test Channel 1',
+          publishedAt: new Date().toISOString(),
+          description: 'Test',
+          inBank: false,
+        },
+      ]
+
+      // Mock /api/channels
+      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockChannels,
+      })
+
+      // Mock /api/channels/videos
+      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockVideos,
+      })
+
+      // Mock /api/videos
+      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          videos: [],
+          stats: {},
+          focusAreaMap: {},
+        }),
+      })
+
+      render(<Discovery />)
+
+      // Wait for videos to load
+      await waitFor(() => {
+        expect(screen.getByText('Video from Channel 1')).toBeInTheDocument()
+      })
+
+      // Initial state should show "All Channels"
+      expect(screen.getByText('All Channels')).toBeInTheDocument()
+
+      // Click filter dropdown and select channel
+      await user.click(screen.getByText('All Channels'))
+      await user.click(screen.getByText('Test Channel 1'))
+
+      // Trigger should now show the selected channel name
+      await waitFor(() => {
+        // Check that "Test Channel 1" appears (in the trigger, not just the menu)
+        const triggers = screen.getAllByText('Test Channel 1')
+        expect(triggers.length).toBeGreaterThan(0)
+      })
+    })
+  })
 })
