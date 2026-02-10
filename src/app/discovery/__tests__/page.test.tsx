@@ -711,4 +711,342 @@ describe('Discovery Page', () => {
       })
     })
   })
+
+  describe('Content Type Filter Integration', () => {
+    it('should render content type filter dropdown when channels exist', async () => {
+      const mockChannels = [
+        {
+          id: 1,
+          channelId: 'UCtest1',
+          name: 'Test Channel 1',
+          createdAt: new Date().toISOString(),
+        },
+      ]
+
+      const mockVideos = [
+        {
+          youtubeId: 'vid1',
+          title: 'Video 1',
+          channelId: 'UCtest1',
+          channelName: 'Test Channel 1',
+          publishedAt: new Date().toISOString(),
+          description: 'Test',
+          inBank: false,
+        },
+      ]
+
+      // Mock /api/channels
+      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockChannels,
+      })
+
+      // Mock /api/channels/videos
+      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockVideos,
+      })
+
+      // Mock /api/videos
+      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          videos: [],
+          stats: {},
+          focusAreaMap: {},
+        }),
+      })
+
+      render(<Discovery />)
+
+      await waitFor(() => {
+        expect(screen.getByText('All')).toBeInTheDocument()
+      })
+    })
+
+    it('should not render content type filter when no channels exist', async () => {
+      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        ok: true,
+        json: async () => [],
+      })
+
+      render(<Discovery />)
+
+      await waitFor(() => {
+        expect(screen.queryByText('All')).not.toBeInTheDocument()
+      })
+    })
+
+    it('should filter to show only videos (inBank: false) when "Videos" is selected', async () => {
+      const user = userEvent.setup()
+
+      const mockChannels = [
+        {
+          id: 1,
+          channelId: 'UCtest1',
+          name: 'Test Channel 1',
+          createdAt: new Date().toISOString(),
+        },
+      ]
+
+      const mockVideos = [
+        {
+          youtubeId: 'vid1',
+          title: 'Video Not In Bank',
+          channelId: 'UCtest1',
+          channelName: 'Test Channel 1',
+          publishedAt: new Date().toISOString(),
+          description: 'Test',
+          inBank: false,
+        },
+        {
+          youtubeId: 'vid2',
+          title: 'Video In Bank',
+          channelId: 'UCtest1',
+          channelName: 'Test Channel 1',
+          publishedAt: new Date().toISOString(),
+          description: 'Test',
+          inBank: true,
+        },
+      ]
+
+      // Mock /api/channels
+      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockChannels,
+      })
+
+      // Mock /api/channels/videos
+      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockVideos,
+      })
+
+      // Mock /api/videos
+      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          videos: [],
+          stats: {},
+          focusAreaMap: {},
+        }),
+      })
+
+      render(<Discovery />)
+
+      // Wait for videos to load
+      await waitFor(() => {
+        expect(screen.getByText('Video Not In Bank')).toBeInTheDocument()
+        expect(screen.getByText('Video In Bank')).toBeInTheDocument()
+      })
+
+      // Click content type filter dropdown
+      const allButtons = screen.getAllByText('All')
+      const contentTypeAllButton = allButtons[0] // Get the content type filter "All"
+      if (!contentTypeAllButton) throw new Error('Content type filter not found')
+      await user.click(contentTypeAllButton)
+
+      // Select "Videos"
+      await user.click(screen.getByText('Videos'))
+
+      // Should only show videos not in bank
+      await waitFor(() => {
+        expect(screen.getByText('Video Not In Bank')).toBeInTheDocument()
+        expect(screen.queryByText('Video In Bank')).not.toBeInTheDocument()
+      })
+    })
+
+    it('should filter to show only transcripts (inBank: true) when "Transcripts" is selected', async () => {
+      const user = userEvent.setup()
+
+      const mockChannels = [
+        {
+          id: 1,
+          channelId: 'UCtest1',
+          name: 'Test Channel 1',
+          createdAt: new Date().toISOString(),
+        },
+      ]
+
+      const mockVideos = [
+        {
+          youtubeId: 'vid1',
+          title: 'Video Not In Bank',
+          channelId: 'UCtest1',
+          channelName: 'Test Channel 1',
+          publishedAt: new Date().toISOString(),
+          description: 'Test',
+          inBank: false,
+        },
+        {
+          youtubeId: 'vid2',
+          title: 'Video In Bank',
+          channelId: 'UCtest1',
+          channelName: 'Test Channel 1',
+          publishedAt: new Date().toISOString(),
+          description: 'Test',
+          inBank: true,
+        },
+      ]
+
+      // Mock /api/channels
+      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockChannels,
+      })
+
+      // Mock /api/channels/videos
+      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockVideos,
+      })
+
+      // Mock /api/videos
+      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          videos: [],
+          stats: {},
+          focusAreaMap: {},
+        }),
+      })
+
+      render(<Discovery />)
+
+      // Wait for videos to load
+      await waitFor(() => {
+        expect(screen.getByText('Video Not In Bank')).toBeInTheDocument()
+        expect(screen.getByText('Video In Bank')).toBeInTheDocument()
+      })
+
+      // Click content type filter dropdown
+      const allButtons = screen.getAllByText('All')
+      const contentTypeAllButton = allButtons[0]
+      if (!contentTypeAllButton) throw new Error('Content type filter not found')
+      await user.click(contentTypeAllButton)
+
+      // Select "Transcripts"
+      await user.click(screen.getByText('Transcripts'))
+
+      // Should only show videos in bank
+      await waitFor(() => {
+        expect(screen.queryByText('Video Not In Bank')).not.toBeInTheDocument()
+        expect(screen.getByText('Video In Bank')).toBeInTheDocument()
+      })
+    })
+
+    it('should compose both channel and content type filters together', async () => {
+      const user = userEvent.setup()
+
+      const mockChannels = [
+        {
+          id: 1,
+          channelId: 'UCtest1',
+          name: 'Test Channel 1',
+          createdAt: new Date().toISOString(),
+        },
+        {
+          id: 2,
+          channelId: 'UCtest2',
+          name: 'Test Channel 2',
+          createdAt: new Date().toISOString(),
+        },
+      ]
+
+      const mockVideos = [
+        {
+          youtubeId: 'vid1',
+          title: 'Channel 1 - Not In Bank',
+          channelId: 'UCtest1',
+          channelName: 'Test Channel 1',
+          publishedAt: new Date().toISOString(),
+          description: 'Test',
+          inBank: false,
+        },
+        {
+          youtubeId: 'vid2',
+          title: 'Channel 1 - In Bank',
+          channelId: 'UCtest1',
+          channelName: 'Test Channel 1',
+          publishedAt: new Date().toISOString(),
+          description: 'Test',
+          inBank: true,
+        },
+        {
+          youtubeId: 'vid3',
+          title: 'Channel 2 - Not In Bank',
+          channelId: 'UCtest2',
+          channelName: 'Test Channel 2',
+          publishedAt: new Date().toISOString(),
+          description: 'Test',
+          inBank: false,
+        },
+        {
+          youtubeId: 'vid4',
+          title: 'Channel 2 - In Bank',
+          channelId: 'UCtest2',
+          channelName: 'Test Channel 2',
+          publishedAt: new Date().toISOString(),
+          description: 'Test',
+          inBank: true,
+        },
+      ]
+
+      // Mock /api/channels
+      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockChannels,
+      })
+
+      // Mock /api/channels/videos
+      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockVideos,
+      })
+
+      // Mock /api/videos
+      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          videos: [],
+          stats: {},
+          focusAreaMap: {},
+        }),
+      })
+
+      render(<Discovery />)
+
+      // Wait for videos to load
+      await waitFor(() => {
+        expect(screen.getByText('Channel 1 - Not In Bank')).toBeInTheDocument()
+      })
+
+      // Select Channel 1
+      await user.click(screen.getByText('All Channels'))
+      await user.click(screen.getByText('Test Channel 1'))
+
+      // Should show both Channel 1 videos
+      await waitFor(() => {
+        expect(screen.getByText('Channel 1 - Not In Bank')).toBeInTheDocument()
+        expect(screen.getByText('Channel 1 - In Bank')).toBeInTheDocument()
+        expect(screen.queryByText('Channel 2 - Not In Bank')).not.toBeInTheDocument()
+        expect(screen.queryByText('Channel 2 - In Bank')).not.toBeInTheDocument()
+      })
+
+      // Now select "Videos" content type
+      const allButtons = screen.getAllByText('All')
+      const contentTypeAllButton = allButtons[0] // Content type filter
+      if (!contentTypeAllButton) throw new Error('Content type filter not found')
+      await user.click(contentTypeAllButton)
+      await user.click(screen.getByText('Videos'))
+
+      // Should only show Channel 1 videos that are not in bank
+      await waitFor(() => {
+        expect(screen.getByText('Channel 1 - Not In Bank')).toBeInTheDocument()
+        expect(screen.queryByText('Channel 1 - In Bank')).not.toBeInTheDocument()
+        expect(screen.queryByText('Channel 2 - Not In Bank')).not.toBeInTheDocument()
+        expect(screen.queryByText('Channel 2 - In Bank')).not.toBeInTheDocument()
+      })
+    })
+  })
 })

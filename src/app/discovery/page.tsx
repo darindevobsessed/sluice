@@ -7,6 +7,7 @@ import { RefreshCw } from 'lucide-react'
 import { FollowChannelInput } from '@/components/discovery/FollowChannelInput'
 import { DiscoveryVideoGrid } from '@/components/discovery/DiscoveryVideoGrid'
 import { ChannelFilterDropdown } from '@/components/discovery/ChannelFilterDropdown'
+import { ContentTypeFilter, type ContentTypeValue } from '@/components/discovery/ContentTypeFilter'
 import type { DiscoveryVideo } from '@/components/discovery/DiscoveryVideoCard'
 
 interface Channel {
@@ -53,6 +54,7 @@ export default function Discovery() {
   const [isLoadingVideos, setIsLoadingVideos] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [selectedChannelId, setSelectedChannelId] = useState<string | null>(null)
+  const [contentType, setContentType] = useState<ContentTypeValue>('all')
 
   useEffect(() => {
     setPageTitle({ title: 'Discovery' })
@@ -147,13 +149,24 @@ export default function Discovery() {
     await fetchVideos()
   }
 
-  // Filter videos by selected channel
+  // Filter videos by selected channel and content type
   const filteredVideos = useMemo(() => {
-    if (selectedChannelId === null) {
-      return discoveryVideos
+    let result = discoveryVideos
+
+    // Apply channel filter
+    if (selectedChannelId !== null) {
+      result = result.filter((video) => video.channelId === selectedChannelId)
     }
-    return discoveryVideos.filter((video) => video.channelId === selectedChannelId)
-  }, [discoveryVideos, selectedChannelId])
+
+    // Apply content type filter
+    if (contentType === 'videos') {
+      result = result.filter((video) => !video.inBank)
+    } else if (contentType === 'transcripts') {
+      result = result.filter((video) => video.inBank)
+    }
+
+    return result
+  }, [discoveryVideos, selectedChannelId, contentType])
 
   if (isLoading) {
     // Show skeleton grid while loading initial data
@@ -191,6 +204,7 @@ export default function Discovery() {
               selectedChannelId={selectedChannelId}
               onChannelChange={setSelectedChannelId}
             />
+            <ContentTypeFilter selected={contentType} onChange={setContentType} />
             <Button
               variant="outline"
               size="default"

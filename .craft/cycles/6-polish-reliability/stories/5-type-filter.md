@@ -1,14 +1,14 @@
 ---
 name: content-type-filter
 title: "Add content type filter to discovery page"
-status: active
+status: complete
 cycle: polish-reliability
 story_number: 5
 priority: medium
 created: 2026-02-10
 updated: 2026-02-10
 chunks_total: 2
-chunks_complete: 1
+chunks_complete: 2
 ---
 
 # Story: Add content type filter to discovery page

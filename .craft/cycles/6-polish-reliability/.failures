@@ -932,3 +932,198 @@ src/components/discovery/ContentTypeFilter.tsx(37,7): error TS17004: Cannot use 
 src/components/discovery/ContentTypeFilter.tsx(38,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
 src/components/discovery/ContentTypeFilter.tsx(39,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
 src/components/discovery/ContentTypeFilter.tsx(40,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+---
+timestamp: "2026-02-10 13:33:30"
+story: "5-type-filter"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 4 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/app/discovery/__tests__/page.test.tsx[2m > [22mDiscovery Page[2m > [22mContent Type Filter Integration[2m > [22mshould render content type filter dropdown when channels exist
+[31m[1mTestingLibraryElementError[22m[39m: Unable to find an element with the text: All. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body[39m
+  [33mstyle[39m=[32m""[39m
+[36m>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"p-4 sm:p-6 space-y-6"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"flex flex-col sm:flex-row items-start gap-3"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex-1 w-full"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mdata-slot[39m=[32m"collapsible"[39m
+            [33mdata-state[39m=[32m"closed"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"space-y-2"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33maria-controls[39m=[32m"radix-_r_1a_"[39m
+                [33maria-expanded[39m=[32m"false"[39m
+                [33mclass[39m=[32m"inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 h-9 px-4 py-2 has-[>svg]:px-3 w-full sm:w-auto"[39m
+                [33mdata-size[39m=[32m"default"[39m
+                [33mdata-slot[39m=[32m"collapsible-trigger"[39m
+                [33mdata-state[39m=[32m"closed"[39m
+                [33mdata-variant[39m=[32m"outline"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  [33mclass[39m=[32m"size-4"[39m
+                  [33mfill[39m=[32m"none"[39m
+                  [33mstroke[39m=[32m"currentColor"[39m
+                  [33mviewBox[39m=[32m"0 0 24 24"[39m
+                  [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+                [36m>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"M12 4v16m8-8H4"[39m
+                    [33mstroke-linecap[39m=[32m"round"[39m
+                    [33mstroke-linejoin[39m=[32m"round"[39m
+                    [33mstroke-width[39m=[32m"2"[39m
+                  [36m/>[39m
+                [36m</svg>[39m
+                [0mFollow a Channel[0m
+              [36m</button>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"overflow-hidden data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:slide-out-to-top-2 data-[state=open]:slide-in-from-top-2 duration-200 ease-out "[39m
+                [33mdata-slot[39m=[32m"collapsible-content"[39m
+                [33mdata-state[39m=[32m"closed"[39m
+                [33mhidden[39m=[32m""[39m
+                [33mid[39m=[32m"radix-_r_1a_"[39m
+                [33mstyle[39m=[32m""[39m
+              [36m/>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+        [36m<button[39m
+          [33maria-expanded[39m=[32m"false"[39m
+          [33maria-haspopup[39m=[32m"menu"[39m
+          [33mclass[39m=[32m"rounded-full px-4 py-1.5 text-sm bg-muted hover:bg-muted/80 transition-colors flex items-center gap-2 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"[39m
+          [33mdata-slot[39m=[32m"dropdown-menu-trigger"[39m
+          [33mdata-state[39m=[32m"closed"[39m
+          [33mid[39m=[32m"radix-_r_1b_"[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [0mAll Channels[0m
+          [36m<svg[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mclass[39m=[32m"lucide lucide-chevron-down h-4 w-4 opacity-50"[39m
+            [33mfill[39m=[32m"none"[39m
+            [33mheight[39m=[32m"24"[39m
+            [33mstroke[39m=[32m"currentColor"[39m
+            [33mstroke-linecap[39m=[32m"round"[39m
+            [33mstroke-linejoin[39m=[32m"round"[39m
+            [33mstroke-width[39m=[32m"2"[39m
+            [33mviewBox[39m=[32m"0 0 24 24"[39m
+            [33mwidth[39m=[32m"24"[39m
+   
+
+... [56736 characters truncated] ...
+
+shrink-0 [&>svg]:size-3 gap-1 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive overflow-hidden [a&]:hover:bg-secondary/90 bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300 transition-opacity duration-200"[39m
+                [33mdata-slot[39m=[32m"badge"[39m
+                [33mdata-variant[39m=[32m"secondary"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  [33mclass[39m=[32m"size-3"[39m
+                  [33mfill[39m=[32m"none"[39m
+                  [33mstroke[39m=[32m"currentColor"[39m
+                  [33mviewBox[39m=[32m"0 0 24 24"[39m
+                  [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+                [36m>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"M5 13l4 4L19 7"[39m
+                    [33mstroke-linecap[39m=[32m"round"[39m
+                    [33mstroke-linejoin[39m=[32m"round"[39m
+                    [33mstroke-width[39m=[32m"2"[39m
+                  [36m/>[39m
+                [36m</svg>[39m
+                [0mIn Bank[0m
+              [36m</span>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+[90m [2m❯[22m Object.getElementError node_modules/@testing-library/dom/dist/config.js:[2m37:19[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m76:38[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m109:15[22m[39m
+[36m [2m❯[22m src/app/discovery/__tests__/page.test.tsx:[2m1033:32[22m[39m
+    [90m1031| [39m
+    [90m1032| [39m      [90m// Now select "Videos" content type[39m
+    [90m1033| [39m      const allButton = screen.getAllByText('All')[0] // Content type …
+    [90m   | [39m                               [31m^[39m
+    [90m1034| [39m      [35mawait[39m user[33m.[39m[34mclick[39m(allButton)
+    [90m1035| [39m      [35mawait[39m user[33m.[39m[34mclick[39m(screen[33m.[39m[34mgetByText[39m([32m'Videos'[39m))
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/app/discovery/__tests__/page.test.tsx
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/app/discovery/__tests__/page.test.tsx [2m([22m[2m20 tests[22m[2m | [22m[31m4 failed[39m[2m)[22m[33m 3050[2mms[22m[39m
+     [32m✓[39m should show empty state when no channels are followed[32m 258[2mms[22m[39m
+     [32m✓[39m should render follow channel input[32m 78[2mms[22m[39m
+     [32m✓[39m should display videos in grid when channels exist[32m 69[2mms[22m[39m
+     [32m✓[39m should show loading state with skeleton grid[32m 13[2mms[22m[39m
+     [32m✓[39m should show error state when fetch fails[32m 20[2mms[22m[39m
+     [32m✓[39m should refetch videos when a new channel is followed[32m 299[2mms[22m[39m
+     [32m✓[39m should handle channel unfollow flow correctly[32m 45[2mms[22m[39m
+     [32m✓[39m should render refresh button when channels exist[32m 127[2mms[22m[39m
+     [32m✓[39m should not render refresh button when no channels exist[32m 40[2mms[22m[39m
+     [32m✓[39m should refetch videos when refresh button is clicked[32m 87[2mms[22m[39m
+       [32m✓[39m should render channel filter dropdown when channels exist[32m 43[2mms[22m[39m
+       [32m✓[39m should not render channel filter dropdown when no channels exist[32m 28[2mms[22m[39m
+       [32m✓[39m should filter videos to show only selected channel[32m 207[2mms[22m[39m
+       [32m✓[39m should show all videos when "All Channels" is selected[32m 299[2mms[22m[39m
+       [32m✓[39m should display channel name in dropdown trigger when channel is selected[32m 147[2mms[22m[39m
+[31m       [31m×[31m should render content type filter dropdown when channels exist[39m[33m 1019[2mms[22m[39m
+       [32m✓[39m should not render content type filter when no channels exist[32m 29[2mms[22m[39m
+[31m       [31m×[31m should filter to show only videos (inBank: false) when "Videos" is selected[39m[32m 43[2mms[22m[39m
+[31m       [31m×[31m should filter to show only transcripts (inBank: true) when "Transcripts" is selected[39m[32m 42[2mms[22m[39m
+[31m       [31m×[31m should compose both channel and content type filters together[39m[32m 155[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m4 failed[39m[22m[2m | [22m[1m[32m16 passed[39m[22m[90m (20)[39m
+[2m   Start at [22m 13:33:24
+[2m   Duration [22m 5.80s[2m (transform 272ms, setup 194ms, import 964ms, tests 3.05s, environment 1.07s)[22m
+---
+timestamp: "2026-02-10 13:34:10"
+story: "5-type-filter"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+npm error Missing script: "typecheck"
+npm error
+npm error To see a list of scripts, run:
+npm error   npm run
+npm error A complete log of this run can be found in: /Users/darindrobinski/.npm/_logs/2026-02-10T19_34_09_866Z-debug-0.log
+---
+timestamp: "2026-02-10 13:34:45"
+story: "5-type-filter"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 2
+src/app/discovery/__tests__/page.test.tsx(845,24): error TS2345: Argument of type 'HTMLElement | undefined' is not assignable to parameter of type 'Element'.
+  Type 'undefined' is not assignable to type 'Element'.
+src/app/discovery/__tests__/page.test.tsx(922,24): error TS2345: Argument of type 'HTMLElement | undefined' is not assignable to parameter of type 'Element'.
+  Type 'undefined' is not assignable to type 'Element'.
+src/app/discovery/__tests__/page.test.tsx(1034,24): error TS2345: Argument of type 'HTMLElement | undefined' is not assignable to parameter of type 'Element'.
+  Type 'undefined' is not assignable to type 'Element'.

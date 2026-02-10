@@ -1,0 +1,17 @@
+story: "type-filter"
+chunk: 2
+total_chunks: 2
+cycle: "6-polish-reliability"
+timestamp: "2026-02-10T19:32:25Z"
+git_ref: "758e8a7"
+git_branch: "main"
+state_CYCLE_STATUS: "ready"
+state_CURRENT_STORY: "5-type-filter"
+state_CURRENT_CHUNK: "2"
+state_TOTAL_CHUNKS: "2"
+state_LAST_VALIDATION: "2026-02-10T19:31:52Z"
+story_status: "active"
+story_chunks_total: "2"
+story_chunks_complete: "1"
+test_status: ""
+modified_files: ".craft/.global-state .craft/checkpoints/type-filter-chunk-1.yaml .craft/cycles/6-polish-reliability/.failures .craft/cycles/6-polish-reliability/.state .craft/cycles/6-polish-reliability/.usage/5-type-filter.log .craft/cycles/6-polish-reliability/stories/5-type-filter.md src/components/discovery/ContentTypeFilter.tsx src/components/discovery/__tests__/ContentTypeFilter.test.tsx "
