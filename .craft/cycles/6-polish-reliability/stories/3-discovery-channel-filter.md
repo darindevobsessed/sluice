@@ -1,10 +1,10 @@
 ---
 name: discovery-channel-filter
 title: Discovery channel filter dropdown
-status: ready
+status: active
 priority: medium
 created: 2026-02-09
-updated: 2026-02-09
+updated: 2026-02-10
 cycle: polish-reliability
 story_number: 3
 chunks_total: 2
