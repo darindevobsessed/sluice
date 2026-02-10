@@ -7,7 +7,7 @@ import { VideoGrid } from '@/components/videos/VideoGrid'
 import { EmptyState } from '@/components/videos/EmptyState'
 import { SearchResults } from '@/components/search/SearchResults'
 import { PersonaPanel } from '@/components/personas/PersonaPanel'
-import { PersonaSuggestion } from '@/components/personas/PersonaSuggestion'
+import { PersonaStatus } from '@/components/personas/PersonaStatus'
 import { useSearch } from '@/hooks/useSearch'
 import { useEnsemble } from '@/hooks/useEnsemble'
 import { usePageTitle } from '@/components/layout/PageTitleContext'
@@ -42,6 +42,7 @@ export default function Home() {
   const [stats, setStats] = useState<VideoStats | null>(null);
   const [isLoadingVideos, setIsLoadingVideos] = useState(true);
   const [focusAreaMap, setFocusAreaMap] = useState<Record<number, FocusAreaMapEntry[]>>({});
+  const [hasActivePersonas, setHasActivePersonas] = useState(false);
 
   // Set page title
   const { setPageTitle } = usePageTitle();
@@ -175,10 +176,10 @@ export default function Home() {
         />
       ) : null}
 
-      {/* Persona Suggestion Banner */}
+      {/* Persona Status */}
       {!showEmptyState && (
         <div className="mb-4">
-          <PersonaSuggestion />
+          <PersonaStatus onActivePersonasChange={setHasActivePersonas} />
         </div>
       )}
 
@@ -190,6 +191,11 @@ export default function Home() {
           {/* Search Bar */}
           <div className="mb-8">
             <VideoSearch onSearch={setQuery} />
+            {hasActivePersonas && (
+              <p className="mt-2 text-xs text-muted-foreground">
+                Type keywords to search · Ask a question (3+ words) to hear from your personas
+              </p>
+            )}
           </div>
 
           {/* Persona Panel - shows above search results when question detected */}

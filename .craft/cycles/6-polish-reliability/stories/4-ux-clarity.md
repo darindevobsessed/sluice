@@ -8,7 +8,7 @@ created: 2026-02-10
 updated: 2026-02-10
 priority: medium
 chunks_total: 4
-chunks_complete: 1
+chunks_complete: 2
 ---
 
 # Story: Persona UX clarity and discoverability improvements

@@ -103,20 +103,23 @@ git clone <repo-url>
 cd gold-miner
 npm install
 
-# Create .env from defaults (matches Docker credentials)
+# Create .env from defaults (matches Docker credentials out of the box)
 cp .env.example .env
+# Optional: add your ANTHROPIC_API_KEY for AI features (insights, personas)
 
 # Start PostgreSQL with pgvector (auto-enables the extension)
 docker compose up -d
 
-# Wait for PostgreSQL to be ready, then push the schema
-npm run db:push
+# Wait for Postgres to be healthy, then push the schema
+docker compose exec postgres pg_isready -U goldminer && npm run db:push
 
 # Start dev server + background agent
 npm run dev
 ```
 
 The Docker Compose file runs `pgvector/pgvector:pg16` with credentials that match `.env.example` out of the box. The init script (`scripts/init-db.sql`) automatically enables the `vector` extension and creates a test database.
+
+> **Note:** The app works without `ANTHROPIC_API_KEY` for browsing, search, and discovery. AI features (insights extraction, persona creation, ensemble queries) require the key. See [Environment Setup](#environment-setup) for all variables.
 
 ### Option B: Existing PostgreSQL
 
