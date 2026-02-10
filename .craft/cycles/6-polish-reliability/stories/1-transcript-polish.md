@@ -8,7 +8,7 @@ created: 2026-02-09
 updated: 2026-02-10
 priority: high
 chunks_total: 4
-chunks_complete: 2
+chunks_complete: 3
 ---
 
 # Story: Optional source field and transcript thumbnail icon

@@ -2,6 +2,7 @@ import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Image from "next/image";
+import { TranscriptIcon } from "@/components/icons/TranscriptIcon";
 
 interface SuccessStateProps {
   title: string;
@@ -9,9 +10,10 @@ interface SuccessStateProps {
   onReset: () => void;
   description?: string;
   videoId?: number | null;
+  sourceType?: 'youtube' | 'transcript';
 }
 
-export function SuccessState({ title, thumbnail, onReset, description, videoId }: SuccessStateProps) {
+export function SuccessState({ title, thumbnail, onReset, description, videoId, sourceType }: SuccessStateProps) {
   // Determine the navigation link - if we have a videoId, link to the detail page; otherwise fallback to the list
   const primaryLink = videoId ? `/videos/${videoId}` : "/";
   return (
@@ -43,8 +45,13 @@ export function SuccessState({ title, thumbnail, onReset, description, videoId }
             <p className="max-w-md text-left text-sm font-medium">{title}</p>
           </div>
         ) : (
-          <div className="mb-8">
-            <p className="max-w-md mx-auto text-sm font-medium">{title}</p>
+          <div className="mb-8 flex items-center justify-center gap-4">
+            {sourceType === 'transcript' && (
+              <div className="flex h-16 w-28 items-center justify-center rounded-md bg-muted">
+                <TranscriptIcon className="h-8 w-8" />
+              </div>
+            )}
+            <p className="max-w-md text-left text-sm font-medium">{title}</p>
           </div>
         )}
 

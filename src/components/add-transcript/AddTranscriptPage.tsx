@@ -37,7 +37,7 @@ export function AddTranscriptPage() {
         body: JSON.stringify({
           sourceType: 'transcript',
           title,
-          channel: source,
+          channel: source.trim() || undefined,
           transcript,
           tags: tagsArray,
           notes: notes || '',
@@ -73,7 +73,7 @@ export function AddTranscriptPage() {
     setSubmitError(null)
   }
 
-  const canSubmit = title.trim() && source.trim() && transcript.length >= 50
+  const canSubmit = title.trim() && transcript.length >= 50
 
   // Show success state if submitted
   if (submitted) {
@@ -88,6 +88,7 @@ export function AddTranscriptPage() {
           thumbnail={null}
           onReset={handleReset}
           description="Your transcript is ready to explore and generate plugin ideas."
+          sourceType="transcript"
         />
       </div>
     )
@@ -117,7 +118,7 @@ export function AddTranscriptPage() {
 
         <div className="space-y-3">
           <Label htmlFor="source" className="text-base">
-            Source
+            Source (optional)
           </Label>
           <Input
             id="source"

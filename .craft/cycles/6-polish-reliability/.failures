@@ -1,0 +1,17 @@
+---
+timestamp: "2026-02-10 09:00:43"
+story: "1-transcript-polish"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+src/app/api/personas/[id]/query/__tests__/route.test.ts(75,54): error TS2353: Object literal may only specify known properties, and 'id' does not exist in type 'Promise<{ id: string; }>'.
+src/app/api/personas/[id]/query/__tests__/route.test.ts(88,54): error TS2353: Object literal may only specify known properties, and 'id' does not exist in type 'Promise<{ id: string; }>'.
+src/app/api/personas/[id]/query/__tests__/route.test.ts(108,54): error TS2353: Object literal may only specify known properties, and 'id' does not exist in type 'Promise<{ id: string; }>'.
+src/app/api/personas/[id]/query/__tests__/route.test.ts(121,54): error TS2353: Object literal may only specify known properties, and 'id' does not exist in type 'Promise<{ id: string; }>'.
+src/app/api/personas/[id]/query/__tests__/route.test.ts(135,37): error TS2353: Object literal may only specify known properties, and 'id' does not exist in type 'Promise<{ id: string; }>'.
+src/app/api/personas/[id]/query/__tests__/route.test.ts(146,54): error TS2353: Object literal may only specify known properties, and 'id' does not exist in type 'Promise<{ id: string; }>'.
+src/app/api/personas/[id]/query/__tests__/route.test.ts(159,54): error TS2353: Object literal may only specify known properties, and 'id' does not exist in type 'Promise<{ id: string; }>'.
+src/app/api/personas/[id]/query/__tests__/route.test.ts(172,54): error TS2353: Object literal may only specify known properties, and 'id' does not exist in type 'Promise<{ id: string; }>'.
+src/app/api/personas/[id]/query/__tests__/route.test.ts(185,54): error TS2353: Object literal may only specify known properties, and 'id' does not exist in type 'Promise<{ id: string; }>'.
+src/app/api/personas/[id]/query/__tests__/route.test.ts(198,54): error TS2353: Object literal may only specify known properties, and 'id' does not exist in type 'Promise<{ id: string; }>'.

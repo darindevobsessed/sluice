@@ -3,12 +3,13 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ChevronDown, ChevronRight, Video as VideoIcon } from 'lucide-react';
+import { ChevronDown, ChevronRight } from 'lucide-react';
 import type { VideoResult } from '@/lib/search/aggregate';
 import type { SearchResult } from '@/lib/search/types';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { TranscriptIcon } from '@/components/icons/TranscriptIcon';
 import { ChunkResult } from './ChunkResult';
 import { FreshnessBadge } from './FreshnessBadge';
 
@@ -47,7 +48,7 @@ export function VideoResultGroup({
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
-                <VideoIcon className="h-8 w-8 text-muted-foreground" />
+                <TranscriptIcon className="h-8 w-8" />
               </div>
             )}
           </div>

@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Tag } from 'lucide-react';
+import { TranscriptIcon } from '@/components/icons/TranscriptIcon';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -77,7 +78,7 @@ export function VideoCard({ video, className, focusAreas, allFocusAreas, onToggl
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-muted">
-            <span className="text-muted-foreground">No thumbnail</span>
+            <TranscriptIcon className="h-10 w-10" />
           </div>
         )}
         {duration && (

@@ -59,7 +59,7 @@ describe('AddTranscriptPage', () => {
     expect(submitButton).toBeDisabled()
   })
 
-  it('submit button is disabled when source is missing', async () => {
+  it('submit button is enabled when source is empty (optional field)', async () => {
     const user = userEvent.setup()
     render(<AddTranscriptPage />)
 
@@ -70,7 +70,7 @@ describe('AddTranscriptPage', () => {
     await user.type(transcriptInput, 'This is a long enough transcript content that meets the minimum requirement')
 
     const submitButton = screen.getByRole('button', { name: /add to knowledge bank/i })
-    expect(submitButton).toBeDisabled()
+    expect(submitButton).toBeEnabled()
   })
 
   it('submit button is disabled when transcript is too short', async () => {

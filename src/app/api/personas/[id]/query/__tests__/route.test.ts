@@ -72,7 +72,7 @@ describe('POST /api/personas/[id]/query', () => {
       body: JSON.stringify({}), // Missing question
     })
 
-    const response = await POST(request, { params: { id: '1' } })
+    const response = await POST(request, { params: Promise.resolve({ id: '1' }) })
 
     expect(response.status).toBe(400)
     const data = await response.json()
@@ -85,7 +85,7 @@ describe('POST /api/personas/[id]/query', () => {
       body: JSON.stringify({ question: 'What is TypeScript?' }),
     })
 
-    const response = await POST(request, { params: { id: 'abc' } })
+    const response = await POST(request, { params: Promise.resolve({ id: 'abc' }) })
 
     expect(response.status).toBe(400)
     const data = await response.json()
@@ -105,7 +105,7 @@ describe('POST /api/personas/[id]/query', () => {
       body: JSON.stringify({ question: 'What is TypeScript?' }),
     })
 
-    const response = await POST(request, { params: { id: '999' } })
+    const response = await POST(request, { params: Promise.resolve({ id: '999' }) })
 
     expect(response.status).toBe(404)
     const data = await response.json()
@@ -118,7 +118,7 @@ describe('POST /api/personas/[id]/query', () => {
       body: JSON.stringify({ question: 'What is TypeScript?' }),
     })
 
-    const response = await POST(request, { params: { id: '1' } })
+    const response = await POST(request, { params: Promise.resolve({ id: '1' }) })
 
     expect(response.status).toBe(200)
     expect(response.headers.get('content-type')).toBe('text/event-stream')
@@ -132,7 +132,7 @@ describe('POST /api/personas/[id]/query', () => {
       body: JSON.stringify({ question: 'What is TypeScript?' }),
     })
 
-    await POST(request, { params: { id: '1' } })
+    await POST(request, { params: Promise.resolve({ id: '1' }) })
 
     expect(mockGetPersonaContext).toHaveBeenCalledWith('Test Channel', 'What is TypeScript?')
   })
@@ -143,7 +143,7 @@ describe('POST /api/personas/[id]/query', () => {
       body: JSON.stringify({ question: '' }),
     })
 
-    const response = await POST(request, { params: { id: '1' } })
+    const response = await POST(request, { params: Promise.resolve({ id: '1' }) })
 
     expect(response.status).toBe(400)
     const data = await response.json()
@@ -156,7 +156,7 @@ describe('POST /api/personas/[id]/query', () => {
       body: JSON.stringify({ question: "What's the difference between 'let' and 'const'?" }),
     })
 
-    const response = await POST(request, { params: { id: '1' } })
+    const response = await POST(request, { params: Promise.resolve({ id: '1' }) })
 
     expect(response.status).toBe(200)
   })
@@ -169,7 +169,7 @@ describe('POST /api/personas/[id]/query', () => {
       body: JSON.stringify({ question: 'What is TypeScript?' }),
     })
 
-    const response = await POST(request, { params: { id: '1' } })
+    const response = await POST(request, { params: Promise.resolve({ id: '1' }) })
 
     expect(response.status).toBe(500)
     const data = await response.json()
@@ -182,7 +182,7 @@ describe('POST /api/personas/[id]/query', () => {
       body: JSON.stringify({ question: 123 }),
     })
 
-    const response = await POST(request, { params: { id: '1' } })
+    const response = await POST(request, { params: Promise.resolve({ id: '1' }) })
 
     expect(response.status).toBe(400)
     const data = await response.json()
@@ -195,7 +195,7 @@ describe('POST /api/personas/[id]/query', () => {
       body: 'invalid json',
     })
 
-    const response = await POST(request, { params: { id: '1' } })
+    const response = await POST(request, { params: Promise.resolve({ id: '1' }) })
 
     expect(response.status).toBe(400)
     const data = await response.json()
