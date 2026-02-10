@@ -12,6 +12,7 @@ import { useEmbedding } from '@/hooks/useEmbedding';
 
 describe('EmbedButton', () => {
   const mockEmbed = vi.fn();
+  const mockReEmbed = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -26,6 +27,7 @@ describe('EmbedButton', () => {
         error: null,
         progress: { current: 0, total: 0 },
         embed: mockEmbed,
+        reEmbed: mockReEmbed,
       });
 
       render(<EmbedButton videoId={1} hasTranscript={true} />);
@@ -41,6 +43,7 @@ describe('EmbedButton', () => {
         error: null,
         progress: { current: 0, total: 0 },
         embed: mockEmbed,
+        reEmbed: mockReEmbed,
       });
 
       render(<EmbedButton videoId={1} hasTranscript={false} />);
@@ -61,6 +64,7 @@ describe('EmbedButton', () => {
         error: null,
         progress: { current: 0, total: 0 },
         embed: mockEmbed,
+        reEmbed: mockReEmbed,
       });
 
       render(<EmbedButton videoId={1} hasTranscript={true} />);
@@ -79,6 +83,7 @@ describe('EmbedButton', () => {
         error: null,
         progress: { current: 5, total: 10 },
         embed: mockEmbed,
+        reEmbed: mockReEmbed,
       });
 
       render(<EmbedButton videoId={1} hasTranscript={true} />);
@@ -96,6 +101,7 @@ describe('EmbedButton', () => {
         error: null,
         progress: { current: 0, total: 0 },
         embed: mockEmbed,
+        reEmbed: mockReEmbed,
       });
 
       render(<EmbedButton videoId={1} hasTranscript={true} />);
@@ -111,6 +117,7 @@ describe('EmbedButton', () => {
         error: null,
         progress: { current: 0, total: 0 },
         embed: mockEmbed,
+        reEmbed: mockReEmbed,
       });
 
       render(<EmbedButton videoId={1} hasTranscript={true} />);
@@ -129,6 +136,7 @@ describe('EmbedButton', () => {
         error: 'Failed to generate embeddings',
         progress: { current: 0, total: 0 },
         embed: mockEmbed,
+        reEmbed: mockReEmbed,
       });
 
       render(<EmbedButton videoId={1} hasTranscript={true} />);
@@ -149,6 +157,7 @@ describe('EmbedButton', () => {
         error: null,
         progress: { current: 0, total: 0 },
         embed: mockEmbed,
+        reEmbed: mockReEmbed,
       });
 
       render(<EmbedButton videoId={1} hasTranscript={true} />);
@@ -159,7 +168,7 @@ describe('EmbedButton', () => {
       expect(mockEmbed).toHaveBeenCalledTimes(1);
     });
 
-    it('calls embed() on click for re-embed', async () => {
+    it('calls reEmbed() on click for re-embed', async () => {
       const user = userEvent.setup();
 
       vi.mocked(useEmbedding).mockReturnValue({
@@ -169,6 +178,7 @@ describe('EmbedButton', () => {
         error: null,
         progress: { current: 0, total: 0 },
         embed: mockEmbed,
+        reEmbed: mockReEmbed,
       });
 
       render(<EmbedButton videoId={1} hasTranscript={true} />);
@@ -176,7 +186,7 @@ describe('EmbedButton', () => {
       const button = screen.getByRole('button', { name: /re-embed/i });
       await user.click(button);
 
-      expect(mockEmbed).toHaveBeenCalledTimes(1);
+      expect(mockReEmbed).toHaveBeenCalledTimes(1);
     });
 
     it('does not render button when no transcript', () => {
@@ -187,6 +197,7 @@ describe('EmbedButton', () => {
         error: null,
         progress: { current: 0, total: 0 },
         embed: mockEmbed,
+        reEmbed: mockReEmbed,
       });
 
       render(<EmbedButton videoId={1} hasTranscript={false} />);
@@ -204,6 +215,7 @@ describe('EmbedButton', () => {
         error: null,
         progress: { current: 0, total: 0 },
         embed: mockEmbed,
+        reEmbed: mockReEmbed,
       });
 
       render(<EmbedButton videoId={1} hasTranscript={true} />);
@@ -222,6 +234,7 @@ describe('EmbedButton', () => {
         error: null,
         progress: { current: 0, total: 0 },
         embed: mockEmbed,
+        reEmbed: mockReEmbed,
       });
 
       render(<EmbedButton videoId={1} hasTranscript={true} />);
@@ -238,6 +251,7 @@ describe('EmbedButton', () => {
         error: null,
         progress: { current: 0, total: 0 },
         embed: mockEmbed,
+        reEmbed: mockReEmbed,
       });
 
       render(<EmbedButton videoId={1} hasTranscript={true} />);

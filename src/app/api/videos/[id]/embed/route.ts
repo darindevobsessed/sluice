@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { db, videos, chunks } from '@/lib/db';
-import { eq, and, isNotNull, count } from 'drizzle-orm';
+import { db, videos } from '@/lib/db';
+import { eq } from 'drizzle-orm';
 import { parseTranscript } from '@/lib/transcript/parse';
 import { chunkTranscript } from '@/lib/embeddings/chunker';
 import { embedChunks } from '@/lib/embeddings/service';
@@ -72,22 +72,6 @@ export async function POST(
         },
         { status: 400 }
       );
-    }
-
-    // Check if already embedded (chunks exist with non-null embeddings)
-    const [result] = await db
-      .select({ count: count() })
-      .from(chunks)
-      .where(and(eq(chunks.videoId, videoId), isNotNull(chunks.embedding)));
-
-    const existingChunkCount = result?.count ?? 0;
-
-    if (existingChunkCount > 0) {
-      return NextResponse.json({
-        success: true,
-        alreadyEmbedded: true,
-        chunkCount: existingChunkCount,
-      });
     }
 
     // Parse transcript into segments

@@ -14,6 +14,7 @@ interface UseEmbeddingReturn {
   error: string | null;
   progress: Progress;
   embed: () => void;
+  reEmbed: () => void;
 }
 
 /**
@@ -45,7 +46,7 @@ export function useEmbedding(videoId: number): UseEmbeddingReturn {
     checkStatus();
   }, [videoId]);
 
-  // Generate embeddings
+  // Generate embeddings (guarded - won't re-embed if already embedded)
   const embed = useCallback(async () => {
     // Don't start if already loading or already embedded
     if (state === 'loading' || hasEmbeddings) {
@@ -85,6 +86,46 @@ export function useEmbedding(videoId: number): UseEmbeddingReturn {
     }
   }, [videoId, state, hasEmbeddings]);
 
+  // Re-embed (bypasses hasEmbeddings guard - force re-generation)
+  const reEmbed = useCallback(async () => {
+    // Don't start if already loading
+    if (state === 'loading') {
+      return;
+    }
+
+    setState('loading');
+    setError(null);
+    setProgress({ current: 0, total: 0 });
+
+    try {
+      const response = await fetch(`/api/videos/${videoId}/embed`, {
+        method: 'POST',
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setState('error');
+        setError(data.error ?? 'Failed to generate embeddings');
+        return;
+      }
+
+      if (data.success) {
+        setState('success');
+        setHasEmbeddings(true);
+        setChunkCount(data.chunkCount ?? 0);
+      } else {
+        setState('error');
+        setError(data.error ?? 'Failed to generate embeddings');
+      }
+    } catch (err) {
+      setState('error');
+      const errorMessage =
+        err instanceof Error ? err.message : 'Failed to generate embeddings';
+      setError(errorMessage);
+    }
+  }, [videoId, state]);
+
   return {
     state,
     hasEmbeddings,
@@ -92,5 +133,6 @@ export function useEmbedding(videoId: number): UseEmbeddingReturn {
     error,
     progress,
     embed,
+    reEmbed,
   };
 }

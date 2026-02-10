@@ -13,7 +13,7 @@ interface EmbedButtonProps {
  * Button component for triggering and displaying embedding generation status
  */
 export function EmbedButton({ videoId, hasTranscript }: EmbedButtonProps) {
-  const { state, hasEmbeddings, chunkCount, error, embed } = useEmbedding(videoId);
+  const { state, hasEmbeddings, chunkCount, error, embed, reEmbed } = useEmbedding(videoId);
 
   // Disabled if no transcript or currently loading
   const isDisabled = !hasTranscript || state === 'loading';
@@ -90,7 +90,7 @@ export function EmbedButton({ videoId, hasTranscript }: EmbedButtonProps) {
               </p>
             </div>
           </div>
-          <Button onClick={embed} size="sm" variant="outline">
+          <Button onClick={reEmbed} size="sm" variant="outline">
             Re-embed
           </Button>
         </div>

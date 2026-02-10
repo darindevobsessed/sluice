@@ -8,7 +8,7 @@ updated: 2026-02-10
 cycle: polish-reliability
 story_number: 2
 chunks_total: 3
-chunks_complete: 1
+chunks_complete: 2
 ---
 
 # Story: Auto-embed on video creation
