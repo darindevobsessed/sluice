@@ -1,0 +1,17 @@
+story: "ux-clarity"
+chunk: 1
+total_chunks: 4
+cycle: "6-polish-reliability"
+timestamp: "2026-02-10T20:09:22Z"
+git_ref: "3c5e867"
+git_branch: "main"
+state_CYCLE_STATUS: "ready"
+state_CURRENT_STORY: "4-ux-clarity"
+state_CURRENT_CHUNK: "1"
+state_TOTAL_CHUNKS: "4"
+state_LAST_VALIDATION: "2026-02-10T19:38:52Z"
+story_status: "active"
+story_chunks_total: "4"
+story_chunks_complete: "0"
+test_status: ""
+modified_files: ".craft/.global-state .craft/.learnings.yaml .craft/checkpoints/type-filter-chunk-2.yaml .craft/cycles/6-polish-reliability/.failures .craft/cycles/6-polish-reliability/.state .craft/cycles/6-polish-reliability/.usage/5-type-filter.log .craft/cycles/6-polish-reliability/stories/4-ux-clarity.md .craft/cycles/6-polish-reliability/stories/5-type-filter.md src/app/discovery/__tests__/page.test.tsx src/app/discovery/page.tsx "
