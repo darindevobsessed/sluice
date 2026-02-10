@@ -87,8 +87,7 @@ export function buildExtractionPrompt(video: {
 
 <video_metadata>
 Title: ${video.title}
-Channel: ${video.channel}
-</video_metadata>
+${video.channel ? `Channel: ${video.channel}\n` : ''}</video_metadata>
 
 <transcript>
 ${video.transcript}
