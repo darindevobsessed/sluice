@@ -136,7 +136,7 @@ describe('POST /api/videos/[id]/embed (Postgres)', () => {
     });
   });
 
-  it('returns existing chunk count if already embedded', async () => {
+  it('re-generates embeddings for already embedded video', async () => {
     const db = getTestDb();
 
     // Create video with transcript
@@ -180,12 +180,18 @@ describe('POST /api/videos/[id]/embed (Postgres)', () => {
     expect(response.status).toBe(200);
     expect(data).toEqual({
       success: true,
-      alreadyEmbedded: true,
+      alreadyEmbedded: false,
       chunkCount: 2,
+      durationMs: 500,
+      relationshipsCreated: 3,
     });
 
-    // Should not call embedding service
-    expect(embedChunks).not.toHaveBeenCalled();
+    // Should call embedding service for re-embed
+    expect(embedChunks).toHaveBeenCalledWith(
+      expect.any(Array),
+      undefined,
+      video!.id
+    );
   });
 
   it('generates embeddings for new video', async () => {
