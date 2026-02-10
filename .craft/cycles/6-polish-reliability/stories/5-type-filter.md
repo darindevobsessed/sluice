@@ -8,7 +8,7 @@ priority: medium
 created: 2026-02-10
 updated: 2026-02-10
 chunks_total: 2
-chunks_complete: 0
+chunks_complete: 1
 ---
 
 # Story: Add content type filter to discovery page
