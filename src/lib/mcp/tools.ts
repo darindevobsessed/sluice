@@ -35,7 +35,7 @@ export function registerSearchRag(server: McpServer): void {
 
       // Filter by creator if provided (case-insensitive)
       const filtered = creator
-        ? results.filter(r => r.channel.toLowerCase().includes(creator.toLowerCase()))
+        ? results.filter(r => r.channel?.toLowerCase().includes(creator.toLowerCase()))
         : results
 
       // Aggregate results by video

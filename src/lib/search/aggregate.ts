@@ -7,7 +7,7 @@ export interface VideoResult {
   videoId: number;
   youtubeId: string | null;
   title: string;
-  channel: string;
+  channel: string | null;
   thumbnail: string | null;
   publishedAt?: Date | null; // Video publication date for freshness badge
   score: number; // Aggregated score (max of all chunks)

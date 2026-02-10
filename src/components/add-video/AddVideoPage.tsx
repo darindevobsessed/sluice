@@ -27,6 +27,7 @@ export function AddVideoPage() {
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
+  const [createdVideoId, setCreatedVideoId] = useState<number | null>(null)
 
   // Transcript auto-fetch state
   const [transcriptFetching, setTranscriptFetching] = useState(false)
@@ -221,6 +222,7 @@ export function AddVideoPage() {
       }
 
       // Success!
+      setCreatedVideoId(data.video.id);
       setSubmitted(true);
     } catch (err) {
       console.error("Submission error:", err);
@@ -243,6 +245,7 @@ export function AddVideoPage() {
     setSubmitting(false);
     setSubmitted(false);
     setSubmitError(null);
+    setCreatedVideoId(null);
     setTranscriptFetching(false);
     setTranscriptFetchError(null);
     setTranscriptSource(null);
@@ -266,6 +269,7 @@ export function AddVideoPage() {
           title={title}
           thumbnail={thumbnail}
           onReset={handleReset}
+          videoId={createdVideoId}
         />
       </div>
     );

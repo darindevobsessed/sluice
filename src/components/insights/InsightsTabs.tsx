@@ -25,7 +25,7 @@ export function InsightsTabs({ video, onSeek, className }: InsightsTabsProps) {
     videoId: video.id,
     video: {
       title: video.title,
-      channel: video.channel,
+      channel: video.channel ?? '',
       transcript: video.transcript || '',
     },
   })

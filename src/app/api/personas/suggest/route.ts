@@ -18,10 +18,11 @@ export async function GET() {
       .groupBy(videos.channel)
 
     // Filter channels with 30+ videos and no existing persona
+    // Exclude null channels (transcript-only videos)
     const suggestions = channelCounts
-      .filter((c) => c.videoCount >= 30 && !existingChannelNames.has(c.channel))
+      .filter((c) => c.channel !== null && c.videoCount >= 30 && !existingChannelNames.has(c.channel))
       .map((c) => ({
-        channelName: c.channel,
+        channelName: c.channel!,
         videoCount: c.videoCount,
       }))
       .sort((a, b) => b.videoCount - a.videoCount) // Sort by video count descending

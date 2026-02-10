@@ -300,6 +300,45 @@ describe('POST /api/videos', () => {
     expect(secondData.video).toBeDefined()
     expect(secondData.video.id).not.toBe(firstData.video.id)
   })
+
+  it('allows transcript-type video without channel (null)', async () => {
+    const request = new Request('http://localhost:3000/api/videos', {
+      method: 'POST',
+      body: JSON.stringify({
+        sourceType: 'transcript',
+        title: 'Transcript Without Channel',
+        transcript: 'This is a transcript entry without a channel specified, which should be allowed',
+      }),
+    })
+
+    const response = await POST(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(201)
+    expect(data.video).toBeDefined()
+    expect(data.video.sourceType).toBe('transcript')
+    expect(data.video.channel).toBeNull()
+    expect(data.video.title).toBe('Transcript Without Channel')
+  })
+
+  it('returns 400 when youtube-type video is missing channel', async () => {
+    const request = new Request('http://localhost:3000/api/videos', {
+      method: 'POST',
+      body: JSON.stringify({
+        sourceType: 'youtube',
+        youtubeId: 'test-video-no-channel',
+        title: 'YouTube Video Without Channel',
+        transcript: 'This should fail because channel is required for youtube sourceType',
+      }),
+    })
+
+    const response = await POST(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(400)
+    expect(data.error).toBeDefined()
+    expect(data.error).toContain('Channel is required')
+  })
 })
 
 describe('GET /api/videos', () => {

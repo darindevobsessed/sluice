@@ -9,7 +9,7 @@ export const videos = pgTable('videos', {
   youtubeId: text('youtube_id'),
   sourceType: text('source_type').notNull().default('youtube'),
   title: text('title').notNull(),
-  channel: text('channel').notNull(),
+  channel: text('channel'),
   thumbnail: text('thumbnail'),
   duration: integer('duration'), // in seconds
   transcript: text('transcript'), // full transcript text

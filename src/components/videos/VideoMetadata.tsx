@@ -32,10 +32,13 @@ export function VideoMetadata({ video, className }: VideoMetadataProps) {
     <div className={className}>
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted-foreground">
         {/* Channel name */}
-        <span className="font-medium">{video.channel}</span>
-
-        {/* Separator */}
-        <span className="text-muted-foreground/50">•</span>
+        {video.channel && (
+          <>
+            <span className="font-medium">{video.channel}</span>
+            {/* Separator */}
+            <span className="text-muted-foreground/50">•</span>
+          </>
+        )}
 
         {/* Date added */}
         <span>{dateAdded}</span>

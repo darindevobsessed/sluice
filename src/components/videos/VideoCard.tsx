@@ -92,9 +92,11 @@ export function VideoCard({ video, className, focusAreas, allFocusAreas, onToggl
         <h3 className="mb-1 line-clamp-2 font-semibold leading-tight">
           {video.title}
         </h3>
-        <p className="mb-1 text-sm text-muted-foreground">
-          {video.channel}
-        </p>
+        {video.channel && (
+          <p className="mb-1 text-sm text-muted-foreground">
+            {video.channel}
+          </p>
+        )}
         <div className="flex items-center gap-2">
           <p className="text-xs text-muted-foreground">
             {dateAdded}

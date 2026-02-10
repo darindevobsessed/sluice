@@ -14,9 +14,11 @@ export function RelatedChunkCard({ chunk }: RelatedChunkCardProps) {
     <Link href={`/videos/${chunk.video.id}`}>
       <div className="rounded-xl border border-border bg-surface p-4 transition-shadow duration-200 hover:shadow-md">
         <div className="mb-2 flex items-center justify-between">
-          <span className="text-sm font-medium text-text-secondary">
-            {chunk.video.channel}
-          </span>
+          {chunk.video.channel && (
+            <span className="text-sm font-medium text-text-secondary">
+              {chunk.video.channel}
+            </span>
+          )}
           <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
             {similarityPercent}% similar
           </span>

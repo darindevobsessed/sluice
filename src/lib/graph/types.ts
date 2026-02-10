@@ -13,7 +13,7 @@ export interface RelatedChunk {
   video: {
     id: number
     title: string
-    channel: string
+    channel: string | null
     youtubeId: string | null
   }
 }

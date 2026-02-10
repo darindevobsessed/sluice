@@ -8,9 +8,12 @@ interface SuccessStateProps {
   thumbnail?: string | null;
   onReset: () => void;
   description?: string;
+  videoId?: number | null;
 }
 
-export function SuccessState({ title, thumbnail, onReset, description }: SuccessStateProps) {
+export function SuccessState({ title, thumbnail, onReset, description, videoId }: SuccessStateProps) {
+  // Determine the navigation link - if we have a videoId, link to the detail page; otherwise fallback to the list
+  const primaryLink = videoId ? `/videos/${videoId}` : "/";
   return (
     <div className="mx-auto max-w-2xl animate-fadeIn">
       <div className="rounded-lg border border-border bg-card p-8 text-center">
@@ -48,7 +51,9 @@ export function SuccessState({ title, thumbnail, onReset, description }: Success
         {/* Action buttons */}
         <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
           <Button asChild size="lg" className="min-w-[200px]">
-            <Link href="/">View in Knowledge Bank</Link>
+            <Link href={primaryLink}>
+              {videoId ? "View Video Details" : "View in Knowledge Bank"}
+            </Link>
           </Button>
           <Button
             variant="outline"

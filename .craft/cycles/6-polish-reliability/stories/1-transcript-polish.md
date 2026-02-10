@@ -5,10 +5,10 @@ status: active
 cycle: polish-reliability
 story_number: 1
 created: 2026-02-09
-updated: 2026-02-09
+updated: 2026-02-10
 priority: high
 chunks_total: 4
-chunks_complete: 0
+chunks_complete: 1
 ---
 
 # Story: Optional source field and transcript thumbnail icon

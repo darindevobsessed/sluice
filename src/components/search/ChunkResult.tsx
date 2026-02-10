@@ -81,7 +81,9 @@ export function ChunkResult({ chunk, highlightTerms, className }: ChunkResultPro
           >
             {chunk.videoTitle}
           </Link>
-          <p className="text-sm text-muted-foreground">{chunk.channel}</p>
+          {chunk.channel && (
+            <p className="text-sm text-muted-foreground">{chunk.channel}</p>
+          )}
         </div>
 
         {/* Similarity score */}

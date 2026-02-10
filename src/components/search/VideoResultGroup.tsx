@@ -80,7 +80,9 @@ export function VideoResultGroup({
               </div>
             </div>
 
-            <p className="text-sm text-muted-foreground mb-2">{video.channel}</p>
+            {video.channel && (
+              <p className="text-sm text-muted-foreground mb-2">{video.channel}</p>
+            )}
 
             {/* Best chunk preview */}
             <p className="text-sm text-muted-foreground line-clamp-2">

@@ -7,12 +7,21 @@ const videoSchema = z.object({
   youtubeId: z.string().min(1).optional(),
   sourceType: z.enum(['youtube', 'transcript']).default('youtube'),
   title: z.string().min(1, "Title is required"),
-  channel: z.string().min(1, "Channel is required"),
+  channel: z.string().optional(),
   thumbnail: z.string().optional(),
   transcript: z.string().min(50, "Transcript must be at least 50 characters"),
   tags: z.array(z.string()).optional(),
   notes: z.string().optional(),
   publishedAt: z.string().datetime().optional(), // ISO 8601 date string
+}).superRefine((data, ctx) => {
+  // Conditional validation: YouTube type requires channel
+  if (data.sourceType === 'youtube' && !data.channel) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Channel is required for YouTube videos",
+      path: ['channel'],
+    });
+  }
 });
 
 export async function GET(request: Request) {
@@ -115,6 +124,9 @@ export async function POST(request: Request) {
       );
     }
 
+    // Convert empty string to undefined for null storage
+    const channelValue = channel?.trim() ? channel : undefined;
+
     // Check for duplicate only for YouTube videos
     if (sourceType === 'youtube' && youtubeId) {
       const existingVideo = await db
@@ -138,7 +150,7 @@ export async function POST(request: Request) {
         youtubeId: youtubeId || null,
         sourceType,
         title,
-        channel,
+        channel: channelValue || null,
         thumbnail: thumbnail || null,
         transcript,
         publishedAt: validationResult.data.publishedAt

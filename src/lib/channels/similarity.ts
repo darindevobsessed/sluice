@@ -124,16 +124,16 @@ export async function findSimilarChannels(
     })
     .from(videos)
 
-  // Filter out followed channels
+  // Filter out followed channels and null channels (transcript-only videos)
   const candidateChannels = allChannelNames
     .map(row => row.channel)
-    .filter(name => !followedChannelNames.has(name))
+    .filter(name => name !== null && !followedChannelNames.has(name))
 
   // Compute similarity for each candidate channel
   const similarChannels: SimilarChannel[] = []
   const startTime = Date.now()
 
-  for (const candidateChannelName of candidateChannels) {
+  for (const candidateChannelName of candidateChannels as string[]) {
     // Performance guard: return partial results if computation exceeds timeout
     if (Date.now() - startTime > timeout) {
       break
