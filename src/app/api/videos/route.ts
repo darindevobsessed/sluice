@@ -1,7 +1,11 @@
 import { db, videos, searchVideos, getVideoStats, videoFocusAreas, focusAreas } from "@/lib/db";
 import { eq, inArray } from "drizzle-orm";
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import { z } from "zod";
+import { parseTranscript } from '@/lib/transcript/parse'
+import { chunkTranscript } from '@/lib/embeddings/chunker'
+import { embedChunks } from '@/lib/embeddings/service'
+import type { TranscriptSegment } from '@/lib/embeddings/types'
 
 const videoSchema = z.object({
   youtubeId: z.string().min(1).optional(),
@@ -160,6 +164,34 @@ export async function POST(request: Request) {
       .returning();
 
     const createdVideo = result[0];
+
+    // Trigger auto-embed if video has transcript
+    if (createdVideo && transcript && transcript.trim().length > 0) {
+      after(async () => {
+        try {
+          // Parse transcript and convert to embedding format
+          const parsedSegments = parseTranscript(transcript)
+          const segments: TranscriptSegment[] = parsedSegments.map(seg => ({
+            text: seg.text,
+            offset: seg.seconds * 1000, // Convert seconds to milliseconds
+          }))
+
+          // Chunk transcript
+          const chunks = chunkTranscript(segments)
+
+          if (chunks.length === 0) {
+            console.error(`[auto-embed] No chunks generated for video ${createdVideo.id}`)
+            return
+          }
+
+          // Generate embeddings
+          const result = await embedChunks(chunks, undefined, createdVideo.id)
+          console.log(`[auto-embed] Generated ${result.successCount} embeddings for video ${createdVideo.id}`)
+        } catch (error) {
+          console.error(`[auto-embed] Failed for video ${createdVideo.id}:`, error)
+        }
+      })
+    }
 
     return NextResponse.json(
       { video: createdVideo },

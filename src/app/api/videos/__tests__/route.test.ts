@@ -8,6 +8,16 @@ vi.mock('@/lib/embeddings/pipeline', () => ({
   generateEmbedding: vi.fn().mockResolvedValue(new Float32Array(384).fill(0.5)),
 }))
 
+// Mock next/server's after function
+const mockAfter = vi.fn()
+vi.mock('next/server', async () => {
+  const actual = await vi.importActual<typeof import('next/server')>('next/server')
+  return {
+    ...actual,
+    after: mockAfter,
+  }
+})
+
 // Setup test database
 const TEST_DATABASE_URL =
   process.env.DATABASE_URL?.replace(/\/goldminer$/, '/goldminer_test') ??
@@ -338,6 +348,48 @@ describe('POST /api/videos', () => {
     expect(response.status).toBe(400)
     expect(data.error).toBeDefined()
     expect(data.error).toContain('Channel is required')
+  })
+
+  it('triggers auto-embed when video is created with transcript', async () => {
+    mockAfter.mockClear()
+
+    const request = new Request('http://localhost:3000/api/videos', {
+      method: 'POST',
+      body: JSON.stringify({
+        sourceType: 'transcript',
+        title: 'Auto-embed Test Video',
+        transcript: 'This is a test transcript that should trigger automatic embedding generation',
+      }),
+    })
+
+    const response = await POST(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(201)
+    expect(data.video).toBeDefined()
+
+    // Verify after() was called with a function
+    expect(mockAfter).toHaveBeenCalledTimes(1)
+    expect(mockAfter).toHaveBeenCalledWith(expect.any(Function))
+  })
+
+  it('does not trigger auto-embed when video has empty transcript', async () => {
+    mockAfter.mockClear()
+
+    // Create video with minimal transcript (below 50 chars) should fail validation
+    const request = new Request('http://localhost:3000/api/videos', {
+      method: 'POST',
+      body: JSON.stringify({
+        sourceType: 'transcript',
+        title: 'No Embed Test',
+        transcript: 'Short', // This will fail validation
+      }),
+    })
+
+    const response = await POST(request)
+
+    expect(response.status).toBe(400) // Should fail validation
+    expect(mockAfter).not.toHaveBeenCalled()
   })
 })
 

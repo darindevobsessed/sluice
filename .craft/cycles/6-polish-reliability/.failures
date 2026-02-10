@@ -15,3 +15,72 @@ src/app/api/personas/[id]/query/__tests__/route.test.ts(159,54): error TS2353: O
 src/app/api/personas/[id]/query/__tests__/route.test.ts(172,54): error TS2353: Object literal may only specify known properties, and 'id' does not exist in type 'Promise<{ id: string; }>'.
 src/app/api/personas/[id]/query/__tests__/route.test.ts(185,54): error TS2353: Object literal may only specify known properties, and 'id' does not exist in type 'Promise<{ id: string; }>'.
 src/app/api/personas/[id]/query/__tests__/route.test.ts(198,54): error TS2353: Object literal may only specify known properties, and 'id' does not exist in type 'Promise<{ id: string; }>'.
+---
+timestamp: "2026-02-10 09:59:54"
+story: "2-auto-embed"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/app/api/videos/__tests__/route.test.ts[2m > [22mPOST /api/videos[2m > [22mtriggers auto-embed when video is created with transcript
+[31m[1mAssertionError[22m: expected "vi.fn()" to be called 1 times, but got 0 times[39m
+[36m [2m❯[22m src/app/api/videos/__tests__/route.test.ts:[2m372:23[22m[39m
+    [90m370| [39m
+    [90m371| [39m    [90m// Verify after() was called with a function[39m
+    [90m372| [39m    [34mexpect[39m(mockAfter)[33m.[39m[34mtoHaveBeenCalledTimes[39m([34m1[39m)
+    [90m   | [39m                      [31m^[39m
+    [90m373| [39m    [34mexpect[39m(mockAfter)[33m.[39m[34mtoHaveBeenCalledWith[39m(expect[33m.[39m[34many[39m([33mFunction[39m))
+    [90m374| [39m  })
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/app/api/videos/__tests__/route.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/app/api/videos/__tests__/route.test.ts [2m([22m[2m21 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 1369[2mms[22m[39m
+     [32m✓[39m creates video with publishedAt field[32m 169[2mms[22m[39m
+     [32m✓[39m creates video without publishedAt field (null)[32m 66[2mms[22m[39m
+     [32m✓[39m returns publishedAt in video response when querying[32m 75[2mms[22m[39m
+     [32m✓[39m handles invalid publishedAt format gracefully[32m 46[2mms[22m[39m
+     [32m✓[39m creates video successfully without publishedAt for backward compatibility[32m 49[2mms[22m[39m
+     [32m✓[39m creates transcript-type video without youtubeId[32m 51[2mms[22m[39m
+     [32m✓[39m returns 400 when youtube-type video is missing youtubeId[32m 45[2mms[22m[39m
+     [32m✓[39m returns 400 when transcript-type video is missing title[32m 44[2mms[22m[39m
+     [32m✓[39m defaults to youtube sourceType when not provided[32m 49[2mms[22m[39m
+     [32m✓[39m still checks for duplicate youtubeId on youtube-type videos[32m 55[2mms[22m[39m
+     [32m✓[39m skips duplicate check for transcript-type videos[32m 60[2mms[22m[39m
+     [32m✓[39m allows transcript-type video without channel (null)[32m 47[2mms[22m[39m
+     [32m✓[39m returns 400 when youtube-type video is missing channel[32m 49[2mms[22m[39m
+[31m     [31m×[31m triggers auto-embed when video is created with transcript[39m[32m 54[2mms[22m[39m
+     [32m✓[39m does not trigger auto-embed when video has empty transcript[32m 46[2mms[22m[39m
+     [32m✓[39m returns empty list when no videos exist[32m 76[2mms[22m[39m
+     [32m✓[39m returns videos with all fields including publishedAt[32m 65[2mms[22m[39m
+     [32m✓[39m filters videos by focusAreaId when provided[32m 87[2mms[22m[39m
+     [32m✓[39m returns all videos when no focusAreaId provided[32m 96[2mms[22m[39m
+     [32m✓[39m returns empty list when focus area has no videos[32m 81[2mms[22m[39m
+     [32m✓[39m returns 400 for invalid focusAreaId[32m 55[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m20 passed[39m[22m[90m (21)[39m
+[2m   Start at [22m 09:59:49
+[2m   Duration [22m 5.09s[2m (transform 141ms, setup 284ms, import 1.01s, tests 1.37s, environment 1.86s)[22m
+---
+timestamp: "2026-02-10 10:02:29"
+story: "2-auto-embed"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+npm error Missing script: "typecheck"
+npm error
+npm error To see a list of scripts, run:
+npm error   npm run
+npm error A complete log of this run can be found in: /Users/darindrobinski/.npm/_logs/2026-02-10T16_02_29_377Z-debug-0.log
