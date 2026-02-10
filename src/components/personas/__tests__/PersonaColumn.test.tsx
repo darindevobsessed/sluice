@@ -114,13 +114,14 @@ describe('PersonaColumn', () => {
     expect(screen.getByText(/Rate limit exceeded/i)).toBeInTheDocument()
   })
 
-  it('renders generic error message when no errorMessage provided', () => {
+  it('renders fallback error message when no errorMessage provided', () => {
     const persona = createPersonaState({
       isError: true,
     })
     render(<PersonaColumn persona={persona} isBestMatch={false} />)
 
-    expect(screen.getByText(/error|failed/i)).toBeInTheDocument()
+    expect(screen.getByText(/Error/i)).toBeInTheDocument()
+    expect(screen.getByText(/Unable to generate response/i)).toBeInTheDocument()
   })
 
   it('displays empty text when no text has arrived yet', () => {

@@ -89,7 +89,7 @@ export async function POST(request: Request) {
 
     if (bestMatches.length === 0) {
       return NextResponse.json(
-        { error: 'No personas found with expertise embeddings' },
+        { error: 'No personas available. Create personas from channels with 5+ transcripts.' },
         { status: 404 }
       )
     }
@@ -117,8 +117,22 @@ export async function POST(request: Request) {
     })
   } catch (error) {
     console.error('Ensemble query error:', error)
+
+    // Categorize error for specific user-facing messages
+    let errorMessage = 'Internal server error'
+
+    if (error instanceof Error) {
+      // Embedding generation errors
+      if (error.message.includes('embedding') || error.message.includes('generate')) {
+        errorMessage = 'Unable to process your question. Please try again.'
+      } else {
+        // Pass through other specific error messages
+        errorMessage = error.message
+      }
+    }
+
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Internal server error' },
+      { error: errorMessage },
       { status: 500 }
     )
   }

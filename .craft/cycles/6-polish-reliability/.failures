@@ -1456,3 +1456,405 @@ npm error
 npm error To see a list of scripts, run:
 npm error   npm run
 npm error A complete log of this run can be found in: /Users/darindrobinski/.npm/_logs/2026-02-10T20_52_56_782Z-debug-0.log
+---
+timestamp: "2026-02-10 15:30:13"
+story: "4-ux-clarity"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 4 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/components/personas/__tests__/PersonaColumn.test.tsx[2m > [22mPersonaColumn[2m > [22mrenders fallback error message when no errorMessage provided
+[31m[1mTestingLibraryElementError[22m: Unable to find an element with the text: /Unable to generate response/i. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[31m
+  [36m<div>[31m
+    [36m<div[31m
+      [33mclass[31m=[32m"flex flex-col gap-3 rounded-lg border bg-card p-4"[31m
+      [33mdata-testid[31m=[32m"persona-column"[31m
+    [36m>[31m
+      [36m<div[31m
+        [33mclass[31m=[32m"flex items-center gap-2"[31m
+      [36m>[31m
+        [36m<h3[31m
+          [33mclass[31m=[32m"font-bold text-base"[31m
+        [36m>[31m
+          [0mFireship[0m
+        [36m</h3>[31m
+      [36m</div>[31m
+      [36m<div[31m
+        [33mclass[31m=[32m"flex-1 text-sm text-muted-foreground"[31m
+        [33mdata-testid[31m=[32m"persona-text"[31m
+      [36m>[31m
+        [36m<div[31m
+          [33mclass[31m=[32m"text-destructive"[31m
+        [36m>[31m
+          [36m<p[31m
+            [33mclass[31m=[32m"font-semibold"[31m
+          [36m>[31m
+            [0mError[0m
+          [36m</p>[31m
+          [36m<p>[31m
+            [0mSomething went wrong[0m
+          [36m</p>[31m
+        [36m</div>[31m
+      [36m</div>[31m
+    [36m</div>[31m
+  [36m</div>[31m
+[36m</body>[31m[39m
+[90m [2m❯[22m Object.getElementError node_modules/@testing-library/dom/dist/config.js:[2m37:19[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m76:38[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m52:17[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m95:19[22m[39m
+[36m [2m❯[22m src/components/personas/__tests__/PersonaColumn.test.tsx:[2m124:19[22m[39m
+    [90m122| [39m
+    [90m123| [39m    [34mexpect[39m(screen[33m.[39m[34mgetByText[39m([36m/Error/i[39m))[33m.[39m[34mtoBeInTheDocument[39m()
+    [90m124| [39m    expect(screen.getByText(/Unable to generate response/i)).toBeInThe…
+    [90m   | [39m                  [31m^[39m
+    [90m125| [39m  })
+    [90m126| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/personas/__tests__/PersonaPanel.test.tsx[2m > [22mPersonaPanel[2m > [22mdisplays specific error message from state.error
+[31m[1mTestingLibraryElementError[22m: Unable to find an element with the text: Unable to reach the server. Check your connection.. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[31m
+  [36m<div>[31m
+    [36m<div[31m
+      [33mclass[31m=[32m"bg-card border rounded-lg p-6"[31m
+    [36m>[31m
+      [36m<h2[31m
+        [33mclass[31m=[32m"text-lg font-semibold mb-4"[31m
+      [36m>[31m
+        [0mHow does RSC work?[0m
+      [36m</h2>[31m
+      [36m<div[31m
+        [33mclass[31m=[32m"flex flex-col items-center gap-3 py-8 text-center"[31m
+      [36m>[31m
+        [36m<svg[31m
+          [33maria-hidden[31m=[32m"true"[31m
+          [33mclass[31m=[32m"lucide lucide-circle-alert size-8 text-destructive"[31m
+          [33mfill[31m=[32m"none"[31m
+          [33mheight[31m=[32m"24"[31m
+          [33mstroke[31m=[32m"currentColor"[31m
+          [33mstroke-linecap[31m=[32m"round"[31m
+          [33mstroke-linejoin[31m=[32m"round"[31m
+          [33mstroke-width[31m=[32m"2"[31m
+          [33mviewBox[31m=[32m"0 0 24 24"[31m
+          [33mwidth[31m=[32m"24"[31m
+          [33mxmlns[31m=[32m"http://www.w3.org/2000/svg"[31m
+        [36m>[31m
+          [36m<circle[31m
+            [33mcx[31m=[32m"12"[31m
+            [33mcy[31m=[32m"12"[31m
+            [33mr[31m=[32m"10"[31m
+          [36m/>[31m
+          [36m<line[31m
+            [33mx1[31m=[32m"12"[31m
+            [33mx2[31m=[32m"12"[31m
+            [33my1[31m=[32m"8"[31m
+            [33my2[31m=[32m"12"[31m
+          [36m/>[31m
+          [36m<line[31m
+            [33mx1[31m=[32m"12"[31m
+            [33mx2[31m=[32m"12.01"[31m
+            [33my1[31m=[32m"16"[31m
+            [33my2[31m=[32m"16"[31m
+          [36m/>[31m
+        [36m</svg>[31m
+        [36m<p[31m
+          [33mclass[31m=[32m"text-sm text-muted-foreground"[31m
+        [36m>[31m
+          [0mSomething went wrong fetching persona responses.[0m
+        [36m</p>[31m
+      [36m</div>[31m
+    [36m</div>[31m
+  [36m</div>[31m
+[36m</body>[
+
+... [3931 characters truncated] ...
+
+[32m"0 0 24 24"[31m
+          [33mwidth[31m=[32m"24"[31m
+          [33mxmlns[31m=[32m"http://www.w3.org/2000/svg"[31m
+        [36m>[31m
+          [36m<path[31m
+            [33md[31m=[32m"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"[31m
+          [36m/>[31m
+          [36m<path[31m
+            [33md[31m=[32m"M16 3.128a4 4 0 0 1 0 7.744"[31m
+          [36m/>[31m
+          [36m<path[31m
+            [33md[31m=[32m"M22 21v-2a4 4 0 0 0-3-3.87"[31m
+          [36m/>[31m
+          [36m<circle[31m
+            [33mcx[31m=[32m"9"[31m
+            [33mcy[31m=[32m"7"[31m
+            [33mr[31m=[32m"4"[31m
+          [36m/>[31m
+        [36m</svg>[31m
+        [36m<p[31m
+          [33mclass[31m=[32m"text-sm text-muted-foreground"[31m
+        [36m>[31m
+          [0mFollow creators and build your knowledge bank to unlock persona queries.[0m
+        [36m</p>[31m
+      [36m</div>[31m
+    [36m</div>[31m
+  [36m</div>[31m
+[36m</body>[31m[39m
+[90m [2m❯[22m Object.getElementError node_modules/@testing-library/dom/dist/config.js:[2m37:19[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m76:38[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m52:17[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m95:19[22m[39m
+[36m [2m❯[22m src/components/personas/__tests__/PersonaPanel.test.tsx:[2m197:19[22m[39m
+    [90m195| [39m    render(<PersonaPanel question="How does RSC work?" state={state} /…
+    [90m196| [39m
+    [90m197| [39m    expect(screen.getByText(/No personas available yet/i)).toBeInTheDo…
+    [90m   | [39m                  [31m^[39m
+    [90m198| [39m    [34mexpect[39m(screen[33m.[39m[34mgetByText[39m([36m/5\+ transcripts/i[39m))[33m.[39m[34mtoBeInTheDocument[39m()
+    [90m199| [39m  })
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/components/personas/__tests__/PersonaPanel.test.tsx src/components/personas/__tests__/PersonaColumn.test.tsx
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/components/personas/__tests__/PersonaColumn.test.tsx [2m([22m[2m13 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 583[2mms[22m[39m
+     [32m✓[39m renders persona name[32m 83[2mms[22m[39m
+     [32m✓[39m displays best match star badge when isBestMatch is true[32m 30[2mms[22m[39m
+     [32m✓[39m does not display star badge when isBestMatch is false[32m 7[2mms[22m[39m
+     [32m✓[39m renders loading state when not done and no error[32m 14[2mms[22m[39m
+     [32m✓[39m renders streaming text with cursor[32m 11[2mms[22m[39m
+     [32m✓[39m removes cursor when done[32m 7[2mms[22m[39m
+     [33m[2m✓[22m[39m displays source count when sources are available and done [33m 338[2mms[22m[39m
+     [32m✓[39m handles singular source count[32m 37[2mms[22m[39m
+     [32m✓[39m hides sources while still streaming[32m 6[2mms[22m[39m
+     [32m✓[39m renders error state when isError is true[32m 9[2mms[22m[39m
+[31m     [31m×[31m renders fallback error message when no errorMessage provided[39m[32m 20[2mms[22m[39m
+     [32m✓[39m displays empty text when no text has arrived yet[32m 7[2mms[22m[39m
+     [32m✓[39m marks as done when isDone is true[32m 7[2mms[22m[39m
+ [31m❯[39m src/components/personas/__tests__/PersonaPanel.test.tsx [2m([22m[2m12 tests[22m[2m | [22m[31m3 failed[39m[2m)[22m[32m 214[2mms[22m[39m
+     [32m✓[39m renders the question as title[32m 62[2mms[22m[39m
+     [32m✓[39m displays best match badge when bestMatch is available[32m 25[2mms[22m[39m
+     [32m✓[39m does not display best match badge when bestMatch is null[32m 6[2mms[22m[39m
+     [32m✓[39m renders loading skeleton when isLoading is true[32m 14[2mms[22m[39m
+     [32m✓[39m renders PersonaColumn for each persona[32m 15[2mms[22m[39m
+     [32m✓[39m marks correct persona as best match[32m 13[2mms[22m[39m
+     [32m✓[39m uses responsive grid layout[32m 18[2mms[22m[39m
+     [32m✓[39m renders empty panel when no personas are loaded yet[32m 5[2mms[22m[39m
+     [32m✓[39m applies card styling[32m 8[2mms[22m[39m
+[31m     [31m×[31m displays specific error message from state.error[39m[32m 27[2mms[22m[39m
+[31m     [31m×[31m displays fallback error message when state.error is empty[39m[32m 6[2mms[22m[39m
+[31m     [31m×[31m displays improved empty state message with transcript threshold[39m[32m 10[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m2 failed[39m[22m[90m (2)[39m
+[2m      Tests [22m [1m[31m4 failed[39m[22m[2m | [22m[1m[32m21 passed[39m[22m[90m (25)[39m
+[2m   Start at [22m 15:29:58
+[2m   Duration [22m 14.40s[2m (transform 525ms, setup 1.02s, import 3.67s, tests 798ms, environment 7.04s)[22m
+---
+timestamp: "2026-02-10 15:32:32"
+story: "4-ux-clarity"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/components/personas/__tests__/PersonaPanel.test.tsx[2m > [22mPersonaPanel[2m > [22mdisplays fallback error message when state.error is empty
+[31m[1mTestingLibraryElementError[22m: Unable to find an element with the text: An error occurred while fetching persona responses.. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[31m
+  [36m<div>[31m
+    [36m<div[31m
+      [33mclass[31m=[32m"bg-card border rounded-lg p-6"[31m
+    [36m>[31m
+      [36m<h2[31m
+        [33mclass[31m=[32m"text-lg font-semibold mb-4"[31m
+      [36m>[31m
+        [0mHow does RSC work?[0m
+      [36m</h2>[31m
+    [36m</div>[31m
+  [36m</div>[31m
+[36m</body>[31m[39m
+[90m [2m❯[22m Object.getElementError node_modules/@testing-library/dom/dist/config.js:[2m37:19[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m76:38[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m52:17[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m95:19[22m[39m
+[36m [2m❯[22m src/components/personas/__tests__/PersonaPanel.test.tsx:[2m187:19[22m[39m
+    [90m185| [39m    render(<PersonaPanel question="How does RSC work?" state={state} /…
+    [90m186| [39m
+    [90m187| [39m    expect(screen.getByText('An error occurred while fetching persona …
+    [90m   | [39m                  [31m^[39m
+    [90m188| [39m  })
+    [90m189| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/components/personas/__tests__/PersonaPanel.test.tsx src/components/personas/__tests__/PersonaColumn.test.tsx
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [32m✓[39m src/components/personas/__tests__/PersonaColumn.test.tsx [2m([22m[2m13 tests[22m[2m)[22m[33m 623[2mms[22m[39m
+     [33m[2m✓[22m[39m displays source count when sources are available and done [33m 390[2mms[22m[39m
+ [31m❯[39m src/components/personas/__tests__/PersonaPanel.test.tsx [2m([22m[2m12 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 317[2mms[22m[39m
+     [32m✓[39m renders the question as title[32m 87[2mms[22m[39m
+     [32m✓[39m displays best match badge when bestMatch is available[32m 28[2mms[22m[39m
+     [32m✓[39m does not display best match badge when bestMatch is null[32m 6[2mms[22m[39m
+     [32m✓[39m renders loading skeleton when isLoading is true[32m 28[2mms[22m[39m
+     [32m✓[39m renders PersonaColumn for each persona[32m 30[2mms[22m[39m
+     [32m✓[39m marks correct persona as best match[32m 21[2mms[22m[39m
+     [32m✓[39m uses responsive grid layout[32m 22[2mms[22m[39m
+     [32m✓[39m renders empty panel when no personas are loaded yet[32m 3[2mms[22m[39m
+     [32m✓[39m applies card styling[32m 4[2mms[22m[39m
+     [32m✓[39m displays specific error message from state.error[32m 8[2mms[22m[39m
+[31m     [31m×[31m displays fallback error message when state.error is empty[39m[32m 43[2mms[22m[39m
+     [32m✓[39m displays improved empty state message with transcript threshold[32m 31[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m24 passed[39m[22m[90m (25)[39m
+[2m   Start at [22m 15:32:16
+[2m   Duration [22m 14.93s[2m (transform 563ms, setup 1.17s, import 3.74s, tests 940ms, environment 7.07s)[22m
+---
+timestamp: "2026-02-10 15:33:40"
+story: "4-ux-clarity"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+npm error Missing script: "typecheck"
+npm error
+npm error To see a list of scripts, run:
+npm error   npm run
+npm error A complete log of this run can be found in: /Users/darindrobinski/.npm/_logs/2026-02-10T21_33_39_565Z-debug-0.log
+---
+timestamp: "2026-02-10 15:39:15"
+story: "4-ux-clarity"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+[90mstderr[2m | src/app/api/personas/ensemble/__tests__/route.test.ts[2m > [22m[2mPOST /api/personas/ensemble[2m > [22m[2mshould return 500 if streaming fails
+[22m[39mEnsemble query error: Error: API error
+    at [90m/Users/darindrobinski/dev/repos/gold-miner/[39msrc/app/api/personas/ensemble/__tests__/route.test.ts:313:54
+    at [90mfile:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:145:11
+    at [90mfile:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:915:26
+    at [90mfile:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1243:20
+    at new Promise (<anonymous>)
+    at runWithTimeout [90m(file:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1209:10[90m)[39m
+    at [90mfile:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1653:37
+    at Traces.$ [90m(file:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4mvitest[24m/dist/chunks/traces.CCmnQaNT.js:142:27[90m)[39m
+    at trace [90m(file:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4mvitest[24m/dist/chunks/test.B8ej_ZHS.js:239:21[90m)[39m
+    at runTest [90m(file:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1653:12[90m)[39m
+
+[90mstderr[2m | src/app/api/personas/ensemble/__tests__/route.test.ts[2m > [22m[2mPOST /api/personas/ensemble[2m > [22m[2mshould return 500 with specific message if findBestPersonas fails with embedding error
+[22m[39mEnsemble query error: Error: Failed to generate embedding
+    at [90m/Users/darindrobinski/dev/repos/gold-miner/[39msrc/app/api/personas/ensemble/__tests__/route.test.ts:328:48
+    at [90mfile:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:145:11
+    at [90mfile:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:915:26
+    at [90mfile:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1243:20
+    at new Promise (<anonymous>)
+    at runWithTimeout [90m(file:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1209:10[90m)[39m
+    at [90mfile:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1653:37
+    at Traces.$ [90m(file:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4mvitest[24m/dist/chunks/traces.CCmnQaNT.js:142:27[90m)[39m
+    at trace [90m(file:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4mvitest[24m/dist/chunks/test.B8ej_ZHS.js:239:21[90m)[39m
+    at runTest [90m(file:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1653:12[90m)[39m
+
+[90mstderr[2m | src/app/api/personas/ensemble/__tests__/route.test.ts[2m > [22m[2mPOST /api/personas/ensemble[2m > [22m[2mshould return 500 with specific message for generic findBestPersonas errors
+[22m[39mEnsemble query error: Error: Database connection failed
+    at [90m/Users/darindrobinski/dev/repos/gold-miner/[39msrc/app/api/personas/ensemble/__tests__/route.test.ts:343:48
+    at [90mfile:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:145:11
+    at [90mfile:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:915:26
+    at [90mfile:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1243:20
+    at new Promise (<anonymous>)
+    at runWithTimeout [90m(file:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1209:10[90m)[39m
+    at [90mfile:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1653:37
+    at Traces.$ [90m(file:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4mvitest[24m/dist/chunks/traces.CCmnQaNT.js:142:27[90m)[39m
+    at trace [90m(file:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4mvitest[24m/dist/chunks/test.B8ej_ZHS.js:239:21[90m)[39m
+    at runTest [90m(file:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1653:12[90m)[39m
+
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/app/api/personas/ensemble/__tests__/route.test.ts[2m > [22mPOST /api/personas/ensemble[2m > [22mshould return 500 with specific message if findBestPersonas fails with embedding error
+[31m[1mAssertionError[22m: expected 'Failed to generate embedding' to be 'Unable to process your question. Plea…' // Object.is equality[39m
+
+... [466 characters truncated] ...
+
+nse[33m.[39m[34mjson[39m()
+    [90m339| [39m    expect(data.error).toBe('Unable to process your question. Please t…
+    [90m   | [39m                       [31m^[39m
+    [90m340| [39m  })
+    [90m341| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/app/api/personas/ensemble/__tests__/route.test.ts --reporter=verbose --run
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [32m✓[39m src/app/api/personas/ensemble/__tests__/route.test.ts[2m > [22mPOST /api/personas/ensemble[2m > [22mshould return 400 if request body is invalid[32m 20[2mms[22m[39m
+ [32m✓[39m src/app/api/personas/ensemble/__tests__/route.test.ts[2m > [22mPOST /api/personas/ensemble[2m > [22mshould return 400 if question is empty[32m 2[2mms[22m[39m
+ [32m✓[39m src/app/api/personas/ensemble/__tests__/route.test.ts[2m > [22mPOST /api/personas/ensemble[2m > [22mshould return 400 if question is not a string[32m 3[2mms[22m[39m
+ [32m✓[39m src/app/api/personas/ensemble/__tests__/route.test.ts[2m > [22mPOST /api/personas/ensemble[2m > [22mshould return 400 if personaIds is not an array[32m 2[2mms[22m[39m
+ [32m✓[39m src/app/api/personas/ensemble/__tests__/route.test.ts[2m > [22mPOST /api/personas/ensemble[2m > [22mshould return 400 if personaIds contains non-numbers[32m 4[2mms[22m[39m
+ [32m✓[39m src/app/api/personas/ensemble/__tests__/route.test.ts[2m > [22mPOST /api/personas/ensemble[2m > [22mshould return 400 if malformed JSON[32m 1[2mms[22m[39m
+ [32m✓[39m src/app/api/personas/ensemble/__tests__/route.test.ts[2m > [22mPOST /api/personas/ensemble[2m > [22mshould return SSE stream if no personas found in database[32m 6[2mms[22m[39m
+ [32m✓[39m src/app/api/personas/ensemble/__tests__/route.test.ts[2m > [22mPOST /api/personas/ensemble[2m > [22mshould return 404 with specific message if personas exist but have no expertise embeddings[32m 4[2mms[22m[39m
+ [32m✓[39m src/app/api/personas/ensemble/__tests__/route.test.ts[2m > [22mPOST /api/personas/ensemble[2m > [22mshould return SSE stream with all_done if specified personaIds not found[32m 3[2mms[22m[39m
+ [32m✓[39m src/app/api/personas/ensemble/__tests__/route.test.ts[2m > [22mPOST /api/personas/ensemble[2m > [22mshould return streaming response for valid request[32m 2[2mms[22m[39m
+ [32m✓[39m src/app/api/personas/ensemble/__tests__/route.test.ts[2m > [22mPOST /api/personas/ensemble[2m > [22mshould fetch all personas if no personaIds specified[32m 9[2mms[22m[39m
+ [32m✓[39m src/app/api/personas/ensemble/__tests__/route.test.ts[2m > [22mPOST /api/personas/ensemble[2m > [22mshould fetch specific personas if personaIds provided[32m 5[2mms[22m[39m
+ [32m✓[39m src/app/api/personas/ensemble/__tests__/route.test.ts[2m > [22mPOST /api/personas/ensemble[2m > [22mshould call findBestPersonas to rank personas[32m 2[2mms[22m[39m
+ [32m✓[39m src/app/api/personas/ensemble/__tests__/route.test.ts[2m > [22mPOST /api/personas/ensemble[2m > [22mshould limit to top 3 personas by default[32m 4[2mms[22m[39m
+ [32m✓[39m src/app/api/personas/ensemble/__tests__/route.test.ts[2m > [22mPOST /api/personas/ensemble[2m > [22mshould call streamEnsembleResponse with best personas[32m 6[2mms[22m[39m
+ [32m✓[39m src/app/api/personas/ensemble/__tests__/route.test.ts[2m > [22mPOST /api/personas/ensemble[2m > [22mshould handle questions with special characters[32m 4[2mms[22m[39m
+ [32m✓[39m src/app/api/personas/ensemble/__tests__/route.test.ts[2m > [22mPOST /api/personas/ensemble[2m > [22mshould return 500 if streaming fails[32m 19[2mms[22m[39m
+ [31m×[39m src/app/api/personas/ensemble/__tests__/route.test.ts[2m > [22mPOST /api/personas/ensemble[2m > [22mshould return 500 with specific message if findBestPersonas fails with embedding error[32m 19[2mms[22m[39m
+[31m   → expected 'Failed to generate embedding' to be 'Unable to process your question. Plea…' // Object.is equality[39m
+ [32m✓[39m src/app/api/personas/ensemble/__tests__/route.test.ts[2m > [22mPOST /api/personas/ensemble[2m > [22mshould return 500 with specific message for generic findBestPersonas errors[32m 12[2mms[22m[39m
+ [32m✓[39m src/app/api/personas/ensemble/__tests__/route.test.ts[2m > [22mPOST /api/personas/ensemble[2m > [22mshould limit personas query to avoid fetching too many[32m 2[2mms[22m[39m
+ [32m✓[39m src/app/api/personas/ensemble/__tests__/route.test.ts[2m > [22mPOST /api/personas/ensemble[2m > [22mshould handle empty personaIds array[32m 2[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m20 passed[39m[22m[90m (21)[39m
+[2m   Start at [22m 15:39:07
+[2m   Duration [22m 7.53s[2m (transform 350ms, setup 549ms, import 2.93s, tests 133ms, environment 3.27s)[22m
+---
+timestamp: "2026-02-10 15:40:47"
+story: "4-ux-clarity"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+npm error Missing script: "typecheck"
+npm error
+npm error To see a list of scripts, run:
+npm error   npm run
+npm error A complete log of this run can be found in: /Users/darindrobinski/.npm/_logs/2026-02-10T21_40_46_661Z-debug-0.log
+---
+timestamp: "2026-02-10 15:43:11"
+story: "4-ux-clarity"
+chunk: "unknown"
+tool: "WebFetch"
+error: |
+  Request failed with status code 403

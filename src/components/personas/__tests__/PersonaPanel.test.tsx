@@ -168,4 +168,34 @@ describe('PersonaPanel', () => {
     expect(panelElement).toHaveClass('border')
     expect(panelElement).toHaveClass('rounded-lg')
   })
+
+  it('displays specific error message from state.error', () => {
+    const state = createEnsembleState({
+      error: 'Unable to reach the server. Check your connection.',
+    })
+    render(<PersonaPanel question="How does RSC work?" state={state} />)
+
+    expect(screen.getByText('Unable to reach the server. Check your connection.')).toBeInTheDocument()
+  })
+
+  it('displays fallback error message when state.error is empty string', () => {
+    const state = createEnsembleState({
+      error: '',
+    })
+    render(<PersonaPanel question="How does RSC work?" state={state} />)
+
+    // When error is empty string (truthy but no message), show fallback
+    expect(screen.getByText('An error occurred while fetching persona responses.')).toBeInTheDocument()
+  })
+
+  it('displays improved empty state message with transcript threshold', () => {
+    const state = createEnsembleState({
+      isAllDone: true,
+      personas: new Map(),
+    })
+    render(<PersonaPanel question="How does RSC work?" state={state} />)
+
+    expect(screen.getByText(/No personas available yet/i)).toBeInTheDocument()
+    expect(screen.getByText(/5\+ transcripts/i)).toBeInTheDocument()
+  })
 })

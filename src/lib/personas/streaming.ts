@@ -114,7 +114,24 @@ export async function streamPersonaResponse(
   })
 
   if (!response.ok) {
-    throw new Error(`Anthropic API error: ${response.status} ${response.statusText}`)
+    // Try to extract specific error message from response body
+    let errorMessage = `Anthropic API error: ${response.status}`
+    try {
+      const errorData = await response.json()
+      if (errorData.error?.message) {
+        errorMessage = errorData.error.message
+      }
+    } catch {
+      // If we can't parse the error, use status-based message
+      if (response.status === 429) {
+        errorMessage = 'Rate limit exceeded'
+      } else if (response.status === 401) {
+        errorMessage = 'Authentication failed'
+      } else if (response.status >= 500) {
+        errorMessage = 'Claude API temporarily unavailable'
+      }
+    }
+    throw new Error(`Anthropic API error: ${response.status} ${errorMessage}`)
   }
 
   if (!response.body) {

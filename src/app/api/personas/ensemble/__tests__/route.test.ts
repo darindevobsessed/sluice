@@ -154,7 +154,7 @@ describe('POST /api/personas/ensemble', () => {
     expect(data.error).toBeTruthy()
   })
 
-  it('should return 404 if no personas found', async () => {
+  it('should return SSE stream if no personas found in database', async () => {
     // Mock empty result
     mockDb.select = vi.fn().mockReturnValue({
       from: vi.fn().mockReturnThis(),
@@ -171,6 +171,22 @@ describe('POST /api/personas/ensemble', () => {
     // Returns SSE stream with all_done event (not 404) for empty personas
     expect(response.status).toBe(200)
     expect(response.headers.get('content-type')).toBe('text/event-stream')
+  })
+
+  it('should return 404 with specific message if personas exist but have no expertise embeddings', async () => {
+    // Mock findBestPersonas returning empty (happens when personas lack embeddings)
+    mockFindBestPersonas.mockResolvedValueOnce([])
+
+    const request = new Request('http://localhost/api/personas/ensemble', {
+      method: 'POST',
+      body: JSON.stringify({ question: 'What is React?' }),
+    })
+
+    const response = await POST(request)
+
+    expect(response.status).toBe(404)
+    const data = await response.json()
+    expect(data.error).toBe('No personas available. Create personas from channels with 5+ transcripts.')
   })
 
   it('should return SSE stream with all_done if specified personaIds not found', async () => {
@@ -308,8 +324,8 @@ describe('POST /api/personas/ensemble', () => {
     expect(data.error).toBeTruthy()
   })
 
-  it('should return 500 if findBestPersonas fails', async () => {
-    mockFindBestPersonas.mockRejectedValueOnce(new Error('Embedding error'))
+  it('should return 500 with specific message if findBestPersonas fails with embedding error', async () => {
+    mockFindBestPersonas.mockRejectedValueOnce(new Error('Failed to generate embedding'))
 
     const request = new Request('http://localhost/api/personas/ensemble', {
       method: 'POST',
@@ -320,7 +336,22 @@ describe('POST /api/personas/ensemble', () => {
 
     expect(response.status).toBe(500)
     const data = await response.json()
-    expect(data.error).toBeTruthy()
+    expect(data.error).toBe('Unable to process your question. Please try again.')
+  })
+
+  it('should return 500 with specific message for generic findBestPersonas errors', async () => {
+    mockFindBestPersonas.mockRejectedValueOnce(new Error('Database connection failed'))
+
+    const request = new Request('http://localhost/api/personas/ensemble', {
+      method: 'POST',
+      body: JSON.stringify({ question: 'What is React?' }),
+    })
+
+    const response = await POST(request)
+
+    expect(response.status).toBe(500)
+    const data = await response.json()
+    expect(data.error).toBe('Database connection failed')
   })
 
   it('should limit personas query to avoid fetching too many', async () => {

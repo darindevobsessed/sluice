@@ -90,12 +90,22 @@ export function useEnsemble(question: string | null) {
         })
 
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
+          // Try to get specific error message from response
+          let errorMessage = 'An error occurred while fetching persona responses.'
+          try {
+            const errorData = await response.json()
+            if (errorData.error) {
+              errorMessage = errorData.error
+            }
+          } catch {
+            // If we can't parse the error, use default message
+          }
+          throw new Error(errorMessage)
         }
 
         const body = response.body
         if (!body) {
-          throw new Error('No response body')
+          throw new Error('Unable to reach the server. Check your connection.')
         }
 
         // Parse SSE stream
@@ -250,9 +260,18 @@ export function useEnsemble(question: string | null) {
           return
         }
 
+        // Set specific error message
+        let errorMessage = 'An error occurred while fetching persona responses.'
+        if (error instanceof Error) {
+          errorMessage = error.message
+        } else if (error instanceof TypeError) {
+          // Network errors are typically TypeErrors
+          errorMessage = 'Unable to reach the server. Check your connection.'
+        }
+
         setState((prev) => ({
           ...prev,
-          error: error instanceof Error ? error.message : 'Unknown error',
+          error: errorMessage,
           isLoading: false,
         }))
       }

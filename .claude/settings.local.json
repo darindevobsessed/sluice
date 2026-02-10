@@ -33,7 +33,11 @@
       "Bash(/Users/darindrobinski/.claude-max/plugins/cache/craft-local/craft/0.30.0/hooks/scripts/complete-chunk.sh)",
       "Bash(python3:*)",
       "WebFetch(domain:github.com)",
-      "Bash(pkill:*)"
+      "Bash(pkill:*)",
+      "WebFetch(domain:www.viewstats.com)",
+      "WebFetch(domain:ytscribe.com)",
+      "WebFetch(domain:www.noxinfluencer.com)",
+      "WebFetch(domain:lilys.ai)"
     ]
   }
 }

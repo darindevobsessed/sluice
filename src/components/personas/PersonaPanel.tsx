@@ -57,11 +57,11 @@ export function PersonaPanel({ question, state, onRetry }: PersonaPanelProps) {
       )}
 
       {/* Error State */}
-      {state.error && (
+      {state.error !== null && (
         <div className="flex flex-col items-center gap-3 py-8 text-center">
           <AlertCircle className="size-8 text-destructive" />
           <p className="text-sm text-muted-foreground">
-            Something went wrong fetching persona responses.
+            {state.error || 'An error occurred while fetching persona responses.'}
           </p>
           {onRetry && (
             <Button variant="outline" size="sm" onClick={onRetry}>
@@ -76,7 +76,7 @@ export function PersonaPanel({ question, state, onRetry }: PersonaPanelProps) {
         <div className="flex flex-col items-center gap-3 py-8 text-center">
           <Users className="size-8 text-muted-foreground" />
           <p className="text-sm text-muted-foreground">
-            Follow creators and build your knowledge bank to unlock persona queries.
+            No personas available yet. Follow channels and add 5+ transcripts to create personas.
           </p>
         </div>
       )}

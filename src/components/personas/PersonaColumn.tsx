@@ -37,7 +37,7 @@ export function PersonaColumn({ persona, isBestMatch }: PersonaColumnProps) {
         {persona.isError ? (
           <div className="text-destructive">
             <p className="font-semibold">Error</p>
-            <p>{persona.errorMessage || 'Something went wrong'}</p>
+            <p>{persona.errorMessage || 'Unable to generate response'}</p>
           </div>
         ) : isWaiting ? (
           <div className="space-y-2">

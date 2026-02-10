@@ -1,14 +1,14 @@
 ---
 name: persona-ux-clarity
 title: Persona UX clarity and discoverability improvements
-status: active
+status: complete
 cycle: polish-reliability
 story_number: 4
 created: 2026-02-10
 updated: 2026-02-10
 priority: medium
 chunks_total: 4
-chunks_complete: 3
+chunks_complete: 4
 ---
 
 # Story: Persona UX clarity and discoverability improvements

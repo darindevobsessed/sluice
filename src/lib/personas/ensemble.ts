@@ -222,11 +222,33 @@ export async function streamEnsembleResponse(
             )
           } catch (error) {
             // Emit error event but don't fail the whole stream
+            let errorMessage = 'Unable to generate response'
+
+            if (error instanceof Error) {
+              // Provide more specific error messages based on error type
+              if (error.message.includes('Anthropic API error')) {
+                // Extract status code for specific messages
+                if (error.message.includes('429')) {
+                  errorMessage = 'Rate limit exceeded. Please try again in a moment.'
+                } else if (error.message.includes('401')) {
+                  errorMessage = 'Authentication error. Please check API configuration.'
+                } else if (error.message.includes('500') || error.message.includes('503')) {
+                  errorMessage = 'Claude API is temporarily unavailable. Please try again later.'
+                } else {
+                  errorMessage = error.message
+                }
+              } else if (error.message.includes('embedding')) {
+                errorMessage = 'Unable to process your question. Please try again.'
+              } else {
+                errorMessage = error.message
+              }
+            }
+
             controller.enqueue(
               formatSSE({
                 type: 'persona_error',
                 personaId: persona.id,
-                error: error instanceof Error ? error.message : 'Unknown error',
+                error: errorMessage,
               })
             )
           }
