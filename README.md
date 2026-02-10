@@ -130,7 +130,8 @@ npm install
 
 # Configure your database connection
 cp .env.example .env
-# Edit .env with your DATABASE_URL
+# Edit .env: set DATABASE_URL to your PostgreSQL instance
+# Optional: add your ANTHROPIC_API_KEY for AI features
 
 # Enable pgvector and push schema
 psql $DATABASE_URL -c "CREATE EXTENSION IF NOT EXISTS vector;"

@@ -1,8 +1,7 @@
 import { db, videos, personas } from '@/lib/db'
 import { NextResponse } from 'next/server'
 import { sql } from 'drizzle-orm'
-
-const PERSONA_THRESHOLD = 5
+import { PERSONA_THRESHOLD } from '../suggest/route'
 
 export async function GET() {
   try {

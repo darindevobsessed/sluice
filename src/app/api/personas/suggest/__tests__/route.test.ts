@@ -24,7 +24,7 @@ describe('GET /api/personas/suggest', () => {
     vi.restoreAllMocks()
   })
 
-  it('returns channels with 30+ videos where no persona exists', async () => {
+  it('returns channels with 5+ videos where no persona exists', async () => {
     // Mock existing personas
     mockDb.select.mockReturnValueOnce({
       from: vi.fn().mockResolvedValue([
@@ -36,10 +36,10 @@ describe('GET /api/personas/suggest', () => {
     mockDb.select.mockReturnValueOnce({
       from: vi.fn().mockReturnValue({
         groupBy: vi.fn().mockResolvedValue([
-          { channel: 'Test Creator 1', videoCount: 50 },
-          { channel: 'Test Creator 2', videoCount: 35 },
-          { channel: 'Existing Persona Channel', videoCount: 40 },
-          { channel: 'Small Channel', videoCount: 15 },
+          { channel: 'Test Creator 1', videoCount: 10 },
+          { channel: 'Test Creator 2', videoCount: 7 },
+          { channel: 'Existing Persona Channel', videoCount: 8 },
+          { channel: 'Small Channel', videoCount: 3 },
         ]),
       }),
     } as never)
@@ -50,12 +50,12 @@ describe('GET /api/personas/suggest', () => {
     expect(response.status).toBe(200)
     expect(data.suggestions).toHaveLength(2)
     expect(data.suggestions).toEqual([
-      { channelName: 'Test Creator 1', videoCount: 50 },
-      { channelName: 'Test Creator 2', videoCount: 35 },
+      { channelName: 'Test Creator 1', videoCount: 10 },
+      { channelName: 'Test Creator 2', videoCount: 7 },
     ])
   })
 
-  it('filters out channels with fewer than 30 videos', async () => {
+  it('filters out channels with fewer than 5 videos', async () => {
     // Mock no existing personas
     mockDb.select.mockReturnValueOnce({
       from: vi.fn().mockResolvedValue([]),
@@ -65,9 +65,9 @@ describe('GET /api/personas/suggest', () => {
     mockDb.select.mockReturnValueOnce({
       from: vi.fn().mockReturnValue({
         groupBy: vi.fn().mockResolvedValue([
-          { channel: 'Big Channel', videoCount: 50 },
-          { channel: 'Medium Channel', videoCount: 29 },
-          { channel: 'Small Channel', videoCount: 10 },
+          { channel: 'Big Channel', videoCount: 10 },
+          { channel: 'Medium Channel', videoCount: 4 },
+          { channel: 'Small Channel', videoCount: 2 },
         ]),
       }),
     } as never)
@@ -77,7 +77,7 @@ describe('GET /api/personas/suggest', () => {
 
     expect(response.status).toBe(200)
     expect(data.suggestions).toHaveLength(1)
-    expect(data.suggestions[0]).toEqual({ channelName: 'Big Channel', videoCount: 50 })
+    expect(data.suggestions[0]).toEqual({ channelName: 'Big Channel', videoCount: 10 })
   })
 
   it('returns empty array when no channels meet criteria', async () => {
@@ -86,12 +86,12 @@ describe('GET /api/personas/suggest', () => {
       from: vi.fn().mockResolvedValue([]),
     } as never)
 
-    // Mock video counts (all below threshold)
+    // Mock video counts (all below threshold of 5)
     mockDb.select.mockReturnValueOnce({
       from: vi.fn().mockReturnValue({
         groupBy: vi.fn().mockResolvedValue([
-          { channel: 'Channel 1', videoCount: 10 },
-          { channel: 'Channel 2', videoCount: 20 },
+          { channel: 'Channel 1', videoCount: 2 },
+          { channel: 'Channel 2', videoCount: 4 },
         ]),
       }),
     } as never)
@@ -116,8 +116,8 @@ describe('GET /api/personas/suggest', () => {
     mockDb.select.mockReturnValueOnce({
       from: vi.fn().mockReturnValue({
         groupBy: vi.fn().mockResolvedValue([
-          { channel: 'Channel 1', videoCount: 50 },
-          { channel: 'Channel 2', videoCount: 40 },
+          { channel: 'Channel 1', videoCount: 10 },
+          { channel: 'Channel 2', videoCount: 8 },
         ]),
       }),
     } as never)
@@ -151,9 +151,9 @@ describe('GET /api/personas/suggest', () => {
     mockDb.select.mockReturnValueOnce({
       from: vi.fn().mockReturnValue({
         groupBy: vi.fn().mockResolvedValue([
-          { channel: 'Channel A', videoCount: 35 },
-          { channel: 'Channel B', videoCount: 50 },
-          { channel: 'Channel C', videoCount: 40 },
+          { channel: 'Channel A', videoCount: 7 },
+          { channel: 'Channel B', videoCount: 10 },
+          { channel: 'Channel C', videoCount: 8 },
         ]),
       }),
     } as never)
@@ -164,7 +164,7 @@ describe('GET /api/personas/suggest', () => {
     expect(response.status).toBe(200)
     expect(data.suggestions).toHaveLength(3)
     expect(data.suggestions[0]?.channelName).toBe('Channel B')
-    expect(data.suggestions[0]?.videoCount).toBe(50)
+    expect(data.suggestions[0]?.videoCount).toBe(10)
     expect(data.suggestions[1]?.channelName).toBe('Channel C')
     expect(data.suggestions[2]?.channelName).toBe('Channel A')
   })

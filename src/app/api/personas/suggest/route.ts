@@ -2,6 +2,8 @@ import { db, videos, personas } from '@/lib/db'
 import { NextResponse } from 'next/server'
 import { sql } from 'drizzle-orm'
 
+export const PERSONA_THRESHOLD = 5
+
 export async function GET() {
   try {
     // Get existing persona channel names
@@ -17,10 +19,10 @@ export async function GET() {
       .from(videos)
       .groupBy(videos.channel)
 
-    // Filter channels with 30+ videos and no existing persona
+    // Filter channels with 5+ videos and no existing persona
     // Exclude null channels (transcript-only videos)
     const suggestions = channelCounts
-      .filter((c) => c.channel !== null && c.videoCount >= 30 && !existingChannelNames.has(c.channel))
+      .filter((c) => c.channel !== null && c.videoCount >= PERSONA_THRESHOLD && !existingChannelNames.has(c.channel))
       .map((c) => ({
         channelName: c.channel!,
         videoCount: c.videoCount,
