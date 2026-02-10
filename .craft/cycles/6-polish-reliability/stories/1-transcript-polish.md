@@ -1,14 +1,14 @@
 ---
 name: transcript-polish
 title: Optional source field and transcript thumbnail icon
-status: active
+status: complete
 cycle: polish-reliability
 story_number: 1
 created: 2026-02-09
 updated: 2026-02-10
 priority: high
 chunks_total: 4
-chunks_complete: 3
+chunks_complete: 4
 ---
 
 # Story: Optional source field and transcript thumbnail icon

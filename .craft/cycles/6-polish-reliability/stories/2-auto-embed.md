@@ -1,10 +1,10 @@
 ---
 name: auto-embed
 title: Auto-embed on video creation
-status: ready
+status: active
 priority: high
 created: 2026-02-09
-updated: 2026-02-09
+updated: 2026-02-10
 cycle: polish-reliability
 story_number: 2
 chunks_total: 3

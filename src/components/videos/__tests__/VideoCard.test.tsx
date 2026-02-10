@@ -78,10 +78,19 @@ describe('VideoCard', () => {
     expect(screen.getByText(/Jan \d{1,2}, 2026/)).toBeInTheDocument();
   });
 
-  it('handles null thumbnail with fallback message', () => {
+  it('renders transcript icon when thumbnail is null', () => {
     const noThumbnailVideo = { ...mockVideo, thumbnail: null };
     render(<VideoCard video={noThumbnailVideo} />);
-    expect(screen.getByText('No thumbnail')).toBeInTheDocument();
+    // TranscriptIcon renders an SVG with aria-hidden
+    const svg = document.querySelector('svg[aria-hidden="true"]');
+    expect(svg).toBeInTheDocument();
+    expect(screen.getByText('React Tutorial for Beginners')).toBeInTheDocument();
+  });
+
+  it('does not render channel text when channel is null', () => {
+    const noChannelVideo = { ...mockVideo, channel: null };
+    render(<VideoCard video={noChannelVideo} />);
+    expect(screen.queryByText('Fireship')).not.toBeInTheDocument();
     expect(screen.getByText('React Tutorial for Beginners')).toBeInTheDocument();
   });
 });

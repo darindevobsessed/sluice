@@ -7,7 +7,7 @@ import { validateToken } from './auth.js'
 import { handleInsightRequest, cancelInsight } from './chat.js'
 import chalk from 'chalk'
 
-const PORT = 9333
+const PORT = parseInt(process.env.AGENT_PORT || '9333', 10)
 
 interface AgentMessage {
   type: string

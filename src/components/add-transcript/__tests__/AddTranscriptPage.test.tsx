@@ -189,6 +189,42 @@ describe('AddTranscriptPage', () => {
     })
   })
 
+  it('submits without channel when source is empty', async () => {
+    const user = userEvent.setup()
+    const mockFetch = vi.mocked(global.fetch)
+
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ id: '123' }),
+    } as Response)
+
+    render(<AddTranscriptPage />)
+
+    const titleInput = screen.getByLabelText(/title/i)
+    const transcriptInput = screen.getByLabelText(/transcript/i)
+
+    await user.type(titleInput, 'Test Meeting Notes')
+    await user.type(transcriptInput, 'This is the full meeting transcript with sufficient content')
+
+    const submitButton = screen.getByRole('button', { name: /add to knowledge bank/i })
+    await user.click(submitButton)
+
+    await waitFor(() => {
+      expect(mockFetch).toHaveBeenCalledWith(
+        '/api/videos',
+        expect.objectContaining({
+          body: JSON.stringify({
+            sourceType: 'transcript',
+            title: 'Test Meeting Notes',
+            transcript: 'This is the full meeting transcript with sufficient content',
+            tags: [],
+            notes: '',
+          }),
+        })
+      )
+    })
+  })
+
   it('shows loading state during submission', async () => {
     const user = userEvent.setup()
     const mockFetch = vi.mocked(global.fetch)
