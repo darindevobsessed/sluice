@@ -6,6 +6,7 @@ import { parseTranscript } from '@/lib/transcript/parse'
 import { chunkTranscript } from '@/lib/embeddings/chunker'
 import { embedChunks } from '@/lib/embeddings/service'
 import type { TranscriptSegment } from '@/lib/embeddings/types'
+import { fetchVideoPageMetadata } from '@/lib/youtube/metadata'
 
 const videoSchema = z.object({
   youtubeId: z.string().min(1).optional(),
@@ -17,6 +18,8 @@ const videoSchema = z.object({
   tags: z.array(z.string()).optional(),
   notes: z.string().optional(),
   publishedAt: z.string().datetime().optional(), // ISO 8601 date string
+  duration: z.number().int().positive().optional(),
+  description: z.string().optional(),
 }).superRefine((data, ctx) => {
   // Conditional validation: YouTube type requires channel
   if (data.sourceType === 'youtube' && !data.channel) {
@@ -118,7 +121,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { youtubeId, sourceType, title, channel, thumbnail, transcript } = validationResult.data;
+    const { youtubeId, sourceType, title, channel, thumbnail, transcript, publishedAt, duration, description } = validationResult.data;
 
     // Conditional validation: YouTube type requires youtubeId
     if (sourceType === 'youtube' && !youtubeId) {
@@ -147,6 +150,30 @@ export async function POST(request: Request) {
       }
     }
 
+    // Auto-fetch metadata if youtubeId present and any metadata field is missing
+    let finalPublishedAt = publishedAt
+    let finalDescription = description
+    let finalDuration = duration
+
+    if (youtubeId && (!publishedAt || !description || !duration)) {
+      try {
+        const metadata = await fetchVideoPageMetadata(youtubeId)
+        // Only use fetched values for fields not provided by caller
+        if (!publishedAt && metadata.publishedAt) {
+          finalPublishedAt = metadata.publishedAt
+        }
+        if (!description && metadata.description) {
+          finalDescription = metadata.description
+        }
+        if (!duration && metadata.duration) {
+          finalDuration = metadata.duration
+        }
+      } catch (error) {
+        console.warn(`Failed to fetch metadata for video ${youtubeId}:`, error)
+        // Continue with save - graceful degradation
+      }
+    }
+
     // Insert video into database
     const result = await db
       .insert(videos)
@@ -157,9 +184,11 @@ export async function POST(request: Request) {
         channel: channelValue || null,
         thumbnail: thumbnail || null,
         transcript,
-        publishedAt: validationResult.data.publishedAt
-          ? new Date(validationResult.data.publishedAt)
+        publishedAt: finalPublishedAt
+          ? new Date(finalPublishedAt)
           : null,
+        duration: finalDuration || null,
+        description: finalDescription || null,
       })
       .returning();
 

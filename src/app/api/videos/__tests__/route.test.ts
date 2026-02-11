@@ -18,6 +18,12 @@ vi.mock('next/server', async () => {
   }
 })
 
+// Mock the metadata fetcher
+const mockFetchVideoPageMetadata = vi.fn()
+vi.mock('@/lib/youtube/metadata', () => ({
+  fetchVideoPageMetadata: mockFetchVideoPageMetadata,
+}))
+
 // Setup test database
 const TEST_DATABASE_URL =
   process.env.DATABASE_URL?.replace(/\/goldminer$/, '/goldminer_test') ??
@@ -59,6 +65,8 @@ describe('POST /api/videos', () => {
   beforeEach(async () => {
     // Clean tables before each test
     await pool.query('TRUNCATE videos, insights, channels, settings, chunks CASCADE')
+    // Reset mocks before each test
+    mockFetchVideoPageMetadata.mockReset()
   })
 
   afterAll(async () => {
@@ -390,6 +398,137 @@ describe('POST /api/videos', () => {
 
     expect(response.status).toBe(400) // Should fail validation
     expect(mockAfter).not.toHaveBeenCalled()
+  })
+
+  it('creates video with duration and description fields', async () => {
+    const request = new Request('http://localhost:3000/api/videos', {
+      method: 'POST',
+      body: JSON.stringify({
+        youtubeId: 'test-duration-desc',
+        title: 'Video with Metadata',
+        channel: 'Test Channel',
+        transcript: 'This is a test transcript with enough characters to pass validation',
+        duration: 300,
+        description: 'This is a test description from the video',
+      }),
+    })
+
+    const response = await POST(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(201)
+    expect(data.video).toBeDefined()
+    expect(data.video.duration).toBe(300)
+    expect(data.video.description).toBe('This is a test description from the video')
+  })
+
+  it('auto-fetches metadata when youtubeId present and metadata fields missing', async () => {
+    mockFetchVideoPageMetadata.mockResolvedValueOnce({
+      publishedAt: '2024-06-09T10:00:00Z',
+      description: 'Fetched description from YouTube',
+      duration: 600,
+    })
+
+    const request = new Request('http://localhost:3000/api/videos', {
+      method: 'POST',
+      body: JSON.stringify({
+        youtubeId: 'test-auto-fetch',
+        title: 'Video Auto Fetch',
+        channel: 'Test Channel',
+        transcript: 'This is a test transcript with enough characters to pass validation',
+      }),
+    })
+
+    const response = await POST(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(201)
+    expect(mockFetchVideoPageMetadata).toHaveBeenCalledWith('test-auto-fetch')
+    expect(data.video.publishedAt).toBeDefined()
+    expect(new Date(data.video.publishedAt).toISOString()).toBe('2024-06-09T10:00:00.000Z')
+    expect(data.video.description).toBe('Fetched description from YouTube')
+    expect(data.video.duration).toBe(600)
+  })
+
+  it('caller-provided values take priority over fetched values', async () => {
+    const request = new Request('http://localhost:3000/api/videos', {
+      method: 'POST',
+      body: JSON.stringify({
+        youtubeId: 'test-priority',
+        title: 'Priority Test',
+        channel: 'Test Channel',
+        transcript: 'This is a test transcript with enough characters to pass validation',
+        publishedAt: '2024-12-25T12:00:00.000Z',
+        description: 'User provided description',
+        duration: 500,
+      }),
+    })
+
+    const response = await POST(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(201)
+    // Should NOT have called fetch because all fields were provided
+    expect(mockFetchVideoPageMetadata).not.toHaveBeenCalled()
+    expect(new Date(data.video.publishedAt).toISOString()).toBe('2024-12-25T12:00:00.000Z')
+    expect(data.video.description).toBe('User provided description')
+    expect(data.video.duration).toBe(500)
+  })
+
+  it('gracefully handles metadata fetch failure - save still succeeds', async () => {
+    mockFetchVideoPageMetadata.mockReset()
+    mockFetchVideoPageMetadata.mockRejectedValueOnce(new Error('YouTube fetch failed'))
+
+    const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+    const request = new Request('http://localhost:3000/api/videos', {
+      method: 'POST',
+      body: JSON.stringify({
+        youtubeId: 'test-fetch-fail',
+        title: 'Fetch Failure Test',
+        channel: 'Test Channel',
+        transcript: 'This is a test transcript with enough characters to pass validation',
+      }),
+    })
+
+    const response = await POST(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(201)
+    expect(data.video).toBeDefined()
+    expect(data.video.youtubeId).toBe('test-fetch-fail')
+    expect(data.video.publishedAt).toBeNull()
+    expect(data.video.description).toBeNull()
+    expect(data.video.duration).toBeNull()
+    expect(consoleWarnSpy).toHaveBeenCalled()
+
+    consoleWarnSpy.mockRestore()
+  })
+
+  it('does not fetch metadata when all fields already provided', async () => {
+    mockFetchVideoPageMetadata.mockClear()
+
+    const request = new Request('http://localhost:3000/api/videos', {
+      method: 'POST',
+      body: JSON.stringify({
+        youtubeId: 'test-no-fetch',
+        title: 'No Fetch Needed',
+        channel: 'Test Channel',
+        transcript: 'This is a test transcript with enough characters to pass validation',
+        publishedAt: '2024-06-15T08:30:00.000Z',
+        description: 'Complete description',
+        duration: 450,
+      }),
+    })
+
+    const response = await POST(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(201)
+    expect(mockFetchVideoPageMetadata).not.toHaveBeenCalled()
+    expect(data.video.publishedAt).toBeDefined()
+    expect(data.video.description).toBe('Complete description')
+    expect(data.video.duration).toBe(450)
   })
 })
 

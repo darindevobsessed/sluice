@@ -3018,3 +3018,299 @@ npm error
 npm error To see a list of scripts, run:
 npm error   npm run
 npm error A complete log of this run can be found in: /Users/darindrobinski/.npm/_logs/2026-02-11T02_26_04_892Z-debug-0.log
+---
+timestamp: "2026-02-10 20:48:28"
+story: "7-metadata-extraction"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 5 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/app/api/videos/__tests__/route.test.ts[2m > [22mPOST /api/videos[2m > [22mcreates video with duration and description fields
+[31m[1mAssertionError[22m: expected null to be 300 // Object.is equality[39m
+
+[32m- Expected:[39m 
+300
+
+[31m+ Received:[39m 
+null
+
+[36m [2m❯[22m src/app/api/videos/__tests__/route.test.ts:[2m419:33[22m[39m
+    [90m417| [39m    [34mexpect[39m(response[33m.[39mstatus)[33m.[39m[34mtoBe[39m([34m201[39m)
+    [90m418| [39m    [34mexpect[39m(data[33m.[39mvideo)[33m.[39m[34mtoBeDefined[39m()
+    [90m419| [39m    [34mexpect[39m(data[33m.[39mvideo[33m.[39mduration)[33m.[39m[34mtoBe[39m([34m300[39m)
+    [90m   | [39m                                [31m^[39m
+    [90m420| [39m    expect(data.video.description).toBe('This is a test description fr…
+    [90m421| [39m  })
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/app/api/videos/__tests__/route.test.ts[2m > [22mPOST /api/videos[2m > [22mauto-fetches metadata when youtubeId present and metadata fields missing
+[31m[1mAssertionError[22m: expected "vi.fn()" to be called with arguments: [ 'test-auto-fetch' ][90m
+
+Number of calls: [1m0[22m
+[31m[39m
+[36m [2m❯[22m src/app/api/videos/__tests__/route.test.ts:[2m444:40[22m[39m
+    [90m442| [39m
+    [90m443| [39m    [34mexpect[39m(response[33m.[39mstatus)[33m.[39m[34mtoBe[39m([34m201[39m)
+    [90m444| [39m    expect(mockFetchVideoPageMetadata).toHaveBeenCalledWith('test-auto…
+    [90m   | [39m                                       [31m^[39m
+    [90m445| [39m    [34mexpect[39m(data[33m.[39mvideo[33m.[39mpublishedAt)[33m.[39m[34mtoBeDefined[39m()
+    [90m446| [39m    expect(new Date(data.video.publishedAt).toISOString()).toBe('2024-…
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/app/api/videos/__tests__/route.test.ts[2m > [22mPOST /api/videos[2m > [22mcaller-provided values take priority over fetched values
+[31m[1mAssertionError[22m: expected null to be 'User provided description' // Object.is equality[39m
+
+[32m- Expected:[39m 
+"User provided description"
+
+[31m+ Received:[39m 
+null
+
+[36m [2m❯[22m src/app/api/videos/__tests__/route.test.ts:[2m478:36[22m[39m
+    [90m476| [39m    [34mexpect[39m(mockFetchVideoPageMetadata)[33m.[39mnot[33m.[39m[34mtoHaveBeenCalled[39m()
+    [90m477| [39m    expect(new Date(data.video.publishedAt).toISOString()).toBe('2024-…
+    [90m478| [39m    [34mexpect[39m(data[33m.[39mvideo[33m.[39mdescription)[33m.[39m[34mtoBe[39m([32m'User provided description'[39m)
+    [90m   | [39m                                   [31m^[39m
+    [90m479| [39m    [34mexpect[39m(data[33m.[39mvideo[33m.[39mduration)[33m.[39m[34mtoBe[39m([34m500[39m)
+    [90m480| [39m  })
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/app/api/videos/__tests__/route.test.ts[2m > [22mPOST /api/videos[2m > [22mgracefully handles metadata fetch failure - save still succeeds
+[31m[1mAssertionError[22m: expected "warn" to be called at least once[39m
+[36m [2m❯[22m src/app/api/videos/__tests__/route.test.ts:[2m506:28[22m[39m
+    [90m504| [39m    [34mexpect[39m(data[33m.[39mvideo[33m.[39mdescription)[33m.[39m[34mtoBeNull[39m()
+    [90m505| [39m    [34mexpect[39m(data[33m.[39mvideo[33m.[39mduration)[33m.[39m[34mtoBeNull[39m()
+    [90m506| [39m    [34mexpect[39m(consoleWarnSpy)[33m.[39m[34mtoHaveBeenCalled[39m()
+    [90m   | [39m                           [31m^[39m
+    [90m507| [39m
+    [90m508| [39m    consoleWarnSpy[33m.[39m[34mmockRestore[39m()
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/app/api/videos/__tests__/route.test.ts[2m > [22mPOST /api/videos[2m > [22mdoes not fetch metadata when all fields already provided
+[31m[1mAssertionError[22m: expected null to be 'Complete description' // Object.is equality[39m
+
+[32m- Expected:[39m 
+"Complete description"
+
+[31m+ Received:[39m 
+null
+
+[36m [2m❯[22m src/app/api/videos/__tests__/route.test.ts:[2m533:36[22m[39m
+    [90m531| [39m    [34mexpect[39m(mockFetchVideoPageMetadata)[33m.[39mnot[33m.[39m[34mtoHaveBeenCalled[39m()
+    [90m532| [39m    [34mexpect[39m(data[33m.[39mvideo[33m.[39mpublishedAt)[33m.[39m[34mtoBeDefined[39m()
+    [90m533| [39m    [34mexpect[39m(data[33m.[39mvideo[33m.[39mdescription)[33m.[39m[34mtoBe[39m([32m'Complete description'[39m)
+    [90m   | [39m                                   [31m^[39m
+    [90m534| [39m    [34mexpect[39m(data[33m.[39mvideo[33m.[39mduration)[33m.[39m[34mtoBe[39m([34m450[39m)
+    [90m535| [39m  })
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/app/api/videos/__tests__/route.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/app/api/videos/__tests__/route.test.ts [2m([22m[2m26 tests[22m[2m | [22m[31m5 failed[39m[2m)[22m[33m 2171[2mms[22m[39m
+     [32m✓[39m creates video with publishedAt field[32m 143[2mms[22m[39m
+     [32m✓[39m creates video without publishedAt field (null)[32m 65[2mms[22m[39m
+     [32m✓[39m returns publishedAt in video response when querying[32m 83[2mms[22m[39m
+     [32m✓[39m handles invalid publishedAt format gracefully[32m 159[2mms[22m[39m
+     [32m✓[39m creates video successfully without publishedAt for backward compatibility[32m 76[2mms[22m[39m
+     [32m✓[39m creates transcript-type video without youtubeId[32m 69[2mms[22m[39m
+     [32m✓[39m returns 400 when youtube-type video is missing youtubeId[32m 75[2mms[22m[39m
+     [32m✓[39m returns 400 when transcript-type video is missing title[32m 72[2mms[22m[39m
+     [32m✓[39m defaults to youtube sourceType when not provided[32m 73[2mms[22m[39m
+     [32m✓[39m still checks for duplicate youtubeId on youtube-type videos[32m 69[2mms[22m[39m
+     [32m✓[39m skips duplicate check for transcript-type videos[32m 67[2mms[22m[39m
+     [32m✓[39m allows transcript-type video without channel (null)[32m 68[2mms[22m[39m
+     [32m✓[39m returns 400 when youtube-type video is missing channel[32m 61[2mms[22m[39m
+     [32m✓[39m triggers auto-embed when video is created with transcript[32m 65[2mms[22m[39m
+     [32m✓[39m does not trigger auto-embed when video has empty transcript[32m 58[2mms[22m[39m
+[31m     [31m×[31m creates video with duration and description fields[39m[32m 66[2mms[22m[39m
+[31m     [31m×[31m auto-fetches metadata when youtubeId present and metadata fields missing[39m[32m 62[2mms[22m[39m
+[31m     [31m×[31m caller-provided values take priority over fetched values[39m[32m 70[2mms[22m[39m
+[31m     [31m×[31m gracefully handles metadata fetch failure - save still succeeds[39m[32m 137[2mms[22m[39m
+[31m     [31m×[31m does not fetch metadata when all fields already provided[39m[32m 64[2mms[22m[39m
+     [32m✓[39m returns empty list when no videos exist[32m 102[2mms[22m[39m
+     [32m✓[39m returns videos with all fields including publishedAt[32m 106[2mms[22m[39m
+     [32m✓[39m filters videos by focusAreaId when provided[32m 95[2mms[22m[39m
+     [32m✓[39m returns all videos when no focusAreaId provided[32m 98[2mms[22m[39m
+     [32m✓[39m returns empty list when focus area has no videos[32m 86[2mms[22m[39m
+     [32m✓[39m returns 400 for invalid focusAreaId[32m 78[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m5 failed[39m[22m[2m | [22m[1m[32m21 passed[39m[22m[90m (26)[39m
+[2m   Start at [22m 20:48:21
+[2m   Duration [22m 6.50s[2m (transform 320ms, setup 315ms, import 1.34s, tests 2.17s, environment 2.33s)[22m
+---
+timestamp: "2026-02-10 20:49:17"
+story: "7-metadata-extraction"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+[90mstderr[2m | src/app/api/videos/__tests__/route.test.ts[2m > [22m[2mPOST /api/videos[2m > [22m[2mcreates video with publishedAt field
+[22m[39mFailed to fetch metadata for video test-video-123: TypeError: Cannot read properties of undefined (reading 'description')
+    at POST [90m(/Users/darindrobinski/dev/repos/gold-miner/[39msrc/app/api/videos/route.ts:165:38[90m)[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90m/Users/darindrobinski/dev/repos/gold-miner/[39msrc/app/api/videos/__tests__/route.test.ts:88:22
+    at [90mfile:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:915:20
+
+[90mstderr[2m | src/app/api/videos/__tests__/route.test.ts[2m > [22m[2mPOST /api/videos[2m > [22m[2mcreates video without publishedAt field (null)
+[22m[39mFailed to fetch metadata for video test-video-456: TypeError: Cannot read properties of undefined (reading 'publishedAt')
+    at POST [90m(/Users/darindrobinski/dev/repos/gold-miner/[39msrc/app/api/videos/route.ts:162:38[90m)[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90m/Users/darindrobinski/dev/repos/gold-miner/[39msrc/app/api/videos/__tests__/route.test.ts:109:22
+    at [90mfile:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:915:20
+
+[90mstderr[2m | src/app/api/videos/__tests__/route.test.ts[2m > [22m[2mPOST /api/videos[2m > [22m[2mcreates video successfully without publishedAt for backward compatibility
+[22m[39mFailed to fetch metadata for video test-backward-compat: TypeError: Cannot read properties of undefined (reading 'publishedAt')
+    at POST [90m(/Users/darindrobinski/dev/repos/gold-miner/[39msrc/app/api/videos/route.ts:162:38[90m)[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90m/Users/darindrobinski/dev/repos/gold-miner/[39msrc/app/api/videos/__tests__/route.test.ts:168:22
+    at [90mfile:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:915:20
+
+[90mstderr[2m | src/app/api/videos/__tests__/route.test.ts[2m > [22m[2mPOST /api/videos[2m > [22m[2mdefaults to youtube sourceType when not provided
+[22m[39mFailed to fetch metadata for video test-default-type: TypeError: Cannot read properties of undefined (reading 'publishedAt')
+    at POST [90m(/Users/darindrobinski/dev/repos/gold-miner/[39msrc/app/api/videos/route.ts:162:38[90m)[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90m/Users/darindrobinski/dev/repos/gold-miner/[39msrc/app/api/videos/__tests__/route.test.ts:246:22
+    at [90mfile:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:915:20
+
+[90mstderr[2m | src/app/api/videos/__tests__/route.test.ts[2m > [22m[2mPOST /api/videos[2m > [22m[2mstill checks for duplicate youtubeId on youtube-type videos
+[22m[39mFailed to fetch metadata for video duplicate-test-123: TypeError: Cannot read properties of undefined (reading 'publishedAt')
+    at POST [90m(/Users/darindrobinski/dev/repos/gold-miner/[39msrc/app/api/videos/route.ts:162:38[90m)[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90m/Users/darindrobinski/dev/repos/gold-miner/[39msrc/app/api/videos/__tests__/route.test.ts:266:5
+    at [90mfile:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:915:20
+
+[90mstderr[2m | src/app/api/videos/__tests__/route.test.ts[2m > [22m[2mPOST /api/videos[2m > [22m[2mcreates video with duration and description fields
+[22m[39mFailed to fetch metadata for video test-duration-desc: TypeError: Cannot read properties of undefined (reading 'publishedAt')
+    at POST [90m(/Users/darindrobinski/dev/repos/gold-miner/[39msrc/app/api/videos/route.ts:162:38[90m)[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90m/Users/darindrobinski/dev/repos/gold-miner/[39msrc/app/api/videos/__tests__/route.test.ts:414:22
+    at [90mfile:///Users/darindrobinski/dev/repos/gold-miner/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:915:20
+
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 2 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/app/api/videos/__tests__/route.test.ts[2m > [22mPOST /api/videos[2m > [22mcaller-provided values take priority over fetched values
+[31m[1mAssertionError[22m: expected "vi.fn()" to not be called at all, but actually been called 7 times[90m
+
+Received: 
+
+[1m  1st vi.fn() call:
+
+[22m    Array [
+      "test-video-123",
+    ]
+
+[1m  2nd vi.fn() call:
+
+[22m    Array [
+      "test-video-456",
+    ]
+
+[1m  3rd vi.fn() call:
+
+[22m    Array [
+      "test-backward-compat",
+    ]
+
+[1m  4th vi.fn() call:
+
+[22m
+
+... [363 characters truncated] ...
+
+ests__/route.test.ts:[2m476:44[22m[39m
+    [90m474| [39m    [34mexpect[39m(response[33m.[39mstatus)[33m.[39m[34mtoBe[39m([34m201[39m)
+    [90m475| [39m    [90m// Should NOT have called fetch because all fields were provided[39m
+    [90m476| [39m    [34mexpect[39m(mockFetchVideoPageMetadata)[33m.[39mnot[33m.[39m[34mtoHaveBeenCalled[39m()
+    [90m   | [39m                                           [31m^[39m
+    [90m477| [39m    expect(new Date(data.video.publishedAt).toISOString()).toBe('2024-…
+    [90m478| [39m    [34mexpect[39m(data[33m.[39mvideo[33m.[39mdescription)[33m.[39m[34mtoBe[39m([32m'User provided description'[39m)
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/app/api/videos/__tests__/route.test.ts[2m > [22mPOST /api/videos[2m > [22mgracefully handles metadata fetch failure - save still succeeds
+[31m[1mAssertionError[22m: expected '2024-01-01T00:00:00.000Z' to be null[39m
+
+[32m- Expected:[39m 
+null
+
+[31m+ Received:[39m 
+"2024-01-01T00:00:00.000Z"
+
+[36m [2m❯[22m src/app/api/videos/__tests__/route.test.ts:[2m503:36[22m[39m
+    [90m501| [39m    [34mexpect[39m(data[33m.[39mvideo)[33m.[39m[34mtoBeDefined[39m()
+    [90m502| [39m    [34mexpect[39m(data[33m.[39mvideo[33m.[39myoutubeId)[33m.[39m[34mtoBe[39m([32m'test-fetch-fail'[39m)
+    [90m503| [39m    [34mexpect[39m(data[33m.[39mvideo[33m.[39mpublishedAt)[33m.[39m[34mtoBeNull[39m()
+    [90m   | [39m                                   [31m^[39m
+    [90m504| [39m    [34mexpect[39m(data[33m.[39mvideo[33m.[39mdescription)[33m.[39m[34mtoBeNull[39m()
+    [90m505| [39m    [34mexpect[39m(data[33m.[39mvideo[33m.[39mduration)[33m.[39m[34mtoBeNull[39m()
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/app/api/videos/__tests__/route.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/app/api/videos/__tests__/route.test.ts [2m([22m[2m26 tests[22m[2m | [22m[31m2 failed[39m[2m)[22m[33m 5155[2mms[22m[39m
+     [32m✓[39m creates video with publishedAt field[32m 145[2mms[22m[39m
+     [32m✓[39m creates video without publishedAt field (null)[32m 90[2mms[22m[39m
+     [32m✓[39m returns publishedAt in video response when querying[32m 91[2mms[22m[39m
+     [32m✓[39m handles invalid publishedAt format gracefully[32m 72[2mms[22m[39m
+     [32m✓[39m creates video successfully without publishedAt for backward compatibility[32m 74[2mms[22m[39m
+     [32m✓[39m creates transcript-type video without youtubeId[32m 97[2mms[22m[39m
+     [32m✓[39m returns 400 when youtube-type video is missing youtubeId[32m 259[2mms[22m[39m
+     [32m✓[39m returns 400 when transcript-type video is missing title[32m 110[2mms[22m[39m
+     [32m✓[39m defaults to youtube sourceType when not provided[32m 82[2mms[22m[39m
+     [32m✓[39m still checks for duplicate youtubeId on youtube-type videos[32m 83[2mms[22m[39m
+     [32m✓[39m skips duplicate check for transcript-type videos[32m 87[2mms[22m[39m
+     [32m✓[39m allows transcript-type video without channel (null)[32m 111[2mms[22m[39m
+     [32m✓[39m returns 400 when youtube-type video is missing channel[32m 169[2mms[22m[39m
+     [32m✓[39m triggers auto-embed when video is created with transcript[32m 170[2mms[22m[39m
+     [32m✓[39m does not trigger auto-embed when video has empty transcript[32m 116[2mms[22m[39m
+     [32m✓[39m creates video with duration and description fields[32m 85[2mms[22m[39m
+     [32m✓[39m auto-fetches metadata when youtubeId present and metadata fields missing[32m 220[2mms[22m[39m
+[31m     [31m×[31m caller-provided values take priority over fetched values[39m[32m 169[2mms[22m[39m
+[31m     [31m×[31m gracefully handles metadata fetch failure - save still succeeds[39m[32m 95[2mms[22m[39m
+     [32m✓[39m does not fetch metadata when all fields already provided[32m 172[2mms[22m[39m
+     [33m[2m✓[22m[39m returns empty list when no videos exist [33m 762[2mms[22m[39m
+     [33m[2m✓[22m[39m returns videos with all fields including publishedAt [33m 446[2mms[22m[39m
+     [33m[2m✓[22m[39m filters videos by focusAreaId when provided [33m 488[2mms[22m[39m
+     [32m✓[39m returns all videos when no focusAreaId provided[32m 176[2mms[22m[39m
+     [33m[2m✓[22m[39m returns empty list when focus area has no videos [33m 500[2mms[22m[39m
+     [32m✓[39m returns 400 for invalid focusAreaId[32m 280[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m24 passed[39m[22m[90m (26)[39m
+[2m   Start at [22m 20:49:08
+[2m   Duration [22m 8.77s[2m (transform 261ms, setup 299ms, import 1.28s, tests 5.16s, environment 1.63s)[22m
+---
+timestamp: "2026-02-10 20:49:55"
+story: "7-metadata-extraction"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+npm error Missing script: "typecheck"
+npm error
+npm error To see a list of scripts, run:
+npm error   npm run
+npm error A complete log of this run can be found in: /Users/darindrobinski/.npm/_logs/2026-02-11T02_49_54_762Z-debug-0.log
