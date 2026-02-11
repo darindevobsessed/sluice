@@ -1,9 +1,8 @@
 import type { Persona } from '@/lib/db/schema'
 import type { SearchResult } from '@/lib/search/types'
 import { formatContextForPrompt } from './context'
+import { query } from '@anthropic-ai/claude-agent-sdk'
 
-const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages'
-const MAX_TOKENS = 4096
 const MODEL = 'claude-sonnet-4-20250514'
 
 /**
@@ -59,121 +58,77 @@ interface StreamPersonaResponseParams {
 }
 
 /**
- * Streams a persona response from Claude API.
+ * Streams a persona response using Agent SDK.
  *
- * Makes a streaming request to the Anthropic Messages API with:
+ * Uses the Agent SDK's query() with:
  * - Persona's system prompt + relevant context
  * - User's question
- * - Streaming enabled
+ * - Streaming enabled via includePartialMessages
  *
- * Returns a ReadableStream that emits SSE-formatted events from Claude.
+ * Returns a ReadableStream that emits SSE-formatted events compatible with ensemble.ts.
  *
  * @param params - Persona, question, context, and optional abort signal
  * @returns ReadableStream of SSE events
- * @throws Error if API key missing, request fails, or signal aborts
+ * @throws Error if request fails or signal aborts
  */
 export async function streamPersonaResponse(
   params: StreamPersonaResponseParams
 ): Promise<ReadableStream<Uint8Array>> {
   const { persona, question, context, signal } = params
 
-  const apiKey = process.env.ANTHROPIC_API_KEY
-  if (!apiKey) {
-    throw new Error('ANTHROPIC_API_KEY environment variable is required')
-  }
-
-  // Check if already aborted
-  if (signal?.aborted) {
-    throw new Error('Request aborted before starting')
-  }
-
+  // Build system prompt with persona + context
   const systemPrompt = buildSystemPrompt(persona, context)
 
-  const requestBody = {
-    model: MODEL,
-    max_tokens: MAX_TOKENS,
-    stream: true,
-    system: systemPrompt,
-    messages: [
-      {
-        role: 'user',
-        content: question,
-      },
-    ],
+  // Concatenate system prompt and question (same pattern as service.ts)
+  const prompt = `${systemPrompt}\n\n---\n\n${question}`
+
+  // Create AbortController for Agent SDK
+  const abortController = new AbortController()
+
+  // Wire incoming signal to our abort controller
+  if (signal) {
+    signal.addEventListener('abort', () => {
+      abortController.abort()
+    })
   }
 
-  const response = await fetch(ANTHROPIC_API_URL, {
-    method: 'POST',
-    headers: {
-      'anthropic-version': '2023-06-01',
-      'x-api-key': apiKey,
-      'content-type': 'application/json',
+  // Start the Agent SDK query
+  const agentQuery = query({
+    prompt,
+    options: {
+      model: MODEL,
+      maxTurns: 1, // Single response, no tool use
+      tools: [], // No tools - pure text generation
+      includePartialMessages: true, // Get streaming events
+      abortController,
+      persistSession: false, // Don't save to disk
     },
-    body: JSON.stringify(requestBody),
-    signal,
   })
 
-  if (!response.ok) {
-    // Try to extract specific error message from response body
-    let errorMessage = `Anthropic API error: ${response.status}`
-    try {
-      const errorData = await response.json()
-      if (errorData.error?.message) {
-        errorMessage = errorData.error.message
-      }
-    } catch {
-      // If we can't parse the error, use status-based message
-      if (response.status === 429) {
-        errorMessage = 'Rate limit exceeded'
-      } else if (response.status === 401) {
-        errorMessage = 'Authentication failed'
-      } else if (response.status >= 500) {
-        errorMessage = 'Claude API temporarily unavailable'
-      }
-    }
-    throw new Error(`Anthropic API error: ${response.status} ${errorMessage}`)
-  }
-
-  if (!response.body) {
-    throw new Error('Response body is null')
-  }
-
-  // Transform the Claude SSE stream into our own SSE format
-  const reader = response.body.getReader()
-  const decoder = new TextDecoder()
   const encoder = new TextEncoder()
 
   return new ReadableStream({
     async start(controller) {
       try {
-        while (true) {
-          const { done, value } = await reader.read()
-
-          if (done) {
-            // Send done event
-            controller.enqueue(encoder.encode('data: {"type":"done"}\n\n'))
-            controller.close()
-            break
-          }
-
-          // Forward SSE chunks as-is (Claude's format)
-          // Parse to transform if needed
-          const chunk = decoder.decode(value, { stream: true })
-          const lines = chunk.split('\n')
-
-          for (const line of lines) {
-            if (line.startsWith('data:')) {
-              // Forward the data line
-              controller.enqueue(encoder.encode(line + '\n\n'))
+        for await (const sdkMessage of agentQuery) {
+          // Handle streaming text events
+          if (sdkMessage.type === 'stream_event') {
+            const event = sdkMessage.event
+            // Emit content_block_delta events in SSE format
+            // ensemble.ts expects: data.type === 'content_block_delta' with data.delta?.text
+            if (event.type === 'content_block_delta') {
+              const sseData = `data: ${JSON.stringify(event)}\n\n`
+              controller.enqueue(encoder.encode(sseData))
             }
           }
         }
+
+        // Emit done event when iteration completes
+        controller.enqueue(encoder.encode('data: {"type":"done"}\n\n'))
+        controller.close()
       } catch (error) {
         controller.error(error)
       }
-    },
-    cancel() {
-      reader.cancel()
     },
   })
 }

@@ -1,6 +1,6 @@
-LAST_ACTIVITY="2026-02-11T00:11:00Z"
+LAST_ACTIVITY="2026-02-11T01:05:38Z"
 ACTIVE_CYCLE="6-polish-reliability"
-CURRENT_STORY="6-anthropic-api-key-with-agent-sdk"
+CURRENT_STORY="7-persona-status-cleanup"
 DEFAULT_MODE="creative"
 BACKLOG_COUNT=1
 HARNESS_CHECKED="2026-02-03"

@@ -1,14 +1,14 @@
 ---
 name: replace-anthropic-api-key-with-agent-sdk
 title: Replace raw Anthropic API calls with Agent SDK
-status: active
+status: complete
 cycle: polish-reliability
 story_number: 6
 created: 2026-02-10
 updated: 2026-02-10
 priority: urgent
 chunks_total: 2
-chunks_complete: 1
+chunks_complete: 2
 ---
 
 # Story: Replace raw Anthropic API calls with Agent SDK

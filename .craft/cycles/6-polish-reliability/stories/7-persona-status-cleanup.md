@@ -1,7 +1,7 @@
 ---
 name: persona-status-cleanup
 title: Clean up PersonaStatus layout on Knowledge Bank
-status: ready
+status: active
 cycle: polish-reliability
 story_number: 7
 created: 2026-02-10

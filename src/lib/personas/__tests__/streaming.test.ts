@@ -2,10 +2,14 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { streamPersonaResponse } from '../streaming'
 import type { Persona } from '@/lib/db/schema'
 import type { SearchResult } from '@/lib/search/types'
+import { query } from '@anthropic-ai/claude-agent-sdk'
 
-// Mock fetch globally
-const mockFetch = vi.fn()
-global.fetch = mockFetch
+// Mock Agent SDK
+vi.mock('@anthropic-ai/claude-agent-sdk', () => ({
+  query: vi.fn(),
+}))
+
+const mockQuery = vi.mocked(query)
 
 describe('streamPersonaResponse', () => {
   const mockPersona: Persona = {
@@ -35,25 +39,27 @@ describe('streamPersonaResponse', () => {
   ]
 
   beforeEach(() => {
-    mockFetch.mockReset()
-    vi.stubEnv('ANTHROPIC_API_KEY', 'test-api-key')
+    mockQuery.mockReset()
   })
 
   it('should return a ReadableStream', async () => {
-    // Mock SSE response
-    const mockResponseBody = new ReadableStream({
-      start(controller) {
-        controller.enqueue(new TextEncoder().encode('event: message_start\ndata: {}\n\n'))
-        controller.enqueue(new TextEncoder().encode('event: content_block_delta\ndata: {"delta":{"text":"Hello"}}\n\n'))
-        controller.close()
-      },
-    })
-
-    mockFetch.mockResolvedValue({
-      ok: true,
-      body: mockResponseBody,
-      headers: new Headers({ 'content-type': 'text/event-stream' }),
-    })
+    // Mock Agent SDK query to yield stream events
+    mockQuery.mockReturnValue(
+      (async function* () {
+        yield {
+          type: 'stream_event',
+          event: {
+            type: 'content_block_delta',
+            index: 0,
+            delta: { type: 'text_delta', text: 'Hello' },
+          },
+        }
+        yield {
+          type: 'assistant',
+          message: { content: [{ type: 'text', text: 'Hello' }] },
+        }
+      })() as never
+    )
 
     const stream = await streamPersonaResponse({
       persona: mockPersona,
@@ -64,59 +70,43 @@ describe('streamPersonaResponse', () => {
     expect(stream).toBeInstanceOf(ReadableStream)
   })
 
-  it('should call Anthropic API with correct parameters', async () => {
-    const mockResponseBody = new ReadableStream({
-      start(controller) {
-        controller.close()
-      },
-    })
-
-    mockFetch.mockResolvedValue({
-      ok: true,
-      body: mockResponseBody,
-      headers: new Headers({ 'content-type': 'text/event-stream' }),
-    })
-
-    await streamPersonaResponse({
-      persona: mockPersona,
-      question: 'What is TypeScript?',
-      context: mockContext,
-    })
-
-    expect(mockFetch).toHaveBeenCalledWith(
-      'https://api.anthropic.com/v1/messages',
-      expect.objectContaining({
-        method: 'POST',
-        headers: expect.objectContaining({
-          'anthropic-version': '2023-06-01',
-          'x-api-key': 'test-api-key',
-          'content-type': 'application/json',
-        }),
-        body: expect.any(String),
-      })
+  it('should call Agent SDK query with correct parameters', async () => {
+    mockQuery.mockReturnValue(
+      (async function* () {
+        yield {
+          type: 'assistant',
+          message: { content: [{ type: 'text', text: 'Response' }] },
+        }
+      })() as never
     )
 
-    const callBody = JSON.parse(mockFetch.mock.calls[0]?.[1]?.body as string)
-    expect(callBody).toMatchObject({
-      model: expect.any(String),
-      max_tokens: expect.any(Number),
-      stream: true,
-      messages: expect.any(Array),
+    await streamPersonaResponse({
+      persona: mockPersona,
+      question: 'What is TypeScript?',
+      context: mockContext,
+    })
+
+    expect(mockQuery).toHaveBeenCalledWith({
+      prompt: expect.stringContaining(mockPersona.systemPrompt),
+      options: expect.objectContaining({
+        model: 'claude-sonnet-4-20250514',
+        maxTurns: 1,
+        tools: [],
+        includePartialMessages: true,
+        persistSession: false,
+      }),
     })
   })
 
-  it('should include persona system prompt in request', async () => {
-    const mockResponseBody = new ReadableStream({
-      start(controller) {
-        controller.close()
-      },
-    })
-
-    mockFetch.mockResolvedValue({
-      ok: true,
-      body: mockResponseBody,
-      headers: new Headers({ 'content-type': 'text/event-stream' }),
-    })
+  it('should include persona system prompt and question in prompt', async () => {
+    mockQuery.mockReturnValue(
+      (async function* () {
+        yield {
+          type: 'assistant',
+          message: { content: [{ type: 'text', text: 'Response' }] },
+        }
+      })() as never
+    )
 
     await streamPersonaResponse({
       persona: mockPersona,
@@ -124,22 +114,20 @@ describe('streamPersonaResponse', () => {
       context: mockContext,
     })
 
-    const callBody = JSON.parse(mockFetch.mock.calls[0]?.[1]?.body as string)
-    expect(callBody.system).toContain(mockPersona.systemPrompt)
+    const promptArg = mockQuery.mock.calls[0]?.[0]?.prompt as string
+    expect(promptArg).toContain(mockPersona.systemPrompt)
+    expect(promptArg).toContain('What is TypeScript?')
   })
 
-  it('should include context in system prompt', async () => {
-    const mockResponseBody = new ReadableStream({
-      start(controller) {
-        controller.close()
-      },
-    })
-
-    mockFetch.mockResolvedValue({
-      ok: true,
-      body: mockResponseBody,
-      headers: new Headers({ 'content-type': 'text/event-stream' }),
-    })
+  it('should include context in prompt', async () => {
+    mockQuery.mockReturnValue(
+      (async function* () {
+        yield {
+          type: 'assistant',
+          message: { content: [{ type: 'text', text: 'Response' }] },
+        }
+      })() as never
+    )
 
     await streamPersonaResponse({
       persona: mockPersona,
@@ -147,107 +135,27 @@ describe('streamPersonaResponse', () => {
       context: mockContext,
     })
 
-    const callBody = JSON.parse(mockFetch.mock.calls[0]?.[1]?.body as string)
-    expect(callBody.system).toContain('TypeScript is a typed superset of JavaScript')
+    const promptArg = mockQuery.mock.calls[0]?.[0]?.prompt as string
+    expect(promptArg).toContain('TypeScript is a typed superset of JavaScript')
   })
 
-  it('should include user question in messages', async () => {
-    const mockResponseBody = new ReadableStream({
-      start(controller) {
-        controller.close()
-      },
-    })
-
-    mockFetch.mockResolvedValue({
-      ok: true,
-      body: mockResponseBody,
-      headers: new Headers({ 'content-type': 'text/event-stream' }),
-    })
-
-    await streamPersonaResponse({
-      persona: mockPersona,
-      question: 'What is TypeScript?',
-      context: mockContext,
-    })
-
-    const callBody = JSON.parse(mockFetch.mock.calls[0]?.[1]?.body as string)
-    expect(callBody.messages).toHaveLength(1)
-    expect(callBody.messages[0]).toMatchObject({
-      role: 'user',
-      content: 'What is TypeScript?',
-    })
-  })
-
-  it('should handle fetch errors', async () => {
-    mockFetch.mockRejectedValue(new Error('Network error'))
-
-    await expect(
-      streamPersonaResponse({
-        persona: mockPersona,
-        question: 'What is TypeScript?',
-        context: mockContext,
-      })
-    ).rejects.toThrow('Network error')
-  })
-
-  it('should handle non-ok responses', async () => {
-    mockFetch.mockResolvedValue({
-      ok: false,
-      status: 429,
-      statusText: 'Too Many Requests',
-      body: null,
-    })
-
-    await expect(
-      streamPersonaResponse({
-        persona: mockPersona,
-        question: 'What is TypeScript?',
-        context: mockContext,
-      })
-    ).rejects.toThrow()
-  })
-
-  it('should handle abort signal', async () => {
-    const mockResponseBody = new ReadableStream({
-      start(controller) {
-        controller.enqueue(new TextEncoder().encode('event: message_start\ndata: {}\n\n'))
-        controller.close()
-      },
-    })
-
-    mockFetch.mockResolvedValue({
-      ok: true,
-      body: mockResponseBody,
-      headers: new Headers({ 'content-type': 'text/event-stream' }),
-    })
-
-    const abortController = new AbortController()
-    abortController.abort()
-
-    await expect(
-      streamPersonaResponse({
-        persona: mockPersona,
-        question: 'What is TypeScript?',
-        context: mockContext,
-        signal: abortController.signal,
-      })
-    ).rejects.toThrow()
-  })
-
-  it('should return SSE-formatted events', async () => {
-    const mockResponseBody = new ReadableStream({
-      start(controller) {
-        controller.enqueue(new TextEncoder().encode('event: content_block_delta\ndata: {"type":"content_block_delta","delta":{"type":"text_delta","text":"Hello"}}\n\n'))
-        controller.enqueue(new TextEncoder().encode('event: message_stop\ndata: {}\n\n'))
-        controller.close()
-      },
-    })
-
-    mockFetch.mockResolvedValue({
-      ok: true,
-      body: mockResponseBody,
-      headers: new Headers({ 'content-type': 'text/event-stream' }),
-    })
+  it('should emit SSE-formatted content_block_delta events', async () => {
+    mockQuery.mockReturnValue(
+      (async function* () {
+        yield {
+          type: 'stream_event',
+          event: {
+            type: 'content_block_delta',
+            index: 0,
+            delta: { type: 'text_delta', text: 'Hello' },
+          },
+        }
+        yield {
+          type: 'assistant',
+          message: { content: [{ type: 'text', text: 'Hello' }] },
+        }
+      })() as never
+    )
 
     const stream = await streamPersonaResponse({
       persona: mockPersona,
@@ -260,7 +168,118 @@ describe('streamPersonaResponse', () => {
 
     const { value, done } = await reader.read()
     expect(done).toBe(false)
-    expect(decoder.decode(value)).toContain('data:')
+
+    const chunk = decoder.decode(value)
+    expect(chunk).toContain('data:')
+
+    const dataLine = chunk.split('\n').find(line => line.startsWith('data:'))
+    const data = JSON.parse(dataLine!.slice(5).trim())
+    expect(data.type).toBe('content_block_delta')
+    expect(data.delta.text).toBe('Hello')
+  })
+
+  it('should emit done event on completion', async () => {
+    mockQuery.mockReturnValue(
+      (async function* () {
+        yield {
+          type: 'stream_event',
+          event: {
+            type: 'content_block_delta',
+            index: 0,
+            delta: { type: 'text_delta', text: 'Complete' },
+          },
+        }
+        yield {
+          type: 'assistant',
+          message: { content: [{ type: 'text', text: 'Complete' }] },
+        }
+      })() as never
+    )
+
+    const stream = await streamPersonaResponse({
+      persona: mockPersona,
+      question: 'What is TypeScript?',
+      context: mockContext,
+    })
+
+    const reader = stream.getReader()
+    const decoder = new TextDecoder()
+
+    // Read first chunk (content_block_delta)
+    await reader.read()
+
+    // Read second chunk (done event)
+    const { value: doneValue, done } = await reader.read()
+    expect(done).toBe(false)
+
+    const doneChunk = decoder.decode(doneValue)
+    const doneLine = doneChunk.split('\n').find(line => line.startsWith('data:'))
+    const doneData = JSON.parse(doneLine!.slice(5).trim())
+    expect(doneData.type).toBe('done')
+  })
+
+  it('should handle query errors', async () => {
+    mockQuery.mockReturnValue(
+      (async function* () {
+        throw new Error('Query failed')
+      })() as never
+    )
+
+    const stream = await streamPersonaResponse({
+      persona: mockPersona,
+      question: 'What is TypeScript?',
+      context: mockContext,
+    })
+
+    const reader = stream.getReader()
+
+    await expect(reader.read()).rejects.toThrow('Query failed')
+  })
+
+  it('should handle abort signal', async () => {
+    const abortController = new AbortController()
+    abortController.abort()
+
+    mockQuery.mockReturnValue(
+      (async function* () {
+        throw new Error('Aborted')
+      })() as never
+    )
+
+    const stream = await streamPersonaResponse({
+      persona: mockPersona,
+      question: 'What is TypeScript?',
+      context: mockContext,
+      signal: abortController.signal,
+    })
+
+    const reader = stream.getReader()
+
+    await expect(reader.read()).rejects.toThrow()
+  })
+
+  it('should wire abort signal to Agent SDK abortController', async () => {
+    const abortController = new AbortController()
+
+    mockQuery.mockReturnValue(
+      (async function* () {
+        yield {
+          type: 'assistant',
+          message: { content: [{ type: 'text', text: 'Response' }] },
+        }
+      })() as never
+    )
+
+    await streamPersonaResponse({
+      persona: mockPersona,
+      question: 'What is TypeScript?',
+      context: mockContext,
+      signal: abortController.signal,
+    })
+
+    const options = mockQuery.mock.calls[0]?.[0]?.options
+    expect(options).toBeDefined()
+    expect(options?.abortController).toBeInstanceOf(AbortController)
   })
 
   it('should limit context to avoid exceeding token budget', async () => {
@@ -278,17 +297,14 @@ describe('streamPersonaResponse', () => {
       similarity: 0.9,
     }))
 
-    const mockResponseBody = new ReadableStream({
-      start(controller) {
-        controller.close()
-      },
-    })
-
-    mockFetch.mockResolvedValue({
-      ok: true,
-      body: mockResponseBody,
-      headers: new Headers({ 'content-type': 'text/event-stream' }),
-    })
+    mockQuery.mockReturnValue(
+      (async function* () {
+        yield {
+          type: 'assistant',
+          message: { content: [{ type: 'text', text: 'Response' }] },
+        }
+      })() as never
+    )
 
     await streamPersonaResponse({
       persona: mockPersona,
@@ -296,8 +312,8 @@ describe('streamPersonaResponse', () => {
       context: largeContext,
     })
 
-    const callBody = JSON.parse(mockFetch.mock.calls[0]?.[1]?.body as string)
-    // System prompt should not be excessively large
-    expect(callBody.system.length).toBeLessThan(20000) // Reasonable limit
+    const promptArg = mockQuery.mock.calls[0]?.[0]?.prompt as string
+    // Prompt should not be excessively large due to token limiting
+    expect(promptArg.length).toBeLessThan(20000) // Reasonable limit
   })
 })
