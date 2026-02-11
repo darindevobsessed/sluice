@@ -3314,3 +3314,91 @@ npm error
 npm error To see a list of scripts, run:
 npm error   npm run
 npm error A complete log of this run can be found in: /Users/darindrobinski/.npm/_logs/2026-02-11T02_49_54_762Z-debug-0.log
+---
+timestamp: "2026-02-10 20:59:51"
+story: "7-metadata-extraction"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 2
+node_modules/drizzle-orm/gel-core/columns/date-duration.d.ts(1,35): error TS2307: Cannot find module 'gel' or its corresponding type declarations.
+node_modules/drizzle-orm/gel-core/columns/duration.d.ts(1,31): error TS2307: Cannot find module 'gel' or its corresponding type declarations.
+node_modules/drizzle-orm/gel-core/columns/localdate.d.ts(1,32): error TS2307: Cannot find module 'gel' or its corresponding type declarations.
+node_modules/drizzle-orm/gel-core/columns/localtime.d.ts(1,32): error TS2307: Cannot find module 'gel' or its corresponding type declarations.
+node_modules/drizzle-orm/gel-core/columns/relative-duration.d.ts(1,39): error TS2307: Cannot find module 'gel' or its corresponding type declarations.
+node_modules/drizzle-orm/gel-core/columns/timestamp.d.ts(1,36): error TS2307: Cannot find module 'gel' or its corresponding type declarations.
+node_modules/drizzle-orm/gel-core/query-builders/query.d.ts(23,22): error TS2420: Class 'GelRelationalQuery<TResult>' incorrectly implements interface 'SQLWrapper'.
+  Property 'getSQL' is missing in type 'GelRelationalQuery<TResult>' but required in type 'SQLWrapper'.
+node_modules/drizzle-orm/gel-core/roles.d.ts(7,22): error TS2559: Type 'GelRole' has no properties in common with type 'GelRoleConfig'.
+node_modules/drizzle-orm/mysql-core/db.d.ts(1,38): error TS2307: Cannot find module 'mysql2/promise' or its corresponding type declarations.
+node_modules/drizzle-orm/mysql-core/query-builders/delete.d.ts(36,22): error TS2420: Class 'MySqlDeleteBase<TTable, TQueryResult, TPreparedQueryHKT, TDynamic, TExcludedMethods>' incorrectly implements interface 'SQLWrapper'.
+  Property 'getSQL' is missing in type 'MySqlDeleteBase<TTable, TQueryResult, TPreparedQueryHKT, TDynamic, TExcludedMethods>' but required in type 'SQLWrapper'.
+node_modules/drizzle-orm/mysql-core/query-builders/select.d.ts(294,244): error TS2344: Type 'string' does not satisfy the constraint 'keyof this & string'.
+  Type 'string' is not assignable to type 'keyof this & string'.
+    Type 'string' is not assignable to type 'keyof this'.
+      Type '"session"' is not assignable to type '"offset" | "_" | "getSQL" | "as" | "union" | "intersect" | "except" | "for" | "where" | "orderBy" | "limit" | "leftJoin" | "rightJoin" | "innerJoin" | "toSQL" | "$dynamic" | "having" | ... 8 more ... | "$withCache"'.
+node_modules/drizzle-orm/mysql-core/query-builders/select.d.ts(320,247): error TS2344: Type 'string' does not satisfy the constraint 'keyof this & string'.
+  Type 'string' is not assignable to type 'keyof this & string'.
+    Type 'string' is not assignable to type 'keyof this'.
+      Type '"session"' is not assignable to type '"offset" | "_" | "getSQL" | "as" | "union" | "intersect" | "except" | "for" | "where" | "orderBy" | "limit" | "leftJoin" | "rightJoin" | "innerJoin" | "toSQL" | "$dynamic" | "having" | ... 8 more ... | "$withCache"'.
+node_modules/drizzle-orm/mysql-core/query-builders/select.d.ts(346,248): error TS2344: Type 'string' does not satisfy the constraint 'keyof this & string'.
+  Type 'string' is not assignable to type 'keyof this & string'.
+    Type 'string' is not assignable to type 'keyof this'.
+      Type '"session"' is not assignable to type '"offset" | "_" | "getSQL" | "as" | "union" | "intersect" | "except" | "for" | "where" | "orderBy" | "limit" | "leftJoin" | "rightJoin" | "innerJoin" | "toSQL" | "$dynamic" | "having" | ... 8 more ... | "$withCache"'.
+node_modules/drizzle-orm/mysql-core/query-builders/select.d.ts(387,251): error TS2344: Type 'string' does not satisfy the constraint 'keyof this & string'.
+  Type 'string' is not assignable to type 'keyof this & string'.
+    Type 'string' is not assignable to type 'keyof this'.
+      Type '"session"' is not assignable to type '"offset" | "_" | "getSQL" | "as" | "union" | "intersect" | "except" | "for" | "where" | "orderBy" | "limit" | "leftJoin" | "rightJoin" | "innerJoin" | "toSQL" | "$dynamic" | "having" | ... 8 more ... | "$withCache"'.
+node_modules/drizzle-orm/mysql-core/query-builders/select.d.ts(413,245): error TS2344: Type 'string' does not satisfy the constraint 'keyof this & string'.
+  Type 'string' is not assignable to type 'keyof this & string'.
+    Type 'string' is not assignable to type 'keyof this'.
+      Type '"session"' is not assignable to type '"offset" | "_" | "getSQL" | "as" | "union" | "intersect" | "except" | "for" | "where" | "orderBy" | "limit" | "leftJoin" | "rightJoin" | "innerJoin" | "toSQL" | "$dynamic" | "having" | ... 8 more ... | "$withCache"'.
+node_modules/drizzle-orm/mysql-core/query-builders/select.d.ts(454,248): error TS2344: Type 'string' does not satisfy the constraint 'keyof this & string'.
+  Type 'string' is not assignable to type 'keyof this & string'.
+    Type 'string' is not assignable to type 'keyof this'.
+      Type '"session"' is not assignable to type '"offset" | "_" | "getSQL" | "as" | "union" | "intersect" | "except" | "for" | "where" | "orderBy" | "limit" | "leftJoin" | "righ
+
+... [15749 characters truncated] ...
+
+tedFields>' does not implement inherited abstract member getSQL from class 'SingleStoreSelectQueryBuilderBase<SingleStoreSelectHKT, TTableName, TSelection, TSelectMode, TPreparedQueryHKT, TNullabilityMap, TDynamic, TExcludedMethods, TResult, TSelectedFields>'.
+node_modules/drizzle-orm/singlestore-core/query-builders/select.types.d.ts(130,1185): error TS2344: Type 'SingleStoreSetOperatorExcludedMethods' does not satisfy the constraint '"offset" | "_" | "getSQL" | "as" | "union" | "intersect" | "except" | "for" | "where" | "orderBy" | "limit" | "execute" | "leftJoin" | "rightJoin" | "innerJoin" | "fullJoin" | "toSQL" | ... 14 more ... | "minus"'.
+  Type '"session"' is not assignable to type '"offset" | "_" | "getSQL" | "as" | "union" | "intersect" | "except" | "for" | "where" | "orderBy" | "limit" | "execute" | "leftJoin" | "rightJoin" | "innerJoin" | "fullJoin" | "toSQL" | ... 14 more ... | "minus"'.
+node_modules/drizzle-orm/singlestore/driver.d.ts(1,100): error TS2307: Cannot find module 'mysql2' or its corresponding type declarations.
+node_modules/drizzle-orm/singlestore/driver.d.ts(2,39): error TS2307: Cannot find module 'mysql2/promise' or its corresponding type declarations.
+node_modules/drizzle-orm/singlestore/session.d.ts(1,94): error TS2307: Cannot find module 'mysql2/promise' or its corresponding type declarations.
+node_modules/drizzle-orm/sqlite-core/query-builders/query.d.ts(25,22): error TS2420: Class 'SQLiteRelationalQuery<TType, TResult>' incorrectly implements interface 'SQLWrapper'.
+  Property 'getSQL' is missing in type 'SQLiteRelationalQuery<TType, TResult>' but required in type 'SQLWrapper'.
+node_modules/drizzle-orm/sqlite-core/query-builders/select.d.ts(233,247): error TS2344: Type 'string' does not satisfy the constraint 'keyof this & string'.
+  Type 'string' is not assignable to type 'keyof this & string'.
+    Type 'string' is not assignable to type 'keyof this'.
+      Type '"config"' is not assignable to type '"offset" | "_" | "getSQL" | "as" | "union" | "intersect" | "except" | "where" | "orderBy" | "limit" | "leftJoin" | "rightJoin" | "innerJoin" | "fullJoin" | "toSQL" | "$dynamic" | "having" | "groupBy" | "crossJoin" | "unionAll"'.
+node_modules/drizzle-orm/sqlite-core/query-builders/select.d.ts(259,250): error TS2344: Type 'string' does not satisfy the constraint 'keyof this & string'.
+  Type 'string' is not assignable to type 'keyof this & string'.
+    Type 'string' is not assignable to type 'keyof this'.
+      Type '"config"' is not assignable to type '"offset" | "_" | "getSQL" | "as" | "union" | "intersect" | "except" | "where" | "orderBy" | "limit" | "leftJoin" | "rightJoin" | "innerJoin" | "fullJoin" | "toSQL" | "$dynamic" | "having" | "groupBy" | "crossJoin" | "unionAll"'.
+node_modules/drizzle-orm/sqlite-core/query-builders/select.d.ts(285,251): error TS2344: Type 'string' does not satisfy the constraint 'keyof this & string'.
+  Type 'string' is not assignable to type 'keyof this & string'.
+    Type 'string' is not assignable to type 'keyof this'.
+      Type '"config"' is not assignable to type '"offset" | "_" | "getSQL" | "as" | "union" | "intersect" | "except" | "where" | "orderBy" | "limit" | "leftJoin" | "rightJoin" | "innerJoin" | "fullJoin" | "toSQL" | "$dynamic" | "having" | "groupBy" | "crossJoin" | "unionAll"'.
+node_modules/drizzle-orm/sqlite-core/query-builders/select.d.ts(311,248): error TS2344: Type 'string' does not satisfy the constraint 'keyof this & string'.
+  Type 'string' is not assignable to type 'keyof this & string'.
+    Type 'string' is not assignable to type 'keyof this'.
+      Type '"config"' is not assignable to type '"offset" | "_" | "getSQL" | "as" | "union" | "intersect" | "except" | "where" | "orderBy" | "limit" | "leftJoin" | "rightJoin" | "innerJoin" | "fullJoin" | "toSQL" | "$dynamic" | "having" | "groupBy" | "crossJoin" | "unionAll"'.
+node_modules/drizzle-orm/sqlite-core/query-builders/select.d.ts(452,22): error TS2515: Non-abstract class 'SQLiteSelectBase<TTableName, TResultType, TRunResult, TSelection, TSelectMode, TNullabilityMap, TDynamic, TExcludedMethods, TResult, TSelectedFields>' does not implement inherited abstract member getSQL from class 'SQLiteSelectQueryBuilderBase<SQLiteSelectHKT, TTableName, TResultType, TRunResult, TSelection, TSelectMode, TNullabilityMap, TDynamic, TExcludedMethods, TResult, TSelectedFields>'.
+node_modules/drizzle-orm/sqlite-core/query-builders/select.types.d.ts(123,1157): error TS2344: Type 'SQLiteSetOperatorExcludedMethods' does not satisfy the constraint '"values" | "all" | "offset" | "get" | "_" | "getSQL" | "as" | "union" | "intersect" | "except" | "where" | "orderBy" | "limit" | "execute" | "leftJoin" | "rightJoin" | "innerJoin" | ... 12 more ... | "run"'.
+  Type '"config"' is not assignable to type '"values" | "all" | "offset" | "get" | "_" | "getSQL" | "as" | "union" | "intersect" | "except" | "where" | "orderBy" | "limit" | "execute" | "leftJoin" | "rightJoin" | "innerJoin" | ... 12 more ... | "run"'.
+---
+timestamp: "2026-02-10 21:00:17"
+story: "7-metadata-extraction"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+[eval]:1
+import('tsx/esm').then(({register}) => {register(); import('./scripts/backfill-published-at.ts').then(() => console.log('Import successful')).catch(e => console.error('Import failed:', e.message))})
+                                        ^
+
+TypeError: register is not a function
+    at [eval]:1:41
+
+Node.js v24.11.0

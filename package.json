@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "concurrently --kill-others -n agent,next -c cyan,green \"npm run agent\" \"npm run next:dev\"",
+    "dev": "npm run dev:cleanup && concurrently -n agent,next -c cyan,green \"npm run agent\" \"npm run next:dev\"",
     "next:dev": "exec next dev -p ${PORT:-3001}",
     "agent": "exec env AGENT_PORT=${AGENT_PORT:-9334} tsx src/agent/index.ts",
     "build": "next build",
@@ -13,7 +13,9 @@
     "test:watch": "vitest",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
-    "db:migrate-data": "tsx scripts/migrate-data.ts"
+    "db:migrate-data": "tsx scripts/migrate-data.ts",
+    "db:backfill-published-at": "tsx scripts/backfill-published-at.ts",
+    "dev:cleanup": "lsof -ti:${PORT:-3001} -ti:${AGENT_PORT:-9334} | xargs kill -9 2>/dev/null; rm -f .next/dev/lock; exit 0"
   },
   "dependencies": {
     "@anthropic-ai/claude-agent-sdk": "^0.2.31",

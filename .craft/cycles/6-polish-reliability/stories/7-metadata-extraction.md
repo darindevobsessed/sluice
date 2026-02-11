@@ -1,14 +1,14 @@
 ---
 name: youtube-metadata-extraction
 title: Extract YouTube metadata (publishedAt, description, duration) during ingestion
-status: active
+status: complete
 cycle: polish-reliability
 story_number: 7
 created: 2026-02-10
 updated: 2026-02-10
 priority: urgent
 chunks_total: 3
-chunks_complete: 2
+chunks_complete: 3
 ---
 
 # Story: Extract YouTube metadata during ingestion

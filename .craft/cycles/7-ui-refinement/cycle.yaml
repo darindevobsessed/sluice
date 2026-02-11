@@ -1,0 +1,10 @@
+name: 7-ui-refinement
+title: UI Refinement
+status: active
+created: 2026-02-11
+goal: Improve navigation UX with collapsible sidebar
+
+stories:
+  - name: collapsible-sidebar
+    title: Collapsible Left Navigation Sidebar
+    status: ready
