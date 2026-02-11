@@ -124,4 +124,15 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Sidebar transition with prefers-reduced-motion support */
+  .sidebar-container {
+    transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sidebar-container {
+      transition: none;
+    }
+  }
 }

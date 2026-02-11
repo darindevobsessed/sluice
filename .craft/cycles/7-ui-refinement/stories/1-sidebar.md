@@ -8,7 +8,7 @@ created: 2026-02-11
 updated: 2026-02-11
 priority: high
 chunks_total: 5
-chunks_complete: 1
+chunks_complete: 2
 ---
 
 # Story: Collapsible Left Navigation Sidebar
