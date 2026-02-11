@@ -2408,3 +2408,397 @@ tool: "Bash"
 error: |
   Exit code 2
 src/lib/personas/__tests__/streaming.test.ts(281,12): error TS18048: 'options' is possibly 'undefined'.
+---
+timestamp: "2026-02-10 19:18:59"
+story: "7-persona-status-cleanup"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 6 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/components/personas/__tests__/PersonaStatus.test.tsx[2m > [22mPersonaStatus[2m > [22mlimits visible channels to 5 by default when more than 5 exist
+[31m[1mError[22m: [2mexpect([22m[31melement[31m[2m).not.toBeInTheDocument()[22m
+
+[31mexpected document not to contain element, found <span
+  class="font-medium"
+>
+  @
+  Channel6
+</span> instead[31m[39m
+[36m [2m❯[22m src/components/personas/__tests__/PersonaStatus.test.tsx:[2m372:49[22m[39m
+    [90m370| [39m
+    [90m371| [39m    [90m// Last 2 should be hidden[39m
+    [90m372| [39m    [34mexpect[39m(screen[33m.[39m[34mqueryByText[39m([32m'@Channel6'[39m))[33m.[39mnot[33m.[39m[34mtoBeInTheDocument[39m()
+    [90m   | [39m                                                [31m^[39m
+    [90m373| [39m    [34mexpect[39m(screen[33m.[39m[34mqueryByText[39m([32m'@Channel7'[39m))[33m.[39mnot[33m.[39m[34mtoBeInTheDocument[39m()
+    [90m374| [39m  })
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/personas/__tests__/PersonaStatus.test.tsx[2m > [22mPersonaStatus[2m > [22mshows "Show all N channels" button when more than 5 channels exist
+[31m[1mTestingLibraryElementError[22m[39m: Unable to find an element with the text: /show all 6 channels/i. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"space-y-3"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"text-sm text-muted-foreground"[39m
+      [36m>[39m
+        [36m<span[39m
+          [33mclass[39m=[32m"font-medium"[39m
+        [36m>[39m
+          [0mPersonas[0m
+        [36m</span>[39m
+        [0m [0m
+        [36m<span>[39m
+          [0m([0m
+          [0m1[0m
+          [0m active · [0m
+          [0m0[0m
+          [0m building)[0m
+        [36m</span>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"flex flex-wrap gap-2"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex items-center gap-1.5 rounded-full border bg-green-500/10 px-3 py-1 text-sm text-green-700 dark:text-green-400"[39m
+        [36m>[39m
+          [36m<span[39m
+            [33mclass[39m=[32m"font-medium"[39m
+          [36m>[39m
+            [0m@[0m
+            [0mChannel1[0m
+          [36m</span>[39m
+          [36m<span[39m
+            [33mclass[39m=[32m"text-green-600 dark:text-green-400"[39m
+          [36m>[39m
+            [0m✓[0m
+          [36m</span>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex items-center gap-2 rounded-lg border bg-card px-3 py-2 text-sm"[39m
+        [36m>[39m
+          [36m<span[39m
+            [33mclass[39m=[32m"font-medium"[39m
+          [36m>[39m
+            [0m@[0m
+            [0mChannel2[0m
+          [36m</span>[39m
+          [36m<span[39m
+            [33mclass[39m=[32m"text-muted-foreground"[39m
+          [36m>[39m
+            [0m([0m
+            [0m9[0m
+            [0m transcripts)[0m
+          [36m</span>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"inline-flex items-center justify-center whitespace-nowrap font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive bg-primary text-primary-foreground hover:bg-primary/90 h-6 gap-1 rounded-md px-2 text-xs has-[>svg]:px-1.5 [&_svg:not([class*='size-'])]:size-3"[39m
+            [33mdata-size[39m=[32m"xs"[39m
+            [33mdata-slot[39m=[32m"button"[39m
+            [33mdata-variant[39m=[32m"default"[39m
+          [36m>[39m
+            [0mCreate[0m
+          [36m</button>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex items-center gap-2 rounded-lg border bg-card px-3 py-2 text-sm"[39m
+        [36m>[39m
+          [36m<span[39m
+            [33mclass[39m=[32m"font-medium"[39m
+          [36m>[39m
+            [0m@[0m
+            [0mChannel3[0m
+          [36m</span>[39m
+          [36m<span[39m
+            [33mclass[39m=[32m"text-muted-foreground"[39m
+          [36m>[39m
+            [0m([0m
+            [0m8[0m
+            [0m transcripts)[0m
+          [36m</span>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"inline-flex items-center justify-center whitespace-nowrap font-medium transition-all disabled:pointer-events-none disabled:opac
+
+... [50292 characters truncated] ...
+
+aitFor[39m(() [33m=>[39m {
+    [90m   | [39m          [31m^[39m
+    [90m479| [39m      expect(screen.getByText(/show all 6 channels/i)).toBeInTheDocume…
+    [90m480| [39m    })
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/6]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/personas/__tests__/PersonaStatus.test.tsx[2m > [22mPersonaStatus[2m > [22msorts channels with active first, then ready, then building by transcript count
+[31m[1mError[22m: [2mexpect([22m[31melement[31m[2m).toHaveTextContent()[22m
+
+Expected element to have text content:
+[32m  @Active1[31m
+Received:
+[31m  @Building1[31m[39m
+[36m [2m❯[22m src/components/personas/__tests__/PersonaStatus.test.tsx:[2m527:25[22m[39m
+    [90m525| [39m
+    [90m526| [39m    // Expected order: Active1 (20), Active2 (15), Ready1 (8), Ready2 …
+    [90m527| [39m    [34mexpect[39m(channels[[34m0[39m])[33m.[39m[34mtoHaveTextContent[39m([32m'@Active1'[39m)
+    [90m   | [39m                        [31m^[39m
+    [90m528| [39m    [34mexpect[39m(channels[[34m1[39m])[33m.[39m[34mtoHaveTextContent[39m([32m'@Active2'[39m)
+    [90m529| [39m    [34mexpect[39m(channels[[34m2[39m])[33m.[39m[34mtoHaveTextContent[39m([32m'@Ready1'[39m)
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/6]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/personas/__tests__/PersonaStatus.test.tsx[2m > [22mPersonaStatus[2m > [22malways shows all active personas even when more than 5 channels exist
+[31m[1mError[22m: [2mexpect([22m[31melement[31m[2m).not.toBeInTheDocument()[22m
+
+[31mexpected document not to contain element, found <span
+  class="font-medium"
+>
+  @
+  Ready1
+</span> instead[31m[39m
+[36m [2m❯[22m src/components/personas/__tests__/PersonaStatus.test.tsx:[2m569:47[22m[39m
+    [90m567| [39m
+    [90m568| [39m    [90m// Ready1 should be hidden (7th item)[39m
+    [90m569| [39m    [34mexpect[39m(screen[33m.[39m[34mqueryByText[39m([32m'@Ready1'[39m))[33m.[39mnot[33m.[39m[34mtoBeInTheDocument[39m()
+    [90m   | [39m                                              [31m^[39m
+    [90m570| [39m
+    [90m571| [39m    [90m// Toggle button should still exist and show correct count[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/6]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/components/personas/__tests__/PersonaStatus.test.tsx
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/components/personas/__tests__/PersonaStatus.test.tsx [2m([22m[2m20 tests[22m[2m | [22m[31m6 failed[39m[2m)[22m[33m 3558[2mms[22m[39m
+     [32m✓[39m renders loading state on initial mount[32m 36[2mms[22m[39m
+     [32m✓[39m does not render when no channels exist[32m 8[2mms[22m[39m
+     [32m✓[39m renders section header with active and building counts[32m 33[2mms[22m[39m
+     [32m✓[39m renders active persona with checkmark badge[32m 8[2mms[22m[39m
+     [32m✓[39m renders ready-to-create channel with transcript count and Create button[32m 175[2mms[22m[39m
+     [32m✓[39m renders building channel with progress bar and "more needed" text[32m 32[2mms[22m[39m
+     [32m✓[39m renders mix of active, ready, and building channels[32m 21[2mms[22m[39m
+     [32m✓[39m calls POST /api/personas when Create button is clicked[32m 54[2mms[22m[39m
+     [32m✓[39m updates card to active state after successful persona creation[32m 32[2mms[22m[39m
+     [32m✓[39m shows loading state on Create button while creating[32m 32[2mms[22m[39m
+     [32m✓[39m shows error message when persona creation fails[32m 36[2mms[22m[39m
+     [32m✓[39m passes hasActivePersonas prop to callback when personas exist[32m 6[2mms[22m[39m
+     [32m✓[39m calls callback with false when no active personas exist[32m 7[2mms[22m[39m
+[31m     [31m×[31m limits visible channels to 5 by default when more than 5 exist[39m[32m 28[2mms[22m[39m
+[31m     [31m×[31m shows "Show all N channels" button when more than 5 channels exist[39m[33m 1006[2mms[22m[39m
+     [32m✓[39m does not show toggle button when 5 or fewer channels exist[32m 13[2mms[22m[39m
+[31m     [31m×[31m expands to show all channels when toggle button is clicked[39m[33m 1004[2mms[22m[39m
+[31m     [31m×[31m collapses back to 5 channels when "Show less" is clicked[39m[33m 1004[2mms[22m[39m
+[31m     [31m×[31m sorts channels with active first, then ready, then building by transcript count[39m[32m 9[2mms[22m[39m
+[31m     [31m×[31m always shows all active personas even when more than 5 channels exist[39m[32m 12[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m6 failed[39m[22m[2m | [22m[1m[32m14 passed[39m[22m[90m (20)[39m
+[2m   Start at [22m 19:18:51
+[2m   Duration [22m 8.07s[2m (transform 201ms, setup 321ms, import 1.44s, tests 3.56s, environment 2.05s)[22m
+---
+timestamp: "2026-02-10 19:19:32"
+story: "7-persona-status-cleanup"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/components/personas/__tests__/PersonaStatus.test.tsx[2m > [22mPersonaStatus[2m > [22malways shows all active personas even when more than 5 channels exist
+[31m[1mTestingLibraryElementError[22m: Unable to find an element with the text: @Active6. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[31m
+  [36m<div>[31m
+    [36m<div[31m
+      [33mclass[31m=[32m"space-y-3"[31m
+    [36m>[31m
+      [36m<div[31m
+        [33mclass[31m=[32m"text-sm text-muted-foreground"[31m
+      [36m>[31m
+        [36m<span[31m
+          [33mclass[31m=[32m"font-medium"[31m
+        [36m>[31m
+          [0mPersonas[0m
+        [36m</span>[31m
+        [0m [0m
+        [36m<span>[31m
+          [0m([0m
+          [0m6[0m
+          [0m active · [0m
+          [0m0[0m
+          [0m building)[0m
+        [36m</span>[31m
+      [36m</div>[31m
+      [36m<div[31m
+        [33mclass[31m=[32m"flex flex-wrap gap-2"[31m
+      [36m>[31m
+        [36m<div[31m
+          [33mclass[31m=[32m"flex items-center gap-1.5 rounded-full border bg-green-500/10 px-3 py-1 text-sm text-green-700 dark:text-green-400"[31m
+        [36m>[31m
+          [36m<span[31m
+            [33mclass[31m=[32m"font-medium"[31m
+          [36m>[31m
+            [0m@[0m
+            [0mActive1[0m
+          [36m</span>[31m
+          [36m<span[31m
+            [33mclass[31m=[32m"text-green-600 dark:text-green-400"[31m
+          [36m>[31m
+            [0m✓[0m
+          [36m</span>[31m
+        [36m</div>[31m
+        [36m<div[31m
+          [33mclass[31m=[32m"flex items-center gap-1.5 rounded-full border bg-green-500/10 px-3 py-1 text-sm text-green-700 dark:text-green-400"[31m
+        [36m>[31m
+          [36m<span[31m
+            [33mclass[31m=[32m"font-medium"[31m
+          [36m>[31m
+            [0m@[0m
+            [0mActive2[0m
+          [36m</span>[31m
+          [36m<span[31m
+            [33mclass[31m=[32m"text-green-600 dark:text-green-400"[31m
+          [36m>[31m
+            [0m✓[0m
+          [36m</span>[31m
+        [36m</div>[31m
+        [36m<div[31m
+          [33mclass[31m=[32m"flex items-center gap-1.5 rounded-full border bg-green-500/10 px-3 py-1 text-sm text-green-700 dark:text-green-400"[31m
+        [36m>[31m
+          [36m<span[31m
+            [33mclass[31m=[32m"font-medium"[31m
+          [36m>[31m
+            [0m@[0m
+            [0mActive3[0m
+          [36m</span>[31m
+          [36m<span[31m
+            [33mclass[31m=[32m"text-green-600 dark:text-green-400"[31m
+          [36m>[31m
+            [0m✓[0m
+          [36m</span>[31m
+        [36m</div>[31m
+        [36m<div[31m
+          [33mclass[31m=[32m"flex items-center gap-1.5 rounded-full border bg-green-500/10 px-3 py-1 text-sm text-green-700 dark:text-green-400"[31m
+        [36m>[31m
+          [36m<span[31m
+            [33mclass[31m=[32m"font-medium"[31m
+          [36m>[31m
+            [0m@[0m
+            [0mActive4[0m
+          [36m</span>[31m
+          [36m<span[31m
+            [33mclass[31m=[32m"text-green-600 dark:text-green-400"[31m
+          [36m>[31m
+            [0m✓[0m
+          [36m</span>[31m
+        [36m</div>[31m
+        [36m<div[31m
+          [33mclass[31m=[32m"flex items-center gap-1.5 rounded-full border bg-green-500/10 px-3 py-1 text-sm text-green-700 dark:text-green-400"[31m
+        [36m>[31m
+          [36m<span[31m
+            [33mclass[31m=[32m"font-medium"[31m
+          [36m>[31m
+            [0m@[0m
+            [0mActive5[0m
+          [36m</span>[31m
+          [36m<span[31m
+            [33mclass[31m=[32m"text-green-600 dark:text-green-400"[31m
+          [36m>[31m
+            [0m✓[0m
+          [36m</span>[31m
+        [36m</div>[31m
+      [36m</div>[31m
+      [36m<button[31m
+        [33mclass[31m=[32m"inline-flex items-center justify-center whitespace-nowrap font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 h-6 gap-1 rounded-md px-2 text-xs has-[>svg]:px-1.5 [&_svg:not([class*='size-'])]:size-3"[31m
+        [33mdata-size[31m=[32m"xs"[31m
+        [33mdata-slot[31m=[32m"button"[31m
+        [33mdata-variant[31m=[32m"ghost"[31m
+      [36m>[31m
+        [0mShow all 7 channels[0m
+      [36m</button>[31m
+    [36m</div>[31m
+  [36m</div>[31m
+[36m</body>[31m[39m
+[90m [2m❯[22m Object.getElementError node_modules/@testing-library/dom/dist/config.js:[2m37:19[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m76:38[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m52:17[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m95:19[22m[39m
+[36m [2m❯[22m src/components/personas/__tests__/PersonaStatus.test.tsx:[2m566:19[22m[39m
+    [90m564| [39m    [34mexpect[39m(screen[33m.[39m[34mgetByText[39m([32m'@Active4'[39m))[33m.[39m[34mtoBeInTheDocument[39m()
+    [90m565| [39m    [34mexpect[39m(screen[33m.[39m[34mgetByText[39m([32m'@Active5'[39m))[33m.[39m[34mtoBeInTheDocument[39m()
+    [90m566| [39m    [34mexpect[39m(screen[33m.[39m[34mgetByText[39m([32m'@Active6'[39m))[33m.[39m[34mtoBeInTheDocument[39m()
+    [90m   | [39m                  [31m^[39m
+    [90m567| [39m
+    [90m568| [39m    [90m// Ready1 should be hidden (7th item)[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/components/personas/__tests__/PersonaStatus.test.tsx
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/components/personas/__tests__/PersonaStatus.test.tsx [2m([22m[2m20 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 946[2mms[22m[39m
+     [32m✓[39m renders loading state on initial mount[32m 37[2mms[22m[39m
+     [32m✓[39m does not render when no channels exist[32m 10[2mms[22m[39m
+     [32m✓[39m renders section header with active and building counts[32m 41[2mms[22m[39m
+     [32m✓[39m renders active persona with checkmark badge[32m 9[2mms[22m[39m
+     [33m[2m✓[22m[39m renders ready-to-create channel with transcript count and Create button [33m 315[2mms[22m[39m
+     [32m✓[39m renders building channel with progress bar and "more needed" text[32m 114[2mms[22m[39m
+     [32m✓[39m renders mix of active, ready, and building channels[32m 42[2mms[22m[39m
+     [32m✓[39m calls POST /api/personas when Create button is clicked[32m 66[2mms[22m[39m
+     [32m✓[39m updates card to active state after successful persona creation[32m 39[2mms[22m[39m
+     [32m✓[39m shows loading state on Create button while creating[32m 39[2mms[22m[39m
+     [32m✓[39m shows error message when persona creation fails[32m 36[2mms[22m[39m
+     [32m✓[39m passes hasActivePersonas prop to callback when personas exist[32m 5[2mms[22m[39m
+     [32m✓[39m calls callback with false when no active personas exist[32m 5[2mms[22m[39m
+     [32m✓[39m limits visible channels to 5 by default when more than 5 exist[32m 16[2mms[22m[39m
+     [32m✓[39m shows "Show all N channels" button when more than 5 channels exist[32m 9[2mms[22m[39m
+     [32m✓[39m does not show toggle button when 5 or fewer channels exist[32m 8[2mms[22m[39m
+     [32m✓[39m expands to show all channels when toggle button is clicked[32m 43[2mms[22m[39m
+     [32m✓[39m collapses back to 5 channels when "Show less" is clicked[32m 76[2mms[22m[39m
+     [32m✓[39m sorts channels with active first, then ready, then building by transcript count[32m 12[2mms[22m[39m
+[31m     [31m×[31m always shows all active personas even when more than 5 channels exist[39m[32m 20[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m19 passed[39m[22m[90m (20)[39m
+[2m   Start at [22m 19:19:28
+[2m   Duration [22m 3.75s[2m (transform 158ms, setup 197ms, import 987ms, tests 946ms, environment 1.13s)[22m
+---
+timestamp: "2026-02-10 19:19:57"
+story: "7-persona-status-cleanup"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+npm error Missing script: "typecheck"
+npm error
+npm error To see a list of scripts, run:
+npm error   npm run
+npm error A complete log of this run can be found in: /Users/darindrobinski/.npm/_logs/2026-02-11T01_19_56_934Z-debug-0.log
+---
+timestamp: "2026-02-10 19:27:30"
+story: "7-persona-status-cleanup"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+npm error Missing script: "typecheck"
+npm error
+npm error To see a list of scripts, run:
+npm error   npm run
+npm error A complete log of this run can be found in: /Users/darindrobinski/.npm/_logs/2026-02-11T01_27_29_874Z-debug-0.log

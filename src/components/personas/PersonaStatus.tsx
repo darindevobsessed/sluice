@@ -4,6 +4,8 @@ import { useCallback, useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Loader2 } from 'lucide-react'
 
+const MAX_VISIBLE = 5
+
 interface Channel {
   channelName: string
   transcriptCount: number
@@ -20,12 +22,38 @@ interface PersonaStatusProps {
   onActivePersonasChange?: (hasActive: boolean) => void
 }
 
+function sortChannels(channels: Channel[], threshold: number): Channel[] {
+  return [...channels].sort((a, b) => {
+    const aIsActive = a.personaId !== null
+    const bIsActive = b.personaId !== null
+    const aIsReady = !aIsActive && a.transcriptCount >= threshold
+    const bIsReady = !bIsActive && b.transcriptCount >= threshold
+
+    // Active personas first
+    if (aIsActive && !bIsActive) return -1
+    if (!aIsActive && bIsActive) return 1
+
+    // If both active, sort by transcript count desc
+    if (aIsActive && bIsActive) {
+      return b.transcriptCount - a.transcriptCount
+    }
+
+    // Ready personas next
+    if (aIsReady && !bIsReady) return -1
+    if (!aIsReady && bIsReady) return 1
+
+    // Within same tier, sort by transcript count desc
+    return b.transcriptCount - a.transcriptCount
+  })
+}
+
 export function PersonaStatus({ onActivePersonasChange }: PersonaStatusProps) {
   const [channels, setChannels] = useState<Channel[]>([])
   const [threshold, setThreshold] = useState(5)
   const [isLoading, setIsLoading] = useState(true)
   const [creating, setCreating] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [expanded, setExpanded] = useState(false)
 
   useEffect(() => {
     async function fetchStatus() {
@@ -93,8 +121,15 @@ export function PersonaStatus({ onActivePersonasChange }: PersonaStatusProps) {
     return null
   }
 
+  const sortedChannels = sortChannels(channels, threshold)
   const activeCount = channels.filter(c => c.personaId !== null).length
   const buildingCount = channels.filter(c => c.personaId === null && c.transcriptCount < threshold).length
+
+  // Determine visible channels
+  // Always show all active personas, then fill to MAX_VISIBLE
+  const minVisible = Math.max(activeCount, MAX_VISIBLE)
+  const visibleChannels = expanded ? sortedChannels : sortedChannels.slice(0, minVisible)
+  const hasMore = sortedChannels.length > minVisible
 
   return (
     <div className="space-y-3">
@@ -109,7 +144,7 @@ export function PersonaStatus({ onActivePersonasChange }: PersonaStatusProps) {
 
       {/* Channel cards */}
       <div className="flex flex-wrap gap-2">
-        {channels.map(channel => {
+        {visibleChannels.map(channel => {
           const isActive = channel.personaId !== null
           const isReady = !isActive && channel.transcriptCount >= threshold
           const isBuilding = !isActive && channel.transcriptCount < threshold
@@ -194,6 +229,19 @@ export function PersonaStatus({ onActivePersonasChange }: PersonaStatusProps) {
           return null
         })}
       </div>
+
+      {/* Toggle button */}
+      {hasMore && (
+        <Button
+          variant="ghost"
+          size="xs"
+          onClick={() => setExpanded(!expanded)}
+        >
+          {expanded
+            ? 'Show less'
+            : `Show all ${sortedChannels.length} channels`}
+        </Button>
+      )}
 
       {/* Error message */}
       {error && (

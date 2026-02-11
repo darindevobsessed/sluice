@@ -337,4 +337,238 @@ describe('PersonaStatus', () => {
       expect(onActivePersonasChange).toHaveBeenCalledWith(false)
     })
   })
+
+  it('limits visible channels to 5 by default when more than 5 exist', async () => {
+    vi.mocked(fetch).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        channels: [
+          { channelName: 'Channel1', transcriptCount: 10, personaId: 1, personaCreatedAt: new Date() },
+          { channelName: 'Channel2', transcriptCount: 10, personaId: 2, personaCreatedAt: new Date() },
+          { channelName: 'Channel3', transcriptCount: 9, personaId: null, personaCreatedAt: null },
+          { channelName: 'Channel4', transcriptCount: 8, personaId: null, personaCreatedAt: null },
+          { channelName: 'Channel5', transcriptCount: 7, personaId: null, personaCreatedAt: null },
+          { channelName: 'Channel6', transcriptCount: 6, personaId: null, personaCreatedAt: null },
+          { channelName: 'Channel7', transcriptCount: 5, personaId: null, personaCreatedAt: null },
+        ],
+        threshold: 5,
+      }),
+    } as Response)
+
+    render(<PersonaStatus />)
+
+    await waitFor(() => {
+      expect(screen.getByText('@Channel1')).toBeInTheDocument()
+    })
+
+    // First 5 should be visible
+    expect(screen.getByText('@Channel1')).toBeInTheDocument()
+    expect(screen.getByText('@Channel2')).toBeInTheDocument()
+    expect(screen.getByText('@Channel3')).toBeInTheDocument()
+    expect(screen.getByText('@Channel4')).toBeInTheDocument()
+    expect(screen.getByText('@Channel5')).toBeInTheDocument()
+
+    // Last 2 should be hidden
+    expect(screen.queryByText('@Channel6')).not.toBeInTheDocument()
+    expect(screen.queryByText('@Channel7')).not.toBeInTheDocument()
+  })
+
+  it('shows "Show all N channels" button when more than 5 channels exist', async () => {
+    vi.mocked(fetch).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        channels: [
+          { channelName: 'Channel1', transcriptCount: 10, personaId: 1, personaCreatedAt: new Date() },
+          { channelName: 'Channel2', transcriptCount: 9, personaId: null, personaCreatedAt: null },
+          { channelName: 'Channel3', transcriptCount: 8, personaId: null, personaCreatedAt: null },
+          { channelName: 'Channel4', transcriptCount: 7, personaId: null, personaCreatedAt: null },
+          { channelName: 'Channel5', transcriptCount: 6, personaId: null, personaCreatedAt: null },
+          { channelName: 'Channel6', transcriptCount: 5, personaId: null, personaCreatedAt: null },
+        ],
+        threshold: 5,
+      }),
+    } as Response)
+
+    render(<PersonaStatus />)
+
+    await waitFor(() => {
+      expect(screen.getByText(/show all 6 channels/i)).toBeInTheDocument()
+    })
+  })
+
+  it('does not show toggle button when 5 or fewer channels exist', async () => {
+    vi.mocked(fetch).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        channels: [
+          { channelName: 'Channel1', transcriptCount: 10, personaId: 1, personaCreatedAt: new Date() },
+          { channelName: 'Channel2', transcriptCount: 9, personaId: null, personaCreatedAt: null },
+          { channelName: 'Channel3', transcriptCount: 8, personaId: null, personaCreatedAt: null },
+        ],
+        threshold: 5,
+      }),
+    } as Response)
+
+    render(<PersonaStatus />)
+
+    await waitFor(() => {
+      expect(screen.getByText('@Channel1')).toBeInTheDocument()
+    })
+
+    // Toggle button should not be present
+    expect(screen.queryByText(/show all/i)).not.toBeInTheDocument()
+  })
+
+  it('expands to show all channels when toggle button is clicked', async () => {
+    const user = userEvent.setup()
+
+    vi.mocked(fetch).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        channels: [
+          { channelName: 'Channel1', transcriptCount: 10, personaId: 1, personaCreatedAt: new Date() },
+          { channelName: 'Channel2', transcriptCount: 9, personaId: null, personaCreatedAt: null },
+          { channelName: 'Channel3', transcriptCount: 8, personaId: null, personaCreatedAt: null },
+          { channelName: 'Channel4', transcriptCount: 7, personaId: null, personaCreatedAt: null },
+          { channelName: 'Channel5', transcriptCount: 6, personaId: null, personaCreatedAt: null },
+          { channelName: 'Channel6', transcriptCount: 5, personaId: null, personaCreatedAt: null },
+        ],
+        threshold: 5,
+      }),
+    } as Response)
+
+    render(<PersonaStatus />)
+
+    await waitFor(() => {
+      expect(screen.getByText(/show all 6 channels/i)).toBeInTheDocument()
+    })
+
+    const toggleButton = screen.getByRole('button', { name: /show all 6 channels/i })
+    await user.click(toggleButton)
+
+    // All channels should now be visible
+    await waitFor(() => {
+      expect(screen.getByText('@Channel6')).toBeInTheDocument()
+    })
+
+    // Button text should change to "Show less"
+    expect(screen.getByText(/show less/i)).toBeInTheDocument()
+  })
+
+  it('collapses back to 5 channels when "Show less" is clicked', async () => {
+    const user = userEvent.setup()
+
+    vi.mocked(fetch).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        channels: [
+          { channelName: 'Channel1', transcriptCount: 10, personaId: 1, personaCreatedAt: new Date() },
+          { channelName: 'Channel2', transcriptCount: 9, personaId: null, personaCreatedAt: null },
+          { channelName: 'Channel3', transcriptCount: 8, personaId: null, personaCreatedAt: null },
+          { channelName: 'Channel4', transcriptCount: 7, personaId: null, personaCreatedAt: null },
+          { channelName: 'Channel5', transcriptCount: 6, personaId: null, personaCreatedAt: null },
+          { channelName: 'Channel6', transcriptCount: 5, personaId: null, personaCreatedAt: null },
+        ],
+        threshold: 5,
+      }),
+    } as Response)
+
+    render(<PersonaStatus />)
+
+    await waitFor(() => {
+      expect(screen.getByText(/show all 6 channels/i)).toBeInTheDocument()
+    })
+
+    const toggleButton = screen.getByRole('button', { name: /show all 6 channels/i })
+    await user.click(toggleButton)
+
+    await waitFor(() => {
+      expect(screen.getByText(/show less/i)).toBeInTheDocument()
+    })
+
+    const collapseButton = screen.getByRole('button', { name: /show less/i })
+    await user.click(collapseButton)
+
+    // Last channel should be hidden again
+    await waitFor(() => {
+      expect(screen.queryByText('@Channel6')).not.toBeInTheDocument()
+    })
+
+    // Button should show "Show all" again
+    expect(screen.getByText(/show all 6 channels/i)).toBeInTheDocument()
+  })
+
+  it('sorts channels with active first, then ready, then building by transcript count', async () => {
+    vi.mocked(fetch).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        channels: [
+          // Intentionally unsorted to test sorting logic
+          { channelName: 'Building1', transcriptCount: 2, personaId: null, personaCreatedAt: null },
+          { channelName: 'Active2', transcriptCount: 15, personaId: 2, personaCreatedAt: new Date() },
+          { channelName: 'Ready1', transcriptCount: 8, personaId: null, personaCreatedAt: null },
+          { channelName: 'Active1', transcriptCount: 20, personaId: 1, personaCreatedAt: new Date() },
+          { channelName: 'Building2', transcriptCount: 4, personaId: null, personaCreatedAt: null },
+          { channelName: 'Ready2', transcriptCount: 6, personaId: null, personaCreatedAt: null },
+        ],
+        threshold: 5,
+      }),
+    } as Response)
+
+    render(<PersonaStatus />)
+
+    await waitFor(() => {
+      expect(screen.getByText('@Active1')).toBeInTheDocument()
+    })
+
+    const channels = screen.getAllByText(/@\w+/)
+
+    // Expected order: Active1 (20), Active2 (15), Ready1 (8), Ready2 (6), Building2 (4)
+    expect(channels[0]).toHaveTextContent('@Active1')
+    expect(channels[1]).toHaveTextContent('@Active2')
+    expect(channels[2]).toHaveTextContent('@Ready1')
+    expect(channels[3]).toHaveTextContent('@Ready2')
+    expect(channels[4]).toHaveTextContent('@Building2')
+
+    // Building1 (2) should be hidden (6th item, only 5 visible)
+    expect(screen.queryByText('@Building1')).not.toBeInTheDocument()
+  })
+
+  it('always shows all active personas even when more than 5 channels exist', async () => {
+    vi.mocked(fetch).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        channels: [
+          { channelName: 'Active1', transcriptCount: 20, personaId: 1, personaCreatedAt: new Date() },
+          { channelName: 'Active2', transcriptCount: 19, personaId: 2, personaCreatedAt: new Date() },
+          { channelName: 'Active3', transcriptCount: 18, personaId: 3, personaCreatedAt: new Date() },
+          { channelName: 'Active4', transcriptCount: 17, personaId: 4, personaCreatedAt: new Date() },
+          { channelName: 'Active5', transcriptCount: 16, personaId: 5, personaCreatedAt: new Date() },
+          { channelName: 'Active6', transcriptCount: 15, personaId: 6, personaCreatedAt: new Date() },
+          { channelName: 'Ready1', transcriptCount: 10, personaId: null, personaCreatedAt: null },
+        ],
+        threshold: 5,
+      }),
+    } as Response)
+
+    render(<PersonaStatus />)
+
+    await waitFor(() => {
+      expect(screen.getByText('@Active1')).toBeInTheDocument()
+    })
+
+    // All 6 active personas should be visible (even though default is 5)
+    expect(screen.getByText('@Active1')).toBeInTheDocument()
+    expect(screen.getByText('@Active2')).toBeInTheDocument()
+    expect(screen.getByText('@Active3')).toBeInTheDocument()
+    expect(screen.getByText('@Active4')).toBeInTheDocument()
+    expect(screen.getByText('@Active5')).toBeInTheDocument()
+    expect(screen.getByText('@Active6')).toBeInTheDocument()
+
+    // Ready1 should be hidden (7th item)
+    expect(screen.queryByText('@Ready1')).not.toBeInTheDocument()
+
+    // Toggle button should still exist and show correct count
+    expect(screen.getByText(/show all 7 channels/i)).toBeInTheDocument()
+  })
 })
