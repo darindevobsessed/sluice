@@ -8,7 +8,7 @@ created: 2026-02-10
 updated: 2026-02-10
 priority: urgent
 chunks_total: 2
-chunks_complete: 0
+chunks_complete: 1
 ---
 
 # Story: Replace raw Anthropic API calls with Agent SDK

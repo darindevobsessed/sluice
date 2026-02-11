@@ -1,8 +1,14 @@
 import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest'
-import { registerSearchRag, registerGetListOfCreators } from '../tools'
+import {
+  registerSearchRag,
+  registerGetListOfCreators,
+  registerChatWithPersona,
+  registerEnsembleQuery,
+} from '../tools'
 import type { SearchResult } from '@/lib/search/types'
 import type { VideoResult } from '@/lib/search/aggregate'
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
+import { db } from '@/lib/db'
 
 // Mock dependencies
 vi.mock('@/lib/search/hybrid-search', () => ({
@@ -18,9 +24,12 @@ vi.mock('@/lib/db/search', () => ({
 }))
 
 vi.mock('@/lib/db', () => ({
-  db: {},
+  db: {
+    select: vi.fn(),
+  },
   chunks: {},
   videos: {},
+  personas: {},
 }))
 
 vi.mock('@/lib/embeddings/pipeline', () => ({
@@ -31,10 +40,26 @@ vi.mock('@/lib/db/insights', () => ({
   getExtractionForVideo: vi.fn(),
 }))
 
+vi.mock('@anthropic-ai/claude-agent-sdk', () => ({
+  query: vi.fn(),
+}))
+
+vi.mock('@/lib/personas/context', () => ({
+  getPersonaContext: vi.fn(),
+  formatContextForPrompt: vi.fn(),
+}))
+
+vi.mock('@/lib/personas/ensemble', () => ({
+  findBestPersonas: vi.fn(),
+}))
+
 // Import mocked functions
 import { hybridSearch } from '@/lib/search/hybrid-search'
 import { aggregateByVideo } from '@/lib/search/aggregate'
 import { getDistinctChannels } from '@/lib/db/search'
+import { query } from '@anthropic-ai/claude-agent-sdk'
+import { getPersonaContext, formatContextForPrompt } from '@/lib/personas/context'
+import { findBestPersonas } from '@/lib/personas/ensemble'
 
 describe('registerSearchRag', () => {
   let mockServer: {
@@ -622,5 +647,476 @@ describe('registerGetListOfCreators', () => {
     expect(parsed).toEqual(mockCreators)
     expect(parsed[0]?.channel).toBe('Creator A')
     expect(parsed[2]?.channel).toBe('Creator C')
+  })
+})
+
+describe('chat_with_persona', () => {
+  let mockServer: {
+    registerTool: Mock
+  }
+  let toolHandler: (params: { personaName: string; question: string }) => Promise<{
+    content: Array<{ type: string; text: string }>
+    isError?: boolean
+  }>
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+
+    // Create mock server that captures the tool handler
+    mockServer = {
+      registerTool: vi.fn((name, config, handler) => {
+        toolHandler = handler
+      }),
+    }
+
+    // Mock database for persona lookup
+    const mockPersonas = [
+      {
+        id: 1,
+        name: 'Test Creator',
+        channelName: 'Test Channel',
+        systemPrompt: 'You are Test Creator, an expert in React.',
+        expertiseTopics: ['react', 'typescript'],
+        expertiseEmbedding: new Array(384).fill(0.5),
+        transcriptCount: 10,
+        createdAt: new Date(),
+      },
+    ]
+
+    vi.mocked(db).select = vi.fn().mockReturnValue({
+      from: vi.fn().mockResolvedValue(mockPersonas),
+    }) as never
+  })
+
+  it('registers chat_with_persona tool with correct configuration', () => {
+    registerChatWithPersona(mockServer as unknown as McpServer)
+
+    expect(mockServer.registerTool).toHaveBeenCalledTimes(1)
+    expect(mockServer.registerTool).toHaveBeenCalledWith(
+      'chat_with_persona',
+      expect.objectContaining({
+        title: 'Chat with Persona',
+        description: expect.any(String),
+        inputSchema: expect.any(Object),
+      }),
+      expect.any(Function)
+    )
+  })
+
+  it('queries persona with Agent SDK and returns response with sources', async () => {
+    registerChatWithPersona(mockServer as unknown as McpServer)
+
+    // Mock context functions
+    const mockContext: SearchResult[] = [
+      {
+        chunkId: 1,
+        videoTitle: 'React Hooks',
+        content: 'React hooks are great for state management...',
+        similarity: 0.9,
+        startTime: 0,
+        endTime: 10,
+        videoId: 1,
+        channel: 'Test Channel',
+        youtubeId: 'abc123',
+        thumbnail: null,
+      },
+      {
+        chunkId: 2,
+        videoTitle: 'TypeScript Tips',
+        content: 'TypeScript provides type safety...',
+        similarity: 0.8,
+        startTime: 20,
+        endTime: 30,
+        videoId: 2,
+        channel: 'Test Channel',
+        youtubeId: 'def456',
+        thumbnail: null,
+      },
+    ]
+    vi.mocked(getPersonaContext).mockResolvedValue(mockContext)
+    vi.mocked(formatContextForPrompt).mockReturnValue('Context from your content:\n...')
+
+    // Mock Agent SDK query
+    const mockAssistantMessage = {
+      type: 'assistant',
+      message: {
+        content: [
+          { type: 'text', text: 'React hooks are indeed a powerful feature for managing state in functional components.' },
+        ],
+      },
+    }
+
+    vi.mocked(query).mockReturnValue(
+      (async function* () {
+        yield mockAssistantMessage
+      })() as never
+    )
+
+    const result = await toolHandler({
+      personaName: 'Test Creator',
+      question: 'What are your thoughts on React hooks?',
+    })
+
+    expect(query).toHaveBeenCalledWith({
+      prompt: expect.stringContaining('You are Test Creator'),
+      options: {
+        model: 'claude-sonnet-4-20250514',
+        maxTurns: 1,
+        tools: [],
+        persistSession: false,
+      },
+    })
+
+    const response = JSON.parse(result.content[0]?.text ?? '{}')
+    expect(response.persona).toBe('Test Creator')
+    expect(response.answer).toContain('React hooks')
+    expect(response.sources).toHaveLength(2)
+    expect(response.sources[0]?.videoTitle).toBe('React Hooks')
+  })
+
+  it('throws error when persona not found', async () => {
+    registerChatWithPersona(mockServer as unknown as McpServer)
+
+    // Mock empty personas
+    vi.mocked(db).select = vi.fn().mockReturnValue({
+      from: vi.fn().mockResolvedValue([]),
+    }) as never
+
+    const result = await toolHandler({
+      personaName: 'Nonexistent Persona',
+      question: 'Hello?',
+    })
+
+    expect(result.isError).toBe(true)
+    expect(result.content[0]?.text).toContain('Persona not found')
+  })
+
+  it('handles empty text response from Agent SDK', async () => {
+    registerChatWithPersona(mockServer as unknown as McpServer)
+
+    // Mock context
+    vi.mocked(getPersonaContext).mockResolvedValue([])
+    vi.mocked(formatContextForPrompt).mockReturnValue('')
+
+    // Mock Agent SDK with no text content
+    const mockAssistantMessage = {
+      type: 'assistant',
+      message: {
+        content: [
+          { type: 'tool_use', id: 'test', name: 'test', input: {} },
+        ],
+      },
+    }
+
+    vi.mocked(query).mockReturnValue(
+      (async function* () {
+        yield mockAssistantMessage
+      })() as never
+    )
+
+    const result = await toolHandler({
+      personaName: 'Test Creator',
+      question: 'What are your thoughts?',
+    })
+
+    const response = JSON.parse(result.content[0]?.text ?? '{}')
+    expect(response.answer).toBe('')
+  })
+
+  it('matches persona by channelName when name does not match', async () => {
+    registerChatWithPersona(mockServer as unknown as McpServer)
+
+    // Mock persona with different name and channelName
+    const mockPersonas = [
+      {
+        id: 1,
+        name: 'John Doe',
+        channelName: 'Test Channel',
+        systemPrompt: 'You are John Doe.',
+        expertiseTopics: [],
+        expertiseEmbedding: null,
+        transcriptCount: 5,
+        createdAt: new Date(),
+      },
+    ]
+
+    vi.mocked(db).select = vi.fn().mockReturnValue({
+      from: vi.fn().mockResolvedValue(mockPersonas),
+    }) as never
+
+    vi.mocked(getPersonaContext).mockResolvedValue([])
+    vi.mocked(formatContextForPrompt).mockReturnValue('')
+
+    const mockAssistantMessage = {
+      type: 'assistant',
+      message: {
+        content: [{ type: 'text', text: 'Hello!' }],
+      },
+    }
+
+    vi.mocked(query).mockReturnValue(
+      (async function* () {
+        yield mockAssistantMessage
+      })() as never
+    )
+
+    const result = await toolHandler({
+      personaName: 'Test Channel',
+      question: 'Hello?',
+    })
+
+    const response = JSON.parse(result.content[0]?.text ?? '{}')
+    expect(response.persona).toBe('Test Channel')
+    expect(response.answer).toBe('Hello!')
+  })
+})
+
+describe('ensemble_query', () => {
+  let mockServer: {
+    registerTool: Mock
+  }
+  let toolHandler: (params: { question: string }) => Promise<{
+    content: Array<{ type: string; text: string }>
+    isError?: boolean
+  }>
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+
+    mockServer = {
+      registerTool: vi.fn((name, config, handler) => {
+        toolHandler = handler
+      }),
+    }
+
+    // Mock personas
+    const mockPersonas = [
+      {
+        id: 1,
+        name: 'Creator A',
+        channelName: 'Channel A',
+        systemPrompt: 'You are Creator A.',
+        expertiseTopics: ['react'],
+        expertiseEmbedding: new Array(384).fill(0.5),
+        transcriptCount: 10,
+        createdAt: new Date(),
+      },
+      {
+        id: 2,
+        name: 'Creator B',
+        channelName: 'Channel B',
+        systemPrompt: 'You are Creator B.',
+        expertiseTopics: ['typescript'],
+        expertiseEmbedding: new Array(384).fill(0.3),
+        transcriptCount: 8,
+        createdAt: new Date(),
+      },
+      {
+        id: 3,
+        name: 'Creator C',
+        channelName: 'Channel C',
+        systemPrompt: 'You are Creator C.',
+        expertiseTopics: ['vue'],
+        expertiseEmbedding: new Array(384).fill(0.2),
+        transcriptCount: 6,
+        createdAt: new Date(),
+      },
+    ]
+
+    vi.mocked(db).select = vi.fn().mockReturnValue({
+      from: vi.fn().mockResolvedValue(mockPersonas),
+    }) as never
+  })
+
+  it('registers ensemble_query tool with correct configuration', () => {
+    registerEnsembleQuery(mockServer as unknown as McpServer)
+
+    expect(mockServer.registerTool).toHaveBeenCalledTimes(1)
+    expect(mockServer.registerTool).toHaveBeenCalledWith(
+      'ensemble_query',
+      expect.objectContaining({
+        title: 'Ensemble Query',
+        description: expect.any(String),
+        inputSchema: expect.any(Object),
+      }),
+      expect.any(Function)
+    )
+  })
+
+  it('queries top 3 personas and returns responses with best match', async () => {
+    registerEnsembleQuery(mockServer as unknown as McpServer)
+
+    // Mock findBestPersonas
+    const mockPersonas = [
+      {
+        id: 1,
+        name: 'Creator A',
+        channelName: 'Channel A',
+        systemPrompt: 'You are Creator A.',
+        expertiseTopics: ['react'],
+        expertiseEmbedding: new Array(384).fill(0.5),
+        transcriptCount: 10,
+        createdAt: new Date(),
+      },
+      {
+        id: 2,
+        name: 'Creator B',
+        channelName: 'Channel B',
+        systemPrompt: 'You are Creator B.',
+        expertiseTopics: ['typescript'],
+        expertiseEmbedding: new Array(384).fill(0.3),
+        transcriptCount: 8,
+        createdAt: new Date(),
+      },
+      {
+        id: 3,
+        name: 'Creator C',
+        channelName: 'Channel C',
+        systemPrompt: 'You are Creator C.',
+        expertiseTopics: ['vue'],
+        expertiseEmbedding: new Array(384).fill(0.2),
+        transcriptCount: 6,
+        createdAt: new Date(),
+      },
+    ]
+
+    vi.mocked(findBestPersonas).mockResolvedValueOnce([
+      { persona: mockPersonas[0]!, score: 0.9 },
+    ])
+
+    vi.mocked(findBestPersonas).mockResolvedValueOnce([
+      { persona: mockPersonas[0]!, score: 0.9 },
+      { persona: mockPersonas[1]!, score: 0.7 },
+      { persona: mockPersonas[2]!, score: 0.5 },
+    ])
+
+    // Mock context
+    const mockContext: SearchResult[] = [
+      {
+        chunkId: 1,
+        videoTitle: 'Test Video',
+        content: 'Test content...',
+        similarity: 0.9,
+        startTime: 0,
+        endTime: 10,
+        videoId: 1,
+        channel: 'Channel A',
+        youtubeId: 'abc123',
+        thumbnail: null,
+      },
+    ]
+    vi.mocked(getPersonaContext).mockResolvedValue(mockContext)
+    vi.mocked(formatContextForPrompt).mockReturnValue('Context...')
+
+    // Mock Agent SDK for each persona
+    const mockMessage1 = {
+      type: 'assistant',
+      message: {
+        content: [{ type: 'text', text: 'Answer from Creator A' }],
+      },
+    }
+    const mockMessage2 = {
+      type: 'assistant',
+      message: {
+        content: [{ type: 'text', text: 'Answer from Creator B' }],
+      },
+    }
+    const mockMessage3 = {
+      type: 'assistant',
+      message: {
+        content: [{ type: 'text', text: 'Answer from Creator C' }],
+      },
+    }
+
+    vi.mocked(query)
+      .mockReturnValueOnce((async function* () { yield mockMessage1 })() as never)
+      .mockReturnValueOnce((async function* () { yield mockMessage2 })() as never)
+      .mockReturnValueOnce((async function* () { yield mockMessage3 })() as never)
+
+    const result = await toolHandler({ question: 'What is React?' })
+
+    expect(findBestPersonas).toHaveBeenCalledTimes(2)
+    expect(query).toHaveBeenCalledTimes(3)
+
+    const response = JSON.parse(result.content[0]?.text ?? '{}')
+    expect(response.question).toBe('What is React?')
+    expect(response.bestMatch).toMatchObject({
+      persona: 'Creator A',
+      score: 0.9,
+    })
+    expect(response.responses).toHaveLength(3)
+    expect(response.responses[0]?.persona).toBe('Creator A')
+    expect(response.responses[0]?.answer).toBe('Answer from Creator A')
+  })
+
+  it('returns helpful message when no personas exist', async () => {
+    registerEnsembleQuery(mockServer as unknown as McpServer)
+
+    // Mock empty personas
+    vi.mocked(db).select = vi.fn().mockReturnValue({
+      from: vi.fn().mockResolvedValue([]),
+    }) as never
+
+    const result = await toolHandler({ question: 'Hello?' })
+
+    expect(result.content[0]?.text).toContain('No personas available')
+    expect(result.content[0]?.text).toContain('5+ transcripts')
+  })
+
+  it('handles partial failures gracefully', async () => {
+    registerEnsembleQuery(mockServer as unknown as McpServer)
+
+    const mockPersonas = [
+      {
+        id: 1,
+        name: 'Creator A',
+        channelName: 'Channel A',
+        systemPrompt: 'You are Creator A.',
+        expertiseTopics: ['react'],
+        expertiseEmbedding: new Array(384).fill(0.5),
+        transcriptCount: 10,
+        createdAt: new Date(),
+      },
+      {
+        id: 2,
+        name: 'Creator B',
+        channelName: 'Channel B',
+        systemPrompt: 'You are Creator B.',
+        expertiseTopics: ['typescript'],
+        expertiseEmbedding: new Array(384).fill(0.3),
+        transcriptCount: 8,
+        createdAt: new Date(),
+      },
+    ]
+
+    vi.mocked(findBestPersonas).mockResolvedValueOnce([
+      { persona: mockPersonas[0]!, score: 0.9 },
+    ])
+
+    vi.mocked(findBestPersonas).mockResolvedValueOnce([
+      { persona: mockPersonas[0]!, score: 0.9 },
+      { persona: mockPersonas[1]!, score: 0.7 },
+    ])
+
+    vi.mocked(getPersonaContext).mockResolvedValue([])
+    vi.mocked(formatContextForPrompt).mockReturnValue('')
+
+    // First persona succeeds, second fails
+    const mockMessage1 = {
+      type: 'assistant',
+      message: {
+        content: [{ type: 'text', text: 'Answer from Creator A' }],
+      },
+    }
+
+    vi.mocked(query)
+      .mockReturnValueOnce((async function* () { yield mockMessage1 })() as never)
+      .mockReturnValueOnce((async function* () { throw new Error('API error') })() as never)
+
+    const result = await toolHandler({ question: 'Test question?' })
+
+    const response = JSON.parse(result.content[0]?.text ?? '{}')
+    expect(response.responses).toHaveLength(1) // Only successful persona
+    expect(response.responses[0]?.persona).toBe('Creator A')
   })
 })

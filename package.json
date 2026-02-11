@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "concurrently --kill-others -n agent,next -c cyan,green \"npm run agent\" \"npm run next:dev\"",
-    "next:dev": "next dev -p ${PORT:-3001}",
-    "agent": "AGENT_PORT=${AGENT_PORT:-9334} tsx src/agent/index.ts",
+    "next:dev": "exec next dev -p ${PORT:-3001}",
+    "agent": "exec env AGENT_PORT=${AGENT_PORT:-9334} tsx src/agent/index.ts",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",

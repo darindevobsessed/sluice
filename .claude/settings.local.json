@@ -37,7 +37,8 @@
       "WebFetch(domain:www.viewstats.com)",
       "WebFetch(domain:ytscribe.com)",
       "WebFetch(domain:www.noxinfluencer.com)",
-      "WebFetch(domain:lilys.ai)"
+      "WebFetch(domain:lilys.ai)",
+      "Bash(timeout 120 bash:*)"
     ]
   }
 }

@@ -1,0 +1,17 @@
+story: "anthropic-api-key-with-agent-sdk"
+chunk: 1
+total_chunks: 2
+cycle: "6-polish-reliability"
+timestamp: "2026-02-10T23:11:43Z"
+git_ref: "2030460"
+git_branch: "main"
+state_CYCLE_STATUS: "ready"
+state_CURRENT_STORY: "6-anthropic-api-key-with-agent-sdk"
+state_CURRENT_CHUNK: "1"
+state_TOTAL_CHUNKS: "2"
+state_LAST_VALIDATION: "2026-02-10T21:45:09Z"
+story_status: "active"
+story_chunks_total: "2"
+story_chunks_complete: "0"
+test_status: ""
+modified_files: ".claude/commands/gm-ingest.md .claude/settings.local.json .craft/.exports/pre-compact-20260208_172208.md .craft/.exports/pre-compact-20260210_162510.md .craft/.global-state .craft/checkpoints/ux-clarity-chunk-4.yaml .craft/cycles/6-polish-reliability/.failures .craft/cycles/6-polish-reliability/.state .craft/cycles/6-polish-reliability/.usage/4-ux-clarity.log .craft/cycles/6-polish-reliability/stories/4-ux-clarity.md .craft/cycles/6-polish-reliability/stories/6-anthropic-api-key-with-agent-sdk.md .craft/cycles/6-polish-reliability/stories/7-metadata-extraction.md .craft/cycles/6-polish-reliability/stories/7-persona-status-cleanup.md src/app/api/personas/ensemble/__tests__/route.test.ts src/app/api/personas/ensemble/route.ts src/components/personas/PersonaColumn.tsx src/components/personas/PersonaPanel.tsx src/components/personas/__tests__/PersonaColumn.test.tsx src/components/personas/__tests__/PersonaPanel.test.tsx src/hooks/useEnsemble.ts src/lib/personas/ensemble.ts src/lib/personas/streaming.ts "

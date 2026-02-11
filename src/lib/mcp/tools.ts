@@ -7,6 +7,7 @@ import { db, personas } from '@/lib/db'
 import { getPersonaContext, formatContextForPrompt } from '@/lib/personas/context'
 import { findBestPersonas } from '@/lib/personas/ensemble'
 import { getExtractionForVideo } from '@/lib/db/insights'
+import { query } from '@anthropic-ai/claude-agent-sdk'
 
 /**
  * Register the search_rag tool with the MCP server.
@@ -101,11 +102,10 @@ export function registerGetListOfCreators(server: McpServer): void {
   )
 }
 
-const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages'
 const MODEL = 'claude-sonnet-4-20250514'
 
 /**
- * Makes a non-streaming Claude API call for a persona query.
+ * Makes a non-streaming query using Agent SDK for a persona query.
  * Reuses persona context scoping and prompt building patterns.
  */
 async function queryPersona(
@@ -122,11 +122,6 @@ async function queryPersona(
     throw new Error(`Persona not found: ${personaName}`)
   }
 
-  const apiKey = process.env.ANTHROPIC_API_KEY
-  if (!apiKey) {
-    throw new Error('ANTHROPIC_API_KEY environment variable is required')
-  }
-
   // Get scoped context for this persona
   const context = await getPersonaContext(persona.channelName, question)
   const formattedContext = formatContextForPrompt(context)
@@ -138,31 +133,32 @@ async function queryPersona(
     systemPrompt += '\n\nAnswer based on your content and expertise.'
   }
 
-  // Non-streaming API call
-  const response = await fetch(ANTHROPIC_API_URL, {
-    method: 'POST',
-    headers: {
-      'anthropic-version': '2023-06-01',
-      'x-api-key': apiKey,
-      'content-type': 'application/json',
-    },
-    body: JSON.stringify({
+  // Concatenate system prompt and question for Agent SDK
+  const prompt = systemPrompt + '\n\n' + question
+
+  // Use Agent SDK query (non-streaming)
+  const agentQuery = query({
+    prompt,
+    options: {
       model: MODEL,
-      max_tokens: 4096,
-      system: systemPrompt,
-      messages: [{ role: 'user', content: question }],
-    }),
+      maxTurns: 1,
+      tools: [],
+      persistSession: false,
+    },
   })
 
-  if (!response.ok) {
-    throw new Error(`Anthropic API error: ${response.status} ${response.statusText}`)
-  }
+  let text = ''
 
-  const data = await response.json()
-  const text = data.content
-    ?.filter((block: { type: string }) => block.type === 'text')
-    .map((block: { text: string }) => block.text)
-    .join('') || ''
+  // Iterate async iterable and extract text
+  for await (const sdkMessage of agentQuery) {
+    if (sdkMessage.type === 'assistant') {
+      for (const block of sdkMessage.message.content) {
+        if (block.type === 'text') {
+          text += block.text
+        }
+      }
+    }
+  }
 
   const sources = context.slice(0, 5).map(c => ({
     videoTitle: c.videoTitle,
@@ -238,7 +234,7 @@ export function registerEnsembleQuery(server: McpServer): void {
 
         if (allPersonas.length === 0) {
           return {
-            content: [{ type: 'text', text: 'No personas available. Create personas first by ingesting 30+ videos from a creator.' }],
+            content: [{ type: 'text', text: 'No personas available. Create personas first by ingesting 5+ transcripts from a creator.' }],
           }
         }
 
