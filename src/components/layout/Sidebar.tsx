@@ -1,13 +1,11 @@
 'use client'
 
-import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useSidebar } from '@/components/providers/SidebarProvider'
-import { Button } from '@/components/ui/button'
 import { SidebarLogo } from './SidebarLogo'
 import { SidebarNav } from './SidebarNav'
 
 export function Sidebar() {
-  const { collapsed, toggleSidebar } = useSidebar()
+  const { collapsed } = useSidebar()
 
   return (
     <aside
@@ -19,22 +17,6 @@ export function Sidebar() {
     >
       <SidebarLogo collapsed={collapsed} />
       <SidebarNav />
-
-      <div className={`mt-auto p-2 flex ${collapsed ? 'justify-center' : 'justify-start'}`}>
-        <Button
-          variant="ghost"
-          size="icon-sm"
-          onClick={toggleSidebar}
-          aria-label="Toggle sidebar"
-          className="transition-all"
-        >
-          {collapsed ? (
-            <ChevronRight className="h-4 w-4" data-lucide="chevron-right" />
-          ) : (
-            <ChevronLeft className="h-4 w-4" data-lucide="chevron-left" />
-          )}
-        </Button>
-      </div>
     </aside>
   )
 }

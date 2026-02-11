@@ -55,13 +55,22 @@ describe('Sidebar', () => {
       expect(screen.getByText('Gold Miner')).toBeInTheDocument()
     })
 
-    it('shows left-pointing chevron when expanded', () => {
+    it('shows left-pointing chevron in header when expanded', () => {
       render(<SidebarTestWrapper />)
       const toggleButton = screen.getByRole('button', { name: /toggle sidebar/i })
 
       // ChevronLeft should be present (svg will have data-lucide="chevron-left")
       const svg = toggleButton.querySelector('svg')
       expect(svg?.getAttribute('data-lucide')).toBe('chevron-left')
+    })
+
+    it('toggle button is in the header row', () => {
+      render(<SidebarTestWrapper />)
+      const toggleButton = screen.getByRole('button', { name: /toggle sidebar/i })
+      const logoText = screen.getByText('Gold Miner')
+
+      // Both should be in the same parent container (the header)
+      expect(toggleButton.parentElement).toBe(logoText.parentElement)
     })
   })
 

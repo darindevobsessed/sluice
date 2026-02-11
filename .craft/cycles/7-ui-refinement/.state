@@ -2,9 +2,9 @@
 # Runtime state for active implementation session
 CYCLE_NAME="ui-refinement"
 CYCLE_STATUS="planning"
-CURRENT_STORY="3-toggle-placement"
+CURRENT_STORY="5-fix-flaky-db-tests"
 CURRENT_CHUNK="1"
 TOTAL_CHUNKS="1"
-LAST_VALIDATION="2026-02-11T21:51:49Z"
-LAST_CHECKPOINT="2026-02-11T21:49:59Z"
+LAST_VALIDATION="2026-02-11T22:21:36Z"
+LAST_CHECKPOINT="2026-02-11T22:20:51Z"
 TOUCHED_FILES="/Users/darindrobinski/dev/repos/gold-miner/src/components/providers/__tests__/SidebarProvider.test.tsx /Users/darindrobinski/dev/repos/gold-miner/src/components/providers/SidebarProvider.tsx /Users/darindrobinski/dev/repos/gold-miner/src/components/ui/__tests__/tooltip.test.tsx /Users/darindrobinski/dev/repos/gold-miner/src/components/ui/tooltip.tsx /Users/darindrobinski/dev/repos/gold-miner/src/app/layout.tsx /Users/darindrobinski/dev/repos/gold-miner/src/components/layout/__tests__/Sidebar.test.tsx /Users/darindrobinski/dev/repos/gold-miner/src/components/layout/Sidebar.tsx /Users/darindrobinski/dev/repos/gold-miner/src/components/layout/SidebarLogo.tsx /Users/darindrobinski/dev/repos/gold-miner/src/app/globals.css /Users/darindrobinski/dev/repos/gold-miner/src/components/layout/__tests__/SidebarNav.test.tsx /Users/darindrobinski/dev/repos/gold-miner/src/components/layout/SidebarNav.tsx /Users/darindrobinski/dev/repos/gold-miner/src/components/layout/__tests__/MainContent.test.tsx /Users/darindrobinski/dev/repos/gold-miner/src/components/layout/MainContent.tsx /Users/darindrobinski/dev/repos/gold-miner/src/app/__tests__/page.test.tsx /Users/darindrobinski/dev/repos/gold-miner/src/app/page.tsx /Users/darindrobinski/dev/repos/gold-miner/src/components/discovery/__tests__/ContentTypeFilter.test.tsx /Users/darindrobinski/dev/repos/gold-miner/src/app/discovery/__tests__/page.test.tsx /Users/darindrobinski/dev/repos/gold-miner/src/components/discovery/ContentTypeFilter.tsx /Users/darindrobinski/dev/repos/gold-miner/src/app/discovery/page.tsx /Users/darindrobinski/dev/repos/gold-miner/src/components/videos/__tests__/ContentTypeFilter.test.tsx /Users/darindrobinski/dev/repos/gold-miner/src/components/videos/ContentTypeFilter.tsx /Users/darindrobinski/dev/repos/gold-miner/src/app/__tests__/page-content-filter.test.tsx"
