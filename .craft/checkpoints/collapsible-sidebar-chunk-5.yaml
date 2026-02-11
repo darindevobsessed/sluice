@@ -1,0 +1,17 @@
+story: "collapsible-sidebar"
+chunk: 5
+total_chunks: 5
+cycle: "7-ui-refinement"
+timestamp: "2026-02-11T18:55:37Z"
+git_ref: "3591da3"
+git_branch: "main"
+state_CYCLE_STATUS: "planning"
+state_CURRENT_STORY: "1-sidebar"
+state_CURRENT_CHUNK: "5"
+state_TOTAL_CHUNKS: "5"
+state_LAST_VALIDATION: "2026-02-11T18:54:41Z"
+story_status: ""
+story_chunks_total: ""
+story_chunks_complete: ""
+test_status: ""
+modified_files: ".craft/.global-state .craft/checkpoints/collapsible-sidebar-chunk-4.yaml .craft/cycles/7-ui-refinement/.failures .craft/cycles/7-ui-refinement/.state .craft/cycles/7-ui-refinement/stories/1-sidebar.md src/app/globals.css src/components/layout/MainContent.tsx src/components/layout/__tests__/MainContent.test.tsx src/components/layout/__tests__/Sidebar.test.tsx "

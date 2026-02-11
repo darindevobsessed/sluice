@@ -14,14 +14,6 @@ import { usePageTitle } from '@/components/layout/PageTitleContext'
 import { useFocusArea } from '@/components/providers/FocusAreaProvider'
 import type { Video, FocusArea } from '@/lib/db/schema'
 
-/**
- * Detects if a query string looks like a question
- */
-function isQuestion(query: string): boolean {
-  const trimmed = query.trim()
-  if (trimmed.endsWith('?')) return true
-  return /^(how|what|why|when|where|who|which|can|should|is|are|do|does)\b/i.test(trimmed)
-}
 
 interface VideoStats {
   count: number;
@@ -53,9 +45,8 @@ export default function Home() {
   // Use the new search hook
   const { query, setQuery, results, isLoading: isSearching } = useSearch({ focusAreaId: selectedFocusAreaId })
 
-  // Detect if query is a question (with 3+ words)
-  const wordCount = query.trim().split(/\s+/).filter(Boolean).length
-  const isQueryQuestion = isQuestion(query) && wordCount >= 3
+  // Detect if query is a question (ends with ? and has 3+ words)
+  const isQueryQuestion = query.trim().endsWith('?') && query.trim().split(/\s+/).filter(Boolean).length >= 3
 
   // Use ensemble hook when query is a question
   const { state: ensembleState, retry: retryEnsemble } = useEnsemble(isQueryQuestion ? query : null)
@@ -193,7 +184,7 @@ export default function Home() {
             <VideoSearch onSearch={setQuery} />
             {hasActivePersonas && (
               <p className="mt-2 text-xs text-muted-foreground">
-                Type keywords to search · Ask a question (3+ words) to hear from your personas
+                Type keywords to search · End with ? to ask your personas
               </p>
             )}
           </div>

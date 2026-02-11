@@ -1,14 +1,14 @@
 ---
 name: collapsible-sidebar
 title: Collapsible Left Navigation Sidebar
-status: active
+status: complete
 cycle: ui-refinement
 story_number: 1
 created: 2026-02-11
 updated: 2026-02-11
 priority: high
 chunks_total: 5
-chunks_complete: 4
+chunks_complete: 5
 ---
 
 # Story: Collapsible Left Navigation Sidebar
