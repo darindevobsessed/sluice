@@ -2237,3 +2237,240 @@ npm error
 npm error To see a list of scripts, run:
 npm error   npm run
 npm error A complete log of this run can be found in: /Users/darindrobinski/.npm/_logs/2026-02-11T21_24_19_753Z-debug-0.log
+---
+timestamp: "2026-02-11 15:43:34"
+story: "2-filter-semantics"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Suites 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/components/videos/__tests__/ContentTypeFilter.test.tsx[2m [ src/components/videos/__tests__/ContentTypeFilter.test.tsx ][22m
+[31m[1mError[22m: Failed to resolve import "../ContentTypeFilter" from "src/components/videos/__tests__/ContentTypeFilter.test.tsx". Does the file exist?[39m
+  Plugin: [35mvite:import-analysis[39m
+  File: [36m/Users/darindrobinski/dev/repos/gold-miner/src/components/videos/__tests__/ContentTypeFilter.test.tsx[39m:4:34
+[33m  3  |  import { render, screen } from "@testing-library/react";
+  4  |  import userEvent from "@testing-library/user-event";
+  5  |  import { ContentTypeFilter } from "../ContentTypeFilter";
+     |                                     ^
+  6  |  describe("ContentTypeFilter (Knowledge Bank)", () => {
+  7  |    it('renders with "All" trigger text when selected is "all"', () => {[39m
+[90m [2m❯[22m TransformPluginContext._formatLog node_modules/vite/dist/node/chunks/config.js:[2m28999:43[22m[39m
+[90m [2m❯[22m TransformPluginContext.error node_modules/vite/dist/node/chunks/config.js:[2m28996:14[22m[39m
+[90m [2m❯[22m normalizeUrl node_modules/vite/dist/node/chunks/config.js:[2m27119:18[22m[39m
+[90m [2m❯[22m node_modules/vite/dist/node/chunks/config.js:[2m27177:32[22m[39m
+[90m [2m❯[22m TransformPluginContext.transform node_modules/vite/dist/node/chunks/config.js:[2m27145:4[22m[39m
+[90m [2m❯[22m EnvironmentPluginContainer.transform node_modules/vite/dist/node/chunks/config.js:[2m28797:14[22m[39m
+[90m [2m❯[22m loadAndTransform node_modules/vite/dist/node/chunks/config.js:[2m22670:26[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/components/videos/__tests__/ContentTypeFilter.test.tsx
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/components/videos/__tests__/ContentTypeFilter.test.tsx [2m([22m[2m0 test[22m[2m)[22m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [2mno tests[22m
+[2m   Start at [22m 15:43:32
+[2m   Duration [22m 1.68s[2m (transform 31ms, setup 158ms, import 0ms, tests 0ms, environment 959ms)[22m
+---
+timestamp: "2026-02-11 15:44:26"
+story: "2-filter-semantics"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+npm error Missing script: "typecheck"
+npm error
+npm error To see a list of scripts, run:
+npm error   npm run
+npm error A complete log of this run can be found in: /Users/darindrobinski/.npm/_logs/2026-02-11T21_44_26_734Z-debug-0.log
+---
+timestamp: "2026-02-11 15:50:10"
+story: "2-filter-semantics"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+[90mstderr[2m | src/app/__tests__/page-content-filter.test.tsx[2m > [22m[2mHome Page - Content Type Filter Integration[2m > [22m[2mrenders content type filter when videos are loaded
+[22m[39mError fetching videos: TypeError: Cannot read properties of undefined (reading 'ok')
+    at fetchVideos [90m(/Users/darindrobinski/dev/repos/gold-miner/[39msrc/app/page.tsx:73:23[90m)[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+
+[90mstderr[2m | src/app/__tests__/page-content-filter.test.tsx[2m > [22m[2mHome Page - Content Type Filter Integration[2m > [22m[2mdoes not render filter when no videos exist
+[22m[39mError fetching videos: TypeError: Cannot read properties of undefined (reading 'ok')
+    at fetchVideos [90m(/Users/darindrobinski/dev/repos/gold-miner/[39msrc/app/page.tsx:73:23[90m)[39m
+
+[90mstderr[2m | src/app/__tests__/page-content-filter.test.tsx[2m > [22m[2mHome Page - Content Type Filter Integration[2m > [22m[2mfilters videos by type when filter is changed
+[22m[39mError fetching videos: TypeError: Cannot read properties of undefined (reading 'ok')
+    at fetchVideos [90m(/Users/darindrobinski/dev/repos/gold-miner/[39msrc/app/page.tsx:73:23[90m)[39m
+
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 3 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/app/__tests__/page-content-filter.test.tsx[2m > [22mHome Page - Content Type Filter Integration[2m > [22mrenders content type filter when videos are loaded
+[31m[1mTestingLibraryElementError[22m[39m: Unable to find an element with the text: All. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"p-6"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"flex flex-col items-center justify-center py-16 text-center"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"relative mb-6"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mclass[39m=[32m"lucide lucide-mountain h-16 w-16 text-muted-foreground/50"[39m
+            [33mfill[39m=[32m"none"[39m
+            [33mheight[39m=[32m"24"[39m
+            [33mstroke[39m=[32m"currentColor"[39m
+            [33mstroke-linecap[39m=[32m"round"[39m
+            [33mstroke-linejoin[39m=[32m"round"[39m
+            [33mstroke-width[39m=[32m"1.5"[39m
+            [33mviewBox[39m=[32m"0 0 24 24"[39m
+            [33mwidth[39m=[32m"24"[39m
+            [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+          [36m>[39m
+            [36m<path[39m
+              [33md[39m=[32m"m8 3 4 8 5-5 5 15H2L8 3z"[39m
+            [36m/>[39m
+          [36m</svg>[39m
+          [36m<svg[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mclass[39m=[32m"lucide lucide-sparkles absolute -right-2 -top-2 h-6 w-6 text-primary"[39m
+            [33mfill[39m=[32m"none"[39m
+            [33mheight[39m=[32m"24"[39m
+            [33mstroke[39m=[32m"currentColor"[39m
+            [33mstroke-linecap[39m=[32m"round"[39m
+            [33mstroke-linejoin[39m=[32m"round"[39m
+            [33mstroke-width[39m=[32m"2"[39m
+            [33mviewBox[39m=[32m"0 0 24 24"[39m
+            [33mwidth[39m=[32m"24"[39m
+            [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+          [36m>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M20 2v4"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M22 4h-4"[39m
+            [36m/>[39m
+            [36m<circle[39m
+              [33mcx[39m=[32m"4"[39m
+              [33mcy[39m=[32m"20"[39m
+              [33mr[39m=[32m"2"[39m
+            [36m/>[39m
+          [36m</svg>[39m
+        [36m</div>[39m
+        [36m<h2[39m
+          [33mclass[39m=[32m"mb-3 text-2xl font-semibold"[39m
+        [36m>[39m
+          [0mStart building your knowledge vault[0m
+        [36m</h2>[39m
+        [36m<p[39m
+          [33mclass[39m=[32m"mb-8 text-muted-foreground"[39m
+        [36m>[39m
+          [0mSave videos • Search transcripts • Extract insights[0m
+        [36m</p>[39m
+        [36m<a[39m
+          [33mclass[39m=[32m"inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-all disabled:pointer-events-none disabled:opac
+
+... [12455 characters truncated] ...
+
+     [36m/>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"4"[39m
+                [33mcy[39m=[32m"20"[39m
+                [33mr[39m=[32m"2"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</div>[39m
+          [36m<h2[39m
+            [33mclass[39m=[32m"mb-3 text-2xl font-semibold"[39m
+          [36m>[39m
+            [0mStart building your knowledge vault[0m
+          [36m</h2>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"mb-8 text-muted-foreground"[39m
+          [36m>[39m
+            [0mSave videos • Search transcripts • Extract insights[0m
+          [36m</p>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive bg-primary text-primary-foreground hover:bg-primary/90 h-10 has-[>svg]:px-4 rounded-full px-8"[39m
+            [33mdata-size[39m=[32m"lg"[39m
+            [33mdata-slot[39m=[32m"button"[39m
+            [33mdata-variant[39m=[32m"default"[39m
+            [33mhref[39m=[32m"/add"[39m
+          [36m>[39m
+            [0mAdd Your First Video[0m
+          [36m</a>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</body>[39m
+[36m</html>[39m
+[90m [2m❯[22m Proxy.waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:[2m163:27[22m[39m
+[36m [2m❯[22m src/app/__tests__/page-content-filter.test.tsx:[2m143:11[22m[39m
+    [90m141| [39m
+    [90m142| [39m    [90m// Wait for videos to load[39m
+    [90m143| [39m    [35mawait[39m [34mwaitFor[39m(() [33m=>[39m {
+    [90m   | [39m          [31m^[39m
+    [90m144| [39m      [34mexpect[39m(screen[33m.[39m[34mgetByText[39m([32m'All'[39m))[33m.[39m[34mtoBeInTheDocument[39m()
+    [90m145| [39m    })
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/app/__tests__/page-content-filter.test.tsx[2m > [22mHome Page - Content Type Filter Integration[2m > [22mhides filter during search
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'length')[39m
+[36m [2m❯[22m SearchResults src/components/search/SearchResults.tsx:[2m57:37[22m[39m
+    [90m 55| [39m  }
+    [90m 56| [39m
+    [90m 57| [39m  const hasResults = results.videos.length > 0 || results.chunks.lengt…
+    [90m   | [39m                                    [31m^[39m
+    [90m 58| [39m
+    [90m 59| [39m  [90m// No embeddings message[39m
+[90m [2m❯[22m Object.react_stack_bottom_frame node_modules/react-dom/cjs/react-dom-client.development.js:[2m25904:20[22m[39m
+[90m [2m❯[22m renderWithHooks node_modules/react-dom/cjs/react-dom-client.development.js:[2m7662:22[22m[39m
+[90m [2m❯[22m updateFunctionComponent node_modules/react-dom/cjs/react-dom-client.development.js:[2m10166:19[22m[39m
+[90m [2m❯[22m beginWork node_modules/react-dom/cjs/react-dom-client.development.js:[2m11778:18[22m[39m
+[90m [2m❯[22m runWithFiberInDEV node_modules/react-dom/cjs/react-dom-client.development.js:[2m874:13[22m[39m
+[90m [2m❯[22m performUnitOfWork node_modules/react-dom/cjs/react-dom-client.development.js:[2m17641:22[22m[39m
+[90m [2m❯[22m workLoopSync node_modules/react-dom/cjs/react-dom-client.development.js:[2m17469:41[22m[39m
+[90m [2m❯[22m renderRootSync node_modules/react-dom/cjs/react-dom-client.development.js:[2m17450:11[22m[39m
+[90m [2m❯[22m performWorkOnRoot node_modules/react-dom/cjs/react-dom-client.development.js:[2m16583:35[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/app/__tests__/page-content-filter.test.tsx --run
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/app/__tests__/page-content-filter.test.tsx [2m([22m[2m4 tests[22m[2m | [22m[31m3 failed[39m[2m)[22m[33m 2098[2mms[22m[39m
+[31m     [31m×[31m renders content type filter when videos are loaded[39m[33m 1052[2mms[22m[39m
+     [32m✓[39m does not render filter when no videos exist[32m 14[2mms[22m[39m
+[31m     [31m×[31m filters videos by type when filter is changed[39m[33m 1014[2mms[22m[39m
+[31m     [31m×[31m hides filter during search[39m[32m 15[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m3 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (4)[39m
+[2m   Start at [22m 15:50:05
+[2m   Duration [22m 4.89s[2m (transform 379ms, setup 147ms, import 1.23s, tests 2.10s, environment 985ms)[22m

@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { StatsHeader, StatsHeaderSkeleton } from '@/components/videos/StatsHeader'
 import { VideoSearch } from '@/components/videos/VideoSearch'
 import { VideoGrid } from '@/components/videos/VideoGrid'
@@ -8,6 +8,7 @@ import { EmptyState } from '@/components/videos/EmptyState'
 import { SearchResults } from '@/components/search/SearchResults'
 import { PersonaPanel } from '@/components/personas/PersonaPanel'
 import { PersonaStatus } from '@/components/personas/PersonaStatus'
+import { ContentTypeFilter, type KBContentTypeValue } from '@/components/videos/ContentTypeFilter'
 import { useSearch } from '@/hooks/useSearch'
 import { useEnsemble } from '@/hooks/useEnsemble'
 import { usePageTitle } from '@/components/layout/PageTitleContext'
@@ -35,6 +36,7 @@ export default function Home() {
   const [isLoadingVideos, setIsLoadingVideos] = useState(true);
   const [focusAreaMap, setFocusAreaMap] = useState<Record<number, FocusAreaMapEntry[]>>({});
   const [hasActivePersonas, setHasActivePersonas] = useState(false);
+  const [contentType, setContentType] = useState<KBContentTypeValue>('all');
 
   // Set page title
   const { setPageTitle } = usePageTitle();
@@ -96,6 +98,12 @@ export default function Home() {
 
     fetchVideos();
   }, [selectedFocusAreaId]);
+
+  // Filter videos by content type
+  const filteredVideos = useMemo(() => {
+    if (contentType === 'all') return videos
+    return videos.filter(v => v.sourceType === contentType)
+  }, [videos, contentType])
 
   // Optimistic toggle handler for focus area assignment
   const handleToggleFocusArea = useCallback(async (videoId: number, focusAreaId: number) => {
@@ -196,12 +204,19 @@ export default function Home() {
             </div>
           )}
 
+          {/* Content Type Filter - only visible when browsing grid */}
+          {!showSearchResults && videos.length > 0 && (
+            <div className="flex items-center gap-2 mb-4">
+              <ContentTypeFilter selected={contentType} onChange={setContentType} />
+            </div>
+          )}
+
           {/* Content: either search results or video grid */}
           {showSearchResults ? (
             <SearchResults results={results} isLoading={isSearching} />
           ) : (
             <VideoGrid
-              videos={videos}
+              videos={filteredVideos}
               isLoading={isLoadingVideos}
               emptyMessage={selectedFocusAreaId ? 'No videos in this focus area' : undefined}
               emptyHint={selectedFocusAreaId ? 'Assign videos from their detail page or use the tag icon on cards' : undefined}

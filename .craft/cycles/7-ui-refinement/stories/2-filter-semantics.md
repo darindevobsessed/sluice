@@ -1,14 +1,14 @@
 ---
 name: fix-filter-semantics
 title: Fix filter semantics across Discovery and Knowledge Bank tabs
-status: active
+status: complete
 cycle: ui-refinement
 story_number: 2
 created: 2026-02-11
 updated: 2026-02-11
 priority: urgent
 chunks_total: 2
-chunks_complete: 1
+chunks_complete: 2
 ---
 
 # Story: Fix filter semantics across Discovery and Knowledge Bank tabs

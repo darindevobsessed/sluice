@@ -1,0 +1,17 @@
+story: "filter-semantics"
+chunk: 2
+total_chunks: 2
+cycle: "7-ui-refinement"
+timestamp: "2026-02-11T21:42:35Z"
+git_ref: "67df067"
+git_branch: "main"
+state_CYCLE_STATUS: "planning"
+state_CURRENT_STORY: "2-filter-semantics"
+state_CURRENT_CHUNK: "2"
+state_TOTAL_CHUNKS: "2"
+state_LAST_VALIDATION: "2026-02-11T21:30:10Z"
+story_status: "active"
+story_chunks_total: "2"
+story_chunks_complete: "1"
+test_status: ""
+modified_files: ".craft/.global-state .craft/checkpoints/filter-semantics-chunk-1.yaml .craft/cycles/7-ui-refinement/.failures .craft/cycles/7-ui-refinement/.state .craft/cycles/7-ui-refinement/.usage/2-filter-semantics.log .craft/cycles/7-ui-refinement/stories/2-filter-semantics.md src/app/discovery/__tests__/page.test.tsx src/app/discovery/page.tsx src/components/discovery/ContentTypeFilter.tsx src/components/discovery/__tests__/ContentTypeFilter.test.tsx "
