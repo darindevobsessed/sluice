@@ -25,6 +25,7 @@ const mockVideo = {
   channel: 'Fireship',
   thumbnail: 'https://i.ytimg.com/vi/abc123/hqdefault.jpg',
   duration: 3665, // 1:01:05
+  description: null,
   transcript: 'Some transcript content',
   createdAt: new Date('2026-01-15'),
   updatedAt: new Date('2026-01-15'),

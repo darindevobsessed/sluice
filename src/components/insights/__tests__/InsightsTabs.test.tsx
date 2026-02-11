@@ -55,6 +55,7 @@ const mockVideo: Video = {
   channel: 'Test Channel',
   thumbnail: 'https://example.com/thumb.jpg',
   duration: 300,
+  description: null,
   transcript: '0:00\nIntro\n1:00\nContent',
   createdAt: new Date('2024-01-01'),
   updatedAt: new Date('2024-01-01'),

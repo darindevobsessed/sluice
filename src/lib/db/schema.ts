@@ -12,6 +12,7 @@ export const videos = pgTable('videos', {
   channel: text('channel'),
   thumbnail: text('thumbnail'),
   duration: integer('duration'), // in seconds
+  description: text('description'), // video description from YouTube
   transcript: text('transcript'), // full transcript text
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),

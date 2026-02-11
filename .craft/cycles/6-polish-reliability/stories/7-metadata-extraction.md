@@ -8,7 +8,7 @@ created: 2026-02-10
 updated: 2026-02-10
 priority: urgent
 chunks_total: 3
-chunks_complete: 0
+chunks_complete: 1
 ---
 
 # Story: Extract YouTube metadata during ingestion
