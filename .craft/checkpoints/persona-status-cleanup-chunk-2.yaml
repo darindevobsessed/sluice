@@ -1,0 +1,17 @@
+story: "persona-status-cleanup"
+chunk: 2
+total_chunks: 2
+cycle: "6-polish-reliability"
+timestamp: "2026-02-11T01:56:44Z"
+git_ref: "46b3c3d"
+git_branch: "main"
+state_CYCLE_STATUS: "ready"
+state_CURRENT_STORY: "7-persona-status-cleanup"
+state_CURRENT_CHUNK: "2"
+state_TOTAL_CHUNKS: "2"
+state_LAST_VALIDATION: "2026-02-11T01:32:34Z"
+story_status: "active"
+story_chunks_total: "2"
+story_chunks_complete: "1"
+test_status: ""
+modified_files: ".craft/.exports/pre-compact-20260208_181159.md .craft/.exports/pre-compact-20260210_192726.md .craft/.global-state .craft/checkpoints/persona-status-cleanup-chunk-1.yaml .craft/cycles/6-polish-reliability/.failures .craft/cycles/6-polish-reliability/.state .craft/cycles/6-polish-reliability/stories/7-persona-status-cleanup.md src/components/personas/PersonaStatus.tsx src/components/personas/__tests__/PersonaStatus.test.tsx "

@@ -2802,3 +2802,164 @@ npm error
 npm error To see a list of scripts, run:
 npm error   npm run
 npm error A complete log of this run can be found in: /Users/darindrobinski/.npm/_logs/2026-02-11T01_27_29_874Z-debug-0.log
+---
+timestamp: "2026-02-10 19:57:55"
+story: "7-persona-status-cleanup"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 7 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/components/personas/__tests__/PersonaStatus.test.tsx[2m > [22mPersonaStatus[2m > [22mUniform pill sizing (Chunk 2)[2m > [22mapplies min-width and max-width constraints to active persona pills
+[31m[1mError[22m: [2mexpect([22m[31melement[31m[2m).toHaveClass([22m[32m[32m"min-w-[160px]"[32m[31m[2m)[22m
+
+Expected the element to have class:
+[32m  min-w-[160px][31m
+Received:
+[31m  flex items-center gap-1.5 rounded-full border bg-green-500/10 px-3 py-1 text-sm text-green-700 dark:text-green-400[31m[39m
+[36m [2m❯[22m src/components/personas/__tests__/PersonaStatus.test.tsx:[2m596:20[22m[39m
+    [90m594| [39m      const pill = container.querySelector('.rounded-full.bg-green-500…
+    [90m595| [39m      [34mexpect[39m(pill)[33m.[39m[34mtoBeInTheDocument[39m()
+    [90m596| [39m      [34mexpect[39m(pill)[33m.[39m[34mtoHaveClass[39m([32m'min-w-[160px]'[39m)
+    [90m   | [39m                   [31m^[39m
+    [90m597| [39m      [34mexpect[39m(pill)[33m.[39m[34mtoHaveClass[39m([32m'max-w-[280px]'[39m)
+    [90m598| [39m    })
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/7]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/personas/__tests__/PersonaStatus.test.tsx[2m > [22mPersonaStatus[2m > [22mUniform pill sizing (Chunk 2)[2m > [22mapplies min-width and max-width constraints to ready-to-create pills
+[31m[1mError[22m: [2mexpect([22m[31melement[31m[2m).toHaveClass([22m[32m[32m"min-w-[160px]"[32m[31m[2m)[22m
+
+Expected the element to have class:
+[32m  min-w-[160px][31m
+Received:
+[31m  flex items-center gap-2 rounded-lg border bg-card px-3 py-2 text-sm[31m[39m
+[36m [2m❯[22m src/components/personas/__tests__/PersonaStatus.test.tsx:[2m620:20[22m[39m
+    [90m618| [39m      const pill = screen.getByRole('button', { name: /create/i }).clo…
+    [90m619| [39m      [34mexpect[39m(pill)[33m.[39m[34mtoBeInTheDocument[39m()
+    [90m620| [39m      [34mexpect[39m(pill)[33m.[39m[34mtoHaveClass[39m([32m'min-w-[160px]'[39m)
+    [90m   | [39m                   [31m^[39m
+    [90m621| [39m      [34mexpect[39m(pill)[33m.[39m[34mtoHaveClass[39m([32m'max-w-[280px]'[39m)
+    [90m622| [39m    })
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/7]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/personas/__tests__/PersonaStatus.test.tsx[2m > [22mPersonaStatus[2m > [22mUniform pill sizing (Chunk 2)[2m > [22mapplies min-width and max-width constraints to building pills
+[31m[1mError[22m: [2mexpect([22m[31melement[31m[2m).toHaveClass([22m[32m[32m"min-w-[160px]"[32m[31m[2m)[22m
+
+Expected the element to have class:
+[32m  min-w-[160px][31m
+Received:
+[31m  flex items-center gap-2 rounded-lg border bg-card px-3 py-2 text-sm[31m[39m
+[36m [2m❯[22m src/components/personas/__tests__/PersonaStatus.test.tsx:[2m644:20[22m[39m
+    [90m642| [39m      const pill = screen.getByRole('progressbar').closest('.rounded-l…
+    [90m643| [39m      [34mexpect[39m(pill)[33m.[39m[34mtoBeInTheDocument[39m()
+    [90m644| [39m      [34mexpect[39m(pill)[33m.[39m[34mtoHaveClass[39m([32m'min-w-[160px]'[39m)
+    [90m   | [39m                   [31m^[39m
+    [90m645| [39m      [34mexpect[39m(pill)[33m.[39m[34mtoHaveClass[39m([32m'max-w-[280px]'[39m)
+    [90m646| [39m    })
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/7]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/personas/__tests__/PersonaStatus.test.tsx[2m > [22mPersonaStatus[2m > [22mUniform pill sizing (Chunk 2)[2m > [22mtruncates long channel names with ellipsis and provides title attribute
+[31m[1mError[22m: [2mexpect([22m[31melement[31m[2m).toHaveClass([22m[32m[32m"truncate"[32m[31m[2m)[22m
+
+Expected the element to have class:
+[32m  truncate[31m
+Received:
+[31m  font-medium[31m[39m
+[36m [2m❯[22m src/components/personas/__tests__/PersonaStatus.test.tsx:[2m668:31[22m[39m
+    [90m666| [39m      [90m// Find the channel name span[39m
+    [90m667| [39m      [35mconst[39m channelNameSpan [33m=[39m screen[33m.[39m[34mgetByText[39m([32m`@[39m[36m${[39mlongChannelName[36m}[39m[32m`[39m)
+    [90m668| [39m      [34mexpect[39m(channelNameSpan)[33m.[39m[34mtoHaveClass[39m([32m'truncate'[39m)
+    [90m   | [39m                              [31m^[39m
+    [90m669| [39m      [34mexpect[39m(channelNameSpan)[33m.[39m[34mtoHaveAttribute[39m([32m'title'[39m[33m,[39m longChannelName)
+    [90m670| [39m    })
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/7]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/personas/__tests__/PersonaStatus.test.tsx[2m > [22mPersonaStatus[2m > [22mUniform pill sizing (Chunk 2)[2m > [22mapplies transition classes to pills container for smooth expand/collapse
+[31m[1mError[22m: [2mexpect([22m[31melement[31m[2m).toHaveClass([22m[32m[32m"transitio
+
+... [1439 characters truncated] ...
+
+([32m`@[39m[36m${[39mlongChannelName[36m}[39m[32m`[39m)
+    [90m716| [39m      [34mexpect[39m(channelNameSpan)[33m.[39m[34mtoHaveClass[39m([32m'truncate'[39m)
+    [90m   | [39m                              [31m^[39m
+    [90m717| [39m      [34mexpect[39m(channelNameSpan)[33m.[39m[34mtoHaveAttribute[39m([32m'title'[39m[33m,[39m longChannelName)
+    [90m718| [39m    })
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/7]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/personas/__tests__/PersonaStatus.test.tsx[2m > [22mPersonaStatus[2m > [22mUniform pill sizing (Chunk 2)[2m > [22mtruncates channel names in building pills
+[31m[1mError[22m: [2mexpect([22m[31melement[31m[2m).toHaveClass([22m[32m[32m"truncate"[32m[31m[2m)[22m
+
+Expected the element to have class:
+[32m  truncate[31m
+Received:
+[31m  font-medium[31m[39m
+[36m [2m❯[22m src/components/personas/__tests__/PersonaStatus.test.tsx:[2m739:31[22m[39m
+    [90m737| [39m
+    [90m738| [39m      [35mconst[39m channelNameSpan [33m=[39m screen[33m.[39m[34mgetByText[39m([32m`@[39m[36m${[39mlongChannelName[36m}[39m[32m`[39m)
+    [90m739| [39m      [34mexpect[39m(channelNameSpan)[33m.[39m[34mtoHaveClass[39m([32m'truncate'[39m)
+    [90m   | [39m                              [31m^[39m
+    [90m740| [39m      [34mexpect[39m(channelNameSpan)[33m.[39m[34mtoHaveAttribute[39m([32m'title'[39m[33m,[39m longChannelName)
+    [90m741| [39m    })
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/7]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/components/personas/__tests__/PersonaStatus.test.tsx
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/components/personas/__tests__/PersonaStatus.test.tsx [2m([22m[2m27 tests[22m[2m | [22m[31m7 failed[39m[2m)[22m[33m 796[2mms[22m[39m
+     [32m✓[39m renders loading state on initial mount[32m 40[2mms[22m[39m
+     [32m✓[39m does not render when no channels exist[32m 8[2mms[22m[39m
+     [32m✓[39m renders section header with active and building counts[32m 34[2mms[22m[39m
+     [32m✓[39m renders active persona with checkmark badge[32m 8[2mms[22m[39m
+     [32m✓[39m renders ready-to-create channel with transcript count and Create button[32m 177[2mms[22m[39m
+     [32m✓[39m renders building channel with progress bar and "more needed" text[32m 33[2mms[22m[39m
+     [32m✓[39m renders mix of active, ready, and building channels[32m 23[2mms[22m[39m
+     [32m✓[39m calls POST /api/personas when Create button is clicked[32m 63[2mms[22m[39m
+     [32m✓[39m updates card to active state after successful persona creation[32m 35[2mms[22m[39m
+     [32m✓[39m shows loading state on Create button while creating[32m 35[2mms[22m[39m
+     [32m✓[39m shows error message when persona creation fails[32m 41[2mms[22m[39m
+     [32m✓[39m passes hasActivePersonas prop to callback when personas exist[32m 5[2mms[22m[39m
+     [32m✓[39m calls callback with false when no active personas exist[32m 7[2mms[22m[39m
+     [32m✓[39m limits visible channels to 5 by default when more than 5 exist[32m 17[2mms[22m[39m
+     [32m✓[39m shows "Show all N channels" button when more than 5 channels exist[32m 10[2mms[22m[39m
+     [32m✓[39m does not show toggle button when 5 or fewer channels exist[32m 9[2mms[22m[39m
+     [32m✓[39m expands to show all channels when toggle button is clicked[32m 51[2mms[22m[39m
+     [32m✓[39m collapses back to 5 channels when "Show less" is clicked[32m 78[2mms[22m[39m
+     [32m✓[39m sorts channels with active first, then ready, then building by transcript count[32m 10[2mms[22m[39m
+     [32m✓[39m always shows all active personas even when more than 5 channels exist[32m 12[2mms[22m[39m
+[31m       [31m×[31m applies min-width and max-width constraints to active persona pills[39m[32m 14[2mms[22m[39m
+[31m       [31m×[31m applies min-width and max-width constraints to ready-to-create pills[39m[32m 21[2mms[22m[39m
+[31m       [31m×[31m applies min-width and max-width constraints to building pills[39m[32m 26[2mms[22m[39m
+[31m       [31m×[31m truncates long channel names with ellipsis and provides title attribute[39m[32m 14[2mms[22m[39m
+[31m       [31m×[31m applies transition classes to pills container for smooth expand/collapse[39m[32m 7[2mms[22m[39m
+[31m       [31m×[31m truncates channel names in ready-to-create pills[39m[32m 6[2mms[22m[39m
+[31m       [31m×[31m truncates channel names in building pills[39m[32m 7[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m7 failed[39m[22m[2m | [22m[1m[32m20 passed[39m[22m[90m (27)[39m
+[2m   Start at [22m 19:57:50
+[2m   Duration [22m 5.65s[2m (transform 210ms, setup 395ms, import 1.41s, tests 796ms, environment 2.38s)[22m
+---
+timestamp: "2026-02-10 19:58:37"
+story: "7-persona-status-cleanup"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+npm error Missing script: "typecheck"
+npm error
+npm error To see a list of scripts, run:
+npm error   npm run
+npm error A complete log of this run can be found in: /Users/darindrobinski/.npm/_logs/2026-02-11T01_58_37_657Z-debug-0.log

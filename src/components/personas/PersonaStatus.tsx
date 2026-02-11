@@ -143,7 +143,7 @@ export function PersonaStatus({ onActivePersonasChange }: PersonaStatusProps) {
       </div>
 
       {/* Channel cards */}
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2 transition-all duration-200">
         {visibleChannels.map(channel => {
           const isActive = channel.personaId !== null
           const isReady = !isActive && channel.transcriptCount >= threshold
@@ -154,9 +154,9 @@ export function PersonaStatus({ onActivePersonasChange }: PersonaStatusProps) {
             return (
               <div
                 key={channel.channelName}
-                className="flex items-center gap-1.5 rounded-full border bg-green-500/10 px-3 py-1 text-sm text-green-700 dark:text-green-400"
+                className="flex items-center gap-1.5 rounded-full border bg-green-500/10 px-3 py-1 text-sm text-green-700 dark:text-green-400 min-w-[160px] max-w-[280px]"
               >
-                <span className="font-medium">@{channel.channelName}</span>
+                <span className="font-medium truncate" title={channel.channelName}>@{channel.channelName}</span>
                 <span className="text-green-600 dark:text-green-400">✓</span>
               </div>
             )
@@ -167,9 +167,9 @@ export function PersonaStatus({ onActivePersonasChange }: PersonaStatusProps) {
             return (
               <div
                 key={channel.channelName}
-                className="flex items-center gap-2 rounded-lg border bg-card px-3 py-2 text-sm"
+                className="flex items-center gap-2 rounded-lg border bg-card px-3 py-2 text-sm min-w-[160px] max-w-[280px]"
               >
-                <span className="font-medium">@{channel.channelName}</span>
+                <span className="font-medium truncate" title={channel.channelName}>@{channel.channelName}</span>
                 <span className="text-muted-foreground">
                   ({channel.transcriptCount} transcripts)
                 </span>
@@ -199,9 +199,9 @@ export function PersonaStatus({ onActivePersonasChange }: PersonaStatusProps) {
             return (
               <div
                 key={channel.channelName}
-                className="flex items-center gap-2 rounded-lg border bg-card px-3 py-2 text-sm"
+                className="flex items-center gap-2 rounded-lg border bg-card px-3 py-2 text-sm min-w-[160px] max-w-[280px]"
               >
-                <span className="font-medium">@{channel.channelName}</span>
+                <span className="font-medium truncate" title={channel.channelName}>@{channel.channelName}</span>
                 <span className="text-muted-foreground">
                   {channel.transcriptCount}/{threshold}
                 </span>

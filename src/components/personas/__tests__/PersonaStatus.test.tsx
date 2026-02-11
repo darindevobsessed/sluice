@@ -571,4 +571,173 @@ describe('PersonaStatus', () => {
     // Toggle button should still exist and show correct count
     expect(screen.getByText(/show all 7 channels/i)).toBeInTheDocument()
   })
+
+  describe('Uniform pill sizing (Chunk 2)', () => {
+    it('applies min-width and max-width constraints to active persona pills', async () => {
+      vi.mocked(fetch).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          channels: [
+            { channelName: 'Fireship', transcriptCount: 10, personaId: 1, personaCreatedAt: new Date() },
+          ],
+          threshold: 5,
+        }),
+      } as Response)
+
+      const { container } = render(<PersonaStatus />)
+
+      await waitFor(() => {
+        expect(screen.getByText('@Fireship')).toBeInTheDocument()
+      })
+
+      // Find the pill container
+      const pill = container.querySelector('.rounded-full.bg-green-500\\/10')
+      expect(pill).toBeInTheDocument()
+      expect(pill).toHaveClass('min-w-[160px]')
+      expect(pill).toHaveClass('max-w-[280px]')
+    })
+
+    it('applies min-width and max-width constraints to ready-to-create pills', async () => {
+      vi.mocked(fetch).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          channels: [
+            { channelName: 'Theo', transcriptCount: 6, personaId: null, personaCreatedAt: null },
+          ],
+          threshold: 5,
+        }),
+      } as Response)
+
+      render(<PersonaStatus />)
+
+      await waitFor(() => {
+        expect(screen.getByText('@Theo')).toBeInTheDocument()
+      })
+
+      // Find the ready pill container (has Create button)
+      const pill = screen.getByRole('button', { name: /create/i }).closest('.rounded-lg')
+      expect(pill).toBeInTheDocument()
+      expect(pill).toHaveClass('min-w-[160px]')
+      expect(pill).toHaveClass('max-w-[280px]')
+    })
+
+    it('applies min-width and max-width constraints to building pills', async () => {
+      vi.mocked(fetch).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          channels: [
+            { channelName: 'Web Dev Simplified', transcriptCount: 2, personaId: null, personaCreatedAt: null },
+          ],
+          threshold: 5,
+        }),
+      } as Response)
+
+      render(<PersonaStatus />)
+
+      await waitFor(() => {
+        expect(screen.getByText('@Web Dev Simplified')).toBeInTheDocument()
+      })
+
+      // Find the building pill container (has progress bar)
+      const pill = screen.getByRole('progressbar').closest('.rounded-lg')
+      expect(pill).toBeInTheDocument()
+      expect(pill).toHaveClass('min-w-[160px]')
+      expect(pill).toHaveClass('max-w-[280px]')
+    })
+
+    it('truncates long channel names with ellipsis and provides title attribute', async () => {
+      const longChannelName = 'AI News & Strategy Daily | Nate B Jones'
+      vi.mocked(fetch).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          channels: [
+            { channelName: longChannelName, transcriptCount: 10, personaId: 1, personaCreatedAt: new Date() },
+          ],
+          threshold: 5,
+        }),
+      } as Response)
+
+      render(<PersonaStatus />)
+
+      await waitFor(() => {
+        expect(screen.getByText(`@${longChannelName}`)).toBeInTheDocument()
+      })
+
+      // Find the channel name span
+      const channelNameSpan = screen.getByText(`@${longChannelName}`)
+      expect(channelNameSpan).toHaveClass('truncate')
+      expect(channelNameSpan).toHaveAttribute('title', longChannelName)
+    })
+
+    it('applies transition classes to pills container for smooth expand/collapse', async () => {
+      vi.mocked(fetch).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          channels: [
+            { channelName: 'Channel1', transcriptCount: 10, personaId: 1, personaCreatedAt: new Date() },
+            { channelName: 'Channel2', transcriptCount: 9, personaId: null, personaCreatedAt: null },
+          ],
+          threshold: 5,
+        }),
+      } as Response)
+
+      const { container } = render(<PersonaStatus />)
+
+      await waitFor(() => {
+        expect(screen.getByText('@Channel1')).toBeInTheDocument()
+      })
+
+      // Find the pills container (flex flex-wrap gap-2)
+      const pillsContainer = container.querySelector('.flex.flex-wrap.gap-2')
+      expect(pillsContainer).toBeInTheDocument()
+      expect(pillsContainer).toHaveClass('transition-all')
+      expect(pillsContainer).toHaveClass('duration-200')
+    })
+
+    it('truncates channel names in ready-to-create pills', async () => {
+      const longChannelName = 'Very Long Channel Name That Should Be Truncated'
+      vi.mocked(fetch).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          channels: [
+            { channelName: longChannelName, transcriptCount: 6, personaId: null, personaCreatedAt: null },
+          ],
+          threshold: 5,
+        }),
+      } as Response)
+
+      render(<PersonaStatus />)
+
+      await waitFor(() => {
+        expect(screen.getByText(`@${longChannelName}`)).toBeInTheDocument()
+      })
+
+      const channelNameSpan = screen.getByText(`@${longChannelName}`)
+      expect(channelNameSpan).toHaveClass('truncate')
+      expect(channelNameSpan).toHaveAttribute('title', longChannelName)
+    })
+
+    it('truncates channel names in building pills', async () => {
+      const longChannelName = 'Another Very Long Channel Name For Testing'
+      vi.mocked(fetch).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          channels: [
+            { channelName: longChannelName, transcriptCount: 2, personaId: null, personaCreatedAt: null },
+          ],
+          threshold: 5,
+        }),
+      } as Response)
+
+      render(<PersonaStatus />)
+
+      await waitFor(() => {
+        expect(screen.getByText(`@${longChannelName}`)).toBeInTheDocument()
+      })
+
+      const channelNameSpan = screen.getByText(`@${longChannelName}`)
+      expect(channelNameSpan).toHaveClass('truncate')
+      expect(channelNameSpan).toHaveAttribute('title', longChannelName)
+    })
+  })
 })
