@@ -2064,3 +2064,176 @@ error: |
 [2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m8 passed[39m[22m[90m (9)[39m
 [2m   Start at [22m 13:00:07
 [2m   Duration [22m 2.31s[2m (transform 280ms, setup 135ms, import 834ms, tests 171ms, environment 810ms)[22m
+---
+timestamp: "2026-02-11 15:23:43"
+story: "2-filter-semantics"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 9 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/app/discovery/__tests__/page.test.tsx[2m > [22mDiscovery Page[2m > [22mContent Type Filter Integration[2m > [22mshould filter to show only not saved videos (inBank: false) when "Not Saved" is selected
+[31m[1mTestingLibraryElementError[22m[39m: Unable to find an element with the text: Not Saved. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body[39m
+  [33mdata-scroll-locked[39m=[32m"1"[39m
+  [33mstyle[39m=[32m"pointer-events: none;"[39m
+[36m>[39m
+  [36m<span[39m
+    [33maria-hidden[39m=[32m"true"[39m
+    [33mdata-aria-hidden[39m=[32m"true"[39m
+    [33mdata-radix-focus-guard[39m=[32m""[39m
+    [33mstyle[39m=[32m"outline: none; opacity: 0; position: fixed; pointer-events: none;"[39m
+    [33mtabindex[39m=[32m"0"[39m
+  [36m/>[39m
+  [36m<div[39m
+    [33maria-hidden[39m=[32m"true"[39m
+    [33mdata-aria-hidden[39m=[32m"true"[39m
+  [36m>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"p-4 sm:p-6 space-y-6"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"flex flex-col sm:flex-row items-start gap-3"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex-1 w-full"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mdata-slot[39m=[32m"collapsible"[39m
+            [33mdata-state[39m=[32m"closed"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"space-y-2"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33maria-controls[39m=[32m"radix-_r_22_"[39m
+                [33maria-expanded[39m=[32m"false"[39m
+                [33mclass[39m=[32m"inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 h-9 px-4 py-2 has-[>svg]:px-3 w-full sm:w-auto"[39m
+                [33mdata-size[39m=[32m"default"[39m
+                [33mdata-slot[39m=[32m"collapsible-trigger"[39m
+                [33mdata-state[39m=[32m"closed"[39m
+                [33mdata-variant[39m=[32m"outline"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  [33mclass[39m=[32m"size-4"[39m
+                  [33mfill[39m=[32m"none"[39m
+                  [33mstroke[39m=[32m"currentColor"[39m
+                  [33mviewBox[39m=[32m"0 0 24 24"[39m
+                  [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+                [36m>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"M12 4v16m8-8H4"[39m
+                    [33mstroke-linecap[39m=[32m"round"[39m
+                    [33mstroke-linejoin[39m=[32m"round"[39m
+                    [33mstroke-width[39m=[32m"2"[39m
+                  [36m/>[39m
+                [36m</svg>[39m
+                [0mFollow a Channel[0m
+              [36m</button>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"overflow-hidden data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:slide-out-to-top-2 data-[state=open]:slide-in-from-top-2 duration-200 ease-out "[39m
+                [33mdata-slot[39m=[32m"collapsible-content"[39m
+                [33mdata-state[39m=[32m"closed"[39m
+                [33mhidden[39m=[32m""[39m
+                [33mid[39m=[32m"radix-_r_22_"[39m
+                [33mstyle[39m=[32m""[39m
+              [36m/>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+        [36m<button[39m
+          [33maria-expanded[39m=[32m"false"[39m
+          [33maria-haspopup[39m=[32m"menu"[39m
+          [33mclass[39m=[32m"rounded-full px-4 py-1.5 text-sm bg-muted hover:bg-muted/80 transition-colors flex items-center gap-2 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"[39m
+          [33mdata-slot[39m=[32m"dropdown-menu-trigger"[39m
+          [33mdata-state[39m=[32m"closed"[39m
+          [33mid[39m=[32m"radix-_r_23_"[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [0mAll Channels[0m
+          [36m<svg[39m
+            [33maria-hidd
+
+... [54693 characters truncated] ...
+
+33maria-hidden[39m=[32m"true"[39m
+    [33mdata-aria-hidden[39m=[32m"true"[39m
+    [33mdata-radix-focus-guard[39m=[32m""[39m
+    [33mstyle[39m=[32m"outline: none; opacity: 0; position: fixed; pointer-events: none;"[39m
+    [33mtabindex[39m=[32m"0"[39m
+  [36m/>[39m
+[36m</body>[39m
+[90m [2m❯[22m Object.getElementError node_modules/@testing-library/dom/dist/config.js:[2m37:19[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m76:38[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m52:17[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m95:19[22m[39m
+[36m [2m❯[22m src/components/discovery/__tests__/ContentTypeFilter.test.tsx:[2m79:29[22m[39m
+    [90m 77| [39m
+    [90m 78| [39m    [35mawait[39m user[33m.[39m[34mclick[39m(screen[33m.[39m[34mgetByText[39m([32m'All'[39m))
+    [90m 79| [39m    [35mawait[39m user[33m.[39m[34mclick[39m(screen[33m.[39m[34mgetByText[39m([32m'Saved'[39m))
+    [90m   | [39m                            [31m^[39m
+    [90m 80| [39m
+    [90m 81| [39m    [34mexpect[39m(onChange)[33m.[39m[34mtoHaveBeenCalledWith[39m([32m'saved'[39m)
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/9]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/components/discovery/__tests__/ContentTypeFilter.test.tsx src/app/discovery/__tests__/page.test.tsx
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/app/discovery/__tests__/page.test.tsx [2m([22m[2m20 tests[22m[2m | [22m[31m3 failed[39m[2m)[22m[33m 2071[2mms[22m[39m
+     [32m✓[39m should show empty state when no channels are followed[32m 217[2mms[22m[39m
+     [32m✓[39m should render follow channel input[32m 63[2mms[22m[39m
+     [32m✓[39m should display videos in grid when channels exist[32m 63[2mms[22m[39m
+     [32m✓[39m should show loading state with skeleton grid[32m 16[2mms[22m[39m
+     [32m✓[39m should show error state when fetch fails[32m 24[2mms[22m[39m
+     [32m✓[39m should refetch videos when a new channel is followed[32m 283[2mms[22m[39m
+     [32m✓[39m should handle channel unfollow flow correctly[32m 36[2mms[22m[39m
+     [32m✓[39m should render refresh button when channels exist[32m 58[2mms[22m[39m
+     [32m✓[39m should not render refresh button when no channels exist[32m 23[2mms[22m[39m
+     [32m✓[39m should refetch videos when refresh button is clicked[32m 99[2mms[22m[39m
+       [32m✓[39m should render channel filter dropdown when channels exist[32m 32[2mms[22m[39m
+       [32m✓[39m should not render channel filter dropdown when no channels exist[32m 19[2mms[22m[39m
+       [32m✓[39m should filter videos to show only selected channel[32m 178[2mms[22m[39m
+       [32m✓[39m should show all videos when "All Channels" is selected[32m 272[2mms[22m[39m
+       [32m✓[39m should display channel name in dropdown trigger when channel is selected[32m 171[2mms[22m[39m
+       [32m✓[39m should render content type filter dropdown when channels exist[32m 33[2mms[22m[39m
+       [32m✓[39m should not render content type filter when no channels exist[32m 23[2mms[22m[39m
+[31m       [31m×[31m should filter to show only not saved videos (inBank: false) when "Not Saved" is selected[39m[32m 101[2mms[22m[39m
+[31m       [31m×[31m should filter to show only saved videos (inBank: true) when "Saved" is selected[39m[32m 106[2mms[22m[39m
+[31m       [31m×[31m should compose both channel and content type filters together[39m[32m 251[2mms[22m[39m
+ [31m❯[39m src/components/discovery/__tests__/ContentTypeFilter.test.tsx [2m([22m[2m8 tests[22m[2m | [22m[31m6 failed[39m[2m)[22m[33m 447[2mms[22m[39m
+     [32m✓[39m renders with "All" trigger text when selected is "all"[32m 45[2mms[22m[39m
+[31m     [31m×[31m renders with "Not Saved" trigger text when selected is "not-saved"[39m[32m 12[2mms[22m[39m
+[31m     [31m×[31m renders with "Saved" trigger text when selected is "saved"[39m[32m 5[2mms[22m[39m
+[31m     [31m×[31m opens menu and displays all three options[39m[32m 231[2mms[22m[39m
+[31m     [31m×[31m calls onChange with "all" when "All" is selected[39m[32m 5[2mms[22m[39m
+[31m     [31m×[31m calls onChange with "not-saved" when "Not Saved" is selected[39m[32m 69[2mms[22m[39m
+[31m     [31m×[31m calls onChange with "saved" when "Saved" is selected[39m[32m 73[2mms[22m[39m
+     [32m✓[39m renders ChevronDown icon in trigger[32m 4[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m2 failed[39m[22m[90m (2)[39m
+[2m      Tests [22m [1m[31m9 failed[39m[22m[2m | [22m[1m[32m19 passed[39m[22m[90m (28)[39m
+[2m   Start at [22m 15:23:33
+[2m   Duration [22m 9.48s[2m (transform 278ms, setup 499ms, import 1.96s, tests 2.52s, environment 3.76s)[22m
+---
+timestamp: "2026-02-11 15:24:19"
+story: "2-filter-semantics"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+npm error Missing script: "typecheck"
+npm error
+npm error To see a list of scripts, run:
+npm error   npm run
+npm error A complete log of this run can be found in: /Users/darindrobinski/.npm/_logs/2026-02-11T21_24_19_753Z-debug-0.log

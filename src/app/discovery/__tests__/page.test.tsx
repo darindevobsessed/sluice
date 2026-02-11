@@ -777,7 +777,7 @@ describe('Discovery Page', () => {
       })
     })
 
-    it('should filter to show only videos (inBank: false) when "Videos" is selected', async () => {
+    it('should filter to show only not saved videos (inBank: false) when "Not Saved" is selected', async () => {
       const user = userEvent.setup()
 
       const mockChannels = [
@@ -846,8 +846,8 @@ describe('Discovery Page', () => {
       if (!contentTypeAllButton) throw new Error('Content type filter not found')
       await user.click(contentTypeAllButton)
 
-      // Select "Videos"
-      await user.click(screen.getByText('Videos'))
+      // Select "Not Saved"
+      await user.click(screen.getByText('Not Saved'))
 
       // Should only show videos not in bank
       await waitFor(() => {
@@ -856,7 +856,7 @@ describe('Discovery Page', () => {
       })
     })
 
-    it('should filter to show only transcripts (inBank: true) when "Transcripts" is selected', async () => {
+    it('should filter to show only saved videos (inBank: true) when "Saved" is selected', async () => {
       const user = userEvent.setup()
 
       const mockChannels = [
@@ -925,8 +925,8 @@ describe('Discovery Page', () => {
       if (!contentTypeAllButton) throw new Error('Content type filter not found')
       await user.click(contentTypeAllButton)
 
-      // Select "Transcripts"
-      await user.click(screen.getByText('Transcripts'))
+      // Select "Saved"
+      await user.click(screen.getByText('Saved'))
 
       // Should only show videos in bank
       await waitFor(() => {
@@ -1033,12 +1033,12 @@ describe('Discovery Page', () => {
         expect(screen.queryByText('Channel 2 - In Bank')).not.toBeInTheDocument()
       })
 
-      // Now select "Videos" content type
+      // Now select "Not Saved" content type
       const allButtons = screen.getAllByText('All')
       const contentTypeAllButton = allButtons[0] // Content type filter
       if (!contentTypeAllButton) throw new Error('Content type filter not found')
       await user.click(contentTypeAllButton)
-      await user.click(screen.getByText('Videos'))
+      await user.click(screen.getByText('Not Saved'))
 
       // Should only show Channel 1 videos that are not in bank
       await waitFor(() => {

@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 
-export type ContentTypeValue = 'all' | 'videos' | 'transcripts'
+export type ContentTypeValue = 'all' | 'saved' | 'not-saved'
 
 interface ContentTypeFilterProps {
   selected: ContentTypeValue
@@ -17,8 +17,8 @@ interface ContentTypeFilterProps {
 
 const DISPLAY_LABELS: Record<ContentTypeValue, string> = {
   all: 'All',
-  videos: 'Videos',
-  transcripts: 'Transcripts',
+  saved: 'Saved',
+  'not-saved': 'Not Saved',
 }
 
 export function ContentTypeFilter({ selected, onChange }: ContentTypeFilterProps) {
@@ -36,9 +36,9 @@ export function ContentTypeFilter({ selected, onChange }: ContentTypeFilterProps
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuItem onClick={() => handleSelect('all')}>All</DropdownMenuItem>
-        <DropdownMenuItem onClick={() => handleSelect('videos')}>Videos</DropdownMenuItem>
-        <DropdownMenuItem onClick={() => handleSelect('transcripts')}>
-          Transcripts
+        <DropdownMenuItem onClick={() => handleSelect('saved')}>Saved</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => handleSelect('not-saved')}>
+          Not Saved
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -8,7 +8,7 @@ created: 2026-02-11
 updated: 2026-02-11
 priority: urgent
 chunks_total: 2
-chunks_complete: 0
+chunks_complete: 1
 ---
 
 # Story: Fix filter semantics across Discovery and Knowledge Bank tabs

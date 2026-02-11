@@ -11,18 +11,18 @@ describe('ContentTypeFilter', () => {
     expect(screen.getByText('All')).toBeInTheDocument()
   })
 
-  it('renders with "Videos" trigger text when selected is "videos"', () => {
+  it('renders with "Not Saved" trigger text when selected is "not-saved"', () => {
     const onChange = vi.fn()
-    render(<ContentTypeFilter selected="videos" onChange={onChange} />)
+    render(<ContentTypeFilter selected="not-saved" onChange={onChange} />)
 
-    expect(screen.getByText('Videos')).toBeInTheDocument()
+    expect(screen.getByText('Not Saved')).toBeInTheDocument()
   })
 
-  it('renders with "Transcripts" trigger text when selected is "transcripts"', () => {
+  it('renders with "Saved" trigger text when selected is "saved"', () => {
     const onChange = vi.fn()
-    render(<ContentTypeFilter selected="transcripts" onChange={onChange} />)
+    render(<ContentTypeFilter selected="saved" onChange={onChange} />)
 
-    expect(screen.getByText('Transcripts')).toBeInTheDocument()
+    expect(screen.getByText('Saved')).toBeInTheDocument()
   })
 
   it('opens menu and displays all three options', async () => {
@@ -36,16 +36,16 @@ describe('ContentTypeFilter', () => {
     const allItems = screen.getAllByText('All')
     expect(allItems.length).toBeGreaterThanOrEqual(2)
 
-    expect(screen.getByText('Videos')).toBeInTheDocument()
-    expect(screen.getByText('Transcripts')).toBeInTheDocument()
+    expect(screen.getByText('Saved')).toBeInTheDocument()
+    expect(screen.getByText('Not Saved')).toBeInTheDocument()
   })
 
   it('calls onChange with "all" when "All" is selected', async () => {
     const user = userEvent.setup()
     const onChange = vi.fn()
-    render(<ContentTypeFilter selected="videos" onChange={onChange} />)
+    render(<ContentTypeFilter selected="not-saved" onChange={onChange} />)
 
-    await user.click(screen.getByText('Videos'))
+    await user.click(screen.getByText('Not Saved'))
 
     // Click the "All" menu item
     const allItems = screen.getAllByText('All')
@@ -58,27 +58,27 @@ describe('ContentTypeFilter', () => {
     expect(onChange).toHaveBeenCalledTimes(1)
   })
 
-  it('calls onChange with "videos" when "Videos" is selected', async () => {
+  it('calls onChange with "not-saved" when "Not Saved" is selected', async () => {
     const user = userEvent.setup()
     const onChange = vi.fn()
     render(<ContentTypeFilter selected="all" onChange={onChange} />)
 
     await user.click(screen.getByText('All'))
-    await user.click(screen.getByText('Videos'))
+    await user.click(screen.getByText('Not Saved'))
 
-    expect(onChange).toHaveBeenCalledWith('videos')
+    expect(onChange).toHaveBeenCalledWith('not-saved')
     expect(onChange).toHaveBeenCalledTimes(1)
   })
 
-  it('calls onChange with "transcripts" when "Transcripts" is selected', async () => {
+  it('calls onChange with "saved" when "Saved" is selected', async () => {
     const user = userEvent.setup()
     const onChange = vi.fn()
     render(<ContentTypeFilter selected="all" onChange={onChange} />)
 
     await user.click(screen.getByText('All'))
-    await user.click(screen.getByText('Transcripts'))
+    await user.click(screen.getByText('Saved'))
 
-    expect(onChange).toHaveBeenCalledWith('transcripts')
+    expect(onChange).toHaveBeenCalledWith('saved')
     expect(onChange).toHaveBeenCalledTimes(1)
   })
 

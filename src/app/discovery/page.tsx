@@ -159,9 +159,9 @@ export default function Discovery() {
     }
 
     // Apply content type filter
-    if (contentType === 'videos') {
+    if (contentType === 'not-saved') {
       result = result.filter((video) => !video.inBank)
-    } else if (contentType === 'transcripts') {
+    } else if (contentType === 'saved') {
       result = result.filter((video) => video.inBank)
     }
 
