@@ -7,6 +7,8 @@ import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { AgentProvider } from "@/lib/agent/AgentProvider";
 import { ExtractionProvider } from "@/components/providers/ExtractionProvider";
 import { FocusAreaProvider } from "@/components/providers/FocusAreaProvider";
+import { SidebarProvider } from "@/components/providers/SidebarProvider";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -37,8 +39,12 @@ export default function RootLayout({
           <AgentProvider>
             <ExtractionProvider>
               <FocusAreaProvider>
-                <Sidebar />
-                <MainContent>{children}</MainContent>
+                <SidebarProvider>
+                  <TooltipProvider>
+                    <Sidebar />
+                    <MainContent>{children}</MainContent>
+                  </TooltipProvider>
+                </SidebarProvider>
               </FocusAreaProvider>
             </ExtractionProvider>
           </AgentProvider>

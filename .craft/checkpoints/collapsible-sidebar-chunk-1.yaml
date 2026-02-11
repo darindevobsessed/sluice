@@ -1,0 +1,17 @@
+story: "collapsible-sidebar"
+chunk: 1
+total_chunks: 4
+cycle: "7-ui-refinement"
+timestamp: "2026-02-11T16:21:03Z"
+git_ref: "b494cce"
+git_branch: "main"
+state_CYCLE_STATUS: "planning"
+state_CURRENT_STORY: "1-sidebar"
+state_CURRENT_CHUNK: "1"
+state_TOTAL_CHUNKS: "4"
+state_LAST_VALIDATION: ""
+story_status: ""
+story_chunks_total: ""
+story_chunks_complete: ""
+test_status: ""
+modified_files: ".craft/.exports/pre-compact-20260209_085231.md .craft/.exports/pre-compact-20260210_213846.md .craft/.global-state .craft/checkpoints/metadata-extraction-chunk-3.yaml .craft/cycles/6-polish-reliability/.failures .craft/cycles/6-polish-reliability/.state .craft/cycles/6-polish-reliability/cycle.yaml .craft/cycles/6-polish-reliability/stories/7-metadata-extraction.md .craft/cycles/7-ui-refinement/.state .craft/cycles/7-ui-refinement/cycle.yaml .craft/cycles/7-ui-refinement/stories/1-sidebar.md package.json scripts/backfill-published-at.ts "

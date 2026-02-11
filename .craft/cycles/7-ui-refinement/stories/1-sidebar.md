@@ -7,8 +7,8 @@ story_number: 1
 created: 2026-02-11
 updated: 2026-02-11
 priority: high
-chunks_total: 4
-chunks_complete: 0
+chunks_total: 5
+chunks_complete: 1
 ---
 
 # Story: Collapsible Left Navigation Sidebar
@@ -178,3 +178,40 @@ The MainContent uses a hard-coded `ml-60` offset. The transition needs to coordi
 - [ ] No gap or overlap between sidebar and content during transition
 - [ ] Rapid toggling produces no jank or desync
 - [ ] TopBar and page content reflow correctly in both states
+
+### Chunk 5: Ensemble Query Trigger on Question Mark
+
+**Goal:** Change persona ensemble queries to only fire when the query ends with a `?`, instead of on every debounced keystroke that looks like a question. Add a subtle UI hint explaining the behavior.
+
+**Files:**
+- `src/app/page.tsx` — modify (lines 56-63: tighten ensemble trigger condition, line 194-198: update hint text)
+- `src/app/page.tsx` — modify `isQuestion()` helper (line 20-24) or replace inline
+
+**Implementation Details:**
+- **Current flow (problem):** `VideoSearch` debounces at 300ms (src/components/videos/VideoSearch.tsx:33) → calls `onSearch` which sets `query` in `useSearch` → page.tsx line 58 checks `isQuestion(query) && wordCount >= 3` → passes to `useEnsemble(isQueryQuestion ? query : null)` → `useEnsemble` fires a POST to `/api/personas/ensemble` with full SSE stream on every debounced query change that matches
+- **Current `isQuestion()` (line 20-24):** Returns true if query ends with `?` OR starts with question words (how/what/why/etc). The question-word heuristic is what causes premature firing — "How do" matches before user finishes typing
+- **Fix:** Change the trigger condition on line 58 from:
+  ```
+  const isQueryQuestion = isQuestion(query) && wordCount >= 3
+  ```
+  to:
+  ```
+  const isQueryQuestion = query.trim().endsWith('?') && wordCount >= 3
+  ```
+  This is a one-line change. The `?` is a natural end-of-question signal typed last, so the 300ms debounce is sufficient — no additional debounce needed
+- **`isQuestion()` helper:** Leave it in place (it may be useful elsewhere or in future). Just stop using it for the ensemble trigger
+- **`showPanel` (line 163):** Already derived from `isQueryQuestion`, so it automatically updates — panel only shows when `?` is present
+- **Hint text (lines 194-198):** Update the existing hint from `"Type keywords to search · Ask a question (3+ words) to hear from your personas"` to `"Type keywords to search · End with ? to ask your personas"` — shorter, more actionable
+- **`useEnsemble` abort behavior (src/hooks/useEnsemble.ts:57-61):** Already aborts previous request when `question` changes, so removing `?` (backspace) sets `question` to `null` which triggers `reset()` on line 64-67. No changes needed in useEnsemble.
+
+**What Could Break:**
+- Users who relied on the old auto-detect behavior without typing `?` — the hint text teaches the new pattern
+- The `isQuestion()` helper is only used in page.tsx (verified via grep) — safe to bypass
+
+**Done When:**
+- [ ] Typing "What is the best approach" does NOT trigger ensemble
+- [ ] Typing "What is the best approach?" DOES trigger ensemble (after 300ms debounce)
+- [ ] Backspacing the `?` clears the ensemble panel (useEnsemble receives null, calls reset)
+- [ ] Hint text updated to mention `?` trigger
+- [ ] Search results still appear with debounced typing (unchanged)
+- [ ] Existing ensemble/persona tests updated for new trigger condition

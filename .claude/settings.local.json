@@ -38,7 +38,8 @@
       "WebFetch(domain:ytscribe.com)",
       "WebFetch(domain:www.noxinfluencer.com)",
       "WebFetch(domain:lilys.ai)",
-      "Bash(timeout 120 bash:*)"
+      "Bash(timeout 120 bash:*)",
+      "Bash(node -e:*)"
     ]
   }
 }
