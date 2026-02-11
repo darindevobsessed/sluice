@@ -823,3 +823,612 @@ error: |
   13:54  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
 
 ✖ 1 problem (1 error, 0 warnings)
+---
+timestamp: "2026-02-11 12:37:25"
+story: "1-sidebar"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 9 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/components/layout/__tests__/MainContent.test.tsx[2m > [22mMainContent[2m > [22mdynamic margin coordination[2m > [22mrenders with 240px left margin when sidebar is expanded
+[41m[1m FAIL [22m[49m src/components/layout/__tests__/MainContent.test.tsx[2m > [22mMainContent[2m > [22mdynamic margin coordination[2m > [22mrenders with 64px left margin when sidebar is collapsed
+[41m[1m FAIL [22m[49m src/components/layout/__tests__/MainContent.test.tsx[2m > [22mMainContent[2m > [22mdynamic margin coordination[2m > [22mtoggles margin in sync with sidebar width
+[41m[1m FAIL [22m[49m src/components/layout/__tests__/MainContent.test.tsx[2m > [22mMainContent[2m > [22mtransition timing[2m > [22mapplies transition for smooth margin animation
+[41m[1m FAIL [22m[49m src/components/layout/__tests__/MainContent.test.tsx[2m > [22mMainContent[2m > [22mtransition timing[2m > [22muses 300ms duration matching sidebar transition
+[41m[1m FAIL [22m[49m src/components/layout/__tests__/MainContent.test.tsx[2m > [22mMainContent[2m > [22mtransition timing[2m > [22muses matching cubic-bezier easing
+[41m[1m FAIL [22m[49m src/components/layout/__tests__/MainContent.test.tsx[2m > [22mMainContent[2m > [22mcontent behavior[2m > [22mrenders children content correctly
+[41m[1m FAIL [22m[49m src/components/layout/__tests__/MainContent.test.tsx[2m > [22mMainContent[2m > [22mcontent behavior[2m > [22mmaintains content visibility during margin transition
+[41m[1m FAIL [22m[49m src/components/layout/__tests__/MainContent.test.tsx[2m > [22mMainContent[2m > [22mrapid toggling[2m > [22mhandles rapid sidebar toggles without desync
+[31m[1mError[22m: useFocusArea must be used within a FocusAreaProvider[39m
+[36m [2m❯[22m useFocusArea src/components/providers/FocusAreaProvider.tsx:[2m82:11[22m[39m
+    [90m 80| [39m  [35mconst[39m context [33m=[39m [34museContext[39m([33mFocusAreaContext[39m)
+    [90m 81| [39m  [35mif[39m (context [33m===[39m undefined) {
+    [90m 82| [39m    throw new Error('useFocusArea must be used within a FocusAreaProvi…
+    [90m   | [39m          [31m^[39m
+    [90m 83| [39m  }
+    [90m 84| [39m  [35mreturn[39m context
+[90m [2m❯[22m FocusAreaDropdown src/components/layout/FocusAreaDropdown.tsx:[2m20:71[22m[39m
+[90m [2m❯[22m Object.react_stack_bottom_frame node_modules/react-dom/cjs/react-dom-client.development.js:[2m25904:20[22m[39m
+[90m [2m❯[22m renderWithHooks node_modules/react-dom/cjs/react-dom-client.development.js:[2m7662:22[22m[39m
+[90m [2m❯[22m updateFunctionComponent node_modules/react-dom/cjs/react-dom-client.development.js:[2m10166:19[22m[39m
+[90m [2m❯[22m beginWork node_modules/react-dom/cjs/react-dom-client.development.js:[2m11778:18[22m[39m
+[90m [2m❯[22m runWithFiberInDEV node_modules/react-dom/cjs/react-dom-client.development.js:[2m874:13[22m[39m
+[90m [2m❯[22m performUnitOfWork node_modules/react-dom/cjs/react-dom-client.development.js:[2m17641:22[22m[39m
+[90m [2m❯[22m workLoopSync node_modules/react-dom/cjs/react-dom-client.development.js:[2m17469:41[22m[39m
+[90m [2m❯[22m renderRootSync node_modules/react-dom/cjs/react-dom-client.development.js:[2m17450:11[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/9]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/components/layout/__tests__/MainContent.test.tsx
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/components/layout/__tests__/MainContent.test.tsx [2m([22m[2m9 tests[22m[2m | [22m[31m9 failed[39m[2m)[22m[32m 162[2mms[22m[39m
+[31m       [31m×[31m renders with 240px left margin when sidebar is expanded[39m[32m 65[2mms[22m[39m
+[31m       [31m×[31m renders with 64px left margin when sidebar is collapsed[39m[32m 15[2mms[22m[39m
+[31m       [31m×[31m toggles margin in sync with sidebar width[39m[32m 14[2mms[22m[39m
+[31m       [31m×[31m applies transition for smooth margin animation[39m[32m 13[2mms[22m[39m
+[31m       [31m×[31m uses 300ms duration matching sidebar transition[39m[32m 12[2mms[22m[39m
+[31m       [31m×[31m uses matching cubic-bezier easing[39m[32m 12[2mms[22m[39m
+[31m       [31m×[31m renders children content correctly[39m[32m 10[2mms[22m[39m
+[31m       [31m×[31m maintains content visibility during margin transition[39m[32m 9[2mms[22m[39m
+[31m       [31m×[31m handles rapid sidebar toggles without desync[39m[32m 10[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m9 failed[39m[22m[90m (9)[39m
+[2m   Start at [22m 12:37:23
+[2m   Duration [22m 2.41s[2m (transform 206ms, setup 138ms, import 921ms, tests 162ms, environment 823ms)[22m
+---
+timestamp: "2026-02-11 12:37:47"
+story: "1-sidebar"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+[90mstderr[2m | src/components/layout/__tests__/MainContent.test.tsx[2m > [22m[2mMainContent[2m > [22m[2mdynamic margin coordination[2m > [22m[2mrenders with 240px left margin when sidebar is expanded
+[22m[39mAn update to FocusAreaProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to FocusAreaProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+[90mstderr[2m | src/components/layout/__tests__/MainContent.test.tsx[2m > [22m[2mMainContent[2m > [22m[2mtransition timing[2m > [22m[2mapplies transition for smooth margin animation
+[22m[39mAn update to FocusAreaProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to FocusAreaProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+[90mstderr[2m | src/components/layout/__tests__/MainContent.test.tsx[2m > [22m[2mMainContent[2m > [22m[2mtransition timing[2m > [22m[2muses 300ms duration matching sidebar transition
+[22m[39mAn update to FocusAreaProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to FocusAreaProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+[90mstderr[2m | src/components/layout/__tests__/MainContent.test.tsx[2m > [22m[2mMainContent[2m > [22m[2mtransition timing[2m > [22m[2muses matching cubic-bezier easing
+[22m[39mAn update to FocusAreaProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to FocusAreaProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+[90mstderr[2m | src/components/layout/__tests__/MainContent.test.tsx[2m > [22m[2mMainContent[2m > [22m[2mcontent behavior[2m > [22m[2mrenders children content correctly
+[22m[39mAn update to FocusAreaProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to FocusAreaProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 7 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/components/layout/__tests__/MainContent.test.tsx[2m > [22mMainContent
+
+... [1075 characters truncated] ...
+
+m[39m
+[90m [2m❯[22m renderWithHooks node_modules/react-dom/cjs/react-dom-client.development.js:[2m7662:22[22m[39m
+[90m [2m❯[22m updateFunctionComponent node_modules/react-dom/cjs/react-dom-client.development.js:[2m10166:19[22m[39m
+[90m [2m❯[22m beginWork node_modules/react-dom/cjs/react-dom-client.development.js:[2m11778:18[22m[39m
+[90m [2m❯[22m runWithFiberInDEV node_modules/react-dom/cjs/react-dom-client.development.js:[2m874:13[22m[39m
+[90m [2m❯[22m performUnitOfWork node_modules/react-dom/cjs/react-dom-client.development.js:[2m17641:22[22m[39m
+[90m [2m❯[22m workLoopSync node_modules/react-dom/cjs/react-dom-client.development.js:[2m17469:41[22m[39m
+[90m [2m❯[22m renderRootSync node_modules/react-dom/cjs/react-dom-client.development.js:[2m17450:11[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/7]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/layout/__tests__/MainContent.test.tsx[2m > [22mMainContent[2m > [22mtransition timing[2m > [22mapplies transition for smooth margin animation
+[31m[1mAssertionError[22m: expected '' to be true // Object.is equality[39m
+
+[32m- Expected:[39m 
+true
+
+[31m+ Received:[39m 
+""
+
+[36m [2m❯[22m src/components/layout/__tests__/MainContent.test.tsx:[2m148:57[22m[39m
+    [90m146| [39m        mainContent[33m.[39mstyle[33m.[39mtransition[33m.[39m[34mincludes[39m([32m'margin'[39m)
+    [90m147| [39m
+    [90m148| [39m      [34mexpect[39m(hasTransitionClass [33m||[39m hasInlineTransition)[33m.[39m[34mtoBe[39m([35mtrue[39m)
+    [90m   | [39m                                                        [31m^[39m
+    [90m149| [39m    })
+    [90m150| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/7]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/layout/__tests__/MainContent.test.tsx[2m > [22mMainContent[2m > [22mtransition timing[2m > [22muses 300ms duration matching sidebar transition
+[31m[1mAssertionError[22m: expected false to be true // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- true[39m
+[31m+ false[39m
+
+[36m [2m❯[22m src/components/layout/__tests__/MainContent.test.tsx:[2m169:65[22m[39m
+    [90m167| [39m      } [35melse[39m {
+    [90m168| [39m        [90m// If using Tailwind classes, should have duration-300[39m
+    [90m169| [39m        expect(mainContent?.classList.contains('duration-300')).toBe(t…
+    [90m   | [39m                                                                [31m^[39m
+    [90m170| [39m      }
+    [90m171| [39m    })
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/7]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/layout/__tests__/MainContent.test.tsx[2m > [22mMainContent[2m > [22mtransition timing[2m > [22muses matching cubic-bezier easing
+[31m[1mAssertionError[22m: expected false to be true // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- true[39m
+[31m+ false[39m
+
+[36m [2m❯[22m src/components/layout/__tests__/MainContent.test.tsx:[2m187:64[22m[39m
+    [90m185| [39m      } [35melse[39m {
+    [90m186| [39m        [90m// If using Tailwind, should have ease-in-out[39m
+    [90m187| [39m        expect(mainContent?.classList.contains('ease-in-out')).toBe(tr…
+    [90m   | [39m                                                               [31m^[39m
+    [90m188| [39m      }
+    [90m189| [39m    })
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/7]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/components/layout/__tests__/MainContent.test.tsx
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/components/layout/__tests__/MainContent.test.tsx [2m([22m[2m9 tests[22m[2m | [22m[31m7 failed[39m[2m)[22m[33m 467[2mms[22m[39m
+       [32m✓[39m renders with 240px left margin when sidebar is expanded[32m 75[2mms[22m[39m
+[31m       [31m×[31m renders with 64px left margin when sidebar is collapsed[39m[32m 208[2mms[22m[39m
+[31m       [31m×[31m toggles margin in sync with sidebar width[39m[32m 44[2mms[22m[39m
+[31m       [31m×[31m applies transition for smooth margin animation[39m[32m 17[2mms[22m[39m
+[31m       [31m×[31m uses 300ms duration matching sidebar transition[39m[32m 19[2mms[22m[39m
+[31m       [31m×[31m uses matching cubic-bezier easing[39m[32m 13[2mms[22m[39m
+       [32m✓[39m renders children content correctly[32m 13[2mms[22m[39m
+[31m       [31m×[31m maintains content visibility during margin transition[39m[32m 43[2mms[22m[39m
+[31m       [31m×[31m handles rapid sidebar toggles without desync[39m[32m 32[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m7 failed[39m[22m[2m | [22m[1m[32m2 passed[39m[22m[90m (9)[39m
+[2m   Start at [22m 12:37:44
+[2m   Duration [22m 2.57s[2m (transform 195ms, setup 133ms, import 773ms, tests 467ms, environment 840ms)[22m
+---
+timestamp: "2026-02-11 12:38:19"
+story: "1-sidebar"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+[90mstderr[2m | src/components/layout/__tests__/MainContent.test.tsx[2m > [22m[2mMainContent[2m > [22m[2mdynamic margin coordination[2m > [22m[2mrenders with 240px left margin when sidebar is expanded
+[22m[39mAn update to FocusAreaProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to FocusAreaProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+[90mstderr[2m | src/components/layout/__tests__/MainContent.test.tsx[2m > [22m[2mMainContent[2m > [22m[2mtransition timing[2m > [22m[2mapplies transition for smooth margin animation
+[22m[39mAn update to FocusAreaProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to FocusAreaProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+[90mstderr[2m | src/components/layout/__tests__/MainContent.test.tsx[2m > [22m[2mMainContent[2m > [22m[2mtransition timing[2m > [22m[2muses 300ms duration matching sidebar transition
+[22m[39mAn update to FocusAreaProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to FocusAreaProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+[90mstderr[2m | src/components/layout/__tests__/MainContent.test.tsx[2m > [22m[2mMainContent[2m > [22m[2mtransition timing[2m > [22m[2muses matching cubic-bezier easing
+[22m[39mAn update to FocusAreaProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to FocusAreaProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+[90mstderr[2m | src/components/layout/__tests__/MainContent.test.tsx[2m > [22m[2mMainContent[2m > [22m[2mcontent behavior[2m > [22m[2mrenders children content correctly
+[22m[39mAn update to FocusAreaProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to FocusAreaProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 7 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/components/layout/__tests__/MainContent.test.tsx[2m > [22mMainContent
+
+... [1075 characters truncated] ...
+
+m[39m
+[90m [2m❯[22m renderWithHooks node_modules/react-dom/cjs/react-dom-client.development.js:[2m7662:22[22m[39m
+[90m [2m❯[22m updateFunctionComponent node_modules/react-dom/cjs/react-dom-client.development.js:[2m10166:19[22m[39m
+[90m [2m❯[22m beginWork node_modules/react-dom/cjs/react-dom-client.development.js:[2m11778:18[22m[39m
+[90m [2m❯[22m runWithFiberInDEV node_modules/react-dom/cjs/react-dom-client.development.js:[2m874:13[22m[39m
+[90m [2m❯[22m performUnitOfWork node_modules/react-dom/cjs/react-dom-client.development.js:[2m17641:22[22m[39m
+[90m [2m❯[22m workLoopSync node_modules/react-dom/cjs/react-dom-client.development.js:[2m17469:41[22m[39m
+[90m [2m❯[22m renderRootSync node_modules/react-dom/cjs/react-dom-client.development.js:[2m17450:11[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/7]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/layout/__tests__/MainContent.test.tsx[2m > [22mMainContent[2m > [22mtransition timing[2m > [22mapplies transition for smooth margin animation
+[31m[1mAssertionError[22m: expected '' to be true // Object.is equality[39m
+
+[32m- Expected:[39m 
+true
+
+[31m+ Received:[39m 
+""
+
+[36m [2m❯[22m src/components/layout/__tests__/MainContent.test.tsx:[2m148:57[22m[39m
+    [90m146| [39m        mainContent[33m.[39mstyle[33m.[39mtransition[33m.[39m[34mincludes[39m([32m'margin'[39m)
+    [90m147| [39m
+    [90m148| [39m      [34mexpect[39m(hasTransitionClass [33m||[39m hasInlineTransition)[33m.[39m[34mtoBe[39m([35mtrue[39m)
+    [90m   | [39m                                                        [31m^[39m
+    [90m149| [39m    })
+    [90m150| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/7]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/layout/__tests__/MainContent.test.tsx[2m > [22mMainContent[2m > [22mtransition timing[2m > [22muses 300ms duration matching sidebar transition
+[31m[1mAssertionError[22m: expected false to be true // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- true[39m
+[31m+ false[39m
+
+[36m [2m❯[22m src/components/layout/__tests__/MainContent.test.tsx:[2m169:65[22m[39m
+    [90m167| [39m      } [35melse[39m {
+    [90m168| [39m        [90m// If using Tailwind classes, should have duration-300[39m
+    [90m169| [39m        expect(mainContent?.classList.contains('duration-300')).toBe(t…
+    [90m   | [39m                                                                [31m^[39m
+    [90m170| [39m      }
+    [90m171| [39m    })
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/7]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/layout/__tests__/MainContent.test.tsx[2m > [22mMainContent[2m > [22mtransition timing[2m > [22muses matching cubic-bezier easing
+[31m[1mAssertionError[22m: expected false to be true // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- true[39m
+[31m+ false[39m
+
+[36m [2m❯[22m src/components/layout/__tests__/MainContent.test.tsx:[2m187:64[22m[39m
+    [90m185| [39m      } [35melse[39m {
+    [90m186| [39m        [90m// If using Tailwind, should have ease-in-out[39m
+    [90m187| [39m        expect(mainContent?.classList.contains('ease-in-out')).toBe(tr…
+    [90m   | [39m                                                               [31m^[39m
+    [90m188| [39m      }
+    [90m189| [39m    })
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/7]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/components/layout/__tests__/MainContent.test.tsx
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/components/layout/__tests__/MainContent.test.tsx [2m([22m[2m9 tests[22m[2m | [22m[31m7 failed[39m[2m)[22m[33m 473[2mms[22m[39m
+       [32m✓[39m renders with 240px left margin when sidebar is expanded[32m 81[2mms[22m[39m
+[31m       [31m×[31m renders with 64px left margin when sidebar is collapsed[39m[32m 201[2mms[22m[39m
+[31m       [31m×[31m toggles margin in sync with sidebar width[39m[32m 45[2mms[22m[39m
+[31m       [31m×[31m applies transition for smooth margin animation[39m[32m 18[2mms[22m[39m
+[31m       [31m×[31m uses 300ms duration matching sidebar transition[39m[32m 20[2mms[22m[39m
+[31m       [31m×[31m uses matching cubic-bezier easing[39m[32m 13[2mms[22m[39m
+       [32m✓[39m renders children content correctly[32m 13[2mms[22m[39m
+[31m       [31m×[31m maintains content visibility during margin transition[39m[32m 36[2mms[22m[39m
+[31m       [31m×[31m handles rapid sidebar toggles without desync[39m[32m 42[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m7 failed[39m[22m[2m | [22m[1m[32m2 passed[39m[22m[90m (9)[39m
+[2m   Start at [22m 12:38:16
+[2m   Duration [22m 3.08s[2m (transform 206ms, setup 222ms, import 976ms, tests 473ms, environment 1.16s)[22m
+---
+timestamp: "2026-02-11 12:50:12"
+story: "1-sidebar"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+[90mstderr[2m | src/components/layout/__tests__/ManageFocusAreasModal.test.tsx[2m > [22m[2mManageFocusAreasModal[2m > [22m[2mrenders modal title "Manage Focus Areas"
+[22m[39mWarning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+
+[90mstderr[2m | src/components/layout/__tests__/ManageFocusAreasModal.test.tsx[2m > [22m[2mManageFocusAreasModal[2m > [22m[2mdisplays list of existing focus areas
+[22m[39mWarning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+
+[90mstderr[2m | src/components/layout/__tests__/ManageFocusAreasModal.test.tsx[2m > [22m[2mManageFocusAreasModal[2m > [22m[2mdisplays empty state when no focus areas exist
+[22m[39mWarning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+
+[90mstderr[2m | src/components/layout/__tests__/ManageFocusAreasModal.test.tsx[2m > [22m[2mManageFocusAreasModal[2m > [22m[2mdisplays rename and delete buttons for each focus area
+[22m[39mWarning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+
+[90mstderr[2m | src/components/layout/__tests__/ManageFocusAreasModal.test.tsx[2m > [22m[2mManageFocusAreasModal[2m > [22m[2mdisplays add focus area input and button
+[22m[39mWarning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+
+[90mstderr[2m | src/components/layout/__tests__/ManageFocusAreasModal.test.tsx[2m > [22m[2mManageFocusAreasModal[2m > [22m[2mcreates new focus area when Add button is clicked
+[22m[39mWarning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+
+[90mstderr[2m | src/components/layout/__tests__/ManageFocusAreasModal.test.tsx[2m > [22m[2mManageFocusAreasModal[2m > [22m[2mclears input after successful create
+[22m[39mWarning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+
+[90mstderr[2m | src/components/layout/__tests__/ManageFocusAreasModal.test.tsx[2m > [22m[2mManageFocusAreasModal[2m > [22m[2mtrims whitespace from focus area name
+[22m[39mWarning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+
+[90mstderr[2m | src/components/layout/__tests__/ManageFocusAreasModal.test.tsx[2m > [22m[2mManageFocusAreasModal[2m > [22m[2mdoes not create focus area when name is empty
+[22m[39mWarning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+
+[90mstderr[2m | src/components/layout/__tests__/ManageFocusAreasModal.test.tsx[2m > [22m[2mManageFocusAreasModal[2m > [22m[2menters edit mode when edit button is clicked
+[22m[39mWarning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+
+[90mstderr[2m | src/components/layout/__tests__/ManageFocusAreasModal.test.tsx[2m > [22m[2mManageFocusAreasModal[2m > [22m[2msaves renamed focus area when save button is clicked in edit mode
+[22m[39mWarning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+
+[90mstderr[2m | src/components/layout/__tests__/ManageFocusAreasModal.test.tsx[2m > [22m[2mManageFocusAreasModal[2m > [22m[2mcancels edit mode when cancel button is clicked
+[22m[39mWarning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+
+[90mstderr[2m | src/components/layout/__tests__/ManageFocusAreasModal.test.tsx[2m > [22m[2mManageFocusAreasModal[2m > [22m[2mshows confirmation dialog when delete button is clicked
+[22m[39mWarning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+
+[90mstderr[2m | src/components/layout/__tests__/ManageFocusAreasModal.test.tsx[2m > [22m[2mManageFocusAreasModal[2m > [22m[2mdeletes focus area when confirmed
+[22m[39mWarning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+
+[90mstderr[2m | src/components/layout/__tests__/ManageFocusAreasModal.test.tsx[2m > [22m[2mManageFocusAreasModal[2m > [22m[2mdoes not delete focus area when cancelled
+[22m[39mWarning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+
+[90mstderr[2m | src/components/layout/__tests__/ManageFocusAreasModal.test.tsx[2m > [22m[2mManageFocusAreasModal[2m > [22m[2mresets selected focus area to "All" when deleting currently selected area
+[22m[39mWarning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+
+[90mstderr[2m | src/components/layout/__tests__/ManageFocusAreasModal.test.tsx[2m > [22m[2mManageFocusAreasModal[2m > [22m[2mcalls onOpenChange when modal is closed
+[22m[39mWarning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+
+[90mstderr[2m | src/components/layout/__tests__/ManageFocusAreasModal.test.tsx[2m > [22m[2mManageFocusAreasModal[2m > [22m[2mdisplays loading state during mutations
+[22m[39mWarning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+
+[90mstder
+
+... [5665 characters truncated] ...
+
+s logo text when collapsed
+[41m[1m FAIL [22m[49m src/components/layout/__tests__/Sidebar.test.tsx[2m > [22mSidebar[2m > [22mcollapsed state[2m > [22mshows right-pointing chevron when collapsed
+[41m[1m FAIL [22m[49m src/components/layout/__tests__/Sidebar.test.tsx[2m > [22mSidebar[2m > [22mtoggle interaction[2m > [22mtoggles between expanded and collapsed on button click
+[41m[1m FAIL [22m[49m src/components/layout/__tests__/Sidebar.test.tsx[2m > [22mSidebar[2m > [22mtoggle interaction[2m > [22mpersists collapsed state to localStorage
+[41m[1m FAIL [22m[49m src/components/layout/__tests__/Sidebar.test.tsx[2m > [22mSidebar[2m > [22maccessibility[2m > [22mtoggle button is keyboard accessible
+[31m[1mError[22m: `Tooltip` must be used within `TooltipProvider`[39m
+[90m [2m❯[22m useContext2 node_modules/@radix-ui/react-context/dist/index.mjs:[2m38:13[22m[39m
+[90m [2m❯[22m Tooltip node_modules/@radix-ui/react-tooltip/dist/index.mjs:[2m81:27[22m[39m
+[90m [2m❯[22m Object.react_stack_bottom_frame node_modules/react-dom/cjs/react-dom-client.development.js:[2m25904:20[22m[39m
+[90m [2m❯[22m renderWithHooks node_modules/react-dom/cjs/react-dom-client.development.js:[2m7662:22[22m[39m
+[90m [2m❯[22m updateFunctionComponent node_modules/react-dom/cjs/react-dom-client.development.js:[2m10166:19[22m[39m
+[90m [2m❯[22m beginWork node_modules/react-dom/cjs/react-dom-client.development.js:[2m11778:18[22m[39m
+[90m [2m❯[22m runWithFiberInDEV node_modules/react-dom/cjs/react-dom-client.development.js:[2m874:13[22m[39m
+[90m [2m❯[22m performUnitOfWork node_modules/react-dom/cjs/react-dom-client.development.js:[2m17641:22[22m[39m
+[90m [2m❯[22m workLoopSync node_modules/react-dom/cjs/react-dom-client.development.js:[2m17469:41[22m[39m
+[90m [2m❯[22m renderRootSync node_modules/react-dom/cjs/react-dom-client.development.js:[2m17450:11[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯[22m[39m
+
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/components/layout/__tests__/Sidebar.test.tsx [2m([22m[2m12 tests[22m[2m | [22m[31m6 failed[39m[2m)[22m[33m 754[2mms[22m[39m
+       [33m[2m✓[22m[39m renders at 240px width when expanded [33m 328[2mms[22m[39m
+       [32m✓[39m shows logo text when expanded[32m 23[2mms[22m[39m
+       [32m✓[39m shows left-pointing chevron when expanded[32m 57[2mms[22m[39m
+[31m       [31m×[31m collapses to 64px width when toggle button is clicked[39m[32m 75[2mms[22m[39m
+[31m       [31m×[31m hides logo text when collapsed[39m[32m 45[2mms[22m[39m
+[31m       [31m×[31m shows right-pointing chevron when collapsed[39m[32m 38[2mms[22m[39m
+[31m       [31m×[31m toggles between expanded and collapsed on button click[39m[32m 49[2mms[22m[39m
+[31m       [31m×[31m persists collapsed state to localStorage[39m[32m 47[2mms[22m[39m
+       [32m✓[39m applies transition classes for smooth animation[32m 19[2mms[22m[39m
+       [32m✓[39m applies overflow-hidden to clip content during transition[32m 17[2mms[22m[39m
+       [32m✓[39m has proper ARIA role for sidebar[32m 20[2mms[22m[39m
+[31m       [31m×[31m toggle button is keyboard accessible[39m[32m 31[2mms[22m[39m
+ [32m✓[39m src/components/layout/__tests__/ManageFocusAreasModal.test.tsx [2m([22m[2m18 tests[22m[2m)[22m[33m 3578[2mms[22m[39m
+     [33m[2m✓[22m[39m renders modal title "Manage Focus Areas" [33m 431[2mms[22m[39m
+     [33m[2m✓[22m[39m creates new focus area when Add button is clicked [33m 324[2mms[22m[39m
+     [33m[2m✓[22m[39m trims whitespace from focus area name [33m 377[2mms[22m[39m
+     [33m[2m✓[22m[39m saves renamed focus area when save button is clicked in edit mode [33m 430[2mms[22m[39m
+ [32m✓[39m src/components/layout/__tests__/FocusAreaDropdown.test.tsx [2m([22m[2m12 tests[22m[2m)[22m[33m 1717[2mms[22m[39m
+ [32m✓[39m src/components/layout/__tests__/MainContent.test.tsx [2m([22m[2m8 tests[22m[2m)[22m[33m 923[2mms[22m[39m
+       [33m[2m✓[22m[39m renders with 64px left margin when sidebar is collapsed [33m 350[2mms[22m[39m
+ [32m✓[39m src/components/layout/__tests__/SidebarNav.test.tsx [2m([22m[2m8 tests[22m[2m)[22m[33m 595[2mms[22m[39m
+ [32m✓[39m src/components/layout/__tests__/TopBar.test.tsx [2m([22m[2m9 tests[22m[2m)[22m[33m 317[2mms[22m[39m
+ [32m✓[39m src/components/layout/__tests__/PageTitleContext.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[32m 97[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m6 passed[39m[22m[90m (7)[39m
+[2m      Tests [22m [1m[31m6 failed[39m[22m[2m | [22m[1m[32m66 passed[39m[22m[90m (72)[39m
+[2m   Start at [22m 12:49:44
+[2m   Duration [22m 27.71s[2m (transform 483ms, setup 1.39s, import 5.60s, tests 7.98s, environment 10.06s)[22m

@@ -3,12 +3,16 @@
 import { PageTitleProvider, usePageTitle } from './PageTitleContext'
 import { TopBar } from './TopBar'
 import { FocusAreaDropdown } from './FocusAreaDropdown'
+import { useSidebar } from '@/components/providers/SidebarProvider'
 
 function MainContentInner({ children }: { children: React.ReactNode }) {
   const { title, backHref, backLabel } = usePageTitle()
+  const { collapsed } = useSidebar()
 
   return (
-    <div className="ml-60 flex min-h-screen flex-col">
+    <div
+      className={`main-content-container flex min-h-screen flex-col ${collapsed ? 'ml-16' : 'ml-60'}`}
+    >
       <TopBar title={title} backHref={backHref} backLabel={backLabel}>
         <FocusAreaDropdown />
       </TopBar>

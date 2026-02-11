@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react'
 import { userEvent } from '@testing-library/user-event'
 import { Sidebar } from '../Sidebar'
 import { SidebarProvider } from '@/components/providers/SidebarProvider'
+import { TooltipProvider } from '@/components/ui/tooltip'
 
 // Mock localStorage
 const localStorageMock = (() => {
@@ -25,7 +26,9 @@ Object.defineProperty(window, 'localStorage', {
 function SidebarTestWrapper() {
   return (
     <SidebarProvider>
-      <Sidebar />
+      <TooltipProvider>
+        <Sidebar />
+      </TooltipProvider>
     </SidebarProvider>
   )
 }
