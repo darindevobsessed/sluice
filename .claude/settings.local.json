@@ -39,7 +39,10 @@
       "WebFetch(domain:www.noxinfluencer.com)",
       "WebFetch(domain:lilys.ai)",
       "Bash(timeout 120 bash:*)",
-      "Bash(node -e:*)"
+      "Bash(node -e:*)",
+      "Bash(psql:*)",
+      "mcp__plugin_craft_chrome-devtools__performance_start_trace",
+      "mcp__plugin_craft_chrome-devtools__wait_for"
     ]
   }
 }

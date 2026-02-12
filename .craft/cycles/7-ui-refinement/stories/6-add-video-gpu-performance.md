@@ -5,10 +5,10 @@ status: active
 cycle: ui-refinement
 story_number: 6
 created: 2026-02-11
-updated: 2026-02-11
+updated: 2026-02-12
 priority: high
 chunks_total: 2
-chunks_complete: 0
+chunks_complete: 1
 ---
 
 # Story: Fix GPU performance issues during insight extraction
