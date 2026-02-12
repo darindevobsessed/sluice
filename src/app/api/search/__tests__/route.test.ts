@@ -85,7 +85,7 @@ describe('GET /api/search', () => {
     const [video] = await db
       .insert(schema.videos)
       .values({
-        youtubeId: 'test-vid',
+        youtubeId: 'sr-test-vid',
         title: 'TypeScript Tutorial',
         channel: 'Dev Channel',
         transcript: 'Test transcript',
@@ -133,7 +133,7 @@ describe('GET /api/search', () => {
     const [video] = await db
       .insert(schema.videos)
       .values({
-        youtubeId: 'test-vid',
+        youtubeId: 'sr-test-vid',
         title: 'Test Video',
         channel: 'Test Channel',
         transcript: 'Test transcript',
@@ -169,7 +169,7 @@ describe('GET /api/search', () => {
       const [video] = await db
         .insert(schema.videos)
         .values({
-          youtubeId: `vid-${i}`,
+          youtubeId: `sr-vid-${i}`,
           title: `TypeScript Video ${i}`,
           channel: 'Test Channel',
           transcript: 'Test transcript',
@@ -201,7 +201,7 @@ describe('GET /api/search', () => {
     const [video] = await db
       .insert(schema.videos)
       .values({
-        youtubeId: 'test-vid',
+        youtubeId: 'sr-test-vid',
         title: 'Test Video',
         channel: 'Test Channel',
         transcript: 'Test transcript',
@@ -235,7 +235,7 @@ describe('GET /api/search', () => {
     const [video] = await db
       .insert(schema.videos)
       .values({
-        youtubeId: 'test-vid',
+        youtubeId: 'sr-test-vid',
         title: 'Test Video',
         channel: 'Test Channel',
         transcript: 'Test transcript',
@@ -267,7 +267,7 @@ describe('GET /api/search', () => {
     const [video] = await db
       .insert(schema.videos)
       .values({
-        youtubeId: 'test-vid',
+        youtubeId: 'sr-test-vid',
         title: 'Test Video',
         channel: 'Test Channel',
         transcript: 'Test transcript',
@@ -308,7 +308,7 @@ describe('GET /api/search', () => {
     const [video] = await db
       .insert(schema.videos)
       .values({
-        youtubeId: 'abc123',
+        youtubeId: 'sr-abc123',
         title: 'TypeScript Tutorial',
         channel: 'Dev Channel',
         thumbnail: 'https://example.com/thumb.jpg',
@@ -335,7 +335,7 @@ describe('GET /api/search', () => {
 
     const videoResult = data.videos[0];
     expect(videoResult).toHaveProperty('videoId', video!.id);
-    expect(videoResult).toHaveProperty('youtubeId', 'abc123');
+    expect(videoResult).toHaveProperty('youtubeId', 'sr-abc123');
     expect(videoResult).toHaveProperty('title', 'TypeScript Tutorial');
     expect(videoResult).toHaveProperty('channel', 'Dev Channel');
     expect(videoResult).toHaveProperty('thumbnail', 'https://example.com/thumb.jpg');
@@ -353,7 +353,7 @@ describe('GET /api/search', () => {
     const [video] = await db
       .insert(schema.videos)
       .values({
-        youtubeId: 'test-vid',
+        youtubeId: 'sr-test-vid',
         title: 'TypeScript Guide',
         channel: 'Dev Channel',
         transcript: 'Test transcript',
@@ -402,7 +402,7 @@ describe('GET /api/search', () => {
     const [video] = await db
       .insert(schema.videos)
       .values({
-        youtubeId: 'test-vid',
+        youtubeId: 'sr-test-vid',
         title: 'Test Video',
         channel: 'Test Channel',
         transcript: 'Test transcript',
@@ -471,7 +471,7 @@ describe('GET /api/search', () => {
     const [video] = await db
       .insert(schema.videos)
       .values({
-        youtubeId: 'test-vid',
+        youtubeId: 'sr-test-vid',
         title: 'Test Video',
         channel: 'Test Channel',
         transcript: 'Test transcript',

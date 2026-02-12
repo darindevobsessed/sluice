@@ -21,7 +21,7 @@ describe('getPersonaContext', () => {
     const db = getTestDb()
 
     const [video1] = await db.insert(schema.videos).values({
-      youtubeId: 'vid1',
+      youtubeId: 'pc-vid1',
       title: 'TypeScript Basics',
       channel: 'Test Channel',
       transcript: 'Test transcript',
@@ -29,7 +29,7 @@ describe('getPersonaContext', () => {
     }).returning()
 
     const [video2] = await db.insert(schema.videos).values({
-      youtubeId: 'vid2',
+      youtubeId: 'pc-vid2',
       title: 'Python Basics',
       channel: 'Other Channel',
       transcript: 'Test transcript',
@@ -66,7 +66,7 @@ describe('getPersonaContext', () => {
     const db = getTestDb()
 
     const [video] = await db.insert(schema.videos).values({
-      youtubeId: 'vid',
+      youtubeId: 'pc-vid',
       title: 'Test Video',
       channel: 'Test Channel',
       transcript: 'Test transcript',
@@ -93,7 +93,7 @@ describe('getPersonaContext', () => {
     const db = getTestDb()
 
     const [video] = await db.insert(schema.videos).values({
-      youtubeId: 'vid',
+      youtubeId: 'pc-vid',
       title: 'Test Video',
       channel: 'Test Channel',
       transcript: 'Test transcript',
@@ -124,7 +124,7 @@ describe('getPersonaContext', () => {
     const db = getTestDb()
 
     const [video] = await db.insert(schema.videos).values({
-      youtubeId: 'vid',
+      youtubeId: 'pc-vid',
       title: 'Test Video',
       channel: 'Different Channel',
       transcript: 'Test transcript',
@@ -149,7 +149,7 @@ describe('getPersonaContext', () => {
     const db = getTestDb()
 
     const [video] = await db.insert(schema.videos).values({
-      youtubeId: 'vid',
+      youtubeId: 'pc-vid',
       title: 'Test Video',
       channel: "O'Reilly Media",
       transcript: 'Test transcript',

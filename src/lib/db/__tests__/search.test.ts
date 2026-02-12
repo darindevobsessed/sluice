@@ -26,7 +26,7 @@ describe('searchVideos (Postgres)', () => {
     // Insert test videos with explicit timestamps
     await db.insert(schema.videos).values([
       {
-        youtubeId: 'vid1',
+        youtubeId: 'ds-vid1',
         title: 'First Video',
         channel: 'Channel A',
         transcript: 'Content about TypeScript',
@@ -35,7 +35,7 @@ describe('searchVideos (Postgres)', () => {
         updatedAt: earlier,
       },
       {
-        youtubeId: 'vid2',
+        youtubeId: 'ds-vid2',
         title: 'Second Video',
         channel: 'Channel B',
         transcript: 'Content about React',
@@ -56,14 +56,14 @@ describe('searchVideos (Postgres)', () => {
 
     await db.insert(schema.videos).values([
       {
-        youtubeId: 'vid1',
+        youtubeId: 'ds-vid1',
         title: 'TypeScript Deep Dive',
         channel: 'Dev Channel',
         transcript: 'Video content here',
         duration: 600,
       },
       {
-        youtubeId: 'vid2',
+        youtubeId: 'ds-vid2',
         title: 'React Hooks Guide',
         channel: 'Dev Channel',
         transcript: 'Video content here',
@@ -81,14 +81,14 @@ describe('searchVideos (Postgres)', () => {
 
     await db.insert(schema.videos).values([
       {
-        youtubeId: 'vid1',
+        youtubeId: 'ds-vid1',
         title: 'Video One',
         channel: 'Channel A',
         transcript: 'This video discusses async/await patterns',
         duration: 600,
       },
       {
-        youtubeId: 'vid2',
+        youtubeId: 'ds-vid2',
         title: 'Video Two',
         channel: 'Channel B',
         transcript: 'This video covers state management',
@@ -106,14 +106,14 @@ describe('searchVideos (Postgres)', () => {
 
     await db.insert(schema.videos).values([
       {
-        youtubeId: 'vid1',
+        youtubeId: 'ds-vid1',
         title: 'Video One',
         channel: 'Fireship',
         transcript: 'Content here',
         duration: 600,
       },
       {
-        youtubeId: 'vid2',
+        youtubeId: 'ds-vid2',
         title: 'Video Two',
         channel: 'Theo - t3.gg',
         transcript: 'Content here',
@@ -131,7 +131,7 @@ describe('searchVideos (Postgres)', () => {
 
     await db.insert(schema.videos).values([
       {
-        youtubeId: 'vid1',
+        youtubeId: 'ds-vid1',
         title: 'JavaScript Performance',
         channel: 'Dev Channel',
         transcript: 'Optimizing JavaScript code',
@@ -177,21 +177,21 @@ describe('getVideoStats (Postgres)', () => {
 
     await db.insert(schema.videos).values([
       {
-        youtubeId: 'vid1',
+        youtubeId: 'ds-vid1',
         title: 'Video 1',
         channel: 'Channel A',
         transcript: 'Content',
         duration: 600,
       },
       {
-        youtubeId: 'vid2',
+        youtubeId: 'ds-vid2',
         title: 'Video 2',
         channel: 'Channel A',
         transcript: 'Content',
         duration: 900,
       },
       {
-        youtubeId: 'vid3',
+        youtubeId: 'ds-vid3',
         title: 'Video 3',
         channel: 'Channel B',
         transcript: 'Content',
@@ -208,14 +208,14 @@ describe('getVideoStats (Postgres)', () => {
 
     await db.insert(schema.videos).values([
       {
-        youtubeId: 'vid1',
+        youtubeId: 'ds-vid1',
         title: 'Video 1',
         channel: 'Channel A',
         transcript: 'Content',
         duration: 3600, // 1 hour
       },
       {
-        youtubeId: 'vid2',
+        youtubeId: 'ds-vid2',
         title: 'Video 2',
         channel: 'Channel A',
         transcript: 'Content',
@@ -232,21 +232,21 @@ describe('getVideoStats (Postgres)', () => {
 
     await db.insert(schema.videos).values([
       {
-        youtubeId: 'vid1',
+        youtubeId: 'ds-vid1',
         title: 'Video 1',
         channel: 'Channel A',
         transcript: 'Content',
         duration: 600,
       },
       {
-        youtubeId: 'vid2',
+        youtubeId: 'ds-vid2',
         title: 'Video 2',
         channel: 'Channel A', // Same channel
         transcript: 'Content',
         duration: 900,
       },
       {
-        youtubeId: 'vid3',
+        youtubeId: 'ds-vid3',
         title: 'Video 3',
         channel: 'Channel B', // Different channel
         transcript: 'Content',
@@ -279,7 +279,7 @@ describe('getDistinctChannels (Postgres)', () => {
 
     await db.insert(schema.videos).values([
       {
-        youtubeId: 'vid1',
+        youtubeId: 'ds-vid1',
         title: 'Video 1',
         channel: 'Solo Creator',
         transcript: 'Content',
@@ -298,21 +298,21 @@ describe('getDistinctChannels (Postgres)', () => {
 
     await db.insert(schema.videos).values([
       {
-        youtubeId: 'vid1',
+        youtubeId: 'ds-vid1',
         title: 'Video 1',
         channel: 'Channel A',
         transcript: 'Content',
         duration: 600,
       },
       {
-        youtubeId: 'vid2',
+        youtubeId: 'ds-vid2',
         title: 'Video 2',
         channel: 'Channel A',
         transcript: 'Content',
         duration: 900,
       },
       {
-        youtubeId: 'vid3',
+        youtubeId: 'ds-vid3',
         title: 'Video 3',
         channel: 'Channel B',
         transcript: 'Content',
@@ -331,42 +331,42 @@ describe('getDistinctChannels (Postgres)', () => {
 
     await db.insert(schema.videos).values([
       {
-        youtubeId: 'vid1',
+        youtubeId: 'ds-vid1',
         title: 'Video 1',
         channel: 'Small Channel',
         transcript: 'Content',
         duration: 600,
       },
       {
-        youtubeId: 'vid2',
+        youtubeId: 'ds-vid2',
         title: 'Video 2',
         channel: 'Big Channel',
         transcript: 'Content',
         duration: 900,
       },
       {
-        youtubeId: 'vid3',
+        youtubeId: 'ds-vid3',
         title: 'Video 3',
         channel: 'Big Channel',
         transcript: 'Content',
         duration: 1200,
       },
       {
-        youtubeId: 'vid4',
+        youtubeId: 'ds-vid4',
         title: 'Video 4',
         channel: 'Big Channel',
         transcript: 'Content',
         duration: 1500,
       },
       {
-        youtubeId: 'vid5',
+        youtubeId: 'ds-vid5',
         title: 'Video 5',
         channel: 'Medium Channel',
         transcript: 'Content',
         duration: 1800,
       },
       {
-        youtubeId: 'vid6',
+        youtubeId: 'ds-vid6',
         title: 'Video 6',
         channel: 'Medium Channel',
         transcript: 'Content',
@@ -387,14 +387,14 @@ describe('getDistinctChannels (Postgres)', () => {
 
     await db.insert(schema.videos).values([
       {
-        youtubeId: 'vid1',
+        youtubeId: 'ds-vid1',
         title: 'Video 1',
         channel: 'Channel A',
         transcript: 'Content',
         duration: 600,
       },
       {
-        youtubeId: 'vid2',
+        youtubeId: 'ds-vid2',
         title: 'Video 2',
         channel: 'Channel B',
         transcript: 'Content',

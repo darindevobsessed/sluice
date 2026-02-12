@@ -18,7 +18,7 @@ describe('relationships table schema (Postgres)', () => {
     const [video] = await db
       .insert(schema.videos)
       .values({
-        youtubeId: 'vid1',
+        youtubeId: 'rl-vid1',
         title: 'Test Video',
         channel: 'Test Channel',
         transcript: 'Test transcript',
@@ -72,7 +72,7 @@ describe('relationships table schema (Postgres)', () => {
     const [video] = await db
       .insert(schema.videos)
       .values({
-        youtubeId: 'vid1',
+        youtubeId: 'rl-vid1',
         title: 'Test Video',
         channel: 'Test Channel',
         transcript: 'Test transcript',
@@ -124,7 +124,7 @@ describe('relationships table schema (Postgres)', () => {
     const [video] = await db
       .insert(schema.videos)
       .values({
-        youtubeId: 'vid1',
+        youtubeId: 'rl-vid1',
         title: 'Test Video',
         channel: 'Test Channel',
         transcript: 'Test transcript',
@@ -186,7 +186,7 @@ describe('relationships table schema (Postgres)', () => {
     const [video] = await db
       .insert(schema.videos)
       .values({
-        youtubeId: 'vid1',
+        youtubeId: 'rl-vid1',
         title: 'Test Video',
         channel: 'Test Channel',
         transcript: 'Test transcript',
@@ -256,7 +256,7 @@ describe('relationships table schema (Postgres)', () => {
     const [video] = await db
       .insert(schema.videos)
       .values({
-        youtubeId: 'vid1',
+        youtubeId: 'rl-vid1',
         title: 'Test Video',
         channel: 'Test Channel',
         transcript: 'Test transcript',
@@ -324,7 +324,7 @@ describe('relationships table schema (Postgres)', () => {
     const [video] = await db
       .insert(schema.videos)
       .values({
-        youtubeId: 'vid1',
+        youtubeId: 'rl-vid1',
         title: 'Test Video',
         channel: 'Test Channel',
         transcript: 'Test transcript',
@@ -393,7 +393,7 @@ describe('edge cases', () => {
     const [video] = await db
       .insert(schema.videos)
       .values({
-        youtubeId: 'vid1',
+        youtubeId: 'rl-vid1',
         title: 'Test Video',
         channel: 'Test Channel',
         transcript: 'Test transcript',
@@ -458,7 +458,7 @@ describe('edge cases', () => {
     const [video] = await db
       .insert(schema.videos)
       .values({
-        youtubeId: 'vid1',
+        youtubeId: 'rl-vid1',
         title: 'Test Video',
         channel: 'Test Channel',
         transcript: 'Test transcript',
@@ -507,7 +507,7 @@ describe('edge cases', () => {
     const [video] = await db
       .insert(schema.videos)
       .values({
-        youtubeId: 'vid1',
+        youtubeId: 'rl-vid1',
         title: 'Test Video',
         channel: 'Test Channel',
         transcript: 'Test transcript',

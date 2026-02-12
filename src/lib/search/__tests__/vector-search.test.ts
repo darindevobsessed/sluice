@@ -31,7 +31,7 @@ describe('vectorSearch (Postgres)', () => {
 
       // Insert video and chunk without embedding
       const [video] = await db.insert(schema.videos).values({
-        youtubeId: 'test-vid',
+        youtubeId: 'vs-test-vid',
         title: 'Test Video',
         channel: 'Test Channel',
         transcript: 'Test transcript',
@@ -57,7 +57,7 @@ describe('vectorSearch (Postgres)', () => {
 
       // Insert video
       const [video] = await db.insert(schema.videos).values({
-        youtubeId: 'test-vid',
+        youtubeId: 'vs-test-vid',
         title: 'Test Video',
         channel: 'Test Channel',
         thumbnail: 'https://example.com/thumb.jpg',
@@ -114,7 +114,7 @@ describe('vectorSearch (Postgres)', () => {
       const db = getTestDb();
 
       const [video] = await db.insert(schema.videos).values({
-        youtubeId: 'test-vid',
+        youtubeId: 'vs-test-vid',
         title: 'Test Video',
         channel: 'Test Channel',
         transcript: 'Test transcript',
@@ -153,7 +153,7 @@ describe('vectorSearch (Postgres)', () => {
       const db = getTestDb();
 
       const [video] = await db.insert(schema.videos).values({
-        youtubeId: 'test-vid',
+        youtubeId: 'vs-test-vid',
         title: 'Test Video',
         channel: 'Test Channel',
         transcript: 'Test transcript',
@@ -182,7 +182,7 @@ describe('vectorSearch (Postgres)', () => {
       const db = getTestDb();
 
       const [video] = await db.insert(schema.videos).values({
-        youtubeId: 'test-vid',
+        youtubeId: 'vs-test-vid',
         title: 'Test Video',
         channel: 'Test Channel',
         transcript: 'Test transcript',
@@ -210,7 +210,7 @@ describe('vectorSearch (Postgres)', () => {
       const db = getTestDb();
 
       const [video] = await db.insert(schema.videos).values({
-        youtubeId: 'test-vid',
+        youtubeId: 'vs-test-vid',
         title: 'Test Video',
         channel: 'Test Channel',
         transcript: 'Test transcript',
@@ -278,7 +278,7 @@ describe('vectorSearch (Postgres)', () => {
       const db = getTestDb();
 
       const [video] = await db.insert(schema.videos).values({
-        youtubeId: 'test-vid',
+        youtubeId: 'vs-test-vid',
         title: 'Test Video',
         channel: 'Test Channel',
         transcript: 'Test transcript',
@@ -307,7 +307,7 @@ describe('vectorSearch (Postgres)', () => {
 
       // Insert two different videos
       const [video1] = await db.insert(schema.videos).values({
-        youtubeId: 'vid1',
+        youtubeId: 'vs-vid1',
         title: 'Video One',
         channel: 'Channel A',
         thumbnail: 'https://example.com/thumb1.jpg',
@@ -316,7 +316,7 @@ describe('vectorSearch (Postgres)', () => {
       }).returning();
 
       const [video2] = await db.insert(schema.videos).values({
-        youtubeId: 'vid2',
+        youtubeId: 'vs-vid2',
         title: 'Video Two',
         channel: 'Channel B',
         thumbnail: 'https://example.com/thumb2.jpg',
@@ -351,14 +351,14 @@ describe('vectorSearch (Postgres)', () => {
       const result1 = results.find(r => r.videoId === video1!.id);
       expect(result1?.videoTitle).toBe('Video One');
       expect(result1?.channel).toBe('Channel A');
-      expect(result1?.youtubeId).toBe('vid1');
+      expect(result1?.youtubeId).toBe('vs-vid1');
       expect(result1?.thumbnail).toBe('https://example.com/thumb1.jpg');
 
       // Check second result has correct video metadata
       const result2 = results.find(r => r.videoId === video2!.id);
       expect(result2?.videoTitle).toBe('Video Two');
       expect(result2?.channel).toBe('Channel B');
-      expect(result2?.youtubeId).toBe('vid2');
+      expect(result2?.youtubeId).toBe('vs-vid2');
       expect(result2?.thumbnail).toBe('https://example.com/thumb2.jpg');
     });
   });
@@ -377,7 +377,7 @@ describe('searchByQuery (E2E)', () => {
     const db = getTestDb();
 
     const [video] = await db.insert(schema.videos).values({
-      youtubeId: 'test-vid',
+      youtubeId: 'vs-test-vid',
       title: 'TypeScript Tutorial',
       channel: 'Dev Channel',
       transcript: 'Learn TypeScript',
@@ -409,7 +409,7 @@ describe('searchByQuery (E2E)', () => {
     const db = getTestDb();
 
     const [video] = await db.insert(schema.videos).values({
-      youtubeId: 'test-vid',
+      youtubeId: 'vs-test-vid',
       title: 'Test Video',
       channel: 'Test Channel',
       transcript: 'Test transcript',

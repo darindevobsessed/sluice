@@ -112,7 +112,7 @@ describe('POST /api/videos/[id]/embed (Postgres)', () => {
     const [video] = await db
       .insert(schema.videos)
       .values({
-        youtubeId: 'vid-no-transcript',
+        youtubeId: 'em-vid-no-transcript',
         title: 'Test Video',
         channel: 'Test Channel',
         transcript: null,
@@ -143,7 +143,7 @@ describe('POST /api/videos/[id]/embed (Postgres)', () => {
     const [video] = await db
       .insert(schema.videos)
       .values({
-        youtubeId: 'vid-already-embedded',
+        youtubeId: 'em-vid-already-embedded',
         title: 'Test Video',
         channel: 'Test Channel',
         transcript: '0:00\nTest content\n0:05\nMore content',
@@ -201,7 +201,7 @@ describe('POST /api/videos/[id]/embed (Postgres)', () => {
     const [video] = await db
       .insert(schema.videos)
       .values({
-        youtubeId: 'vid-new-embedding',
+        youtubeId: 'em-vid-new-embedding',
         title: 'Test Video',
         channel: 'Test Channel',
         transcript: '0:00\nTest content\n0:05\nMore content',
@@ -242,7 +242,7 @@ describe('POST /api/videos/[id]/embed (Postgres)', () => {
     const [video] = await db
       .insert(schema.videos)
       .values({
-        youtubeId: 'vid-response-structure',
+        youtubeId: 'em-vid-response-structure',
         title: 'Test Video',
         channel: 'Test Channel',
         transcript: '0:00\nTest content',
@@ -273,7 +273,7 @@ describe('POST /api/videos/[id]/embed (Postgres)', () => {
     const [video] = await db
       .insert(schema.videos)
       .values({
-        youtubeId: 'vid-with-relationships',
+        youtubeId: 'em-vid-with-relationships',
         title: 'Test Video',
         channel: 'Test Channel',
         transcript: '0:00\nTest content',

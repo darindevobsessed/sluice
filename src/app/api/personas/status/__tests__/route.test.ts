@@ -60,13 +60,13 @@ describe('GET /api/personas/status', () => {
   it('returns channels with transcript counts and no personas', async () => {
     // Create videos for multiple channels
     await testDb.insert(schema.videos).values([
-      { youtubeId: 'vid1', title: 'Video 1', channel: 'Nate B Jones', transcript: 'transcript 1' },
-      { youtubeId: 'vid2', title: 'Video 2', channel: 'Nate B Jones', transcript: 'transcript 2' },
-      { youtubeId: 'vid3', title: 'Video 3', channel: 'Nate B Jones', transcript: 'transcript 3' },
-      { youtubeId: 'vid4', title: 'Video 4', channel: 'Nate B Jones', transcript: 'transcript 4' },
-      { youtubeId: 'vid5', title: 'Video 5', channel: 'Nate B Jones', transcript: 'transcript 5' },
-      { youtubeId: 'vid6', title: 'Video 6', channel: 'Nate B Jones', transcript: 'transcript 6' },
-      { youtubeId: 'vid7', title: 'Video 7', channel: 'Anthropic', transcript: 'transcript 7' },
+      { youtubeId: 'ps-vid1', title: 'Video 1', channel: 'Nate B Jones', transcript: 'transcript 1' },
+      { youtubeId: 'ps-vid2', title: 'Video 2', channel: 'Nate B Jones', transcript: 'transcript 2' },
+      { youtubeId: 'ps-vid3', title: 'Video 3', channel: 'Nate B Jones', transcript: 'transcript 3' },
+      { youtubeId: 'ps-vid4', title: 'Video 4', channel: 'Nate B Jones', transcript: 'transcript 4' },
+      { youtubeId: 'ps-vid5', title: 'Video 5', channel: 'Nate B Jones', transcript: 'transcript 5' },
+      { youtubeId: 'ps-vid6', title: 'Video 6', channel: 'Nate B Jones', transcript: 'transcript 6' },
+      { youtubeId: 'ps-vid7', title: 'Video 7', channel: 'Anthropic', transcript: 'transcript 7' },
     ])
 
     const response = await GET()
@@ -94,10 +94,10 @@ describe('GET /api/personas/status', () => {
   it('returns channels with personas included', async () => {
     // Create videos
     await testDb.insert(schema.videos).values([
-      { youtubeId: 'vid1', title: 'Video 1', channel: 'Nate B Jones', transcript: 'transcript 1' },
-      { youtubeId: 'vid2', title: 'Video 2', channel: 'Nate B Jones', transcript: 'transcript 2' },
-      { youtubeId: 'vid3', title: 'Video 3', channel: 'Nate B Jones', transcript: 'transcript 3' },
-      { youtubeId: 'vid4', title: 'Video 4', channel: 'Anthropic', transcript: 'transcript 4' },
+      { youtubeId: 'ps-vid1', title: 'Video 1', channel: 'Nate B Jones', transcript: 'transcript 1' },
+      { youtubeId: 'ps-vid2', title: 'Video 2', channel: 'Nate B Jones', transcript: 'transcript 2' },
+      { youtubeId: 'ps-vid3', title: 'Video 3', channel: 'Nate B Jones', transcript: 'transcript 3' },
+      { youtubeId: 'ps-vid4', title: 'Video 4', channel: 'Anthropic', transcript: 'transcript 4' },
     ])
 
     // Create persona for Nate B Jones
@@ -139,16 +139,16 @@ describe('GET /api/personas/status', () => {
   it('sorts active personas first, then by transcript count descending', async () => {
     // Create videos for three channels
     await testDb.insert(schema.videos).values([
-      { youtubeId: 'vid1', title: 'Video 1', channel: 'Channel A', transcript: 'transcript 1' },
-      { youtubeId: 'vid2', title: 'Video 2', channel: 'Channel A', transcript: 'transcript 2' },
-      { youtubeId: 'vid3', title: 'Video 3', channel: 'Channel B', transcript: 'transcript 3' },
-      { youtubeId: 'vid4', title: 'Video 4', channel: 'Channel B', transcript: 'transcript 4' },
-      { youtubeId: 'vid5', title: 'Video 5', channel: 'Channel B', transcript: 'transcript 5' },
-      { youtubeId: 'vid6', title: 'Video 6', channel: 'Channel B', transcript: 'transcript 6' },
-      { youtubeId: 'vid7', title: 'Video 7', channel: 'Channel B', transcript: 'transcript 7' },
-      { youtubeId: 'vid8', title: 'Video 8', channel: 'Channel C', transcript: 'transcript 8' },
-      { youtubeId: 'vid9', title: 'Video 9', channel: 'Channel C', transcript: 'transcript 9' },
-      { youtubeId: 'vid10', title: 'Video 10', channel: 'Channel C', transcript: 'transcript 10' },
+      { youtubeId: 'ps-vid1', title: 'Video 1', channel: 'Channel A', transcript: 'transcript 1' },
+      { youtubeId: 'ps-vid2', title: 'Video 2', channel: 'Channel A', transcript: 'transcript 2' },
+      { youtubeId: 'ps-vid3', title: 'Video 3', channel: 'Channel B', transcript: 'transcript 3' },
+      { youtubeId: 'ps-vid4', title: 'Video 4', channel: 'Channel B', transcript: 'transcript 4' },
+      { youtubeId: 'ps-vid5', title: 'Video 5', channel: 'Channel B', transcript: 'transcript 5' },
+      { youtubeId: 'ps-vid6', title: 'Video 6', channel: 'Channel B', transcript: 'transcript 6' },
+      { youtubeId: 'ps-vid7', title: 'Video 7', channel: 'Channel B', transcript: 'transcript 7' },
+      { youtubeId: 'ps-vid8', title: 'Video 8', channel: 'Channel C', transcript: 'transcript 8' },
+      { youtubeId: 'ps-vid9', title: 'Video 9', channel: 'Channel C', transcript: 'transcript 9' },
+      { youtubeId: 'ps-vid10', title: 'Video 10', channel: 'Channel C', transcript: 'transcript 10' },
     ])
 
     // Create persona for Channel A (2 transcripts, has persona)
@@ -179,9 +179,9 @@ describe('GET /api/personas/status', () => {
   it('excludes channels with null channel name', async () => {
     // Create videos with and without channel names
     await testDb.insert(schema.videos).values([
-      { youtubeId: 'vid1', title: 'Video 1', channel: 'Valid Channel', transcript: 'transcript 1' },
-      { youtubeId: 'vid2', title: 'Video 2', channel: null, transcript: 'transcript 2', sourceType: 'transcript' },
-      { youtubeId: 'vid3', title: 'Video 3', channel: null, transcript: 'transcript 3', sourceType: 'transcript' },
+      { youtubeId: 'ps-vid1', title: 'Video 1', channel: 'Valid Channel', transcript: 'transcript 1' },
+      { youtubeId: 'ps-vid2', title: 'Video 2', channel: null, transcript: 'transcript 2', sourceType: 'transcript' },
+      { youtubeId: 'ps-vid3', title: 'Video 3', channel: null, transcript: 'transcript 3', sourceType: 'transcript' },
     ])
 
     const response = await GET()
@@ -195,20 +195,20 @@ describe('GET /api/personas/status', () => {
   it('handles channels below and above threshold', async () => {
     // Create channels with various transcript counts relative to threshold (5)
     await testDb.insert(schema.videos).values([
-      { youtubeId: 'vid1', title: 'Video 1', channel: 'Below Threshold', transcript: 'transcript 1' },
-      { youtubeId: 'vid2', title: 'Video 2', channel: 'Below Threshold', transcript: 'transcript 2' },
-      { youtubeId: 'vid3', title: 'Video 3', channel: 'Below Threshold', transcript: 'transcript 3' },
-      { youtubeId: 'vid4', title: 'Video 4', channel: 'At Threshold', transcript: 'transcript 4' },
-      { youtubeId: 'vid5', title: 'Video 5', channel: 'At Threshold', transcript: 'transcript 5' },
-      { youtubeId: 'vid6', title: 'Video 6', channel: 'At Threshold', transcript: 'transcript 6' },
-      { youtubeId: 'vid7', title: 'Video 7', channel: 'At Threshold', transcript: 'transcript 7' },
-      { youtubeId: 'vid8', title: 'Video 8', channel: 'At Threshold', transcript: 'transcript 8' },
-      { youtubeId: 'vid9', title: 'Video 9', channel: 'Above Threshold', transcript: 'transcript 9' },
-      { youtubeId: 'vid10', title: 'Video 10', channel: 'Above Threshold', transcript: 'transcript 10' },
-      { youtubeId: 'vid11', title: 'Video 11', channel: 'Above Threshold', transcript: 'transcript 11' },
-      { youtubeId: 'vid12', title: 'Video 12', channel: 'Above Threshold', transcript: 'transcript 12' },
-      { youtubeId: 'vid13', title: 'Video 13', channel: 'Above Threshold', transcript: 'transcript 13' },
-      { youtubeId: 'vid14', title: 'Video 14', channel: 'Above Threshold', transcript: 'transcript 14' },
+      { youtubeId: 'ps-vid1', title: 'Video 1', channel: 'Below Threshold', transcript: 'transcript 1' },
+      { youtubeId: 'ps-vid2', title: 'Video 2', channel: 'Below Threshold', transcript: 'transcript 2' },
+      { youtubeId: 'ps-vid3', title: 'Video 3', channel: 'Below Threshold', transcript: 'transcript 3' },
+      { youtubeId: 'ps-vid4', title: 'Video 4', channel: 'At Threshold', transcript: 'transcript 4' },
+      { youtubeId: 'ps-vid5', title: 'Video 5', channel: 'At Threshold', transcript: 'transcript 5' },
+      { youtubeId: 'ps-vid6', title: 'Video 6', channel: 'At Threshold', transcript: 'transcript 6' },
+      { youtubeId: 'ps-vid7', title: 'Video 7', channel: 'At Threshold', transcript: 'transcript 7' },
+      { youtubeId: 'ps-vid8', title: 'Video 8', channel: 'At Threshold', transcript: 'transcript 8' },
+      { youtubeId: 'ps-vid9', title: 'Video 9', channel: 'Above Threshold', transcript: 'transcript 9' },
+      { youtubeId: 'ps-vid10', title: 'Video 10', channel: 'Above Threshold', transcript: 'transcript 10' },
+      { youtubeId: 'ps-vid11', title: 'Video 11', channel: 'Above Threshold', transcript: 'transcript 11' },
+      { youtubeId: 'ps-vid12', title: 'Video 12', channel: 'Above Threshold', transcript: 'transcript 12' },
+      { youtubeId: 'ps-vid13', title: 'Video 13', channel: 'Above Threshold', transcript: 'transcript 13' },
+      { youtubeId: 'ps-vid14', title: 'Video 14', channel: 'Above Threshold', transcript: 'transcript 14' },
     ])
 
     const response = await GET()

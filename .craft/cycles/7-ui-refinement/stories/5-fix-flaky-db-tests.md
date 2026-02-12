@@ -1,14 +1,14 @@
 ---
 name: fix-flaky-db-tests
 title: Fix flaky DB test isolation
-status: active
+status: complete
 cycle: ui-refinement
 story_number: 5
 created: 2026-02-11
 updated: 2026-02-11
 priority: urgent
 chunks_total: 1
-chunks_complete: 0
+chunks_complete: 1
 ---
 
 # Story: Fix flaky DB test isolation

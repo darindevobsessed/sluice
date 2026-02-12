@@ -2588,3 +2588,67 @@ npm error
 npm error To see a list of scripts, run:
 npm error   npm run
 npm error A complete log of this run can be found in: /Users/darindrobinski/.npm/_logs/2026-02-11T22_13_43_953Z-debug-0.log
+---
+timestamp: "2026-02-11 17:09:33"
+story: "5-fix-flaky-db-tests"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+> gold-miner@0.1.0 test
+> vitest run src/app/api/search/__tests__/route.test.ts -t video results include all required fields
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/app/api/search/__tests__/route.test.ts [2m([22m[2m25 tests[22m[2m | [22m[31m1 failed[39m[2m | [22m[33m24 skipped[39m[2m)[22m[33m 313[2mms[22m[39m
+     [2m[90m↓[39m[22m returns empty results for empty query
+     [2m[90m↓[39m[22m returns empty results for missing query parameter
+     [2m[90m↓[39m[22m returns both chunk and video results
+     [2m[90m↓[39m[22m respects limit parameter for chunks
+     [2m[90m↓[39m[22m respects limit parameter for videos
+     [2m[90m↓[39m[22m uses default limit of 10
+     [2m[90m↓[39m[22m respects mode parameter: keyword
+     [2m[90m↓[39m[22m respects mode parameter: vector
+     [2m[90m↓[39m[22m uses hybrid mode by default
+[31m     [31m×[31m video results include all required fields[39m[33m 305[2mms[22m[39m
+     [2m[90m↓[39m[22m aggregates multiple chunks from same video
+     [2m[90m↓[39m[22m handles database with no embeddings
+     [2m[90m↓[39m[22m includes cache headers
+     [2m[90m↓[39m[22m handles invalid mode parameter gracefully
+     [2m[90m↓[39m[22m handles invalid limit parameter
+     [2m[90m↓[39m[22m handles very large limit parameter
+     [2m[90m↓[39m[22m handles query with special characters
+     [2m[90m↓[39m[22m returns timing measurement
+       [2m[90m↓[39m[22m does not apply decay by default
+       [2m[90m↓[39m[22m applies temporal decay when temporalDecay=true
+       [2m[90m↓[39m[22m respects custom halfLifeDays parameter
+       [2m[90m↓[39m[22m handles temporalDecay=false explicitly
+       [2m[90m↓[39m[22m ignores halfLifeDays when temporalDecay is false
+       [2m[90m↓[39m[22m handles invalid temporalDecay parameter
+       [2m[90m↓[39m[22m handles invalid halfLifeDays parameter
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/app/api/search/__tests__/route.test.ts[2m > [22mGET /api/search[2m > [22mvideo results include all required fields
+[31m[1mAssertionError[22m: expected { videoId: 21606, …(8) } to have property "youtubeId" with value 'abc123'[39m
+
+Expected: [32m"abc123"[39m
+Received: [31m"[7msr-[27mabc123"[39m
+
+[36m [2m❯[22m src/app/api/search/__tests__/route.test.ts:[2m338:25[22m[39m
+    [90m336| [39m    [35mconst[39m videoResult [33m=[39m data[33m.[39mvideos[[34m0[39m][33m;[39m
+    [90m337| [39m    [34mexpect[39m(videoResult)[33m.[39m[34mtoHaveProperty[39m([32m'videoId'[39m[33m,[39m video[33m![39m[33m.[39mid)[33m;[39m
+    [90m338| [39m    [34mexpect[39m(videoResult)[33m.[39m[34mtoHaveProperty[39m([32m'youtubeId'[39m[33m,[39m [32m'abc123'[39m)[33m;[39m
+    [90m   | [39m                        [31m^[39m
+    [90m339| [39m    [34mexpect[39m(videoResult)[33m.[39m[34mtoHaveProperty[39m([32m'title'[39m[33m,[39m [32m'TypeScript Tutorial'[39m)[33m;[39m
+    [90m340| [39m    [34mexpect[39m(videoResult)[33m.[39m[34mtoHaveProperty[39m([32m'channel'[39m[33m,[39m [32m'Dev Channel'[39m)[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[33m24 skipped[39m[90m (25)[39m
+[2m   Start at [22m 17:09:28
+[2m   Duration [22m 4.49s[2m (transform 356ms, setup 254ms, import 1.56s, tests 313ms, environment 1.87s)[22m

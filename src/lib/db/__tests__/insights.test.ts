@@ -24,7 +24,7 @@ describe('getExtractionForVideo (Postgres)', () => {
     const [video] = await db
       .insert(schema.videos)
       .values({
-        youtubeId: 'vid1',
+        youtubeId: 'in-vid1',
         title: 'Test Video',
         channel: 'Test Channel',
         transcript: 'Test transcript',
@@ -43,7 +43,7 @@ describe('getExtractionForVideo (Postgres)', () => {
     const [video] = await db
       .insert(schema.videos)
       .values({
-        youtubeId: 'vid1',
+        youtubeId: 'in-vid1',
         title: 'Test Video',
         channel: 'Test Channel',
         transcript: 'Test transcript',
@@ -110,7 +110,7 @@ describe('upsertExtraction (Postgres)', () => {
     const [video] = await db
       .insert(schema.videos)
       .values({
-        youtubeId: 'vid1',
+        youtubeId: 'in-vid1',
         title: 'Test Video',
         channel: 'Test Channel',
         transcript: 'Test transcript',
@@ -158,7 +158,7 @@ describe('upsertExtraction (Postgres)', () => {
     const [video] = await db
       .insert(schema.videos)
       .values({
-        youtubeId: 'vid1',
+        youtubeId: 'in-vid1',
         title: 'Test Video',
         channel: 'Test Channel',
         transcript: 'Test transcript',
@@ -236,7 +236,7 @@ describe('upsertExtraction (Postgres)', () => {
     const [video] = await db
       .insert(schema.videos)
       .values({
-        youtubeId: 'vid1',
+        youtubeId: 'in-vid1',
         title: 'Test Video',
         channel: 'Test Channel',
         transcript: 'Test transcript',
@@ -298,7 +298,7 @@ describe('deleteExtraction (Postgres)', () => {
     const [video] = await db
       .insert(schema.videos)
       .values({
-        youtubeId: 'vid1',
+        youtubeId: 'in-vid1',
         title: 'Test Video',
         channel: 'Test Channel',
         transcript: 'Test transcript',
@@ -352,7 +352,7 @@ describe('deleteExtraction (Postgres)', () => {
     const [video] = await db
       .insert(schema.videos)
       .values({
-        youtubeId: 'vid1',
+        youtubeId: 'in-vid1',
         title: 'Test Video',
         channel: 'Test Channel',
         transcript: 'Test transcript',
@@ -381,7 +381,7 @@ describe('edge cases (Postgres)', () => {
     const [video] = await db
       .insert(schema.videos)
       .values({
-        youtubeId: 'vid1',
+        youtubeId: 'in-vid1',
         title: 'Test Video',
         channel: 'Test Channel',
         transcript: 'Test transcript',
@@ -428,7 +428,7 @@ describe('edge cases (Postgres)', () => {
     const [video] = await db
       .insert(schema.videos)
       .values({
-        youtubeId: 'vid1',
+        youtubeId: 'in-vid1',
         title: 'Test Video',
         channel: 'Test Channel',
         transcript: 'Test transcript',
