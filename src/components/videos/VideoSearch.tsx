@@ -8,15 +8,25 @@ import { useEffect, useRef, useState } from 'react';
 interface VideoSearchProps {
   onSearch: (query: string) => void;
   placeholder?: string;
+  defaultValue?: string;
 }
 
 export function VideoSearch({
   onSearch,
   placeholder = 'Ask a question or search...',
+  defaultValue,
 }: VideoSearchProps) {
-  const [value, setValue] = useState('');
+  const [value, setValue] = useState(defaultValue || '');
+  const [prevDefault, setPrevDefault] = useState(defaultValue);
   const abortControllerRef = useRef<AbortController | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Sync with external defaultValue changes (browser back/forward)
+  // Uses "adjusting state during rendering" pattern (React docs)
+  if (prevDefault !== defaultValue) {
+    setPrevDefault(defaultValue);
+    setValue(defaultValue || '');
+  }
 
   useEffect(() => {
     // Cancel any pending request

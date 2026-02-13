@@ -1,16 +1,23 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
-import Home from '../page'
+import { KnowledgeBankContent } from '@/components/knowledge-bank/KnowledgeBankContent'
 
 // Create module-level mock functions that vi.mock can use
 const mockSetQuery = vi.fn()
 const mockRetryEnsemble = vi.fn()
 
+// Create mock functions for Next.js navigation
+const mockReplace = vi.fn()
+const mockSearchParams = new URLSearchParams()
+
 // Mock Next.js hooks
 vi.mock('next/navigation', () => ({
   useRouter: () => ({
     push: vi.fn(),
+    replace: mockReplace,
   }),
+  useSearchParams: () => mockSearchParams,
+  usePathname: () => '/',
 }))
 
 // Mock PageTitleContext
@@ -69,10 +76,12 @@ describe('Home Page - Ensemble Trigger', () => {
   beforeEach(() => {
     vi.clearAllMocks()
 
+    // Clear URL params
+    mockSearchParams.delete('q')
+    mockSearchParams.delete('type')
+
     // Reset to default return values
     mockUseSearch.mockReturnValue({
-      query: '',
-      setQuery: mockSetQuery,
       results: null,
       isLoading: false,
       error: null,
@@ -121,17 +130,9 @@ describe('Home Page - Ensemble Trigger', () => {
   })
 
   it('does not trigger ensemble when query lacks question mark', async () => {
-    mockUseSearch.mockReturnValue({
-      query: 'What is the best approach',
-      setQuery: mockSetQuery,
-      results: null,
-      isLoading: false,
-      error: null,
-      mode: 'hybrid' as const,
-      setMode: vi.fn(),
-    })
+    mockSearchParams.set('q', 'What is the best approach')
 
-    render(<Home />)
+    render(<KnowledgeBankContent />)
 
     // Wait for component to settle
     await waitFor(() => {
@@ -143,17 +144,9 @@ describe('Home Page - Ensemble Trigger', () => {
   })
 
   it('triggers ensemble when query ends with question mark and has 3+ words', async () => {
-    mockUseSearch.mockReturnValue({
-      query: 'What is the best approach?',
-      setQuery: mockSetQuery,
-      results: null,
-      isLoading: false,
-      error: null,
-      mode: 'hybrid' as const,
-      setMode: vi.fn(),
-    })
+    mockSearchParams.set('q', 'What is the best approach?')
 
-    render(<Home />)
+    render(<KnowledgeBankContent />)
 
     // Wait for component to settle
     await waitFor(() => {
@@ -165,17 +158,9 @@ describe('Home Page - Ensemble Trigger', () => {
   })
 
   it('does not trigger ensemble when query has question mark but less than 3 words', async () => {
-    mockUseSearch.mockReturnValue({
-      query: 'What is?',
-      setQuery: mockSetQuery,
-      results: null,
-      isLoading: false,
-      error: null,
-      mode: 'hybrid' as const,
-      setMode: vi.fn(),
-    })
+    mockSearchParams.set('q', 'What is?')
 
-    render(<Home />)
+    render(<KnowledgeBankContent />)
 
     // Wait for component to settle
     await waitFor(() => {
@@ -187,17 +172,9 @@ describe('Home Page - Ensemble Trigger', () => {
   })
 
   it('triggers ensemble when query has exactly 3 words with question mark', async () => {
-    mockUseSearch.mockReturnValue({
-      query: 'What is TypeScript?',
-      setQuery: mockSetQuery,
-      results: null,
-      isLoading: false,
-      error: null,
-      mode: 'hybrid' as const,
-      setMode: vi.fn(),
-    })
+    mockSearchParams.set('q', 'What is TypeScript?')
 
-    render(<Home />)
+    render(<KnowledgeBankContent />)
 
     // Wait for component to settle
     await waitFor(() => {
@@ -209,17 +186,9 @@ describe('Home Page - Ensemble Trigger', () => {
   })
 
   it('does not trigger ensemble for question words without question mark', async () => {
-    mockUseSearch.mockReturnValue({
-      query: 'How to learn programming',
-      setQuery: mockSetQuery,
-      results: null,
-      isLoading: false,
-      error: null,
-      mode: 'hybrid' as const,
-      setMode: vi.fn(),
-    })
+    mockSearchParams.set('q', 'How to learn programming')
 
-    render(<Home />)
+    render(<KnowledgeBankContent />)
 
     // Wait for component to settle
     await waitFor(() => {
@@ -231,17 +200,9 @@ describe('Home Page - Ensemble Trigger', () => {
   })
 
   it('handles query with trailing whitespace and question mark', async () => {
-    mockUseSearch.mockReturnValue({
-      query: '  What is the best approach?  ',
-      setQuery: mockSetQuery,
-      results: null,
-      isLoading: false,
-      error: null,
-      mode: 'hybrid' as const,
-      setMode: vi.fn(),
-    })
+    mockSearchParams.set('q', '  What is the best approach?  ')
 
-    render(<Home />)
+    render(<KnowledgeBankContent />)
 
     // Wait for component to settle
     await waitFor(() => {
@@ -253,16 +214,6 @@ describe('Home Page - Ensemble Trigger', () => {
   })
 
   it('displays updated hint text when personas are active', async () => {
-    mockUseSearch.mockReturnValue({
-      query: '',
-      setQuery: mockSetQuery,
-      results: null,
-      isLoading: false,
-      error: null,
-      mode: 'hybrid' as const,
-      setMode: vi.fn(),
-    })
-
     // Override fetch to return videos so empty state doesn't show
     ;(global.fetch as ReturnType<typeof vi.fn>).mockImplementation(async (url) => {
       if (typeof url === 'string' && url.includes('/api/personas/status')) {
@@ -301,7 +252,7 @@ describe('Home Page - Ensemble Trigger', () => {
       }
     })
 
-    render(<Home />)
+    render(<KnowledgeBankContent />)
 
     // Wait for persona status to load
     await waitFor(() => {
@@ -314,15 +265,7 @@ describe('Home Page - Ensemble Trigger', () => {
   })
 
   it('shows persona panel when query has question mark', async () => {
-    mockUseSearch.mockReturnValue({
-      query: 'What is the best approach?',
-      setQuery: mockSetQuery,
-      results: null,
-      isLoading: false,
-      error: null,
-      mode: 'hybrid' as const,
-      setMode: vi.fn(),
-    })
+    mockSearchParams.set('q', 'What is the best approach?')
 
     // Mock ensemble state with personas
     mockUseEnsemble.mockReturnValue({
@@ -336,7 +279,7 @@ describe('Home Page - Ensemble Trigger', () => {
       retry: mockRetryEnsemble,
     })
 
-    render(<Home />)
+    render(<KnowledgeBankContent />)
 
     // Wait for component to render
     await waitFor(() => {
@@ -347,17 +290,9 @@ describe('Home Page - Ensemble Trigger', () => {
   })
 
   it('does not show persona panel when query lacks question mark', async () => {
-    mockUseSearch.mockReturnValue({
-      query: 'What is the best approach',
-      setQuery: mockSetQuery,
-      results: null,
-      isLoading: false,
-      error: null,
-      mode: 'hybrid' as const,
-      setMode: vi.fn(),
-    })
+    mockSearchParams.set('q', 'What is the best approach')
 
-    render(<Home />)
+    render(<KnowledgeBankContent />)
 
     // Wait for component to settle
     await waitFor(() => {

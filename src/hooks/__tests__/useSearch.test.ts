@@ -16,9 +16,8 @@ describe('useSearch', () => {
   });
 
   it('initializes with default state', () => {
-    const { result } = renderHook(() => useSearch());
+    const { result } = renderHook(() => useSearch({ query: '' }));
 
-    expect(result.current.query).toBe('');
     expect(result.current.results).toBeNull();
     expect(result.current.isLoading).toBe(false);
     expect(result.current.error).toBeNull();
@@ -26,13 +25,12 @@ describe('useSearch', () => {
   });
 
   it('does not fetch when query is empty', () => {
-    renderHook(() => useSearch());
+    renderHook(() => useSearch({ query: '' }));
 
     expect(mockFetch).not.toHaveBeenCalled();
   });
 
-  it('debounces search query', async () => {
-    vi.useFakeTimers();
+  it('fetches immediately when query changes (no debounce)', async () => {
     const mockResponse = {
       chunks: [],
       videos: [],
@@ -46,33 +44,25 @@ describe('useSearch', () => {
       json: async () => mockResponse,
     });
 
-    const { result } = renderHook(() => useSearch());
-
-    // Update query multiple times rapidly
-    act(() => {
-      result.current.setQuery('t');
-      result.current.setQuery('te');
-      result.current.setQuery('tes');
-      result.current.setQuery('test');
-    });
-
-    // Should not have called fetch yet
-    expect(mockFetch).not.toHaveBeenCalled();
-
-    // Fast-forward past debounce delay (300ms)
-    await act(async () => {
-      vi.advanceTimersByTime(300);
-      await Promise.resolve();
-    });
-
-    // Now should have called fetch once
-    expect(mockFetch).toHaveBeenCalledTimes(1);
-    expect(mockFetch).toHaveBeenCalledWith(
-      '/api/search?q=test&mode=hybrid',
-      expect.any(Object)
+    const { rerender } = renderHook(
+      ({ query }) => useSearch({ query }),
+      { initialProps: { query: '' } }
     );
 
-    vi.useRealTimers();
+    // Should not fetch on empty query
+    expect(mockFetch).not.toHaveBeenCalled();
+
+    // Change query to non-empty value
+    rerender({ query: 'test' });
+
+    // Should fetch immediately without debounce
+    await waitFor(() => {
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+      expect(mockFetch).toHaveBeenCalledWith(
+        '/api/search?q=test&mode=hybrid',
+        expect.any(Object)
+      );
+    });
   });
 
   it('sets loading state during fetch', async () => {
@@ -92,19 +82,12 @@ describe('useSearch', () => {
 
     mockFetch.mockReturnValue(fetchPromise);
 
-    const { result } = renderHook(() => useSearch());
+    const { result } = renderHook(() => useSearch({ query: 'test' }));
 
-    act(() => {
-      result.current.setQuery('test');
+    // Should be loading immediately
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(true);
     });
-
-    // Wait for debounce
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 350));
-    });
-
-    // Should be loading now
-    expect(result.current.isLoading).toBe(true);
 
     // Complete the fetch
     await act(async () => {
@@ -162,11 +145,7 @@ describe('useSearch', () => {
       json: async () => mockResponse,
     });
 
-    const { result } = renderHook(() => useSearch());
-
-    act(() => {
-      result.current.setQuery('test');
-    });
+    const { result } = renderHook(() => useSearch({ query: 'test' }));
 
     await waitFor(
       () => {
@@ -179,11 +158,7 @@ describe('useSearch', () => {
   it('handles fetch error', async () => {
     mockFetch.mockRejectedValue(new Error('Network error'));
 
-    const { result } = renderHook(() => useSearch());
-
-    act(() => {
-      result.current.setQuery('test');
-    });
+    const { result } = renderHook(() => useSearch({ query: 'test' }));
 
     await waitFor(
       () => {
@@ -209,12 +184,10 @@ describe('useSearch', () => {
       json: async () => mockResponse,
     });
 
-    const { result } = renderHook(() => useSearch());
-
-    // Set query
-    act(() => {
-      result.current.setQuery('test');
-    });
+    const { result, rerender } = renderHook(
+      ({ query }) => useSearch({ query }),
+      { initialProps: { query: 'test' } }
+    );
 
     await waitFor(
       () => {
@@ -223,12 +196,12 @@ describe('useSearch', () => {
       { timeout: 1000 }
     );
 
-    // Clear query
-    act(() => {
-      result.current.setQuery('');
-    });
+    // Clear query by rerendering with empty string
+    rerender({ query: '' });
 
-    expect(result.current.results).toBeNull();
+    await waitFor(() => {
+      expect(result.current.results).toBeNull();
+    });
   });
 
   it('changes search mode', async () => {
@@ -244,11 +217,10 @@ describe('useSearch', () => {
       }),
     });
 
-    const { result } = renderHook(() => useSearch());
+    const { result } = renderHook(() => useSearch({ query: 'test' }));
 
     act(() => {
       result.current.setMode('vector');
-      result.current.setQuery('test');
     });
 
     await waitFor(
@@ -262,7 +234,7 @@ describe('useSearch', () => {
     );
   });
 
-  it('fetches only the final query when rapidly changing', async () => {
+  it('cancels previous request when query changes rapidly', async () => {
     mockFetch.mockResolvedValue({
       ok: true,
       json: async () => ({
@@ -275,19 +247,13 @@ describe('useSearch', () => {
       }),
     });
 
-    const { result } = renderHook(() => useSearch());
+    const { rerender } = renderHook(
+      ({ query }) => useSearch({ query }),
+      { initialProps: { query: 'test1' } }
+    );
 
-    act(() => {
-      result.current.setQuery('test1');
-    });
-
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 150));
-    });
-
-    act(() => {
-      result.current.setQuery('test2');
-    });
+    // Immediately change to test2 (should abort test1)
+    rerender({ query: 'test2' });
 
     await waitFor(
       () => {
@@ -299,8 +265,9 @@ describe('useSearch', () => {
       { timeout: 1000 }
     );
 
-    // Should only have called once (for test2, not test1)
-    expect(mockFetch).toHaveBeenCalledTimes(1);
+    // Both requests fire, but the first is aborted
+    // We expect 2 calls total (test1 aborted, test2 completed)
+    expect(mockFetch).toHaveBeenCalledTimes(2);
   });
 
   it('ignores AbortError', async () => {
@@ -308,14 +275,10 @@ describe('useSearch', () => {
     abortError.name = 'AbortError';
     mockFetch.mockRejectedValue(abortError);
 
-    const { result } = renderHook(() => useSearch());
-
-    act(() => {
-      result.current.setQuery('test');
-    });
+    const { result } = renderHook(() => useSearch({ query: 'test' }));
 
     await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 350));
+      await new Promise((resolve) => setTimeout(resolve, 100));
     });
 
     expect(result.current.error).toBeNull();
@@ -329,15 +292,11 @@ describe('useSearch', () => {
         })
     );
 
-    const { result, unmount } = renderHook(() => useSearch());
+    const { unmount } = renderHook(() => useSearch({ query: 'test' }));
 
-    act(() => {
-      result.current.setQuery('test');
-    });
-
-    // Wait for debounce to trigger
+    // Wait for fetch to be called
     await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 350));
+      await new Promise((resolve) => setTimeout(resolve, 50));
     });
 
     // Fetch should be called
@@ -348,5 +307,31 @@ describe('useSearch', () => {
 
     // If cleanup works, this test passes without hanging
     expect(true).toBe(true);
+  });
+
+  it('includes focusAreaId in request when provided', async () => {
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        chunks: [],
+        videos: [],
+        query: 'test',
+        mode: 'hybrid' as const,
+        timing: 10,
+        hasEmbeddings: true,
+      }),
+    });
+
+    renderHook(() => useSearch({ query: 'test', focusAreaId: 42 }));
+
+    await waitFor(
+      () => {
+        expect(mockFetch).toHaveBeenCalledWith(
+          '/api/search?q=test&mode=hybrid&focusAreaId=42',
+          expect.any(Object)
+        );
+      },
+      { timeout: 1000 }
+    );
   });
 });

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { SearchResult } from '@/lib/search/types';
 import type { VideoResult } from '@/lib/search/aggregate';
 
@@ -20,97 +20,83 @@ export interface SearchResponse {
 }
 
 interface UseSearchOptions {
+  query: string;
   focusAreaId?: number | null;
 }
 
 /**
- * Hook for managing search state with debounced queries
+ * Hook for managing search state
+ * Accepts query as a prop (debouncing handled by caller)
  */
-export function useSearch(options: UseSearchOptions = {}) {
-  const { focusAreaId = null } = options;
-  const [query, setQueryRaw] = useState('');
+export function useSearch(options: UseSearchOptions) {
+  const { query, focusAreaId = null } = options;
   const [results, setResults] = useState<SearchResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [mode, setMode] = useState<SearchMode>('hybrid');
 
   const abortControllerRef = useRef<AbortController | null>(null);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Wrap setQuery to clear results immediately when query is emptied
-  const setQuery = useCallback((newQuery: string) => {
-    setQueryRaw(newQuery);
-    if (!newQuery.trim()) {
-      setResults(null);
-      setError(null);
-    }
-  }, []);
+  const trimmedQuery = query.trim();
 
   useEffect(() => {
-    // Clear existing timeout
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-
     // Abort previous request
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
+      abortControllerRef.current = null;
     }
 
-    // Nothing to fetch if query is empty
-    if (!query.trim()) {
+    // Skip fetch if query is empty
+    if (!trimmedQuery) {
       return;
     }
 
-    // Debounce search
-    timeoutRef.current = setTimeout(() => {
-      const controller = new AbortController();
-      abortControllerRef.current = controller;
+    // Fire search immediately (no debounce)
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
 
+    const params = new URLSearchParams({
+      q: trimmedQuery,
+      mode,
+    });
+    if (focusAreaId !== null && focusAreaId !== undefined) {
+      params.set('focusAreaId', String(focusAreaId));
+    }
+
+    const doSearch = async () => {
       setIsLoading(true);
       setError(null);
-
-      const params = new URLSearchParams({
-        q: query,
-        mode,
-      });
-      if (focusAreaId !== null && focusAreaId !== undefined) {
-        params.set('focusAreaId', String(focusAreaId));
-      }
-
-      fetch(`/api/search?${params}`, {
-        signal: controller.signal,
-      })
-        .then((res) => res.json())
-        .then((data: SearchResponse) => {
-          setResults(data);
-          setIsLoading(false);
-        })
-        .catch((err) => {
-          if (err.name !== 'AbortError') {
-            setError('Search failed. Please try again.');
-            setIsLoading(false);
-          }
+      try {
+        const res = await fetch(`/api/search?${params}`, {
+          signal: controller.signal,
         });
-    }, 300);
+        const data: SearchResponse = await res.json();
+        setResults(data);
+        setIsLoading(false);
+      } catch (err) {
+        if (err instanceof Error && err.name !== 'AbortError') {
+          setError('Search failed. Please try again.');
+          setIsLoading(false);
+        }
+      }
+    };
+
+    doSearch();
 
     // Cleanup
     return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
+      controller.abort();
     };
-  }, [query, mode, focusAreaId]);
+  }, [trimmedQuery, mode, focusAreaId]);
+
+  // Derive empty-query state without setting state in effect
+  const activeResults = trimmedQuery ? results : null;
+  const activeIsLoading = trimmedQuery ? isLoading : false;
+  const activeError = trimmedQuery ? error : null;
 
   return {
-    query,
-    setQuery,
-    results,
-    isLoading,
-    error,
+    results: activeResults,
+    isLoading: activeIsLoading,
+    error: activeError,
     mode,
     setMode,
   };

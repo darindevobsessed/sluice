@@ -134,4 +134,45 @@ describe('VideoSearch', () => {
     fireEvent.change(input, { target: { value: 'typescript' } });
     expect(input).toHaveValue('typescript');
   });
+
+  it('initializes with defaultValue when provided', () => {
+    const onSearch = vi.fn();
+
+    render(<VideoSearch onSearch={onSearch} defaultValue="initial query" />);
+
+    const input = screen.getByPlaceholderText('Ask a question or search...');
+    expect(input).toHaveValue('initial query');
+  });
+
+  it('syncs with external defaultValue changes (browser back/forward)', () => {
+    const onSearch = vi.fn();
+
+    const { rerender } = render(
+      <VideoSearch onSearch={onSearch} defaultValue="first query" />
+    );
+
+    const input = screen.getByPlaceholderText('Ask a question or search...');
+    expect(input).toHaveValue('first query');
+
+    // Simulate browser back/forward by changing defaultValue
+    rerender(<VideoSearch onSearch={onSearch} defaultValue="second query" />);
+
+    expect(input).toHaveValue('second query');
+  });
+
+  it('does not sync when defaultValue is undefined', () => {
+    const onSearch = vi.fn();
+
+    const { rerender } = render(<VideoSearch onSearch={onSearch} />);
+
+    const input = screen.getByPlaceholderText('Ask a question or search...');
+
+    // User types
+    fireEvent.change(input, { target: { value: 'user typed' } });
+    expect(input).toHaveValue('user typed');
+
+    // Rerender without defaultValue should not change input
+    rerender(<VideoSearch onSearch={onSearch} />);
+    expect(input).toHaveValue('user typed');
+  });
 });
