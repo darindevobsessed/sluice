@@ -1,0 +1,20 @@
+name: state-navigation
+title: State & Navigation
+status: ready
+created: 2026-02-13
+updated: 2026-02-13
+target: Preserve user context across navigation — filters survive page transitions, navigation flows are contextual, active filters are visible and dismissible
+focus: Frontend state management and navigation UX
+
+goals:
+  - Encode filter state in URL searchParams so browser back/forward preserves context
+  - Context-aware navigation with returnTo param for add-video and video detail flows
+  - Active filter pills showing current filters with dismiss capability
+
+notes: |
+  Key decisions:
+  - router.replace() for filter changes, router.push() for pagination
+  - returnTo URL param for contextual back navigation (not router.back())
+  - Focus Area stays in localStorage (global, not page-specific)
+  - Filter pills are a shared component used on both Discovery and KB
+  - Param names: ?channel=, ?type=, ?page= (Discovery); ?q=, ?type= (KB)

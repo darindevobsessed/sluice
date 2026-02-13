@@ -1,14 +1,14 @@
 ---
 name: storytelling-loading-states
 title: "Storytelling loading state messages"
-status: active
+status: complete
 priority: medium
 created: 2026-02-12
 updated: 2026-02-13
 cycle: add-video-delight
 story_number: 3
 chunks_total: 3
-chunks_complete: 2
+chunks_complete: 3
 ---
 
 # Story: Storytelling loading state messages

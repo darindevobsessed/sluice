@@ -254,7 +254,7 @@ describe('AddTranscriptPage', () => {
     await user.click(submitButton)
 
     // Should show loading state
-    expect(screen.getByText(/saving/i)).toBeInTheDocument()
+    expect(screen.getByText(/adding to your knowledge bank/i)).toBeInTheDocument()
     expect(submitButton).toBeDisabled()
   })
 

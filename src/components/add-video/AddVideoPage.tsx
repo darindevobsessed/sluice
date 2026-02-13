@@ -392,7 +392,7 @@ export function AddVideoPage() {
                 {submitting ? (
                   <>
                     <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                    Saving...
+                    Adding to your Knowledge Bank...
                   </>
                 ) : (
                   "Add to Knowledge Bank"

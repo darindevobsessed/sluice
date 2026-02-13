@@ -815,3 +815,170 @@ npm error
 npm error To see a list of scripts, run:
 npm error   npm run
 npm error A complete log of this run can be found in: /Users/darindrobinski/.npm/_logs/2026-02-13T16_33_44_016Z-debug-0.log
+---
+timestamp: "2026-02-13 10:44:24"
+story: "3-storytelling-loading-states"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/components/add-transcript/__tests__/AddTranscriptPage.test.tsx[2m > [22mAddTranscriptPage[2m > [22mshows loading state during submission
+[31m[1mTestingLibraryElementError[22m[39m: Unable to find an element with the text: /adding to your knowledge bank/i. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"p-6"[39m
+    [36m>[39m
+      [36m<h1[39m
+        [33mclass[39m=[32m"mb-2 text-2xl font-semibold"[39m
+      [36m>[39m
+        [0mAdd a Transcript[0m
+      [36m</h1>[39m
+      [36m<p[39m
+        [33mclass[39m=[32m"mb-8 text-muted-foreground"[39m
+      [36m>[39m
+        [0mImport meeting notes, podcast transcripts, or any text content.[0m
+      [36m</p>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"mx-auto max-w-2xl space-y-6"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"space-y-3"[39m
+        [36m>[39m
+          [36m<label[39m
+            [33mclass[39m=[32m"flex items-center gap-2 font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50 text-base"[39m
+            [33mdata-slot[39m=[32m"label"[39m
+            [33mfor[39m=[32m"title"[39m
+          [36m>[39m
+            [0mTitle[0m
+          [36m</label>[39m
+          [36m<input[39m
+            [33mclass[39m=[32m"file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive text-base"[39m
+            [33mdata-slot[39m=[32m"input"[39m
+            [33mid[39m=[32m"title"[39m
+            [33mplaceholder[39m=[32m"Enter title..."[39m
+            [33mtype[39m=[32m"text"[39m
+            [33mvalue[39m=[32m"Test Title"[39m
+          [36m/>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"space-y-3"[39m
+        [36m>[39m
+          [36m<label[39m
+            [33mclass[39m=[32m"flex items-center gap-2 font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50 text-base"[39m
+            [33mdata-slot[39m=[32m"label"[39m
+            [33mfor[39m=[32m"source"[39m
+          [36m>[39m
+            [0mSource (optional)[0m
+          [36m</label>[39m
+          [36m<input[39m
+            [33mclass[39m=[32m"file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive text-base"[39m
+            [33mdata-slot[39m=[32m"input"[39m
+            [33mid[39m=[32m"source"[39m
+            [33mplaceholder[39m=[32m"e.g., Team Meeting, Podcast Name, Document..."[39m
+            [33mtype[39m=[32m"text"[39m
+            [33mvalue[39m=[32m"Test Source"[39m
+          [36m/>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"space-y-3"[39m
+        [36m>[39m
+          [36m<label[39m
+            [33mclass[39m=[32m"flex items-center gap-2 font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50 text-base"[39m
+            [33mdata-slot[39m=[32m"label"[39m
+            [33mfor[39m=[32m"transcript"[39m
+          [36m>[39m
+            [0mTranscript[0m
+          [36m</label>[39m
+          [36m<textarea[39m
+            [33mclass[39m=[32m"border-input placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destruc
+
+... [3668 characters truncated] ...
+
+ing-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 flex field-sizing-content w-full rounded-md border bg-transparent px-3 py-2 shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 md:text-sm min-h-[80px] text-base"[39m
+              [33mdata-slot[39m=[32m"textarea"[39m
+              [33mid[39m=[32m"notes"[39m
+              [33mplaceholder[39m=[32m"Add any additional notes or context..."[39m
+            [36m/>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex justify-end pt-4"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive bg-primary text-primary-foreground hover:bg-primary/90 h-10 rounded-md px-6 has-[>svg]:px-4 min-w-[200px]"[39m
+            [33mdata-size[39m=[32m"lg"[39m
+            [33mdata-slot[39m=[32m"button"[39m
+            [33mdata-variant[39m=[32m"default"[39m
+            [33mdisabled[39m=[32m""[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"[39m
+            [36m/>[39m
+            [0mSaving...[0m
+          [36m</button>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+[90m [2m❯[22m Object.getElementError node_modules/@testing-library/dom/dist/config.js:[2m37:19[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m76:38[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m52:17[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m95:19[22m[39m
+[36m [2m❯[22m src/components/add-transcript/__tests__/AddTranscriptPage.test.tsx:[2m257:19[22m[39m
+    [90m255| [39m
+    [90m256| [39m    [90m// Should show loading state[39m
+    [90m257| [39m    expect(screen.getByText(/adding to your knowledge bank/i)).toBeInT…
+    [90m   | [39m                  [31m^[39m
+    [90m258| [39m    [34mexpect[39m(submitButton)[33m.[39m[34mtoBeDisabled[39m()
+    [90m259| [39m  })
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/components/add-transcript/__tests__/AddTranscriptPage.test.tsx
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/components/add-transcript/__tests__/AddTranscriptPage.test.tsx [2m([22m[2m15 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 15824[2mms[22m[39m
+     [33m[2m✓[22m[39m renders all form fields [33m 321[2mms[22m[39m
+     [32m✓[39m shows character count for transcript field[32m 88[2mms[22m[39m
+     [33m[2m✓[22m[39m updates character count as user types [33m 1366[2mms[22m[39m
+     [32m✓[39m submit button is disabled when form is empty[32m 286[2mms[22m[39m
+     [33m[2m✓[22m[39m submit button is disabled when title is missing [33m 1480[2mms[22m[39m
+     [33m[2m✓[22m[39m submit button is enabled when source is empty (optional field) [33m 1426[2mms[22m[39m
+     [33m[2m✓[22m[39m submit button is disabled when transcript is too short [33m 491[2mms[22m[39m
+     [33m[2m✓[22m[39m submit button is enabled when all required fields are valid [33m 1452[2mms[22m[39m
+     [33m[2m✓[22m[39m submits form with correct data structure [33m 2360[2mms[22m[39m
+     [33m[2m✓[22m[39m submits without tags and notes when optional fields are empty [33m 1385[2mms[22m[39m
+     [33m[2m✓[22m[39m submits without channel when source is empty [33m 943[2mms[22m[39m
+[31m     [31m×[31m shows loading state during submission[39m[33m 813[2mms[22m[39m
+     [33m[2m✓[22m[39m shows success state after successful submission [33m 953[2mms[22m[39m
+     [33m[2m✓[22m[39m shows error message on submission failure [33m 1179[2mms[22m[39m
+     [33m[2m✓[22m[39m allows reset after successful submission [33m 1275[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m14 passed[39m[22m[90m (15)[39m
+[2m   Start at [22m 10:43:55
+[2m   Duration [22m 28.49s[2m (transform 276ms, setup 566ms, import 4.03s, tests 15.82s, environment 6.59s)[22m
+---
+timestamp: "2026-02-13 10:45:43"
+story: "3-storytelling-loading-states"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+npm error Missing script: "typecheck"
+npm error
+npm error To see a list of scripts, run:
+npm error   npm run
+npm error A complete log of this run can be found in: /Users/darindrobinski/.npm/_logs/2026-02-13T16_45_43_025Z-debug-0.log
