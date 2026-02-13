@@ -8,7 +8,7 @@ updated: 2026-02-13
 cycle: add-video-delight
 story_number: 3
 chunks_total: 3
-chunks_complete: 1
+chunks_complete: 2
 ---
 
 # Story: Storytelling loading state messages

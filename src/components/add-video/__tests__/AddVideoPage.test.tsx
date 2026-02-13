@@ -125,9 +125,9 @@ describe('AddVideoPage - Transcript Auto-fetch', () => {
       expect(screen.getByText(/test video title/i)).toBeInTheDocument();
     }, { timeout: 3000 });
 
-    // Should show loading state
+    // Should show loading state with first rotating message
     await waitFor(() => {
-      expect(screen.getByText(/fetching transcript/i)).toBeInTheDocument();
+      expect(screen.getByText(/fetching transcript from youtube/i)).toBeInTheDocument();
     }, { timeout: 3000 });
   }, 10000);
 

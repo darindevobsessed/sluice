@@ -11,9 +11,17 @@ import { OptionalFields } from "./OptionalFields"
 import { SuccessState } from "./SuccessState"
 import { parseYouTubeUrl, fetchVideoMetadata } from "@/lib/youtube"
 import type { VideoMetadata } from "@/lib/youtube"
+import { useRotatingMessages } from "@/hooks/useRotatingMessages"
+
+const METADATA_FETCH_MESSAGES = [
+  'Looking up this video...',
+  'Fetching details from YouTube...',
+  'Getting everything ready...',
+]
 
 export function AddVideoPage() {
   const searchParams = useSearchParams()
+  const metadataMessage = useRotatingMessages(METADATA_FETCH_MESSAGES)
   const [url, setUrl] = useState("")
   const [metadata, setMetadata] = useState<VideoMetadata | null>(null)
   const [loading, setLoading] = useState(false)
@@ -306,8 +314,9 @@ export function AddVideoPage() {
         </div>
 
         {loading && (
-          <div className="flex items-center justify-center py-8">
+          <div className="flex flex-col items-center justify-center gap-3 py-8">
             <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+            <p className="text-sm text-muted-foreground">{metadataMessage}</p>
           </div>
         )}
 

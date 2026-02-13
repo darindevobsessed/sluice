@@ -6,6 +6,14 @@ import { Button } from "@/components/ui/button";
 import { TranscriptInstructions } from "./TranscriptInstructions";
 import { Sparkles, RefreshCw, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useRotatingMessages } from "@/hooks/useRotatingMessages";
+
+const TRANSCRIPT_FETCH_MESSAGES = [
+  'Fetching transcript from YouTube...',
+  'Reading through the content...',
+  'Pulling it all together...',
+  'Almost there...',
+];
 
 interface TranscriptSectionProps {
   value: string;
@@ -24,6 +32,7 @@ export function TranscriptSection({
   source = null,
   onRetryFetch,
 }: TranscriptSectionProps) {
+  const fetchMessage = useRotatingMessages(TRANSCRIPT_FETCH_MESSAGES);
   const charCount = value.length;
   const isCollapsed = source === "auto";
 
@@ -37,7 +46,7 @@ export function TranscriptSection({
           {isFetching && (
             <span className="flex items-center gap-2 text-sm text-muted-foreground">
               <div className="h-3 w-3 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-              Fetching transcript...
+              {fetchMessage}
             </span>
           )}
           {source === "auto" && !isFetching && (

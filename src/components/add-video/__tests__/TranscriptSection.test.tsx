@@ -24,8 +24,8 @@ describe('TranscriptSection', () => {
   it('shows loading spinner when isFetching is true', () => {
     render(<TranscriptSection {...defaultProps} isFetching={true} />);
 
-    // Should show a loading indicator
-    expect(screen.getByText(/fetching transcript/i)).toBeInTheDocument();
+    // Should show a loading indicator with first rotating message
+    expect(screen.getByText(/fetching transcript from youtube/i)).toBeInTheDocument();
   });
 
   it('shows auto-fetched badge when source is auto', () => {
