@@ -54,7 +54,16 @@ patterns:
         date: 2026-02-10
     occurrences: 1
 
-errors: []        # Validation failures to prevent
+errors:
+  - pattern: "Stateful resources (DB pools, Redis clients) must use globalThis singleton in Next.js dev mode"
+    evidence:
+      - source: runtime_bug
+        quote: "All API routes returning 500 after 5-10 minutes in dev mode"
+        story: "storytelling-loading-states"
+        date: 2026-02-13
+    occurrences: 1
+    context: "Next.js HMR re-evaluates modules on file changes. A bare `new Pool()` at module scope creates orphaned pools each cycle. Fix: stash on globalThis so the pool survives re-evaluation. Zero effect in production (modules evaluated once)."
+    file: "src/lib/db/index.ts"
 
 conventions:
   - pattern: "Hint text below search bar explains both modes: keywords for search, questions for personas"

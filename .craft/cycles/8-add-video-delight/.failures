@@ -425,3 +425,208 @@ npm error
 npm error To see a list of scripts, run:
 npm error   npm run
 npm error A complete log of this run can be found in: /Users/darindrobinski/.npm/_logs/2026-02-13T03_51_14_729Z-debug-0.log
+---
+timestamp: "2026-02-13 09:58:53"
+story: "3-storytelling-loading-states"
+chunk: "unknown"
+tool: "Read"
+error: |
+  EISDIR: illegal operation on a directory, read
+---
+timestamp: "2026-02-13 10:17:59"
+story: "3-storytelling-loading-states"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Suites 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/hooks/__tests__/useRotatingMessages.test.ts[2m [ src/hooks/__tests__/useRotatingMessages.test.ts ][22m
+[31m[1mError[22m: Failed to resolve import "../useRotatingMessages" from "src/hooks/__tests__/useRotatingMessages.test.ts". Does the file exist?[39m
+  Plugin: [35mvite:import-analysis[39m
+  File: [36m/Users/darindrobinski/dev/repos/gold-miner/src/hooks/__tests__/useRotatingMessages.test.ts[39m:3:36
+[33m  1  |  import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+  2  |  import { renderHook, act } from "@testing-library/react";
+  3  |  import { useRotatingMessages } from "../useRotatingMessages";
+     |                                       ^
+  4  |  describe("useRotatingMessages", () => {
+  5  |    beforeEach(() => {[39m
+[90m [2m❯[22m TransformPluginContext._formatLog node_modules/vite/dist/node/chunks/config.js:[2m28999:43[22m[39m
+[90m [2m❯[22m TransformPluginContext.error node_modules/vite/dist/node/chunks/config.js:[2m28996:14[22m[39m
+[90m [2m❯[22m normalizeUrl node_modules/vite/dist/node/chunks/config.js:[2m27119:18[22m[39m
+[90m [2m❯[22m node_modules/vite/dist/node/chunks/config.js:[2m27177:32[22m[39m
+[90m [2m❯[22m TransformPluginContext.transform node_modules/vite/dist/node/chunks/config.js:[2m27145:4[22m[39m
+[90m [2m❯[22m EnvironmentPluginContainer.transform node_modules/vite/dist/node/chunks/config.js:[2m28797:14[22m[39m
+[90m [2m❯[22m loadAndTransform node_modules/vite/dist/node/chunks/config.js:[2m22670:26[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/hooks/__tests__/useRotatingMessages.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/hooks/__tests__/useRotatingMessages.test.ts [2m([22m[2m0 test[22m[2m)[22m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [2mno tests[22m
+[2m   Start at [22m 10:17:54
+[2m   Duration [22m 4.91s[2m (transform 51ms, setup 419ms, import 0ms, tests 0ms, environment 3.61s)[22m
+---
+timestamp: "2026-02-13 10:18:14"
+story: "3-storytelling-loading-states"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 9 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/hooks/__tests__/useRotatingMessages.test.ts[2m > [22museRotatingMessages[2m > [22mreturns first message initially
+[41m[1m FAIL [22m[49m src/hooks/__tests__/useRotatingMessages.test.ts[2m > [22museRotatingMessages[2m > [22mcycles to next message after interval
+[41m[1m FAIL [22m[49m src/hooks/__tests__/useRotatingMessages.test.ts[2m > [22museRotatingMessages[2m > [22mwraps around to first message after all messages shown
+[41m[1m FAIL [22m[49m src/hooks/__tests__/useRotatingMessages.test.ts[2m > [22museRotatingMessages[2m > [22mcleans up timer on unmount
+[41m[1m FAIL [22m[49m src/hooks/__tests__/useRotatingMessages.test.ts[2m > [22museRotatingMessages[2m > [22mresets to first message when messages array changes
+[41m[1m FAIL [22m[49m src/hooks/__tests__/useRotatingMessages.test.ts[2m > [22museRotatingMessages[2m > [22muses default interval of 3000ms when not provided
+[41m[1m FAIL [22m[49m src/hooks/__tests__/useRotatingMessages.test.ts[2m > [22museRotatingMessages[2m > [22mhandles custom interval correctly
+[41m[1m FAIL [22m[49m src/hooks/__tests__/useRotatingMessages.test.ts[2m > [22museRotatingMessages[2m > [22mhandles single message array
+[41m[1m FAIL [22m[49m src/hooks/__tests__/useRotatingMessages.test.ts[2m > [22museRotatingMessages[2m > [22mreturns first message as fallback for empty index
+[31m[1mTypeError[22m: window.matchMedia is not a function[39m
+[36m [2m❯[22m src/hooks/useRotatingMessages.ts:[2m12:32[22m[39m
+    [90m 10| [39m
+    [90m 11| [39m  [34museEffect[39m(() [33m=>[39m {
+    [90m 12| [39m    const motionQuery = window.matchMedia('(prefers-reduced-motion: re…
+    [90m   | [39m                               [31m^[39m
+    [90m 13| [39m    [35mif[39m (motionQuery[33m.[39mmatches) [35mreturn[39m
+    [90m 14| [39m
+[90m [2m❯[22m Object.react_stack_bottom_frame node_modules/react-dom/cjs/react-dom-client.development.js:[2m25989:20[22m[39m
+[90m [2m❯[22m runWithFiberInDEV node_modules/react-dom/cjs/react-dom-client.development.js:[2m874:13[22m[39m
+[90m [2m❯[22m commitHookEffectListMount node_modules/react-dom/cjs/react-dom-client.development.js:[2m13249:29[22m[39m
+[90m [2m❯[22m commitHookPassiveMountEffects node_modules/react-dom/cjs/react-dom-client.development.js:[2m13336:11[22m[39m
+[90m [2m❯[22m commitPassiveMountOnFiber node_modules/react-dom/cjs/react-dom-client.development.js:[2m15484:13[22m[39m
+[90m [2m❯[22m recursivelyTraversePassiveMountEffects node_modules/react-dom/cjs/react-dom-client.development.js:[2m15439:11[22m[39m
+[90m [2m❯[22m commitPassiveMountOnFiber node_modules/react-dom/cjs/react-dom-client.development.js:[2m15519:11[22m[39m
+[90m [2m❯[22m flushPassiveEffects node_modules/react-dom/cjs/react-dom-client.development.js:[2m18432:9[22m[39m
+[90m [2m❯[22m node_modules/react-dom/cjs/react-dom-client.development.js:[2m17923:15[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/9]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/hooks/__tests__/useRotatingMessages.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/hooks/__tests__/useRotatingMessages.test.ts [2m([22m[2m10 tests[22m[2m | [22m[31m9 failed[39m[2m)[22m[32m 156[2mms[22m[39m
+[31m     [31m×[31m returns first message initially[39m[32m 26[2mms[22m[39m
+[31m     [31m×[31m cycles to next message after interval[39m[32m 5[2mms[22m[39m
+[31m     [31m×[31m wraps around to first message after all messages shown[39m[32m 3[2mms[22m[39m
+     [32m✓[39m respects prefers-reduced-motion and stays on first message[32m 71[2mms[22m[39m
+[31m     [31m×[31m cleans up timer on unmount[39m[32m 30[2mms[22m[39m
+[31m     [31m×[31m resets to first message when messages array changes[39m[32m 4[2mms[22m[39m
+[31m     [31m×[31m uses default interval of 3000ms when not provided[39m[32m 3[2mms[22m[39m
+[31m     [31m×[31m handles custom interval correctly[39m[32m 5[2mms[22m[39m
+[31m     [31m×[31m handles single message array[39m[32m 4[2mms[22m[39m
+[31m     [31m×[31m returns first message as fallback for empty index[39m[32m 3[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m9 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (10)[39m
+[2m   Start at [22m 10:18:11
+[2m   Duration [22m 2.73s[2m (transform 91ms, setup 213ms, import 547ms, tests 156ms, environment 1.49s)[22m
+---
+timestamp: "2026-02-13 10:20:38"
+story: "3-storytelling-loading-states"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+npm error Missing script: "typecheck"
+npm error
+npm error To see a list of scripts, run:
+npm error   npm run
+npm error A complete log of this run can be found in: /Users/darindrobinski/.npm/_logs/2026-02-13T16_20_38_299Z-debug-0.log
+---
+timestamp: "2026-02-13 10:20:57"
+story: "3-storytelling-loading-states"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 2
+src/hooks/useRotatingMessages.ts(26,3): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+---
+timestamp: "2026-02-13 10:21:53"
+story: "3-storytelling-loading-states"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+> gold-miner@0.1.0 lint
+> eslint --max-warnings=0
+
+
+/Users/darindrobinski/dev/repos/gold-miner/src/hooks/useRotatingMessages.ts
+  23:5  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/darindrobinski/dev/repos/gold-miner/src/hooks/useRotatingMessages.ts:23:5
+  21 |
+  22 |   useEffect(() => {
+> 23 |     setIndex(0)
+     |     ^^^^^^^^ Avoid calling setState() directly within an effect
+  24 |   }, [messages])
+  25 |
+  26 |   return messages[index] ?? messages[0] ?? ''  react-hooks/set-state-in-effect
+
+✖ 1 problem (1 error, 0 warnings)
+---
+timestamp: "2026-02-13 10:22:43"
+story: "3-storytelling-loading-states"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+> gold-miner@0.1.0 lint
+> eslint --max-warnings=0
+
+
+/Users/darindrobinski/dev/repos/gold-miner/src/hooks/useRotatingMessages.ts
+  13:20  error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+/Users/darindrobinski/dev/repos/gold-miner/src/hooks/useRotatingMessages.ts:13:20
+  11 |
+  12 |   // Reset index when messages array changes
+> 13 |   if (messages !== messagesRef.current) {
+     |                    ^^^^^^^^^^^^^^^^^^^ Cannot access ref value during render
+  14 |     messagesRef.current = messages
+  15 |     if (index !== 0) {
+  16 |       setIndex(0)  react-hooks/refs
+  14:5   error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+/Users/darindrobinski/dev/repos/gold-miner/src/hooks/useRotatingMessages.ts:14:5
+  12 |   // Reset index when messages array changes
+  13 |   if (messages !== messagesRef.current) {
+> 14 |     messagesRef.current = messages
+     |     ^^^^^^^^^^^^^^^^^^^ Cannot update ref during render
+  15 |     if (index !== 0) {
+  16 |       setIndex(0)
+  17 |     }                  react-hooks/refs
+
+✖ 2 problems (2 errors, 0 warnings)

@@ -2,23 +2,31 @@ import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 import * as schema from './schema';
 
-// Detect if running against Neon (for SSL config)
-const isNeon = process.env.DATABASE_URL?.includes('neon.tech');
+// Survive Next.js HMR in dev mode — reuse pool across module re-evaluations
+const globalForDb = globalThis as unknown as { pgPool?: Pool }
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  // Neon requires SSL
-  ssl: isNeon ? { rejectUnauthorized: false } : undefined,
-  // Connection pool settings (Neon-friendly)
-  max: 10,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 5000,
-});
+function getPool() {
+  if (globalForDb.pgPool) return globalForDb.pgPool
 
-// Handle pool errors
-pool.on('error', (err) => {
-  console.error('Unexpected database pool error:', err);
-});
+  const isNeon = process.env.DATABASE_URL?.includes('neon.tech')
+
+  const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: isNeon ? { rejectUnauthorized: false } : undefined,
+    max: 10,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 5000,
+  })
+
+  pool.on('error', (err) => {
+    console.error('Unexpected database pool error:', err)
+  })
+
+  globalForDb.pgPool = pool
+  return pool
+}
+
+const pool = getPool()
 
 export const db = drizzle(pool, { schema });
 
