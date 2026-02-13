@@ -385,4 +385,44 @@ describe('InsightsPanel', () => {
       expect(screen.getByText('Knowledge Prompt')).toBeInTheDocument();
     });
   });
+
+  describe('GPU Performance Optimizations', () => {
+    it('adds will-change-transform to large spinner during streaming', () => {
+      const onExtract = vi.fn();
+      const { container } = render(
+        <InsightsPanel
+          status="streaming"
+          extractionData={{}}
+          onExtract={onExtract}
+        />
+      );
+
+      // Find the large spinner (h-4 w-4 in the progress header)
+      const spinner = container.querySelector('svg[class*="h-4"][class*="w-4"][class*="animate-spin"]');
+      expect(spinner).toHaveClass('will-change-transform');
+    });
+
+    it('uses scoped transition on progress bar', () => {
+      const onExtract = vi.fn();
+      const { container } = render(
+        <InsightsPanel
+          status="streaming"
+          extractionData={{}}
+          sectionStatuses={{
+            summary: 'done',
+            insights: 'working',
+            actions: 'pending',
+            claudeCode: 'pending',
+            knowledgePrompt: 'pending',
+          }}
+          onExtract={onExtract}
+        />
+      );
+
+      // Find the progress bar (inner div with bg-blue-600)
+      const progressBar = container.querySelector('div[class*="bg-blue-600"]');
+      expect(progressBar).toHaveClass('transition-[width]');
+      expect(progressBar?.className).not.toContain('transition-all');
+    });
+  });
 });

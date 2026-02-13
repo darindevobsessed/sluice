@@ -153,4 +153,51 @@ describe('InsightSection', () => {
     // Should render without crashing
     expect(screen.getByText('Summary')).toBeInTheDocument();
   });
+
+  describe('GPU Performance Optimizations', () => {
+    it('uses scoped transition properties instead of transition-all', () => {
+      const { container } = render(
+        <InsightSection
+          title="Summary"
+          icon={FileText}
+          status="working"
+          content=""
+        />
+      );
+
+      // Find the card div (first child of container)
+      const card = container.querySelector('div[class*="rounded-lg"]');
+      expect(card).toHaveClass('transition-[border-color,box-shadow]');
+      expect(card?.className).not.toContain('transition-all');
+    });
+
+    it('adds will-change-transform to working status spinner for GPU compositing', () => {
+      render(
+        <InsightSection
+          title="Summary"
+          icon={FileText}
+          status="working"
+          content=""
+        />
+      );
+
+      const spinner = screen.getByTestId('status-indicator-working');
+      expect(spinner).toHaveClass('will-change-transform');
+      expect(spinner).toHaveClass('animate-spin');
+    });
+
+    it('does not add will-change-transform to non-spinning icons', () => {
+      render(
+        <InsightSection
+          title="Summary"
+          icon={FileText}
+          status="done"
+          content="Test"
+        />
+      );
+
+      const doneIcon = screen.getByTestId('status-indicator-done');
+      expect(doneIcon?.className).not.toContain('will-change-transform');
+    });
+  });
 });

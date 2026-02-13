@@ -1,14 +1,14 @@
 ---
 name: add-video-gpu-performance
 title: Fix GPU performance issues during insight extraction
-status: active
+status: complete
 cycle: ui-refinement
 story_number: 6
 created: 2026-02-11
 updated: 2026-02-12
 priority: high
 chunks_total: 2
-chunks_complete: 1
+chunks_complete: 2
 ---
 
 # Story: Fix GPU performance issues during insight extraction

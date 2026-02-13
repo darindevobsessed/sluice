@@ -43,7 +43,7 @@ export function InsightSection({
 
   return (
     <div className={cn(
-      'rounded-lg border bg-card p-6 transition-all duration-300',
+      'rounded-lg border bg-card p-6 transition-[border-color,box-shadow] duration-300',
       status === 'working' && 'border-blue-500/50 shadow-sm shadow-blue-500/10',
       className
     )}>
@@ -70,7 +70,7 @@ export function InsightSection({
           )}
           {status === 'working' && (
             <Loader2
-              className="h-5 w-5 animate-spin text-blue-500"
+              className="h-5 w-5 animate-spin will-change-transform text-blue-500"
               data-testid="status-indicator-working"
               aria-label="Working"
             />

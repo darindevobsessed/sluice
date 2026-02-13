@@ -46,7 +46,7 @@ export function InsightsPanel({
     return (
       <div className={className}>
         <div className="flex flex-col items-center justify-center py-12 text-center">
-          <Loader2 className="mb-4 h-12 w-12 animate-spin text-muted-foreground" />
+          <Loader2 className="mb-4 h-12 w-12 animate-spin will-change-transform text-muted-foreground" />
           <h3 className="mb-2 text-lg font-medium">Connecting to Claude Code agent</h3>
           <p className="max-w-md text-muted-foreground">
             Establishing connection to the local agent...
@@ -175,7 +175,7 @@ export function InsightsPanel({
           <div className="rounded-lg border border-blue-200 bg-blue-50 dark:border-blue-900 dark:bg-blue-950/30 p-4">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
+                <Loader2 className="h-4 w-4 animate-spin will-change-transform text-blue-600" />
                 <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
                   Extracting insights...
                 </span>
@@ -186,7 +186,7 @@ export function InsightsPanel({
             </div>
             <div className="h-2 bg-blue-200 dark:bg-blue-900 rounded-full overflow-hidden">
               <div
-                className="h-full bg-blue-600 transition-all duration-500 ease-out rounded-full"
+                className="h-full bg-blue-600 transition-[width] duration-500 ease-out rounded-full"
                 style={{ width: `${(progress.done / progress.total) * 100}%` }}
               />
             </div>
