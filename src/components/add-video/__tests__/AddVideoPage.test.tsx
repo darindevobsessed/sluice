@@ -250,6 +250,123 @@ describe('AddVideoPage - Transcript Auto-fetch', () => {
     expect(textarea).toHaveValue('Manually pasted transcript');
   }, 10000);
 
+  it('renders milestone message in success state after submission', async () => {
+    const user = userEvent.setup();
+    const mockFetch = vi.mocked(global.fetch);
+
+    // Mock successful transcript fetch
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ success: true, transcript: 'Test transcript content with enough characters to pass validation' }),
+    } as Response);
+
+    // Mock successful video submission with milestones
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        video: {
+          id: 123,
+          youtubeId: 'abc123',
+          title: 'Test Video Title',
+          channel: 'Test Channel',
+        },
+        milestones: {
+          totalVideos: 1,
+          channelVideoCount: 1,
+          isNewChannel: true,
+        },
+      }),
+    } as Response);
+
+    render(<AddVideoPage />);
+
+    const input = screen.getByLabelText(/what video would you like to add/i);
+    await user.type(input, 'https://youtube.com/watch?v=abc123');
+
+    // Wait for metadata and transcript to load
+    await waitFor(() => {
+      expect(screen.getByText(/test video title/i)).toBeInTheDocument();
+    }, { timeout: 3000 });
+
+    await waitFor(() => {
+      expect(screen.getByText(/transcript ready/i)).toBeInTheDocument();
+    }, { timeout: 3000 });
+
+    // Submit the form
+    const submitButton = screen.getByRole('button', { name: /add to knowledge bank/i });
+    await user.click(submitButton);
+
+    // Wait for success state and milestone message
+    await waitFor(() => {
+      expect(screen.getByText(/added to your knowledge bank/i)).toBeInTheDocument();
+    }, { timeout: 3000 });
+
+    // Should show milestone message for first video
+    expect(screen.getByText(/your first video — welcome to your knowledge bank/i)).toBeInTheDocument();
+  }, 10000);
+
+  it('resets milestones when user clicks "Add Another"', async () => {
+    const user = userEvent.setup();
+    const mockFetch = vi.mocked(global.fetch);
+
+    // Mock successful transcript fetch
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ success: true, transcript: 'Test transcript content with enough characters to pass validation' }),
+    } as Response);
+
+    // Mock successful video submission with milestones
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        video: {
+          id: 456,
+          youtubeId: 'xyz789',
+          title: 'Another Video',
+          channel: 'Test Channel',
+        },
+        milestones: {
+          totalVideos: 5,
+          channelVideoCount: 2,
+          isNewChannel: false,
+        },
+      }),
+    } as Response);
+
+    render(<AddVideoPage />);
+
+    const input = screen.getByLabelText(/what video would you like to add/i);
+    await user.type(input, 'https://youtube.com/watch?v=xyz789');
+
+    // Wait for metadata and transcript to load
+    await waitFor(() => {
+      expect(screen.getByText(/test video title/i)).toBeInTheDocument();
+    }, { timeout: 3000 });
+
+    await waitFor(() => {
+      expect(screen.getByText(/transcript ready/i)).toBeInTheDocument();
+    }, { timeout: 3000 });
+
+    // Submit the form
+    const submitButton = screen.getByRole('button', { name: /add to knowledge bank/i });
+    await user.click(submitButton);
+
+    // Wait for success state with milestone
+    await waitFor(() => {
+      expect(screen.getByText(/5 videos strong — your collection is taking shape/i)).toBeInTheDocument();
+    }, { timeout: 3000 });
+
+    // Click "Add another"
+    const addAnotherButton = screen.getByRole('button', { name: /add another video/i });
+    await user.click(addAnotherButton);
+
+    // Should reset to initial state without milestone
+    await waitFor(() => {
+      expect(screen.getByLabelText(/what video would you like to add/i)).toBeInTheDocument();
+      expect(screen.queryByText(/5 videos strong/i)).not.toBeInTheDocument();
+    });
+  }, 10000);
+
   it('handles AbortError gracefully when request is cancelled', async () => {
     const user = userEvent.setup();
     const mockFetch = vi.mocked(global.fetch);

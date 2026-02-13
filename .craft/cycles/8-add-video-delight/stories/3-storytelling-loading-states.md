@@ -1,7 +1,7 @@
 ---
 name: storytelling-loading-states
 title: "Storytelling loading state messages"
-status: ready
+status: active
 priority: medium
 created: 2026-02-12
 updated: 2026-02-12

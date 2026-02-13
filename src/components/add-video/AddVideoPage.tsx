@@ -28,6 +28,7 @@ export function AddVideoPage() {
   const [submitted, setSubmitted] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [createdVideoId, setCreatedVideoId] = useState<number | null>(null)
+  const [milestones, setMilestones] = useState<{ totalVideos: number, channelVideoCount: number, isNewChannel: boolean } | undefined>()
 
   // Transcript auto-fetch state
   const [transcriptFetching, setTranscriptFetching] = useState(false)
@@ -223,6 +224,7 @@ export function AddVideoPage() {
 
       // Success!
       setCreatedVideoId(data.video.id);
+      setMilestones(data.milestones);
       setSubmitted(true);
     } catch (err) {
       console.error("Submission error:", err);
@@ -246,6 +248,7 @@ export function AddVideoPage() {
     setSubmitted(false);
     setSubmitError(null);
     setCreatedVideoId(null);
+    setMilestones(undefined);
     setTranscriptFetching(false);
     setTranscriptFetchError(null);
     setTranscriptSource(null);
@@ -270,6 +273,7 @@ export function AddVideoPage() {
           thumbnail={thumbnail}
           onReset={handleReset}
           videoId={createdVideoId}
+          milestones={milestones}
         />
       </div>
     );
