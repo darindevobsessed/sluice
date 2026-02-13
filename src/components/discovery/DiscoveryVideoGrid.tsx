@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useRef } from 'react'
+import { useMemo, useRef } from 'react'
 import { DiscoveryVideoCard, DiscoveryVideoCardSkeleton, type DiscoveryVideo } from './DiscoveryVideoCard'
 import { Pagination } from './Pagination'
 
@@ -8,11 +8,19 @@ interface DiscoveryVideoGridProps {
   videos: DiscoveryVideo[]
   isLoading?: boolean
   focusAreaMap?: Record<string, { id: number; name: string; color: string }[]>
+  currentPage?: number
+  onPageChange?: (page: number) => void
 }
 
 const VIDEOS_PER_PAGE = 24
 
-export function DiscoveryVideoGrid({ videos, isLoading = false, focusAreaMap }: DiscoveryVideoGridProps) {
+export function DiscoveryVideoGrid({
+  videos,
+  isLoading = false,
+  focusAreaMap,
+  currentPage = 1,
+  onPageChange,
+}: DiscoveryVideoGridProps) {
   const gridRef = useRef<HTMLDivElement>(null)
 
   // Sort videos by publishedAt descending (newest first)
@@ -22,21 +30,6 @@ export function DiscoveryVideoGrid({ videos, isLoading = false, focusAreaMap }: 
     })
   }, [videos])
 
-  // Create a stable key from the video IDs to detect when the video list changes
-  const videosKey = useMemo(() => {
-    return videos.map((v) => v.youtubeId).join(',')
-  }, [videos])
-
-  // State includes both current page and the videos key it's associated with
-  // This allows us to reset page to 1 when videos change
-  const [pageState, setPageState] = useState<{ page: number; videosKey: string }>({
-    page: 1,
-    videosKey
-  })
-
-  // If videos changed, reset to page 1
-  const currentPage = pageState.videosKey === videosKey ? pageState.page : 1
-
   // Calculate pagination
   const totalPages = Math.ceil(sortedVideos.length / VIDEOS_PER_PAGE)
   const startIndex = (currentPage - 1) * VIDEOS_PER_PAGE
@@ -45,7 +38,9 @@ export function DiscoveryVideoGrid({ videos, isLoading = false, focusAreaMap }: 
 
   // Scroll to top of grid on page change
   const handlePageChange = (page: number) => {
-    setPageState({ page, videosKey })
+    if (onPageChange) {
+      onPageChange(page)
+    }
 
     // Scroll to top of the page
     window.scrollTo({ top: 0, behavior: 'smooth' })
