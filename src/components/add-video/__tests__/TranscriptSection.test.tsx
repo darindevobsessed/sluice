@@ -31,8 +31,8 @@ describe('TranscriptSection', () => {
   it('shows auto-fetched badge when source is auto', () => {
     render(<TranscriptSection {...defaultProps} source="auto" />);
 
-    // Should show success indicator
-    expect(screen.getByText(/auto-fetched from youtube/i)).toBeInTheDocument();
+    // Should show success indicator with new celebratory copy
+    expect(screen.getByText(/transcript ready/i)).toBeInTheDocument();
   });
 
   it('shows error alert with retry button when fetchError exists', () => {
@@ -76,6 +76,43 @@ describe('TranscriptSection', () => {
     // Instructions should be collapsed (small link visible, not full instructions)
     expect(screen.queryByText(/Open the video on YouTube/i)).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: /how to get a transcript manually/i })).toBeInTheDocument();
+  });
+
+  it('shows "Your transcript:" label when source is auto', () => {
+    render(<TranscriptSection {...defaultProps} source="auto" />);
+
+    // Should show warmer label copy
+    expect(screen.getByText(/your transcript:/i)).toBeInTheDocument();
+  });
+
+  it('shows "Now paste the transcript:" label when source is not auto', () => {
+    render(<TranscriptSection {...defaultProps} source="manual" />);
+
+    // Should show instructional label copy
+    expect(screen.getByText(/now paste the transcript:/i)).toBeInTheDocument();
+  });
+
+  it('applies entrance animation to success indicator', () => {
+    const { container } = render(<TranscriptSection {...defaultProps} source="auto" />);
+
+    // Find the success indicator span
+    const successIndicator = container.querySelector('.animate-in');
+    expect(successIndicator).toBeInTheDocument();
+    expect(successIndicator).toHaveClass('fade-in', 'duration-200');
+  });
+
+  it('applies green border to textarea when source is auto', () => {
+    render(<TranscriptSection {...defaultProps} source="auto" />);
+
+    const textarea = screen.getByRole('textbox');
+    expect(textarea).toHaveClass('border-green-300');
+  });
+
+  it('does not apply green border to textarea when source is not auto', () => {
+    render(<TranscriptSection {...defaultProps} source="manual" />);
+
+    const textarea = screen.getByRole('textbox');
+    expect(textarea).not.toHaveClass('border-green-300');
   });
 
   it('shows expanded instructions when source is manual or null', () => {

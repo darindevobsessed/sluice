@@ -151,7 +151,7 @@ describe('AddVideoPage - Transcript Auto-fetch', () => {
 
     // Wait for transcript to load
     await waitFor(() => {
-      expect(screen.getByText(/auto-fetched from youtube/i)).toBeInTheDocument();
+      expect(screen.getByText(/transcript ready/i)).toBeInTheDocument();
     }, { timeout: 3000 });
   }, 10000);
 
@@ -239,7 +239,7 @@ describe('AddVideoPage - Transcript Auto-fetch', () => {
     await user.type(input, 'https://youtube.com/watch?v=abc123');
 
     await waitFor(() => {
-      expect(screen.getByText(/auto-fetched from youtube/i)).toBeInTheDocument();
+      expect(screen.getByText(/transcript ready/i)).toBeInTheDocument();
     }, { timeout: 3000 });
 
     // User should still be able to edit the transcript

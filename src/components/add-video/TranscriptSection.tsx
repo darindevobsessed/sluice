@@ -4,7 +4,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { TranscriptInstructions } from "./TranscriptInstructions";
-import { Check, RefreshCw, AlertCircle } from "lucide-react";
+import { Sparkles, RefreshCw, AlertCircle } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface TranscriptSectionProps {
   value: string;
@@ -31,7 +32,7 @@ export function TranscriptSection({
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <Label htmlFor="transcript" className="text-base">
-            {source === "auto" ? "Transcript:" : "Now paste the transcript:"}
+            {source === "auto" ? "Your transcript:" : "Now paste the transcript:"}
           </Label>
           {isFetching && (
             <span className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -40,9 +41,9 @@ export function TranscriptSection({
             </span>
           )}
           {source === "auto" && !isFetching && (
-            <span className="flex items-center gap-1 text-sm text-green-600">
-              <Check className="h-4 w-4" />
-              Auto-fetched from YouTube
+            <span className="flex items-center gap-1.5 text-sm text-green-600 animate-in fade-in duration-200">
+              <Sparkles className="h-3.5 w-3.5" />
+              Transcript ready — pulled from YouTube
             </span>
           )}
         </div>
@@ -75,7 +76,10 @@ export function TranscriptSection({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder="Paste the full video transcript here..."
-        className="min-h-[300px] max-h-[500px] overflow-y-auto text-base leading-relaxed"
+        className={cn(
+          "min-h-[300px] max-h-[500px] overflow-y-auto text-base leading-relaxed",
+          source === "auto" && "border-green-300 dark:border-green-800"
+        )}
         disabled={isFetching}
       />
 

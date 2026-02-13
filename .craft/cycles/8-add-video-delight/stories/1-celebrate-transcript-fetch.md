@@ -8,7 +8,7 @@ updated: 2026-02-12
 cycle: add-video-delight
 story_number: 1
 chunks_total: 2
-chunks_complete: 0
+chunks_complete: 1
 ---
 
 # Story: Celebrate transcript auto-fetch with personality

@@ -1,0 +1,17 @@
+story: "celebrate-transcript-fetch"
+chunk: 1
+total_chunks: 2
+cycle: "8-add-video-delight"
+timestamp: "2026-02-13T01:10:16Z"
+git_ref: "91a5610"
+git_branch: "main"
+state_CYCLE_STATUS: "planning"
+state_CURRENT_STORY: "1-celebrate-transcript-fetch"
+state_CURRENT_CHUNK: "1"
+state_TOTAL_CHUNKS: "2"
+state_LAST_VALIDATION: ""
+story_status: "active"
+story_chunks_total: "2"
+story_chunks_complete: "0"
+test_status: ""
+modified_files: ".craft/.exports/pre-compact-20260210_114603.md .craft/.exports/pre-compact-20260210_162510.md .craft/.exports/pre-compact-20260212_172640.md .craft/.exports/pre-compact-20260212_185012.md .craft/.global-state .craft/analysis/add-transcript-page.png .craft/analysis/add-video-page.png .craft/checkpoints/add-video-gpu-performance-chunk-2.yaml .craft/cycles/7-ui-refinement/.failures .craft/cycles/7-ui-refinement/.state .craft/cycles/7-ui-refinement/cycle.yaml .craft/cycles/7-ui-refinement/stories/6-add-video-gpu-performance.md .craft/cycles/8-add-video-delight/.state .craft/cycles/8-add-video-delight/cycle.yaml .craft/cycles/8-add-video-delight/stories/1-celebrate-transcript-fetch.md .craft/cycles/8-add-video-delight/stories/2-success-state-milestones.md .craft/cycles/8-add-video-delight/stories/3-storytelling-loading-states.md src/components/insights/InsightSection.tsx src/components/insights/InsightsPanel.tsx src/components/insights/__tests__/InsightSection.test.tsx src/components/insights/__tests__/InsightsPanel.test.tsx src/components/ui/__tests__/button.test.tsx src/components/ui/button.tsx "
