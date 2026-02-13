@@ -1,0 +1,17 @@
+story: "celebrate-transcript-fetch"
+chunk: 2
+total_chunks: 2
+cycle: "8-add-video-delight"
+timestamp: "2026-02-13T01:18:51Z"
+git_ref: "bb48f74"
+git_branch: "main"
+state_CYCLE_STATUS: "active"
+state_CURRENT_STORY: "1-celebrate-transcript-fetch"
+state_CURRENT_CHUNK: "2"
+state_TOTAL_CHUNKS: "2"
+state_LAST_VALIDATION: "2026-02-13T01:18:44Z"
+story_status: "active"
+story_chunks_total: "2"
+story_chunks_complete: "1"
+test_status: ""
+modified_files: ".craft/.global-state .craft/checkpoints/celebrate-transcript-fetch-chunk-1.yaml .craft/cycles/8-add-video-delight/.state .craft/cycles/8-add-video-delight/.usage/1-celebrate-transcript-fetch.log .craft/cycles/8-add-video-delight/stories/1-celebrate-transcript-fetch.md src/components/add-video/TranscriptSection.tsx src/components/add-video/__tests__/AddVideoPage.test.tsx src/components/add-video/__tests__/TranscriptSection.test.tsx "

@@ -1,7 +1,7 @@
 ---
 name: success-state-milestones
 title: "Transform success state with milestones and what's next card"
-status: ready
+status: active
 priority: high
 created: 2026-02-12
 updated: 2026-02-12

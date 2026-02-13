@@ -1,14 +1,14 @@
 ---
 name: celebrate-transcript-fetch
 title: "Celebrate transcript auto-fetch with personality"
-status: active
+status: complete
 priority: high
 created: 2026-02-12
 updated: 2026-02-12
 cycle: add-video-delight
 story_number: 1
 chunks_total: 2
-chunks_complete: 1
+chunks_complete: 2
 ---
 
 # Story: Celebrate transcript auto-fetch with personality
