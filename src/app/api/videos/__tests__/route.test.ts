@@ -50,6 +50,7 @@ vi.mock('@/lib/db/search', async () => {
     ...actual,
     searchVideos: (query: string) => actual.searchVideos(query, testDb),
     getVideoStats: () => actual.getVideoStats(testDb),
+    getDistinctChannels: () => actual.getDistinctChannels(testDb),
   }
 })
 
@@ -529,6 +530,87 @@ describe('POST /api/videos', () => {
     expect(data.video.publishedAt).toBeDefined()
     expect(data.video.description).toBe('Complete description')
     expect(data.video.duration).toBe(450)
+  })
+
+  it('includes milestones in POST response', async () => {
+    // Create an existing video from a different channel first
+    await testDb.insert(schema.videos).values({
+      youtubeId: 'existing-video',
+      title: 'Existing Video',
+      channel: 'Existing Channel',
+      transcript: 'Existing transcript content',
+    })
+
+    const request = new Request('http://localhost:3000/api/videos', {
+      method: 'POST',
+      body: JSON.stringify({
+        youtubeId: 'test-milestones',
+        title: 'Milestones Test Video',
+        channel: 'Test Channel',
+        transcript: 'This is a test transcript with enough characters to pass validation',
+      }),
+    })
+
+    const response = await POST(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(201)
+    expect(data.video).toBeDefined()
+    expect(data.milestones).toBeDefined()
+    expect(data.milestones.totalVideos).toBe(2) // Includes the new video
+    expect(data.milestones.channelVideoCount).toBe(1)
+    expect(data.milestones.isNewChannel).toBe(true)
+  })
+
+  it('marks isNewChannel as false when adding second video from same channel', async () => {
+    // Create first video from "Same Channel"
+    await testDb.insert(schema.videos).values({
+      youtubeId: 'first-video-same-channel',
+      title: 'First Video',
+      channel: 'Same Channel',
+      transcript: 'First video transcript',
+    })
+
+    // Add second video from "Same Channel"
+    const request = new Request('http://localhost:3000/api/videos', {
+      method: 'POST',
+      body: JSON.stringify({
+        youtubeId: 'second-video-same-channel',
+        title: 'Second Video',
+        channel: 'Same Channel',
+        transcript: 'This is the second video from the same channel with enough characters',
+      }),
+    })
+
+    const response = await POST(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(201)
+    expect(data.milestones).toBeDefined()
+    expect(data.milestones.totalVideos).toBe(2)
+    expect(data.milestones.channelVideoCount).toBe(2)
+    expect(data.milestones.isNewChannel).toBe(false)
+  })
+
+  it('handles transcript-type videos with null channel in milestones', async () => {
+    const request = new Request('http://localhost:3000/api/videos', {
+      method: 'POST',
+      body: JSON.stringify({
+        sourceType: 'transcript',
+        title: 'Transcript Without Channel',
+        transcript: 'This is a transcript entry without channel for milestone testing',
+      }),
+    })
+
+    const response = await POST(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(201)
+    expect(data.video.channel).toBeNull()
+    expect(data.milestones).toBeDefined()
+    expect(data.milestones.totalVideos).toBe(1)
+    expect(data.milestones.channelVideoCount).toBe(0)
+    expect(data.milestones.isNewChannel).toBe(false)
   })
 })
 

@@ -8,7 +8,7 @@ updated: 2026-02-12
 cycle: add-video-delight
 story_number: 2
 chunks_total: 3
-chunks_complete: 0
+chunks_complete: 1
 ---
 
 # Story: Transform success state with milestones and what's next card

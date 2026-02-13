@@ -29,4 +29,4 @@ export { pool };
 export * from './schema'
 
 // Re-export search functions
-export { searchVideos, getVideoStats } from './search'
+export { searchVideos, getVideoStats, getDistinctChannels } from './search'

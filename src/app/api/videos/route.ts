@@ -1,4 +1,4 @@
-import { db, videos, searchVideos, getVideoStats, videoFocusAreas, focusAreas } from "@/lib/db";
+import { db, videos, searchVideos, getVideoStats, getDistinctChannels, videoFocusAreas, focusAreas } from "@/lib/db";
 import { eq, inArray } from "drizzle-orm";
 import { NextResponse, after } from "next/server";
 import { z } from "zod";
@@ -222,8 +222,29 @@ export async function POST(request: Request) {
       })
     }
 
+    if (!createdVideo) {
+      return NextResponse.json(
+        { error: "Failed to create video" },
+        { status: 500 }
+      );
+    }
+
+    // Get milestone data
+    const stats = await getVideoStats()
+    const channels = await getDistinctChannels()
+    const channelVideoCount = createdVideo.channel
+      ? channels.find(c => c.channel === createdVideo.channel)?.videoCount ?? 0
+      : 0
+
     return NextResponse.json(
-      { video: createdVideo },
+      {
+        video: createdVideo,
+        milestones: {
+          totalVideos: stats.count,
+          channelVideoCount,
+          isNewChannel: channelVideoCount === 1 && createdVideo.channel !== null,
+        }
+      },
       { status: 201 }
     );
   } catch (error) {

@@ -1,0 +1,22 @@
+---
+timestamp: "2026-02-12 21:35:06"
+story: "2-success-state-milestones"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+npm error Missing script: "typecheck"
+npm error
+npm error To see a list of scripts, run:
+npm error   npm run
+npm error A complete log of this run can be found in: /Users/darindrobinski/.npm/_logs/2026-02-13T03_35_06_201Z-debug-0.log
+---
+timestamp: "2026-02-12 21:35:58"
+story: "2-success-state-milestones"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 2
+src/app/api/videos/route.ts(228,31): error TS18048: 'createdVideo' is possibly 'undefined'.
+src/app/api/videos/route.ts(229,42): error TS18048: 'createdVideo' is possibly 'undefined'.
+src/app/api/videos/route.ts(238,52): error TS18048: 'createdVideo' is possibly 'undefined'.
