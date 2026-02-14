@@ -7,6 +7,8 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { formatRelativeTime } from '@/lib/time-utils'
+import { Loader2, Check, X } from 'lucide-react'
+import type { BatchItemStatus } from '@/hooks/useBatchAdd'
 
 export interface DiscoveryVideo {
   youtubeId: string
@@ -27,6 +29,7 @@ interface DiscoveryVideoCardProps {
   selectable?: boolean
   selected?: boolean
   onToggleSelect?: (youtubeId: string) => void
+  batchStatus?: BatchItemStatus
 }
 
 export function DiscoveryVideoCard({
@@ -38,6 +41,7 @@ export function DiscoveryVideoCard({
   selectable = false,
   selected = false,
   onToggleSelect,
+  batchStatus,
 }: DiscoveryVideoCardProps) {
   const publishedDate = new Date(video.publishedAt)
   const relativeTime = formatRelativeTime(publishedDate)
@@ -46,6 +50,9 @@ export function DiscoveryVideoCard({
 
   // Only show selection UI on not-saved cards
   const showSelectionUI = selectable && !video.inBank
+
+  // When batch status is 'done', treat the card as if it's in the bank
+  const isInBankOrDone = video.inBank || batchStatus === 'done'
 
   const handleCheckboxClick = (e: React.MouseEvent<HTMLInputElement>) => {
     e.stopPropagation()
@@ -96,6 +103,25 @@ export function DiscoveryVideoCard({
         {isNew && (
           <div className="absolute top-2 right-2 size-3 rounded-full bg-[#059669]" aria-label="New video" />
         )}
+
+        {/* Batch status overlay */}
+        {batchStatus && batchStatus !== 'pending' && (
+          <div className="absolute inset-0 bg-background/60 flex items-center justify-center z-10">
+            {(batchStatus === 'fetching-transcript' || batchStatus === 'saving') && (
+              <Loader2 className="size-8 animate-spin text-primary" />
+            )}
+            {batchStatus === 'done' && (
+              <div className="bg-green-500/20 rounded-full p-3 animate-in fade-in duration-300">
+                <Check className="size-8 text-green-600 dark:text-green-400" />
+              </div>
+            )}
+            {batchStatus === 'error' && (
+              <div className="bg-red-500/20 rounded-full p-3">
+                <X className="size-8 text-red-600 dark:text-red-400" />
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Content */}
@@ -119,7 +145,7 @@ export function DiscoveryVideoCard({
         )}
 
         {/* Action: Add to Bank or In Bank badge */}
-        {video.inBank ? (
+        {isInBankOrDone ? (
           <Badge variant="secondary" className="bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300 transition-opacity duration-200">
             <svg
               className="size-3"

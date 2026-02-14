@@ -1,14 +1,14 @@
 ---
 name: batch-add-from-discovery
 title: "Batch Add from Discovery"
-status: active
+status: complete
 cycle: state-navigation
 story_number: 4
 created: 2026-02-14
 updated: 2026-02-14
 priority: high
 chunks_total: 3
-chunks_complete: 2
+chunks_complete: 3
 ---
 
 # Story: Batch Add from Discovery

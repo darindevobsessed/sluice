@@ -14,6 +14,7 @@ import type { FilterPill } from '@/components/filters/FilterPillBar'
 import { FloatingBatchBar } from '@/components/discovery/FloatingBatchBar'
 import { useURLParams } from '@/hooks/useURLParams'
 import { buildReturnTo } from '@/lib/navigation'
+import { useBatchAdd } from '@/hooks/useBatchAdd'
 
 interface Channel {
   id: number
@@ -60,7 +61,14 @@ export function DiscoveryContent() {
   const [isLoadingVideos, setIsLoadingVideos] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
-  const [isBatchAdding] = useState(false) // setIsBatchAdding wired in chunk 3
+
+  // Batch add hook
+  const { startBatch, batchStatus, isRunning } = useBatchAdd({
+    onComplete: () => {
+      fetchVideos()
+      setSelectedIds(new Set())
+    },
+  })
 
   // Compute returnTo for navigation
   const returnTo = buildReturnTo('/discovery', searchParams)
@@ -181,9 +189,9 @@ export function DiscoveryContent() {
   }, [])
 
   const handleBatchAdd = useCallback(() => {
-    // Placeholder — wired in chunk 3
-    console.log('Batch add:', [...selectedIds])
-  }, [selectedIds])
+    const videosToAdd = discoveryVideos.filter(v => selectedIds.has(v.youtubeId) && !v.inBank)
+    startBatch(videosToAdd)
+  }, [selectedIds, discoveryVideos, startBatch])
 
   const handleChannelChange = (channelId: string | null) => {
     updateParams({ channel: channelId, page: null })
@@ -331,6 +339,7 @@ export function DiscoveryContent() {
           returnTo={returnTo}
           selectedIds={selectedIds}
           onToggleSelect={handleToggleSelect}
+          batchStatus={batchStatus}
         />
       )}
 
@@ -339,7 +348,7 @@ export function DiscoveryContent() {
         selectedCount={selectedIds.size}
         onAdd={handleBatchAdd}
         onClear={() => setSelectedIds(new Set())}
-        isAdding={isBatchAdding}
+        isAdding={isRunning}
       />
     </div>
   )

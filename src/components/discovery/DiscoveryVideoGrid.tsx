@@ -3,6 +3,7 @@
 import { useMemo, useRef } from 'react'
 import { DiscoveryVideoCard, DiscoveryVideoCardSkeleton, type DiscoveryVideo } from './DiscoveryVideoCard'
 import { Pagination } from './Pagination'
+import type { BatchItem } from '@/hooks/useBatchAdd'
 
 interface DiscoveryVideoGridProps {
   videos: DiscoveryVideo[]
@@ -13,6 +14,7 @@ interface DiscoveryVideoGridProps {
   returnTo?: string
   selectedIds?: Set<string>
   onToggleSelect?: (youtubeId: string) => void
+  batchStatus?: Map<string, BatchItem>
 }
 
 const VIDEOS_PER_PAGE = 24
@@ -26,6 +28,7 @@ export function DiscoveryVideoGrid({
   returnTo,
   selectedIds,
   onToggleSelect,
+  batchStatus,
 }: DiscoveryVideoGridProps) {
   const gridRef = useRef<HTMLDivElement>(null)
 
@@ -78,6 +81,7 @@ export function DiscoveryVideoGrid({
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
         {currentVideos.map((video) => {
           const focusAreas = focusAreaMap?.[video.youtubeId]
+          const itemBatchStatus = batchStatus?.get(video.youtubeId)?.status
 
           return (
             <DiscoveryVideoCard
@@ -88,6 +92,7 @@ export function DiscoveryVideoGrid({
               selectable={!video.inBank}
               selected={selectedIds?.has(video.youtubeId)}
               onToggleSelect={onToggleSelect}
+              batchStatus={itemBatchStatus}
             />
           )
         })}
