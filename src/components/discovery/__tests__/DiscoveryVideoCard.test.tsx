@@ -135,6 +135,23 @@ describe('DiscoveryVideoCard', () => {
     vi.useRealTimers()
   })
 
+  describe('Bank video ID prop', () => {
+    it('should accept bankVideoId prop and render without error', () => {
+      render(<DiscoveryVideoCard video={mockVideo} bankVideoId={42} />)
+      expect(screen.getByText('Test Video Title')).toBeInTheDocument()
+    })
+
+    it('should render without error when bankVideoId is undefined', () => {
+      render(<DiscoveryVideoCard video={mockVideo} bankVideoId={undefined} />)
+      expect(screen.getByText('Test Video Title')).toBeInTheDocument()
+    })
+
+    it('should render without error when bankVideoId is not provided', () => {
+      render(<DiscoveryVideoCard video={mockVideo} />)
+      expect(screen.getByText('Test Video Title')).toBeInTheDocument()
+    })
+  })
+
   describe('Selection behavior', () => {
     it('should render checkbox when selectable and not in bank', () => {
       const onToggleSelect = vi.fn()

@@ -57,6 +57,7 @@ export function DiscoveryContent() {
   const [channels, setChannels] = useState<Channel[]>([])
   const [discoveryVideos, setDiscoveryVideos] = useState<DiscoveryVideo[]>([])
   const [focusAreaMap, setFocusAreaMap] = useState<Record<string, { id: number; name: string; color: string }[]>>({})
+  const [bankIdMap, setBankIdMap] = useState<Record<string, number>>({})
   const [isLoading, setIsLoading] = useState(true)
   const [isLoadingVideos, setIsLoadingVideos] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -101,6 +102,7 @@ export function DiscoveryContent() {
         console.error('Failed to fetch discovery videos')
         setDiscoveryVideos([])
         setFocusAreaMap({})
+        setBankIdMap({})
         return
       }
 
@@ -113,6 +115,7 @@ export function DiscoveryContent() {
       if (!bankResponse.ok) {
         console.error('Failed to fetch bank videos')
         setFocusAreaMap({})
+        setBankIdMap({})
         return
       }
 
@@ -120,6 +123,7 @@ export function DiscoveryContent() {
 
       // Remap focusAreaMap from DB id to youtubeId
       const youtubeIdMap: Record<string, { id: number; name: string; color: string }[]> = {}
+      const bankIdMap: Record<string, number> = {}
       for (const video of bankData.videos) {
         const areas = bankData.focusAreaMap[video.id]
         if (areas && areas.length > 0 && video.youtubeId) {
@@ -129,13 +133,18 @@ export function DiscoveryContent() {
             color: fa.color ?? '',
           }))
         }
+        if (video.youtubeId) {
+          bankIdMap[video.youtubeId] = video.id
+        }
       }
 
       setFocusAreaMap(youtubeIdMap)
+      setBankIdMap(bankIdMap)
     } catch (err) {
       console.error('Failed to fetch videos:', err)
       setDiscoveryVideos([])
       setFocusAreaMap({})
+      setBankIdMap({})
     } finally {
       setIsLoadingVideos(false)
     }
@@ -334,6 +343,7 @@ export function DiscoveryContent() {
           videos={filteredVideos}
           isLoading={isLoadingVideos}
           focusAreaMap={focusAreaMap}
+          bankIdMap={bankIdMap}
           currentPage={currentPage}
           onPageChange={handlePageChange}
           returnTo={returnTo}

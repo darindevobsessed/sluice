@@ -8,7 +8,7 @@ created: 2026-02-14
 updated: 2026-02-14
 priority: high
 chunks_total: 2
-chunks_complete: 0
+chunks_complete: 1
 ---
 
 # Story: Navigate to Video Detail from Discovery (In-Bank Videos)

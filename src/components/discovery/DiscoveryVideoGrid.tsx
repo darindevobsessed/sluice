@@ -15,6 +15,7 @@ interface DiscoveryVideoGridProps {
   selectedIds?: Set<string>
   onToggleSelect?: (youtubeId: string) => void
   batchStatus?: Map<string, BatchItem>
+  bankIdMap?: Record<string, number>
 }
 
 const VIDEOS_PER_PAGE = 24
@@ -29,6 +30,7 @@ export function DiscoveryVideoGrid({
   selectedIds,
   onToggleSelect,
   batchStatus,
+  bankIdMap,
 }: DiscoveryVideoGridProps) {
   const gridRef = useRef<HTMLDivElement>(null)
 
@@ -82,6 +84,7 @@ export function DiscoveryVideoGrid({
         {currentVideos.map((video) => {
           const focusAreas = focusAreaMap?.[video.youtubeId]
           const itemBatchStatus = batchStatus?.get(video.youtubeId)?.status
+          const bankVideoId = bankIdMap?.[video.youtubeId]
 
           return (
             <DiscoveryVideoCard
@@ -93,6 +96,7 @@ export function DiscoveryVideoGrid({
               selected={selectedIds?.has(video.youtubeId)}
               onToggleSelect={onToggleSelect}
               batchStatus={itemBatchStatus}
+              bankVideoId={bankVideoId}
             />
           )
         })}

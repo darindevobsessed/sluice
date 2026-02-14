@@ -30,6 +30,7 @@ interface DiscoveryVideoCardProps {
   selected?: boolean
   onToggleSelect?: (youtubeId: string) => void
   batchStatus?: BatchItemStatus
+  bankVideoId?: number
 }
 
 export function DiscoveryVideoCard({
@@ -42,6 +43,7 @@ export function DiscoveryVideoCard({
   selected = false,
   onToggleSelect,
   batchStatus,
+  bankVideoId,
 }: DiscoveryVideoCardProps) {
   const publishedDate = new Date(video.publishedAt)
   const relativeTime = formatRelativeTime(publishedDate)
