@@ -240,4 +240,60 @@ describe('SuccessState', () => {
     expect(screen.getByText('Add another video')).toBeInTheDocument()
     expect(screen.getByText('Browse Knowledge Bank')).toBeInTheDocument()
   })
+
+  // returnTo behavior tests
+  it('shows "Back to Discovery" when returnTo contains /discovery', () => {
+    render(
+      <SuccessState
+        title="Test Video"
+        onReset={mockOnReset}
+        videoId={123}
+        returnTo="/discovery?channel=abc&type=not-saved"
+      />
+    )
+
+    const link = screen.getByRole('link', { name: /back to discovery/i })
+    expect(link).toHaveAttribute('href', '/discovery?channel=abc&type=not-saved')
+  })
+
+  it('shows "Back to Knowledge Bank" when returnTo is KB with filters', () => {
+    render(
+      <SuccessState
+        title="Test Video"
+        onReset={mockOnReset}
+        videoId={123}
+        returnTo="/?q=react&type=youtube"
+      />
+    )
+
+    const link = screen.getByRole('link', { name: /back to knowledge bank/i })
+    expect(link).toHaveAttribute('href', '/?q=react&type=youtube')
+  })
+
+  it('shows "Browse Knowledge Bank" when no returnTo provided (backward compat)', () => {
+    render(
+      <SuccessState
+        title="Test Video"
+        onReset={mockOnReset}
+        videoId={123}
+      />
+    )
+
+    const link = screen.getByRole('link', { name: /browse knowledge bank/i })
+    expect(link).toHaveAttribute('href', '/')
+  })
+
+  it('shows "Browse Knowledge Bank" when returnTo is null', () => {
+    render(
+      <SuccessState
+        title="Test Video"
+        onReset={mockOnReset}
+        videoId={123}
+        returnTo={null}
+      />
+    )
+
+    const link = screen.getByRole('link', { name: /browse knowledge bank/i })
+    expect(link).toHaveAttribute('href', '/')
+  })
 })

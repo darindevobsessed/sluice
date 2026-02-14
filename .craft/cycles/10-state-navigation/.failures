@@ -582,3 +582,383 @@ npm error
 npm error To see a list of scripts, run:
 npm error   npm run
 npm error A complete log of this run can be found in: /Users/darindrobinski/.npm/_logs/2026-02-13T22_52_39_405Z-debug-0.log
+---
+timestamp: "2026-02-13 18:51:17"
+story: "2-context-aware-navigation"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Suites 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/lib/__tests__/navigation.test.ts[2m [ src/lib/__tests__/navigation.test.ts ][22m
+[31m[1mError[22m: Failed to resolve import "../navigation" from "src/lib/__tests__/navigation.test.ts". Does the file exist?[39m
+  Plugin: [35mvite:import-analysis[39m
+  File: [36m/Users/darindrobinski/dev/repos/gold-miner/src/lib/__tests__/navigation.test.ts[39m:2:61
+[33m  1  |  import { describe, it, expect } from "vitest";
+  2  |  import { buildReturnTo, parseReturnTo, getReturnLabel } from "../navigation";
+     |                                                                ^
+  3  |  describe("buildReturnTo", () => {
+  4  |    it("encodes discovery URL with channel and type filters", () => {[39m
+[90m [2m❯[22m TransformPluginContext._formatLog node_modules/vite/dist/node/chunks/config.js:[2m28999:43[22m[39m
+[90m [2m❯[22m TransformPluginContext.error node_modules/vite/dist/node/chunks/config.js:[2m28996:14[22m[39m
+[90m [2m❯[22m normalizeUrl node_modules/vite/dist/node/chunks/config.js:[2m27119:18[22m[39m
+[90m [2m❯[22m node_modules/vite/dist/node/chunks/config.js:[2m27177:32[22m[39m
+[90m [2m❯[22m TransformPluginContext.transform node_modules/vite/dist/node/chunks/config.js:[2m27145:4[22m[39m
+[90m [2m❯[22m EnvironmentPluginContainer.transform node_modules/vite/dist/node/chunks/config.js:[2m28797:14[22m[39m
+[90m [2m❯[22m loadAndTransform node_modules/vite/dist/node/chunks/config.js:[2m22670:26[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/lib/__tests__/navigation.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/lib/__tests__/navigation.test.ts [2m([22m[2m0 test[22m[2m)[22m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [2mno tests[22m
+[2m   Start at [22m 18:51:13
+[2m   Duration [22m 3.28s[2m (transform 37ms, setup 360ms, import 0ms, tests 0ms, environment 2.56s)[22m
+---
+timestamp: "2026-02-13 18:51:36"
+story: "2-context-aware-navigation"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/lib/__tests__/navigation.test.ts[2m > [22mparseReturnTo[2m > [22mreturns null for protocol-relative URL (open redirect prevention)
+[31m[1mAssertionError[22m: expected '//evil.com/phishing' to be null[39m
+
+[32m- Expected:[39m 
+null
+
+[31m+ Received:[39m 
+"//evil.com/phishing"
+
+[36m [2m❯[22m src/lib/__tests__/navigation.test.ts:[2m86:20[22m[39m
+    [90m 84| [39m    [35mconst[39m result [33m=[39m [34mparseReturnTo[39m([32m'//evil.com/phishing'[39m)
+    [90m 85| [39m
+    [90m 86| [39m    [34mexpect[39m(result)[33m.[39m[34mtoBeNull[39m()
+    [90m   | [39m                   [31m^[39m
+    [90m 87| [39m  })
+    [90m 88| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/lib/__tests__/navigation.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/lib/__tests__/navigation.test.ts [2m([22m[2m21 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 11[2mms[22m[39m
+     [32m✓[39m encodes discovery URL with channel and type filters[32m 1[2mms[22m[39m
+     [32m✓[39m encodes KB URL with search and type filters[32m 0[2mms[22m[39m
+     [32m✓[39m returns empty string for bare KB (no filters)[32m 0[2mms[22m[39m
+     [32m✓[39m handles complex query params with special characters[32m 0[2mms[22m[39m
+     [32m✓[39m returns empty string for root path with empty params[32m 0[2mms[22m[39m
+     [32m✓[39m decodes a valid encoded discovery URL[32m 0[2mms[22m[39m
+     [32m✓[39m decodes a valid encoded KB URL[32m 0[2mms[22m[39m
+     [32m✓[39m returns null for null input[32m 0[2mms[22m[39m
+     [32m✓[39m returns null for empty string[32m 0[2mms[22m[39m
+     [32m✓[39m returns null for external URL (open redirect prevention)[32m 0[2mms[22m[39m
+[31m     [31m×[31m returns null for protocol-relative URL (open redirect prevention)[39m[32m 5[2mms[22m[39m
+     [32m✓[39m returns null for malformed input that does not start with /[32m 0[2mms[22m[39m
+     [32m✓[39m handles encoded URLs that start with / after decoding[32m 0[2mms[22m[39m
+     [32m✓[39m rejects URL with only ? (no pathname)[32m 0[2mms[22m[39m
+     [32m✓[39m returns "Back to Discovery" for discovery URL[32m 1[2mms[22m[39m
+     [32m✓[39m returns "Back to Discovery" for discovery URL without query params[32m 0[2mms[22m[39m
+     [32m✓[39m returns "Back to Knowledge Bank" for KB URL with filters[32m 0[2mms[22m[39m
+     [32m✓[39m returns "Browse Knowledge Bank" for null returnTo (default)[32m 0[2mms[22m[39m
+     [32m✓[39m returns "Browse Knowledge Bank" for bare KB URL[32m 0[2mms[22m[39m
+     [32m✓[39m returns "Back to Knowledge Bank" for video detail with returnTo[32m 0[2mms[22m[39m
+     [32m✓[39m handles discovery subpaths correctly[32m 0[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m20 passed[39m[22m[90m (21)[39m
+[2m   Start at [22m 18:51:34
+[2m   Duration [22m 1.80s[2m (transform 53ms, setup 178ms, import 29ms, tests 11ms, environment 1.14s)[22m
+---
+timestamp: "2026-02-13 18:52:13"
+story: "2-context-aware-navigation"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 2 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/components/add-video/__tests__/SuccessState.test.tsx[2m > [22mSuccessState[2m > [22mshows "Back to Discovery" when returnTo contains /discovery
+[31m[1mTestingLibraryElementError[22m[39m: Unable to find an accessible element with the role "link" and name `/back to discovery/i`
+
+Here are the accessible roles:
+
+  heading:
+
+  Name "Added to your Knowledge Bank!":
+  [36m<h2[39m
+    [33mclass[39m=[32m"mb-2 text-2xl font-semibold"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  paragraph:
+
+  Name "":
+  [36m<p[39m
+    [33mclass[39m=[32m"mb-8 text-muted-foreground"[39m
+  [36m/>[39m
+
+  Name "":
+  [36m<p[39m
+    [33mclass[39m=[32m"max-w-md text-left text-sm font-medium"[39m
+  [36m/>[39m
+
+  Name "":
+  [36m<p[39m
+    [33mclass[39m=[32m"text-sm font-medium text-muted-foreground"[39m
+  [36m/>[39m
+
+  Name "":
+  [36m<p[39m
+    [33mclass[39m=[32m"font-medium"[39m
+  [36m/>[39m
+
+  Name "":
+  [36m<p[39m
+    [33mclass[39m=[32m"text-muted-foreground"[39m
+  [36m/>[39m
+
+  Name "":
+  [36m<p[39m
+    [33mclass[39m=[32m"font-medium"[39m
+  [36m/>[39m
+
+  Name "":
+  [36m<p[39m
+    [33mclass[39m=[32m"text-muted-foreground"[39m
+  [36m/>[39m
+
+  Name "":
+  [36m<p[39m
+    [33mclass[39m=[32m"font-medium"[39m
+  [36m/>[39m
+
+  Name "":
+  [36m<p[39m
+    [33mclass[39m=[32m"text-muted-foreground"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  link:
+
+  Name "View video details Explore the transcript, extract insights, and more":
+  [36m<a[39m
+    [33mclass[39m=[32m"flex items-center gap-3 rounded-lg border bg-card p-3 text-sm transition-colors hover:bg-accent"[39m
+    [33mhref[39m=[32m"/videos/123"[39m
+  [36m/>[39m
+
+  Name "Browse Knowledge Bank Search across everything you've collected":
+  [36m<a[39m
+    [33mclass[39m=[32m"flex items-center gap-3 rounded-lg border bg-card p-3 text-sm transition-colors hover:bg-accent"[39m
+    [33mhref[39m=[32m"/"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  button:
+
+  Name "Add another video Keep building your knowledge bank":
+  [36m<button[39m
+    [33mclass[39m=[32m"flex w-full items-center gap-3 rounded-lg border bg-card p-3 text-sm text-left transition-colors hover:bg-accent"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"mx-auto max-w-2xl animate-in fade-in duration-200"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"rounded-lg border border-border bg-card p-8 text-center"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mclass[39m=[32m"lucide lucide-check h-8 w-8 text-primary"[39m
+            [33mfill[39m=[32m"none"[39m
+            [33mheight[39m=[32m"24"[39m
+            [33mstroke[39m=[32m"currentColor"[39m
+            [33mstroke-linecap[39m=[32m"round"[39m
+            [33mstroke-linejoin[39m=[32m"round"[39m
+            [33mstroke-width[39m=[32m"3"[39m
+            [33mviewBox[39m=[32m"0 0 24 24"[39m
+            [33mwidth[39m=[32m"24"[39m
+            [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+          [36m>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M20 6 9 17l-5-5"[39m
+            [36m/>[39m
+          [36m</svg>[39m
+        [36m</div>[39m
+        [36m<h2[39m
+          [33mclass[39m=[32m"mb-2 text-2xl font-semibold"[39m
+        [36m>[39m
+          [0mAdded to your Knowledge Bank![0m
+        [36m</h2>[39m
+        [36m<p[39m
+          [33mclass[39m=[32m"mb-8 text-muted-foreground"[39m
+        [36m>[39m
+          [0mYour video is ready to explore and generate plugin ideas.[0m
+        [36m</p>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"mb-8 flex items-center justify-center gap-4"[39m
+        [36m>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"max-w-md text-left text-sm font-medium"[39m
+          [36m>[39m
+            [0mTest Video[0m
+          [36m</p>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"space-y-3 text-left"[39m
+        [36m>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"text-sm font-medium text-muted-foreground"[39m
+          [36m>[39m
+            [0mWhat's next?[0m
+          [36m</p>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"flex items-center gap-3 rounded-lg border bg-card p-3 text-sm transition-colors hover:bg-accent"[39m
+            [33mhref[39m=[32m"/videos/123"[39m
+         
+
+... [14003 characters truncated] ...
+
+[39m=[32m"flex items-center gap-3 rounded-lg border bg-card p-3 text-sm transition-colors hover:bg-accent"[39m
+            [33mhref[39m=[32m"/"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-search h-4 w-4 text-muted-foreground"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m21 21-4.34-4.34"[39m
+              [36m/>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"11"[39m
+                [33mcy[39m=[32m"11"[39m
+                [33mr[39m=[32m"8"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [36m<div>[39m
+              [36m<p[39m
+                [33mclass[39m=[32m"font-medium"[39m
+              [36m>[39m
+                [0mBrowse Knowledge Bank[0m
+              [36m</p>[39m
+              [36m<p[39m
+                [33mclass[39m=[32m"text-muted-foreground"[39m
+              [36m>[39m
+                [0mSearch across everything you've collected[0m
+              [36m</p>[39m
+            [36m</div>[39m
+          [36m</a>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+[90m [2m❯[22m Object.getElementError node_modules/@testing-library/dom/dist/config.js:[2m37:19[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m76:38[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m52:17[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m95:19[22m[39m
+[36m [2m❯[22m src/components/add-video/__tests__/SuccessState.test.tsx:[2m269:25[22m[39m
+    [90m267| [39m    )
+    [90m268| [39m
+    [90m269| [39m    const link = screen.getByRole('link', { name: /back to knowledge b…
+    [90m   | [39m                        [31m^[39m
+    [90m270| [39m    [34mexpect[39m(link)[33m.[39m[34mtoHaveAttribute[39m([32m'href'[39m[33m,[39m [32m'/?q=react&type=youtube'[39m)
+    [90m271| [39m  })
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/components/add-video/__tests__/SuccessState.test.tsx
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/components/add-video/__tests__/SuccessState.test.tsx [2m([22m[2m19 tests[22m[2m | [22m[31m2 failed[39m[2m)[22m[33m 583[2mms[22m[39m
+     [32m✓[39m renders success heading and video title[32m 35[2mms[22m[39m
+     [32m✓[39m shows milestone for totalVideos=1 (first video)[32m 6[2mms[22m[39m
+     [32m✓[39m shows milestone for isNewChannel=true (not first video)[32m 5[2mms[22m[39m
+     [32m✓[39m shows milestone for totalVideos=5[32m 5[2mms[22m[39m
+     [32m✓[39m shows milestone for totalVideos=10[32m 5[2mms[22m[39m
+     [32m✓[39m shows milestone for totalVideos=25[32m 5[2mms[22m[39m
+     [32m✓[39m shows milestone for totalVideos=50[32m 5[2mms[22m[39m
+     [32m✓[39m shows milestone for totalVideos=100[32m 5[2mms[22m[39m
+     [32m✓[39m shows no milestone for count=7 (non-milestone)[32m 7[2mms[22m[39m
+     [32m✓[39m renders 3 "What's next?" action items[32m 7[2mms[22m[39m
+     [32m✓[39m "View video" links to /videos/[id][32m 139[2mms[22m[39m
+     [32m✓[39m "Add another" calls onReset on click[32m 39[2mms[22m[39m
+     [32m✓[39m "Browse Knowledge Bank" links to /[32m 30[2mms[22m[39m
+     [32m✓[39m is backward-compatible with no milestones prop[32m 5[2mms[22m[39m
+     [32m✓[39m does not show "View video details" when no videoId provided[32m 5[2mms[22m[39m
+[31m     [31m×[31m shows "Back to Discovery" when returnTo contains /discovery[39m[32m 121[2mms[22m[39m
+[31m     [31m×[31m shows "Back to Knowledge Bank" when returnTo is KB with filters[39m[32m 114[2mms[22m[39m
+     [32m✓[39m shows "Browse Knowledge Bank" when no returnTo provided (backward compat)[32m 21[2mms[22m[39m
+     [32m✓[39m shows "Browse Knowledge Bank" when returnTo is null[32m 20[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m17 passed[39m[22m[90m (19)[39m
+[2m   Start at [22m 18:52:10
+[2m   Duration [22m 3.11s[2m (transform 175ms, setup 182ms, import 927ms, tests 583ms, environment 1.02s)[22m
+---
+timestamp: "2026-02-13 18:55:26"
+story: "2-context-aware-navigation"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+npm error Missing script: "typecheck"
+npm error
+npm error To see a list of scripts, run:
+npm error   npm run
+npm error A complete log of this run can be found in: /Users/darindrobinski/.npm/_logs/2026-02-14T00_55_26_069Z-debug-0.log
+---
+timestamp: "2026-02-13 18:57:03"
+story: "2-context-aware-navigation"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+npm error Missing script: "typecheck"
+npm error
+npm error To see a list of scripts, run:
+npm error   npm run
+npm error A complete log of this run can be found in: /Users/darindrobinski/.npm/_logs/2026-02-14T00_57_03_218Z-debug-0.log

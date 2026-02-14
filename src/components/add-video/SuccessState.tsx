@@ -2,6 +2,7 @@ import { Check, Eye, Plus, Search } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { TranscriptIcon } from "@/components/icons/TranscriptIcon";
+import { getReturnLabel } from "@/lib/navigation";
 
 interface SuccessStateProps {
   title: string;
@@ -15,6 +16,7 @@ interface SuccessStateProps {
     channelVideoCount: number;
     isNewChannel: boolean;
   };
+  returnTo?: string | null;
 }
 
 function getMilestoneMessage(
@@ -38,8 +40,9 @@ function getMilestoneMessage(
   return null
 }
 
-export function SuccessState({ title, thumbnail, onReset, description, videoId, sourceType, milestones }: SuccessStateProps) {
+export function SuccessState({ title, thumbnail, onReset, description, videoId, sourceType, milestones, returnTo }: SuccessStateProps) {
   const milestoneMessage = getMilestoneMessage(milestones)
+  const { href: returnHref, label: returnLabel } = getReturnLabel(returnTo ?? null)
 
   return (
     <div className="mx-auto max-w-2xl animate-in fade-in duration-200">
@@ -106,11 +109,11 @@ export function SuccessState({ title, thumbnail, onReset, description, videoId, 
               <p className="text-muted-foreground">Keep building your knowledge bank</p>
             </div>
           </button>
-          <Link href="/"
+          <Link href={returnHref}
             className="flex items-center gap-3 rounded-lg border bg-card p-3 text-sm transition-colors hover:bg-accent">
             <Search className="h-4 w-4 text-muted-foreground" />
             <div>
-              <p className="font-medium">Browse Knowledge Bank</p>
+              <p className="font-medium">{returnLabel}</p>
               <p className="text-muted-foreground">Search across everything you&apos;ve collected</p>
             </div>
           </Link>
