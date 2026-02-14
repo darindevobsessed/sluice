@@ -1,15 +1,15 @@
 ---
 name: active-filter-pills
 title: "Active Filter Pills"
-status: active
+status: complete
 priority: medium
 created: 2026-02-13
 updated: 2026-02-14
 cycle: state-navigation
 story_number: 3
 chunks_total: 3
-chunks_complete: 2
-current_chunk: 3
+chunks_complete: 3
+current_chunk: 4
 ---
 
 # Story: Active Filter Pills

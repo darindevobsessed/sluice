@@ -9,6 +9,7 @@ import { SearchResults } from '@/components/search/SearchResults'
 import { PersonaPanel } from '@/components/personas/PersonaPanel'
 import { PersonaStatus } from '@/components/personas/PersonaStatus'
 import { ContentTypeFilter, type KBContentTypeValue } from '@/components/videos/ContentTypeFilter'
+import { FilterPillBar, type FilterPill } from '@/components/filters/FilterPillBar'
 import { useSearch } from '@/hooks/useSearch'
 import { useEnsemble } from '@/hooks/useEnsemble'
 import { usePageTitle } from '@/components/layout/PageTitleContext'
@@ -123,6 +124,32 @@ export function KnowledgeBankContent() {
     return videos.filter(v => v.sourceType === contentType)
   }, [videos, contentType])
 
+  // Build filter pills
+  const filterPills = useMemo(() => {
+    const pills: FilterPill[] = []
+    if (contentType !== 'all') {
+      const typeLabel = contentType === 'youtube' ? 'YouTube' : 'Transcript'
+      pills.push({
+        label: 'Type',
+        value: typeLabel,
+        onDismiss: () => updateParams({ type: null }),
+      })
+    }
+    if (urlQuery.trim()) {
+      pills.push({
+        label: 'Search',
+        value: `"${urlQuery}"`,
+        onDismiss: () => updateParams({ q: null }),
+      })
+    }
+    return pills
+  }, [contentType, urlQuery, updateParams])
+
+  // Clear all filters handler
+  const handleClearAllFilters = useCallback(() => {
+    updateParams({ type: null, q: null })
+  }, [updateParams])
+
   // Search handler - updates URL query param
   const handleSearch = useCallback((q: string) => {
     updateParams({ q: q || null })
@@ -231,6 +258,13 @@ export function KnowledgeBankContent() {
               <PersonaPanel question={urlQuery} state={ensembleState} onRetry={retryEnsemble} />
             </div>
           )}
+
+          {/* Filter Pills */}
+          <FilterPillBar
+            pills={filterPills}
+            onClearAll={handleClearAllFilters}
+            className="mb-4"
+          />
 
           {/* Content Type Filter - only visible when browsing grid */}
           {!showSearchResults && videos.length > 0 && (
