@@ -9,6 +9,8 @@ import { DiscoveryVideoGrid } from '@/components/discovery/DiscoveryVideoGrid'
 import { ChannelFilterDropdown } from '@/components/discovery/ChannelFilterDropdown'
 import { ContentTypeFilter, type ContentTypeValue } from '@/components/discovery/ContentTypeFilter'
 import type { DiscoveryVideo } from '@/components/discovery/DiscoveryVideoCard'
+import { FilterPillBar } from '@/components/filters/FilterPillBar'
+import type { FilterPill } from '@/components/filters/FilterPillBar'
 import { useURLParams } from '@/hooks/useURLParams'
 import { buildReturnTo } from '@/lib/navigation'
 
@@ -178,6 +180,33 @@ export function DiscoveryContent() {
     updateParams({ page: page <= 1 ? null : String(page) }, 'push')
   }
 
+  // Build filter pills array
+  const filterPills = useMemo(() => {
+    const pills: FilterPill[] = []
+    if (selectedChannelId) {
+      const channelName = channels.find(c => c.channelId === selectedChannelId)?.name ?? selectedChannelId
+      pills.push({
+        label: 'Creator',
+        value: channelName,
+        onDismiss: () => updateParams({ channel: null, page: null }),
+      })
+    }
+    if (contentType !== 'all') {
+      const typeLabel = contentType === 'saved' ? 'Saved' : 'Not Saved'
+      pills.push({
+        label: 'Status',
+        value: typeLabel,
+        onDismiss: () => updateParams({ type: null, page: null }),
+      })
+    }
+    return pills
+  }, [selectedChannelId, channels, contentType, updateParams])
+
+  // Clear all filters handler
+  const handleClearAllFilters = useCallback(() => {
+    updateParams({ channel: null, type: null, page: null })
+  }, [updateParams])
+
   // Filter videos by selected channel and content type
   const filteredVideos = useMemo(() => {
     let result = discoveryVideos
@@ -247,6 +276,13 @@ export function DiscoveryContent() {
           </>
         )}
       </div>
+
+      {/* Active filter pills */}
+      <FilterPillBar
+        pills={filterPills}
+        onClearAll={handleClearAllFilters}
+        className="mb-4"
+      />
 
       {/* Empty state or video grid */}
       {channels.length === 0 ? (

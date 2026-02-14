@@ -2628,3 +2628,15 @@ error: |
 [2m      Tests [22m [2mno tests[22m
 [2m   Start at [22m 08:53:04
 [2m   Duration [22m 3.75s[2m (transform 38ms, setup 393ms, import 0ms, tests 0ms, environment 2.98s)[22m
+---
+timestamp: "2026-02-14 09:01:59"
+story: "3-active-filter-pills"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+npm error Missing script: "typecheck"
+npm error
+npm error To see a list of scripts, run:
+npm error   npm run
+npm error A complete log of this run can be found in: /Users/darindrobinski/.npm/_logs/2026-02-14T15_01_59_376Z-debug-0.log
