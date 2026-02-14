@@ -43,10 +43,17 @@ export function KnowledgeBankContent() {
   // Focus area filtering
   const { selectedFocusAreaId, focusAreas } = useFocusArea();
 
-  // URL state
+  // URL state with validation
   const { searchParams, updateParams } = useURLParams();
   const urlQuery = searchParams.get('q') || '';
-  const contentType = (searchParams.get('type') as KBContentTypeValue) || 'all';
+
+  // Validate content type
+  const VALID_KB_TYPES = ['all', 'youtube', 'transcript'] as const
+  type KBContentType = typeof VALID_KB_TYPES[number]
+  const rawType = searchParams.get('type')
+  const contentType = (rawType && VALID_KB_TYPES.includes(rawType as KBContentType))
+    ? (rawType as KBContentTypeValue)
+    : 'all'
 
   // Use the search hook with URL query
   const { results, isLoading: isSearching } = useSearch({

@@ -111,8 +111,11 @@ describe('DiscoveryVideoGrid', () => {
 
   it('should navigate to next page and show correct videos', async () => {
     const user = userEvent.setup()
+    const onPageChange = vi.fn()
     const videos = createMockVideos(30) // 2 pages
-    render(<DiscoveryVideoGrid videos={videos} />)
+    const { rerender } = render(
+      <DiscoveryVideoGrid videos={videos} currentPage={1} onPageChange={onPageChange} />
+    )
 
     // First page should show Video 0-23
     expect(screen.getByText('Video 0')).toBeInTheDocument()
@@ -121,6 +124,14 @@ describe('DiscoveryVideoGrid', () => {
     // Click next page
     const nextButton = screen.getByRole('button', { name: /next/i })
     await user.click(nextButton)
+
+    // Parent should receive page change callback
+    expect(onPageChange).toHaveBeenCalledWith(2)
+
+    // Simulate parent updating currentPage prop
+    rerender(
+      <DiscoveryVideoGrid videos={videos} currentPage={2} onPageChange={onPageChange} />
+    )
 
     // Second page should show Video 24-29
     expect(screen.queryByText('Video 0')).not.toBeInTheDocument()
@@ -239,44 +250,56 @@ describe('DiscoveryVideoGrid', () => {
 
   it('should maintain current page state across pagination', async () => {
     const user = userEvent.setup()
+    const onPageChange = vi.fn()
     const videos = createMockVideos(50) // 3 pages
-    render(<DiscoveryVideoGrid videos={videos} />)
+    const { rerender } = render(
+      <DiscoveryVideoGrid videos={videos} currentPage={1} onPageChange={onPageChange} />
+    )
 
     // Navigate to page 2
     const page2Button = screen.getByRole('button', { name: '2' })
     await user.click(page2Button)
+    expect(onPageChange).toHaveBeenCalledWith(2)
 
+    // Simulate parent updating to page 2
+    rerender(
+      <DiscoveryVideoGrid videos={videos} currentPage={2} onPageChange={onPageChange} />
+    )
     expect(screen.getByText('Video 24')).toBeInTheDocument()
 
     // Navigate to page 3
     const page3Button = screen.getByRole('button', { name: '3' })
     await user.click(page3Button)
+    expect(onPageChange).toHaveBeenCalledWith(3)
 
+    // Simulate parent updating to page 3
+    rerender(
+      <DiscoveryVideoGrid videos={videos} currentPage={3} onPageChange={onPageChange} />
+    )
     expect(screen.getByText('Video 48')).toBeInTheDocument()
   })
 
-  it('should reset to page 1 when videos prop changes', async () => {
-    const user = userEvent.setup()
+  it('should show page 1 when parent resets currentPage on video change', () => {
+    const onPageChange = vi.fn()
     const videos1 = createMockVideos(30)
-    const { rerender } = render(<DiscoveryVideoGrid videos={videos1} />)
-
-    // Navigate to page 2
-    const nextButton = screen.getByRole('button', { name: /next/i })
-    await user.click(nextButton)
+    const { rerender } = render(
+      <DiscoveryVideoGrid videos={videos1} currentPage={2} onPageChange={onPageChange} />
+    )
 
     // Verify we're on page 2
     expect(screen.getByText('Video 24')).toBeInTheDocument()
 
-    // Change videos to a completely new set with different IDs
+    // Parent changes videos and resets to page 1 (as it does when filters change)
     const videos2 = createMockVideos(30).map((v, i) => ({
       ...v,
       youtubeId: `newVideo${i}`,
-      title: `New Video ${i}`
+      title: `New Video ${i}`,
     }))
-    rerender(<DiscoveryVideoGrid videos={videos2} />)
+    rerender(
+      <DiscoveryVideoGrid videos={videos2} currentPage={1} onPageChange={onPageChange} />
+    )
 
-    // Should show first page of new videos (wait for effect to run)
-    await screen.findByText('New Video 0')
+    // Should show first page of new videos
     expect(screen.getByText('New Video 0')).toBeInTheDocument()
     expect(screen.queryByText('New Video 24')).not.toBeInTheDocument()
   })

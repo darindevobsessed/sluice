@@ -1090,4 +1090,288 @@ describe('Discovery Page', () => {
       })
     })
   })
+
+  describe('Edge Case Validation', () => {
+    it('should handle nonexistent channel ID gracefully', async () => {
+      mockSearchParamsString = 'channel=FAKE_CHANNEL_ID'
+
+      const mockChannels = [
+        {
+          id: 1,
+          channelId: 'UCtest1',
+          name: 'Test Channel 1',
+          createdAt: new Date().toISOString(),
+        },
+      ]
+
+      const mockVideos = [
+        {
+          youtubeId: 'vid1',
+          title: 'Video 1',
+          channelId: 'UCtest1',
+          channelName: 'Test Channel 1',
+          publishedAt: new Date().toISOString(),
+          description: 'Test',
+          inBank: false,
+        },
+      ]
+
+      // Mock /api/channels
+      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockChannels,
+      })
+
+      // Mock /api/channels/videos
+      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockVideos,
+      })
+
+      // Mock /api/videos
+      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          videos: [],
+          stats: {},
+          focusAreaMap: {},
+        }),
+      })
+
+      render(<Discovery />)
+
+      await waitFor(() => {
+        // Should show empty grid (filtered to nonexistent channel)
+        expect(screen.queryByText('Video 1')).not.toBeInTheDocument()
+        // Should not crash - filter dropdown should still be visible
+        expect(screen.getByText('All Channels')).toBeInTheDocument()
+      })
+    })
+
+    it('should default to "all" when type param is invalid', async () => {
+      mockSearchParamsString = 'type=bogus'
+
+      const mockChannels = [
+        {
+          id: 1,
+          channelId: 'UCtest1',
+          name: 'Test Channel 1',
+          createdAt: new Date().toISOString(),
+        },
+      ]
+
+      const mockVideos = [
+        {
+          youtubeId: 'vid1',
+          title: 'Video 1',
+          channelId: 'UCtest1',
+          channelName: 'Test Channel 1',
+          publishedAt: new Date().toISOString(),
+          description: 'Test',
+          inBank: false,
+        },
+        {
+          youtubeId: 'vid2',
+          title: 'Video 2',
+          channelId: 'UCtest1',
+          channelName: 'Test Channel 1',
+          publishedAt: new Date().toISOString(),
+          description: 'Test',
+          inBank: true,
+        },
+      ]
+
+      // Mock /api/channels
+      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockChannels,
+      })
+
+      // Mock /api/channels/videos
+      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockVideos,
+      })
+
+      // Mock /api/videos
+      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          videos: [],
+          stats: {},
+          focusAreaMap: {},
+        }),
+      })
+
+      render(<Discovery />)
+
+      await waitFor(() => {
+        // Should show all videos (default to 'all')
+        expect(screen.getByText('Video 1')).toBeInTheDocument()
+        expect(screen.getByText('Video 2')).toBeInTheDocument()
+        // Should show "All" in filter
+        const allButtons = screen.getAllByText('All')
+        expect(allButtons.length).toBeGreaterThan(0)
+      })
+    })
+
+    it('should default to page 1 when page param is "abc"', async () => {
+      mockSearchParamsString = 'page=abc'
+
+      const mockChannels = [
+        {
+          id: 1,
+          channelId: 'UCtest1',
+          name: 'Test Channel 1',
+          createdAt: new Date().toISOString(),
+        },
+      ]
+
+      const mockVideos = Array.from({ length: 30 }, (_, i) => ({
+        youtubeId: `vid${i}`,
+        title: `Video ${i}`,
+        channelId: 'UCtest1',
+        channelName: 'Test Channel 1',
+        publishedAt: new Date(Date.now() - i * 86400000).toISOString(),
+        description: 'Test',
+        inBank: false,
+      }))
+
+      // Mock /api/channels
+      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockChannels,
+      })
+
+      // Mock /api/channels/videos
+      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockVideos,
+      })
+
+      // Mock /api/videos
+      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          videos: [],
+          stats: {},
+          focusAreaMap: {},
+        }),
+      })
+
+      render(<Discovery />)
+
+      await waitFor(() => {
+        // Should show first page videos
+        expect(screen.getByText('Video 0')).toBeInTheDocument()
+        expect(screen.queryByText('Video 24')).not.toBeInTheDocument()
+      })
+    })
+
+    it('should default to page 1 when page param is 0', async () => {
+      mockSearchParamsString = 'page=0'
+
+      const mockChannels = [
+        {
+          id: 1,
+          channelId: 'UCtest1',
+          name: 'Test Channel 1',
+          createdAt: new Date().toISOString(),
+        },
+      ]
+
+      const mockVideos = Array.from({ length: 30 }, (_, i) => ({
+        youtubeId: `vid${i}`,
+        title: `Video ${i}`,
+        channelId: 'UCtest1',
+        channelName: 'Test Channel 1',
+        publishedAt: new Date(Date.now() - i * 86400000).toISOString(),
+        description: 'Test',
+        inBank: false,
+      }))
+
+      // Mock /api/channels
+      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockChannels,
+      })
+
+      // Mock /api/channels/videos
+      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockVideos,
+      })
+
+      // Mock /api/videos
+      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          videos: [],
+          stats: {},
+          focusAreaMap: {},
+        }),
+      })
+
+      render(<Discovery />)
+
+      await waitFor(() => {
+        // Should show first page videos
+        expect(screen.getByText('Video 0')).toBeInTheDocument()
+        expect(screen.queryByText('Video 24')).not.toBeInTheDocument()
+      })
+    })
+
+    it('should default to page 1 when page param is negative', async () => {
+      mockSearchParamsString = 'page=-1'
+
+      const mockChannels = [
+        {
+          id: 1,
+          channelId: 'UCtest1',
+          name: 'Test Channel 1',
+          createdAt: new Date().toISOString(),
+        },
+      ]
+
+      const mockVideos = Array.from({ length: 30 }, (_, i) => ({
+        youtubeId: `vid${i}`,
+        title: `Video ${i}`,
+        channelId: 'UCtest1',
+        channelName: 'Test Channel 1',
+        publishedAt: new Date(Date.now() - i * 86400000).toISOString(),
+        description: 'Test',
+        inBank: false,
+      }))
+
+      // Mock /api/channels
+      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockChannels,
+      })
+
+      // Mock /api/channels/videos
+      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockVideos,
+      })
+
+      // Mock /api/videos
+      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          videos: [],
+          stats: {},
+          focusAreaMap: {},
+        }),
+      })
+
+      render(<Discovery />)
+
+      await waitFor(() => {
+        // Should show first page videos
+        expect(screen.getByText('Video 0')).toBeInTheDocument()
+        expect(screen.queryByText('Video 24')).not.toBeInTheDocument()
+      })
+    })
+  })
 })

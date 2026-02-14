@@ -303,3 +303,119 @@ describe('Home Page - Ensemble Trigger', () => {
     expect(mockUseEnsemble).toHaveBeenCalledWith(null)
   })
 })
+
+describe('Home Page - Edge Case Validation', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+
+    // Clear URL params
+    mockSearchParams.delete('q')
+    mockSearchParams.delete('type')
+
+    // Reset to default return values
+    mockUseSearch.mockReturnValue({
+      results: null,
+      isLoading: false,
+      error: null,
+      mode: 'hybrid' as const,
+      setMode: vi.fn(),
+    })
+
+    mockUseEnsemble.mockReturnValue({
+      state: {
+        isLoading: false,
+        personas: new Map(),
+        bestMatch: null,
+        isAllDone: false,
+        error: null,
+      },
+      retry: mockRetryEnsemble,
+    })
+
+    // Default mock for videos API
+    ;(global.fetch as ReturnType<typeof vi.fn>).mockImplementation(async (url) => {
+      if (typeof url === 'string' && url.includes('/api/personas/status')) {
+        return {
+          ok: true,
+          json: async () => ({
+            channels: [],
+            threshold: 30,
+          }),
+        }
+      }
+      return {
+        ok: true,
+        json: async () => ({
+          videos: [
+            {
+              id: 1,
+              youtubeId: 'test123',
+              title: 'Test Video',
+              channelId: 'UCtest',
+              channelName: 'Test Channel',
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            },
+          ],
+          stats: { count: 1, totalHours: 1, channels: 1 },
+          focusAreaMap: {},
+        }),
+      }
+    })
+  })
+
+  it('should default to "all" when type param is invalid', async () => {
+    mockSearchParams.set('type', 'nope')
+
+    render(<KnowledgeBankContent />)
+
+    // Wait for component to render
+    await waitFor(() => {
+      expect(screen.getByText('Test Video')).toBeInTheDocument()
+    })
+
+    // Should show "All" in the filter (defaulted from invalid "nope")
+    expect(screen.getByText('All')).toBeInTheDocument()
+  })
+
+  it('should treat whitespace-only query as empty', async () => {
+    mockSearchParams.set('q', '   ')
+
+    render(<KnowledgeBankContent />)
+
+    // Wait for component to render
+    await waitFor(() => {
+      expect(mockUseSearch).toHaveBeenCalled()
+    })
+
+    // useSearch should receive empty string (trimmed)
+    expect(mockUseSearch).toHaveBeenCalledWith({
+      query: '   ',
+      focusAreaId: null,
+    })
+
+    // Since the trimmed query is empty, the component should show VideoGrid (not SearchResults)
+    // The SearchResults component checks if query.trim().length > 0
+    expect(screen.getByText('Test Video')).toBeInTheDocument()
+  })
+
+  it('should show default state when no params are present', async () => {
+    // No params set
+
+    render(<KnowledgeBankContent />)
+
+    // Wait for component to render
+    await waitFor(() => {
+      expect(screen.getByText('Test Video')).toBeInTheDocument()
+    })
+
+    // Should show "All" type filter
+    expect(screen.getByText('All')).toBeInTheDocument()
+
+    // useSearch should be called with empty query
+    expect(mockUseSearch).toHaveBeenCalledWith({
+      query: '',
+      focusAreaId: null,
+    })
+  })
+})

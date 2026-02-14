@@ -1,8 +1,8 @@
-import { eq } from 'drizzle-orm';
-import { nanoid } from 'nanoid';
-import { db as defaultDb } from './index';
-import { insights } from './schema';
-import type { ExtractionResult } from '@/lib/claude/prompts/types';
+import { eq } from 'drizzle-orm'
+import crypto from 'node:crypto'
+import { db as defaultDb } from './index'
+import { insights } from './schema'
+import type { ExtractionResult } from '@/lib/claude/prompts/types'
 
 /**
  * Get extraction for a video
@@ -14,26 +14,26 @@ export async function getExtractionForVideo(
   videoId: number,
   dbInstance = defaultDb
 ): Promise<{
-  id: string;
-  videoId: number;
-  contentType: string;
-  extraction: ExtractionResult;
-  createdAt: Date;
-  updatedAt: Date;
+  id: string
+  videoId: number
+  contentType: string
+  extraction: ExtractionResult
+  createdAt: Date
+  updatedAt: Date
 } | null> {
   const results = await dbInstance
     .select()
     .from(insights)
     .where(eq(insights.videoId, videoId))
-    .limit(1);
+    .limit(1)
 
-  const result = results[0];
-  if (!result) return null;
+  const result = results[0]
+  if (!result) return null
 
   return {
     ...result,
     extraction: result.extraction as ExtractionResult,
-  };
+  }
 }
 
 /**
@@ -48,15 +48,15 @@ export async function upsertExtraction(
   extraction: ExtractionResult,
   dbInstance = defaultDb
 ): Promise<{
-  id: string;
-  videoId: number;
-  contentType: string;
-  extraction: ExtractionResult;
-  createdAt: Date;
-  updatedAt: Date;
+  id: string
+  videoId: number
+  contentType: string
+  extraction: ExtractionResult
+  createdAt: Date
+  updatedAt: Date
 }> {
-  const now = new Date();
-  const existing = await getExtractionForVideo(videoId, dbInstance);
+  const now = new Date()
+  const existing = await getExtractionForVideo(videoId, dbInstance)
 
   if (existing) {
     // Update existing
@@ -67,18 +67,18 @@ export async function upsertExtraction(
         extraction: extraction as unknown as typeof insights.$inferInsert.extraction,
         updatedAt: now,
       })
-      .where(eq(insights.id, existing.id));
+      .where(eq(insights.id, existing.id))
 
     return {
       ...existing,
       contentType: extraction.contentType,
       extraction,
       updatedAt: now,
-    };
+    }
   }
 
   // Create new
-  const id = nanoid();
+  const id = crypto.randomUUID()
   const dbRecord = {
     id,
     videoId,
@@ -86,9 +86,9 @@ export async function upsertExtraction(
     extraction: extraction as unknown as typeof insights.$inferInsert.extraction,
     createdAt: now,
     updatedAt: now,
-  };
+  }
 
-  await dbInstance.insert(insights).values(dbRecord);
+  await dbInstance.insert(insights).values(dbRecord)
 
   return {
     id,
@@ -97,7 +97,7 @@ export async function upsertExtraction(
     extraction,
     createdAt: now,
     updatedAt: now,
-  };
+  }
 }
 
 /**
@@ -109,5 +109,5 @@ export async function deleteExtraction(
   videoId: number,
   dbInstance = defaultDb
 ): Promise<void> {
-  await dbInstance.delete(insights).where(eq(insights.videoId, videoId));
+  await dbInstance.delete(insights).where(eq(insights.videoId, videoId))
 }

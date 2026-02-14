@@ -56,10 +56,18 @@ export function DiscoveryContent() {
   const [isLoadingVideos, setIsLoadingVideos] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // Read filters from URL params
+  // Read filters from URL params with validation
   const selectedChannelId = searchParams.get('channel') || null
-  const contentType = (searchParams.get('type') as ContentTypeValue) || 'all'
-  const currentPage = Number(searchParams.get('page')) || 1
+
+  // Validate content type
+  const VALID_DISCOVERY_TYPES = ['all', 'saved', 'not-saved'] as const
+  const rawType = searchParams.get('type')
+  const contentType = (rawType && VALID_DISCOVERY_TYPES.includes(rawType as ContentTypeValue))
+    ? (rawType as ContentTypeValue)
+    : 'all'
+
+  // Validate page number (ensure at least 1)
+  const currentPage = Math.max(1, Number(searchParams.get('page')) || 1)
 
   useEffect(() => {
     setPageTitle({ title: 'Discovery' })

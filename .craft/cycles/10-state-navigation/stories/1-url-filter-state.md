@@ -1,15 +1,15 @@
 ---
 name: url-filter-state
 title: "URL Filter State"
-status: active
+status: complete
 priority: high
 created: 2026-02-13
 updated: 2026-02-13
 cycle: state-navigation
 story_number: 1
 chunks_total: 3
-chunks_complete: 2
-current_chunk: 3
+chunks_complete: 3
+current_chunk: 4
 ---
 
 # Story: URL Filter State
