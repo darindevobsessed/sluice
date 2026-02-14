@@ -24,18 +24,41 @@ interface DiscoveryVideoCardProps {
   isNew?: boolean
   focusAreas?: { id: number; name: string; color: string }[]
   returnTo?: string
+  selectable?: boolean
+  selected?: boolean
+  onToggleSelect?: (youtubeId: string) => void
 }
 
-export function DiscoveryVideoCard({ video, className, isNew = false, focusAreas, returnTo }: DiscoveryVideoCardProps) {
+export function DiscoveryVideoCard({
+  video,
+  className,
+  isNew = false,
+  focusAreas,
+  returnTo,
+  selectable = false,
+  selected = false,
+  onToggleSelect,
+}: DiscoveryVideoCardProps) {
   const publishedDate = new Date(video.publishedAt)
   const relativeTime = formatRelativeTime(publishedDate)
   const thumbnailUrl = `https://i.ytimg.com/vi/${video.youtubeId}/mqdefault.jpg`
   const addUrl = `/add?url=https://youtube.com/watch?v=${video.youtubeId}${returnTo ? `&returnTo=${returnTo}` : ''}`
 
+  // Only show selection UI on not-saved cards
+  const showSelectionUI = selectable && !video.inBank
+
+  const handleCheckboxClick = (e: React.MouseEvent<HTMLInputElement>) => {
+    e.stopPropagation()
+    if (onToggleSelect) {
+      onToggleSelect(video.youtubeId)
+    }
+  }
+
   return (
     <Card
       className={cn(
         'group overflow-hidden p-0 transition-all duration-200 hover:shadow-lg hover:scale-[1.02]',
+        selected && 'ring-2 ring-primary transition-all duration-150',
         className
       )}
     >
@@ -48,9 +71,30 @@ export function DiscoveryVideoCard({ video, className, isNew = false, focusAreas
           className="object-cover transition-transform duration-200 group-hover:scale-105"
           unoptimized
         />
-        {/* Green "new" dot */}
+
+        {/* Selection checkbox */}
+        {showSelectionUI && (
+          <input
+            type="checkbox"
+            checked={selected}
+            onChange={() => {}}
+            onClick={handleCheckboxClick}
+            className={cn(
+              'absolute top-2 left-2 z-10 size-5 rounded border-2 accent-primary cursor-pointer transition-opacity duration-150',
+              selected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+            )}
+            aria-label="Select video"
+          />
+        )}
+
+        {/* Selection overlay */}
+        {selected && (
+          <div className="absolute inset-0 bg-primary/10 z-[5]" />
+        )}
+
+        {/* Green "new" dot - moved to right to avoid checkbox */}
         {isNew && (
-          <div className="absolute top-2 left-2 size-3 rounded-full bg-[#059669]" aria-label="New video" />
+          <div className="absolute top-2 right-2 size-3 rounded-full bg-[#059669]" aria-label="New video" />
         )}
       </div>
 

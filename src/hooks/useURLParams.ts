@@ -1,5 +1,6 @@
 'use client'
 
+import { useCallback } from 'react'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 
 export function useURLParams() {
@@ -7,7 +8,7 @@ export function useURLParams() {
   const router = useRouter()
   const pathname = usePathname()
 
-  const updateParams = (
+  const updateParams = useCallback((
     updates: Record<string, string | null>,
     method: 'replace' | 'push' = 'replace'
   ) => {
@@ -29,7 +30,7 @@ export function useURLParams() {
 
     // Navigate
     router[method](url)
-  }
+  }, [searchParams, pathname, router])
 
   return { searchParams, updateParams }
 }

@@ -2652,3 +2652,367 @@ npm error
 npm error To see a list of scripts, run:
 npm error   npm run
 npm error A complete log of this run can be found in: /Users/darindrobinski/.npm/_logs/2026-02-14T15_12_57_757Z-debug-0.log
+---
+timestamp: "2026-02-14 17:45:52"
+story: "4-add-from-discovery"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 6 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/components/discovery/__tests__/DiscoveryVideoCard.test.tsx[2m > [22mDiscoveryVideoCard[2m > [22mSelection behavior[2m > [22mshould render checkbox when selectable and not in bank
+[31m[1mTestingLibraryElementError[22m: Unable to find an accessible element with the role "checkbox"
+
+Here are the accessible roles:
+
+  img:
+
+  Name "Test Video Title":
+  [36m<img[31m
+    [33malt[31m=[32m"Test Video Title"[31m
+    [33mclass[31m=[32m"object-cover transition-transform duration-200 group-hover:scale-105"[31m
+    [33mdata-nimg[31m=[32m"fill"[31m
+    [33mdecoding[31m=[32m"async"[31m
+    [33mloading[31m=[32m"lazy"[31m
+    [33msrc[31m=[32m"https://i.ytimg.com/vi/dQw4w9WgXcQ/mqdefault.jpg"[31m
+    [33mstyle[31m=[32m"position: absolute; height: 100%; width: 100%; left: 0px; top: 0px; right: 0px; bottom: 0px; color: transparent;"[31m
+  [36m/>[31m
+
+  --------------------------------------------------
+  heading:
+
+  Name "Test Video Title":
+  [36m<h3[31m
+    [33mclass[31m=[32m"line-clamp-2 font-semibold leading-tight text-sm"[31m
+  [36m/>[31m
+
+  --------------------------------------------------
+  paragraph:
+
+  Name "":
+  [36m<p[31m
+    [33mclass[31m=[32m"text-xs text-muted-foreground"[31m
+  [36m/>[31m
+
+  --------------------------------------------------
+  link:
+
+  Name "Add to Bank":
+  [36m<a[31m
+    [33mclass[31m=[32m"inline-flex items-center justify-center whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5 w-full"[31m
+    [33mdata-size[31m=[32m"sm"[31m
+    [33mdata-slot[31m=[32m"button"[31m
+    [33mdata-variant[31m=[32m"outline"[31m
+    [33mhref[31m=[32m"/add?url=https://youtube.com/watch?v=dQw4w9WgXcQ"[31m
+  [36m/>[31m
+
+  --------------------------------------------------
+
+Ignored nodes: comments, script, style
+[36m<body>[31m
+  [36m<div>[31m
+    [36m<div[31m
+      [33mclass[31m=[32m"bg-card text-card-foreground flex flex-col gap-6 rounded-xl border shadow-sm group overflow-hidden p-0 transition-all duration-200 hover:shadow-lg hover:scale-[1.02]"[31m
+      [33mdata-slot[31m=[32m"card"[31m
+    [36m>[31m
+      [36m<div[31m
+        [33mclass[31m=[32m"relative aspect-video w-full overflow-hidden"[31m
+      [36m>[31m
+        [36m<img[31m
+          [33malt[31m=[32m"Test Video Title"[31m
+          [33mclass[31m=[32m"object-cover transition-transform duration-200 group-hover:scale-105"[31m
+          [33mdata-nimg[31m=[32m"fill"[31m
+          [33mdecoding[31m=[32m"async"[31m
+          [33mloading[31m=[32m"lazy"[31m
+          [33msrc[31m=[32m"https://i.ytimg.com/vi/dQw4w9WgXcQ/mqdefault.jpg"[31m
+          [33mstyle[31m=[32m"position: absolute; height: 100%; width: 100%; left: 0px; top: 0px; right: 0px; bottom: 0px; color: transparent;"[31m
+        [36m/>[31m
+      [36m</div>[31m
+      [36m<div[31m
+        [33mclass[31m=[32m"p-3 space-y-2"[31m
+      [36m>[31m
+        [36m<h3[31m
+          [33mclass[31m=[32m"line-clamp-2 font-semibold leading-tight text-sm"[31m
+        [36m>[31m
+          [0mTest Video Title[0m
+        [36m</h3>[31m
+        [36m<p[31m
+          [33mclass[31m=[32m"text-xs text-muted-foreground"[31m
+        [36m>[31m
+          [0m2y ago[0m
+        [36m</p>[31m
+        [36m<a[31m
+          [33mclass[31m=[32m"inline-flex items-center justify-center whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5 w-full"[31m
+          [33mdata-size[31m=[32m"sm"[31m
+          [33mdata-slot[31m=[32m"button"[31m
+          [33mdata-variant[31m=[32m"outline"[31m
+          [33mhref[31m=[32m"/add?url=https://youtube.com/watch?v=dQw4w9WgXcQ"[31m
+        [36m>[31m
+          [0mAdd to Bank[0m
+        [36m</a>[31m
+      [36
+
+... [19045 characters truncated] ...
+
+lection behavior[2m > [22mshould add ring-primary class to card when selected
+[31m[1mError[22m: [2mexpect([22m[31melement[31m[2m).toHaveClass([22m[32m[32m"ring-2"[32m[31m[2m)[22m
+
+Expected the element to have class:
+[32m  ring-2[31m
+Received:
+[31m  bg-card text-card-foreground flex flex-col gap-6 rounded-xl border shadow-sm group overflow-hidden p-0 transition-all duration-200 hover:shadow-lg hover:scale-[1.02][31m[39m
+[36m [2m❯[22m src/components/discovery/__tests__/DiscoveryVideoCard.test.tsx:[2m225:20[22m[39m
+    [90m223| [39m      )
+    [90m224| [39m      [35mconst[39m card [33m=[39m container[33m.[39m[34mquerySelector[39m([32m'[data-slot="card"]'[39m)
+    [90m225| [39m      [34mexpect[39m(card)[33m.[39m[34mtoHaveClass[39m([32m'ring-2'[39m)
+    [90m   | [39m                   [31m^[39m
+    [90m226| [39m      [34mexpect[39m(card)[33m.[39m[34mtoHaveClass[39m([32m'ring-primary'[39m)
+    [90m227| [39m    })
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/6]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/discovery/__tests__/DiscoveryVideoCard.test.tsx[2m > [22mDiscoveryVideoCard[2m > [22mSelection behavior[2m > [22mshould render selection overlay when selected
+[31m[1mError[22m: [2mexpect([22m[31mreceived[31m[2m).toBeInTheDocument()[22m
+
+[31mreceived[31m value must be an HTMLElement or an SVGElement.
+Received has type:  Null
+Received has value: [31mnull[31m[39m
+[36m [2m❯[22m src/components/discovery/__tests__/DiscoveryVideoCard.test.tsx:[2m255:23[22m[39m
+    [90m253| [39m      )
+    [90m254| [39m      [35mconst[39m overlay [33m=[39m container[33m.[39m[34mquerySelector[39m([32m'.bg-primary\\/10'[39m)
+    [90m255| [39m      [34mexpect[39m(overlay)[33m.[39m[34mtoBeInTheDocument[39m()
+    [90m   | [39m                      [31m^[39m
+    [90m256| [39m    })
+    [90m257| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/6]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/components/discovery/__tests__/DiscoveryVideoCard.test.tsx
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/components/discovery/__tests__/DiscoveryVideoCard.test.tsx [2m([22m[2m25 tests[22m[2m | [22m[31m6 failed[39m[2m)[22m[33m 477[2mms[22m[39m
+     [32m✓[39m should render video title with line clamp[32m 65[2mms[22m[39m
+     [32m✓[39m should render thumbnail with correct aspect ratio[32m 8[2mms[22m[39m
+     [32m✓[39m should render "Add to Bank" button when video is not in bank[32m 141[2mms[22m[39m
+     [32m✓[39m should render "In Bank" badge when video is already in bank[32m 8[2mms[22m[39m
+     [32m✓[39m should link to add page with correct URL when not in bank[32m 22[2mms[22m[39m
+     [32m✓[39m should include returnTo in add link when provided[32m 15[2mms[22m[39m
+     [32m✓[39m should render published date as relative time[32m 8[2mms[22m[39m
+     [32m✓[39m should have compact card styling[32m 5[2mms[22m[39m
+     [32m✓[39m should not have scroll classes by default[32m 4[2mms[22m[39m
+     [32m✓[39m should accept custom className prop[32m 4[2mms[22m[39m
+     [32m✓[39m should render focus area badges when provided[32m 6[2mms[22m[39m
+     [32m✓[39m should not render focus area badges when not provided[32m 9[2mms[22m[39m
+     [32m✓[39m should not render focus area badges when empty array provided[32m 4[2mms[22m[39m
+     [32m✓[39m should render focus area badges below the date[32m 6[2mms[22m[39m
+[31m       [31m×[31m should render checkbox when selectable and not in bank[39m[32m 54[2mms[22m[39m
+       [32m✓[39m should not render checkbox when not selectable[32m 3[2mms[22m[39m
+       [32m✓[39m should not render checkbox when video is in bank[32m 3[2mms[22m[39m
+[31m       [31m×[31m should call onToggleSelect when checkbox is clicked[39m[32m 36[2mms[22m[39m
+[31m       [31m×[31m should render checkbox as checked when selected is true[39m[32m 25[2mms[22m[39m
+[31m       [31m×[31m should render checkbox as unchecked when selected is false[39m[32m 28[2mms[22m[39m
+[31m       [31m×[31m should add ring-primary class to card when selected[39m[32m 5[2mms[22m[39m
+       [32m✓[39m should not add ring classes to card when not selected[32m 4[2mms[22m[39m
+[31m       [31m×[31m should render selection overlay when selected[39m[32m 7[2mms[22m[39m
+       [32m✓[39m should not render selection overlay when not selected[32m 3[2mms[22m[39m
+     [32m✓[39m should render skeleton with correct structure[32m 2[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m6 failed[39m[22m[2m | [22m[1m[32m19 passed[39m[22m[90m (25)[39m
+[2m   Start at [22m 11:45:46
+[2m   Duration [22m 5.72s[2m (transform 170ms, setup 471ms, import 1.25s, tests 477ms, environment 3.08s)[22m
+---
+timestamp: "2026-02-14 17:46:23"
+story: "4-add-from-discovery"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 6 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/components/discovery/__tests__/DiscoveryVideoCard.test.tsx[2m > [22mDiscoveryVideoCard[2m > [22mSelection behavior[2m > [22mshould render checkbox when selectable and not in bank
+[31m[1mTestingLibraryElementError[22m: Unable to find an accessible element with the role "checkbox"
+
+Here are the accessible roles:
+
+  img:
+
+  Name "Test Video Title":
+  [36m<img[31m
+    [33malt[31m=[32m"Test Video Title"[31m
+    [33mclass[31m=[32m"object-cover transition-transform duration-200 group-hover:scale-105"[31m
+    [33mdata-nimg[31m=[32m"fill"[31m
+    [33mdecoding[31m=[32m"async"[31m
+    [33mloading[31m=[32m"lazy"[31m
+    [33msrc[31m=[32m"https://i.ytimg.com/vi/dQw4w9WgXcQ/mqdefault.jpg"[31m
+    [33mstyle[31m=[32m"position: absolute; height: 100%; width: 100%; left: 0px; top: 0px; right: 0px; bottom: 0px; color: transparent;"[31m
+  [36m/>[31m
+
+  --------------------------------------------------
+  heading:
+
+  Name "Test Video Title":
+  [36m<h3[31m
+    [33mclass[31m=[32m"line-clamp-2 font-semibold leading-tight text-sm"[31m
+  [36m/>[31m
+
+  --------------------------------------------------
+  paragraph:
+
+  Name "":
+  [36m<p[31m
+    [33mclass[31m=[32m"text-xs text-muted-foreground"[31m
+  [36m/>[31m
+
+  --------------------------------------------------
+  link:
+
+  Name "Add to Bank":
+  [36m<a[31m
+    [33mclass[31m=[32m"inline-flex items-center justify-center whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5 w-full"[31m
+    [33mdata-size[31m=[32m"sm"[31m
+    [33mdata-slot[31m=[32m"button"[31m
+    [33mdata-variant[31m=[32m"outline"[31m
+    [33mhref[31m=[32m"/add?url=https://youtube.com/watch?v=dQw4w9WgXcQ"[31m
+  [36m/>[31m
+
+  --------------------------------------------------
+
+Ignored nodes: comments, script, style
+[36m<body>[31m
+  [36m<div>[31m
+    [36m<div[31m
+      [33mclass[31m=[32m"bg-card text-card-foreground flex flex-col gap-6 rounded-xl border shadow-sm group overflow-hidden p-0 transition-all duration-200 hover:shadow-lg hover:scale-[1.02]"[31m
+      [33mdata-slot[31m=[32m"card"[31m
+    [36m>[31m
+      [36m<div[31m
+        [33mclass[31m=[32m"relative aspect-video w-full overflow-hidden"[31m
+      [36m>[31m
+        [36m<img[31m
+          [33malt[31m=[32m"Test Video Title"[31m
+          [33mclass[31m=[32m"object-cover transition-transform duration-200 group-hover:scale-105"[31m
+          [33mdata-nimg[31m=[32m"fill"[31m
+          [33mdecoding[31m=[32m"async"[31m
+          [33mloading[31m=[32m"lazy"[31m
+          [33msrc[31m=[32m"https://i.ytimg.com/vi/dQw4w9WgXcQ/mqdefault.jpg"[31m
+          [33mstyle[31m=[32m"position: absolute; height: 100%; width: 100%; left: 0px; top: 0px; right: 0px; bottom: 0px; color: transparent;"[31m
+        [36m/>[31m
+      [36m</div>[31m
+      [36m<div[31m
+        [33mclass[31m=[32m"p-3 space-y-2"[31m
+      [36m>[31m
+        [36m<h3[31m
+          [33mclass[31m=[32m"line-clamp-2 font-semibold leading-tight text-sm"[31m
+        [36m>[31m
+          [0mTest Video Title[0m
+        [36m</h3>[31m
+        [36m<p[31m
+          [33mclass[31m=[32m"text-xs text-muted-foreground"[31m
+        [36m>[31m
+          [0m2y ago[0m
+        [36m</p>[31m
+        [36m<a[31m
+          [33mclass[31m=[32m"inline-flex items-center justify-center whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5 w-full"[31m
+          [33mdata-size[31m=[32m"sm"[31m
+          [33mdata-slot[31m=[32m"button"[31m
+          [33mdata-variant[31m=[32m"outline"[31m
+          [33mhref[31m=[32m"/add?url=https://youtube.com/watch?v=dQw4w9WgXcQ"[31m
+        [36m>[31m
+          [0mAdd to Bank[0m
+        [36m</a>[31m
+      [36
+
+... [19045 characters truncated] ...
+
+lection behavior[2m > [22mshould add ring-primary class to card when selected
+[31m[1mError[22m: [2mexpect([22m[31melement[31m[2m).toHaveClass([22m[32m[32m"ring-2"[32m[31m[2m)[22m
+
+Expected the element to have class:
+[32m  ring-2[31m
+Received:
+[31m  bg-card text-card-foreground flex flex-col gap-6 rounded-xl border shadow-sm group overflow-hidden p-0 transition-all duration-200 hover:shadow-lg hover:scale-[1.02][31m[39m
+[36m [2m❯[22m src/components/discovery/__tests__/DiscoveryVideoCard.test.tsx:[2m225:20[22m[39m
+    [90m223| [39m      )
+    [90m224| [39m      [35mconst[39m card [33m=[39m container[33m.[39m[34mquerySelector[39m([32m'[data-slot="card"]'[39m)
+    [90m225| [39m      [34mexpect[39m(card)[33m.[39m[34mtoHaveClass[39m([32m'ring-2'[39m)
+    [90m   | [39m                   [31m^[39m
+    [90m226| [39m      [34mexpect[39m(card)[33m.[39m[34mtoHaveClass[39m([32m'ring-primary'[39m)
+    [90m227| [39m    })
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/6]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/discovery/__tests__/DiscoveryVideoCard.test.tsx[2m > [22mDiscoveryVideoCard[2m > [22mSelection behavior[2m > [22mshould render selection overlay when selected
+[31m[1mError[22m: [2mexpect([22m[31mreceived[31m[2m).toBeInTheDocument()[22m
+
+[31mreceived[31m value must be an HTMLElement or an SVGElement.
+Received has type:  Null
+Received has value: [31mnull[31m[39m
+[36m [2m❯[22m src/components/discovery/__tests__/DiscoveryVideoCard.test.tsx:[2m255:23[22m[39m
+    [90m253| [39m      )
+    [90m254| [39m      [35mconst[39m overlay [33m=[39m container[33m.[39m[34mquerySelector[39m([32m'.bg-primary\\/10'[39m)
+    [90m255| [39m      [34mexpect[39m(overlay)[33m.[39m[34mtoBeInTheDocument[39m()
+    [90m   | [39m                      [31m^[39m
+    [90m256| [39m    })
+    [90m257| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/6]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/components/discovery/__tests__/DiscoveryVideoCard.test.tsx
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/components/discovery/__tests__/DiscoveryVideoCard.test.tsx [2m([22m[2m25 tests[22m[2m | [22m[31m6 failed[39m[2m)[22m[33m 453[2mms[22m[39m
+     [32m✓[39m should render video title with line clamp[32m 60[2mms[22m[39m
+     [32m✓[39m should render thumbnail with correct aspect ratio[32m 7[2mms[22m[39m
+     [32m✓[39m should render "Add to Bank" button when video is not in bank[32m 136[2mms[22m[39m
+     [32m✓[39m should render "In Bank" badge when video is already in bank[32m 8[2mms[22m[39m
+     [32m✓[39m should link to add page with correct URL when not in bank[32m 17[2mms[22m[39m
+     [32m✓[39m should include returnTo in add link when provided[32m 14[2mms[22m[39m
+     [32m✓[39m should render published date as relative time[32m 6[2mms[22m[39m
+     [32m✓[39m should have compact card styling[32m 4[2mms[22m[39m
+     [32m✓[39m should not have scroll classes by default[32m 4[2mms[22m[39m
+     [32m✓[39m should accept custom className prop[32m 4[2mms[22m[39m
+     [32m✓[39m should render focus area badges when provided[32m 5[2mms[22m[39m
+     [32m✓[39m should not render focus area badges when not provided[32m 8[2mms[22m[39m
+     [32m✓[39m should not render focus area badges when empty array provided[32m 3[2mms[22m[39m
+     [32m✓[39m should render focus area badges below the date[32m 5[2mms[22m[39m
+[31m       [31m×[31m should render checkbox when selectable and not in bank[39m[32m 49[2mms[22m[39m
+       [32m✓[39m should not render checkbox when not selectable[32m 4[2mms[22m[39m
+       [32m✓[39m should not render checkbox when video is in bank[32m 3[2mms[22m[39m
+[31m       [31m×[31m should call onToggleSelect when checkbox is clicked[39m[32m 30[2mms[22m[39m
+[31m       [31m×[31m should render checkbox as checked when selected is true[39m[32m 30[2mms[22m[39m
+[31m       [31m×[31m should render checkbox as unchecked when selected is false[39m[32m 35[2mms[22m[39m
+[31m       [31m×[31m should add ring-primary class to card when selected[39m[32m 7[2mms[22m[39m
+       [32m✓[39m should not add ring classes to card when not selected[32m 3[2mms[22m[39m
+[31m       [31m×[31m should render selection overlay when selected[39m[32m 4[2mms[22m[39m
+       [32m✓[39m should not render selection overlay when not selected[32m 3[2mms[22m[39m
+     [32m✓[39m should render skeleton with correct structure[32m 2[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m6 failed[39m[22m[2m | [22m[1m[32m19 passed[39m[22m[90m (25)[39m
+[2m   Start at [22m 11:46:20
+[2m   Duration [22m 3.05s[2m (transform 164ms, setup 214ms, import 703ms, tests 453ms, environment 1.20s)[22m
+---
+timestamp: "2026-02-14 17:47:23"
+story: "4-add-from-discovery"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+npm error Missing script: "typecheck"
+npm error
+npm error To see a list of scripts, run:
+npm error   npm run
+npm error A complete log of this run can be found in: /Users/darindrobinski/.npm/_logs/2026-02-14T17_47_22_952Z-debug-0.log

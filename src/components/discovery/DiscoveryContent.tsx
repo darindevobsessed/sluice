@@ -58,6 +58,7 @@ export function DiscoveryContent() {
   const [isLoading, setIsLoading] = useState(true)
   const [isLoadingVideos, setIsLoadingVideos] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
 
   // Compute returnTo for navigation
   const returnTo = buildReturnTo('/discovery', searchParams)
@@ -168,12 +169,23 @@ export function DiscoveryContent() {
     await fetchVideos()
   }
 
+  const handleToggleSelect = useCallback((youtubeId: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev)
+      if (next.has(youtubeId)) next.delete(youtubeId)
+      else next.add(youtubeId)
+      return next
+    })
+  }, [])
+
   const handleChannelChange = (channelId: string | null) => {
     updateParams({ channel: channelId, page: null })
+    setSelectedIds(new Set())
   }
 
   const handleContentTypeChange = (type: ContentTypeValue) => {
     updateParams({ type: type === 'all' ? null : type, page: null })
+    setSelectedIds(new Set())
   }
 
   const handlePageChange = (page: number) => {
@@ -310,6 +322,8 @@ export function DiscoveryContent() {
           currentPage={currentPage}
           onPageChange={handlePageChange}
           returnTo={returnTo}
+          selectedIds={selectedIds}
+          onToggleSelect={handleToggleSelect}
         />
       )}
     </div>

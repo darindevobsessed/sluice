@@ -11,6 +11,8 @@ interface DiscoveryVideoGridProps {
   currentPage?: number
   onPageChange?: (page: number) => void
   returnTo?: string
+  selectedIds?: Set<string>
+  onToggleSelect?: (youtubeId: string) => void
 }
 
 const VIDEOS_PER_PAGE = 24
@@ -22,6 +24,8 @@ export function DiscoveryVideoGrid({
   currentPage = 1,
   onPageChange,
   returnTo,
+  selectedIds,
+  onToggleSelect,
 }: DiscoveryVideoGridProps) {
   const gridRef = useRef<HTMLDivElement>(null)
 
@@ -81,6 +85,9 @@ export function DiscoveryVideoGrid({
               video={video}
               focusAreas={focusAreas}
               returnTo={returnTo}
+              selectable={!video.inBank}
+              selected={selectedIds?.has(video.youtubeId)}
+              onToggleSelect={onToggleSelect}
             />
           )
         })}

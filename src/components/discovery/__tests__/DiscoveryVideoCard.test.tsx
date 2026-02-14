@@ -134,6 +134,141 @@ describe('DiscoveryVideoCard', () => {
 
     vi.useRealTimers()
   })
+
+  describe('Selection behavior', () => {
+    it('should render checkbox when selectable and not in bank', () => {
+      const onToggleSelect = vi.fn()
+      render(
+        <DiscoveryVideoCard
+          video={mockVideo}
+          selectable={true}
+          selected={false}
+          onToggleSelect={onToggleSelect}
+        />
+      )
+      const checkbox = screen.getByRole('checkbox')
+      expect(checkbox).toBeInTheDocument()
+    })
+
+    it('should not render checkbox when not selectable', () => {
+      render(<DiscoveryVideoCard video={mockVideo} selectable={false} />)
+      expect(screen.queryByRole('checkbox')).not.toBeInTheDocument()
+    })
+
+    it('should not render checkbox when video is in bank', () => {
+      const onToggleSelect = vi.fn()
+      render(
+        <DiscoveryVideoCard
+          video={{ ...mockVideo, inBank: true }}
+          selectable={true}
+          onToggleSelect={onToggleSelect}
+        />
+      )
+      expect(screen.queryByRole('checkbox')).not.toBeInTheDocument()
+    })
+
+    it('should call onToggleSelect when checkbox is clicked', () => {
+      const onToggleSelect = vi.fn()
+      render(
+        <DiscoveryVideoCard
+          video={mockVideo}
+          selectable={true}
+          selected={false}
+          onToggleSelect={onToggleSelect}
+        />
+      )
+      const checkbox = screen.getByRole('checkbox')
+      checkbox.click()
+      expect(onToggleSelect).toHaveBeenCalledWith('dQw4w9WgXcQ')
+      expect(onToggleSelect).toHaveBeenCalledTimes(1)
+    })
+
+    it('should render checkbox as checked when selected is true', () => {
+      const onToggleSelect = vi.fn()
+      render(
+        <DiscoveryVideoCard
+          video={mockVideo}
+          selectable={true}
+          selected={true}
+          onToggleSelect={onToggleSelect}
+        />
+      )
+      const checkbox = screen.getByRole('checkbox') as HTMLInputElement
+      expect(checkbox.checked).toBe(true)
+    })
+
+    it('should render checkbox as unchecked when selected is false', () => {
+      const onToggleSelect = vi.fn()
+      render(
+        <DiscoveryVideoCard
+          video={mockVideo}
+          selectable={true}
+          selected={false}
+          onToggleSelect={onToggleSelect}
+        />
+      )
+      const checkbox = screen.getByRole('checkbox') as HTMLInputElement
+      expect(checkbox.checked).toBe(false)
+    })
+
+    it('should add ring-primary class to card when selected', () => {
+      const onToggleSelect = vi.fn()
+      const { container } = render(
+        <DiscoveryVideoCard
+          video={mockVideo}
+          selectable={true}
+          selected={true}
+          onToggleSelect={onToggleSelect}
+        />
+      )
+      const card = container.querySelector('[data-slot="card"]')
+      expect(card).toHaveClass('ring-2')
+      expect(card).toHaveClass('ring-primary')
+    })
+
+    it('should not add ring classes to card when not selected', () => {
+      const onToggleSelect = vi.fn()
+      const { container } = render(
+        <DiscoveryVideoCard
+          video={mockVideo}
+          selectable={true}
+          selected={false}
+          onToggleSelect={onToggleSelect}
+        />
+      )
+      const card = container.querySelector('[data-slot="card"]')
+      expect(card).not.toHaveClass('ring-2')
+      expect(card).not.toHaveClass('ring-primary')
+    })
+
+    it('should render selection overlay when selected', () => {
+      const onToggleSelect = vi.fn()
+      const { container } = render(
+        <DiscoveryVideoCard
+          video={mockVideo}
+          selectable={true}
+          selected={true}
+          onToggleSelect={onToggleSelect}
+        />
+      )
+      const overlay = container.querySelector('.bg-primary\\/10')
+      expect(overlay).toBeInTheDocument()
+    })
+
+    it('should not render selection overlay when not selected', () => {
+      const onToggleSelect = vi.fn()
+      const { container } = render(
+        <DiscoveryVideoCard
+          video={mockVideo}
+          selectable={true}
+          selected={false}
+          onToggleSelect={onToggleSelect}
+        />
+      )
+      const overlay = container.querySelector('.bg-primary\\/10')
+      expect(overlay).not.toBeInTheDocument()
+    })
+  })
 })
 
 describe('DiscoveryVideoCardSkeleton', () => {
