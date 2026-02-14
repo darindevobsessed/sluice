@@ -8,7 +8,7 @@ created: 2026-02-14
 updated: 2026-02-14
 priority: high
 chunks_total: 3
-chunks_complete: 1
+chunks_complete: 2
 ---
 
 # Story: Batch Add from Discovery

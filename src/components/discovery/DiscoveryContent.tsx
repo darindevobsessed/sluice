@@ -11,6 +11,7 @@ import { ContentTypeFilter, type ContentTypeValue } from '@/components/discovery
 import type { DiscoveryVideo } from '@/components/discovery/DiscoveryVideoCard'
 import { FilterPillBar } from '@/components/filters/FilterPillBar'
 import type { FilterPill } from '@/components/filters/FilterPillBar'
+import { FloatingBatchBar } from '@/components/discovery/FloatingBatchBar'
 import { useURLParams } from '@/hooks/useURLParams'
 import { buildReturnTo } from '@/lib/navigation'
 
@@ -59,6 +60,7 @@ export function DiscoveryContent() {
   const [isLoadingVideos, setIsLoadingVideos] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [isBatchAdding] = useState(false) // setIsBatchAdding wired in chunk 3
 
   // Compute returnTo for navigation
   const returnTo = buildReturnTo('/discovery', searchParams)
@@ -177,6 +179,11 @@ export function DiscoveryContent() {
       return next
     })
   }, [])
+
+  const handleBatchAdd = useCallback(() => {
+    // Placeholder — wired in chunk 3
+    console.log('Batch add:', [...selectedIds])
+  }, [selectedIds])
 
   const handleChannelChange = (channelId: string | null) => {
     updateParams({ channel: channelId, page: null })
@@ -326,6 +333,14 @@ export function DiscoveryContent() {
           onToggleSelect={handleToggleSelect}
         />
       )}
+
+      {/* Floating batch action bar */}
+      <FloatingBatchBar
+        selectedCount={selectedIds.size}
+        onAdd={handleBatchAdd}
+        onClear={() => setSelectedIds(new Set())}
+        isAdding={isBatchAdding}
+      />
     </div>
   )
 }
