@@ -10,6 +10,7 @@ import { ChannelFilterDropdown } from '@/components/discovery/ChannelFilterDropd
 import { ContentTypeFilter, type ContentTypeValue } from '@/components/discovery/ContentTypeFilter'
 import type { DiscoveryVideo } from '@/components/discovery/DiscoveryVideoCard'
 import { useURLParams } from '@/hooks/useURLParams'
+import { buildReturnTo } from '@/lib/navigation'
 
 interface Channel {
   id: number
@@ -55,6 +56,9 @@ export function DiscoveryContent() {
   const [isLoading, setIsLoading] = useState(true)
   const [isLoadingVideos, setIsLoadingVideos] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  // Compute returnTo for navigation
+  const returnTo = buildReturnTo('/discovery', searchParams)
 
   // Read filters from URL params with validation
   const selectedChannelId = searchParams.get('channel') || null
@@ -269,6 +273,7 @@ export function DiscoveryContent() {
           focusAreaMap={focusAreaMap}
           currentPage={currentPage}
           onPageChange={handlePageChange}
+          returnTo={returnTo}
         />
       )}
     </div>

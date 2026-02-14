@@ -12,6 +12,7 @@ import { SuccessState } from "./SuccessState"
 import { parseYouTubeUrl, fetchVideoMetadata } from "@/lib/youtube"
 import type { VideoMetadata } from "@/lib/youtube"
 import { useRotatingMessages } from "@/hooks/useRotatingMessages"
+import { parseReturnTo } from "@/lib/navigation"
 
 const METADATA_FETCH_MESSAGES = [
   'Looking up this video...',
@@ -21,6 +22,7 @@ const METADATA_FETCH_MESSAGES = [
 
 export function AddVideoPage() {
   const searchParams = useSearchParams()
+  const returnTo = parseReturnTo(searchParams.get('returnTo'))
   const metadataMessage = useRotatingMessages(METADATA_FETCH_MESSAGES)
   const [url, setUrl] = useState("")
   const [metadata, setMetadata] = useState<VideoMetadata | null>(null)
@@ -282,6 +284,7 @@ export function AddVideoPage() {
           onReset={handleReset}
           videoId={createdVideoId}
           milestones={milestones}
+          returnTo={returnTo}
         />
       </div>
     );

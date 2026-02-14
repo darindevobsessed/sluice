@@ -3,6 +3,12 @@ import { userEvent } from '@testing-library/user-event'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { AddTranscriptPage } from '../AddTranscriptPage'
 
+// Mock next/navigation for useSearchParams
+const mockSearchParams = new URLSearchParams()
+vi.mock('next/navigation', () => ({
+  useSearchParams: () => mockSearchParams,
+}))
+
 // Mock fetch for API calls
 global.fetch = vi.fn()
 
@@ -343,5 +349,73 @@ describe('AddTranscriptPage', () => {
 
     // Should return to form
     expect(screen.getByLabelText(/title/i)).toBeInTheDocument()
+  })
+})
+
+describe('AddTranscriptPage - returnTo Context', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockSearchParams.delete('returnTo')
+  })
+
+  it('passes returnTo to SuccessState when present in URL', async () => {
+    const user = userEvent.setup()
+    const mockFetch = vi.mocked(global.fetch)
+
+    // Set returnTo param
+    mockSearchParams.set('returnTo', encodeURIComponent('/discovery?channel=abc'))
+
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ id: '123' }),
+    } as Response)
+
+    render(<AddTranscriptPage />)
+
+    const titleInput = screen.getByLabelText(/title/i)
+    const transcriptInput = screen.getByLabelText(/transcript/i)
+
+    await user.type(titleInput, 'Test Meeting')
+    await user.type(transcriptInput, 'This is the full meeting transcript with sufficient content')
+
+    const submitButton = screen.getByRole('button', { name: /add to knowledge bank/i })
+    await user.click(submitButton)
+
+    await waitFor(() => {
+      expect(screen.getByText(/added to your knowledge bank/i)).toBeInTheDocument()
+    })
+
+    // Should show "Back to Discovery" label
+    expect(screen.getByText(/back to discovery/i)).toBeInTheDocument()
+  })
+
+  it('shows "Browse Knowledge Bank" when no returnTo present', async () => {
+    const user = userEvent.setup()
+    const mockFetch = vi.mocked(global.fetch)
+
+    // No returnTo param
+
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ id: '123' }),
+    } as Response)
+
+    render(<AddTranscriptPage />)
+
+    const titleInput = screen.getByLabelText(/title/i)
+    const transcriptInput = screen.getByLabelText(/transcript/i)
+
+    await user.type(titleInput, 'Test Meeting')
+    await user.type(transcriptInput, 'This is the full meeting transcript with sufficient content')
+
+    const submitButton = screen.getByRole('button', { name: /add to knowledge bank/i })
+    await user.click(submitButton)
+
+    await waitFor(() => {
+      expect(screen.getByText(/added to your knowledge bank/i)).toBeInTheDocument()
+    })
+
+    // Should show default label
+    expect(screen.getByText(/browse knowledge bank/i)).toBeInTheDocument()
   })
 })

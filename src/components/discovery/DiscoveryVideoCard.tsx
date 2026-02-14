@@ -23,13 +23,14 @@ interface DiscoveryVideoCardProps {
   className?: string
   isNew?: boolean
   focusAreas?: { id: number; name: string; color: string }[]
+  returnTo?: string
 }
 
-export function DiscoveryVideoCard({ video, className, isNew = false, focusAreas }: DiscoveryVideoCardProps) {
+export function DiscoveryVideoCard({ video, className, isNew = false, focusAreas, returnTo }: DiscoveryVideoCardProps) {
   const publishedDate = new Date(video.publishedAt)
   const relativeTime = formatRelativeTime(publishedDate)
   const thumbnailUrl = `https://i.ytimg.com/vi/${video.youtubeId}/mqdefault.jpg`
-  const addUrl = `/add?url=https://youtube.com/watch?v=${video.youtubeId}`
+  const addUrl = `/add?url=https://youtube.com/watch?v=${video.youtubeId}${returnTo ? `&returnTo=${returnTo}` : ''}`
 
   return (
     <Card

@@ -10,6 +10,7 @@ interface DiscoveryVideoGridProps {
   focusAreaMap?: Record<string, { id: number; name: string; color: string }[]>
   currentPage?: number
   onPageChange?: (page: number) => void
+  returnTo?: string
 }
 
 const VIDEOS_PER_PAGE = 24
@@ -20,6 +21,7 @@ export function DiscoveryVideoGrid({
   focusAreaMap,
   currentPage = 1,
   onPageChange,
+  returnTo,
 }: DiscoveryVideoGridProps) {
   const gridRef = useRef<HTMLDivElement>(null)
 
@@ -78,6 +80,7 @@ export function DiscoveryVideoGrid({
               key={video.youtubeId}
               video={video}
               focusAreas={focusAreas}
+              returnTo={returnTo}
             />
           )
         })}

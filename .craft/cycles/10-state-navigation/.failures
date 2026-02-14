@@ -962,3 +962,1253 @@ npm error
 npm error To see a list of scripts, run:
 npm error   npm run
 npm error A complete log of this run can be found in: /Users/darindrobinski/.npm/_logs/2026-02-14T00_57_03_218Z-debug-0.log
+---
+timestamp: "2026-02-13 19:00:18"
+story: "2-context-aware-navigation"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 2 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/components/add-transcript/__tests__/AddTranscriptPage.test.tsx[2m > [22mAddTranscriptPage - returnTo Context[2m > [22mpasses returnTo to SuccessState when present in URL
+[31m[1mTestingLibraryElementError[22m[39m: Unable to find an element with the text: /back to discovery/i. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"p-6"[39m
+    [36m>[39m
+      [36m<h1[39m
+        [33mclass[39m=[32m"mb-2 text-2xl font-semibold"[39m
+      [36m>[39m
+        [0mAdd a Transcript[0m
+      [36m</h1>[39m
+      [36m<p[39m
+        [33mclass[39m=[32m"mb-8 text-muted-foreground"[39m
+      [36m>[39m
+        [0mImport meeting notes, podcast transcripts, or any text content.[0m
+      [36m</p>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"mx-auto max-w-2xl animate-in fade-in duration-200"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"rounded-lg border border-border bg-card p-8 text-center"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-check h-8 w-8 text-primary"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"3"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M20 6 9 17l-5-5"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</div>[39m
+          [36m<h2[39m
+            [33mclass[39m=[32m"mb-2 text-2xl font-semibold"[39m
+          [36m>[39m
+            [0mAdded to your Knowledge Bank![0m
+          [36m</h2>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"mb-8 text-muted-foreground"[39m
+          [36m>[39m
+            [0mYour transcript is ready to explore and generate plugin ideas.[0m
+          [36m</p>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"mb-8 flex items-center justify-center gap-4"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex h-16 w-28 items-center justify-center rounded-md bg-muted"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33maria-hidden[39m=[32m"true"[39m
+                [33mclass[39m=[32m"text-muted-foreground h-8 w-8"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"1.5"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M14 2v6h6"[39m
+                [36m/>[39m
+                [36m<line[39m
+                  [33mx1[39m=[32m"8"[39m
+                  [33mx2[39m=[32m"16"[39m
+                  [33my1[39m=[32m"13"[39m
+                  [33my2[39m=[32m"13"[39m
+                [36m/>[39m
+                [36m<line[39m
+                  [33mx1[39m=[32m"8"[39m
+                  [33mx2[39m=[32m"13"[39m
+                  [33my1[39m=[32m"17"[39m
+                  [33my2[39m=[32m"17"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+            [36m</div>[39m
+            [36m<p[39m
+              [33mclass[39m=[32m"max-w-md text-left text-sm font-medium"[39m
+            [36m>[39m
+              [0mTest Meeting[0m
+            [36m</p>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"space-y-3 text-left"[39m
+          [36m>[39m
+            [36m<p[39m
+              [33mclass[39m=[32m"text-sm font-medium text-muted-foreground"[39m
+            [36m>[39m
+              [0mWhat's next?[0m
+            [36m</p>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"flex w-full items-center gap-3 rou
+
+... [18813 characters truncated] ...
+
+<path[39m
+                      [33md[39m=[32m"M20 2v4"[39m
+                    [36m/>[39m
+                    ...
+[90m [2m❯[22m Proxy.waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:[2m163:27[22m[39m
+[36m [2m❯[22m src/components/add-video/__tests__/AddVideoPage.test.tsx:[2m573:11[22m[39m
+    [90m571| [39m
+    [90m572| [39m    [90m// Wait for success state[39m
+    [90m573| [39m    [35mawait[39m [34mwaitFor[39m(() [33m=>[39m {
+    [90m   | [39m          [31m^[39m
+    [90m574| [39m      expect(screen.getByText(/added to your knowledge bank/i)).toBeIn…
+    [90m575| [39m    }[33m,[39m { timeout[33m:[39m [34m3000[39m })
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/components/add-video/__tests__/AddVideoPage.test.tsx src/components/add-transcript/__tests__/AddTranscriptPage.test.tsx
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/components/add-video/__tests__/AddVideoPage.test.tsx [2m([22m[2m17 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 13206[2mms[22m[39m
+     [33m[2m✓[22m[39m debounces URL input and does not fetch immediately [33m 718[2mms[22m[39m
+     [33m[2m✓[22m[39m fetches transcript after metadata loads and debounce completes [33m 666[2mms[22m[39m
+     [33m[2m✓[22m[39m shows transcript fetch loading state [33m 639[2mms[22m[39m
+     [33m[2m✓[22m[39m shows auto-fetched indicator on success [33m 626[2mms[22m[39m
+     [33m[2m✓[22m[39m shows error with retry button on failure [33m 653[2mms[22m[39m
+     [33m[2m✓[22m[39m cancels pending fetch when URL changes [33m 737[2mms[22m[39m
+     [33m[2m✓[22m[39m allows manual paste when auto-fetch is available [33m 790[2mms[22m[39m
+     [33m[2m✓[22m[39m renders milestone message in success state after submission [33m 666[2mms[22m[39m
+     [33m[2m✓[22m[39m resets milestones when user clicks "Add Another" [33m 677[2mms[22m[39m
+     [33m[2m✓[22m[39m handles AbortError gracefully when request is cancelled [33m 1116[2mms[22m[39m
+     [32m✓[39m should prefill URL input when url query param is present[32m 4[2mms[22m[39m
+     [33m[2m✓[22m[39m should auto-fetch metadata when url query param is present [33m 511[2mms[22m[39m
+     [33m[2m✓[22m[39m should auto-fetch transcript when url query param is present [33m 511[2mms[22m[39m
+     [33m[2m✓[22m[39m should not prefill when url query param is empty [33m 605[2mms[22m[39m
+     [32m✓[39m should handle invalid URL in query param gracefully[32m 6[2mms[22m[39m
+[31m     [31m×[31m passes returnTo to SuccessState when present in URL[39m[33m 3638[2mms[22m[39m
+     [33m[2m✓[22m[39m shows "Browse Knowledge Bank" when no returnTo present [33m 640[2mms[22m[39m
+ [31m❯[39m src/components/add-transcript/__tests__/AddTranscriptPage.test.tsx [2m([22m[2m17 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 5047[2mms[22m[39m
+     [32m✓[39m renders all form fields[32m 58[2mms[22m[39m
+     [32m✓[39m shows character count for transcript field[32m 11[2mms[22m[39m
+     [32m✓[39m updates character count as user types[32m 279[2mms[22m[39m
+     [32m✓[39m submit button is disabled when form is empty[32m 28[2mms[22m[39m
+     [33m[2m✓[22m[39m submit button is disabled when title is missing [33m 381[2mms[22m[39m
+     [33m[2m✓[22m[39m submit button is enabled when source is empty (optional field) [33m 371[2mms[22m[39m
+     [32m✓[39m submit button is disabled when transcript is too short[32m 150[2mms[22m[39m
+     [33m[2m✓[22m[39m submit button is enabled when all required fields are valid [33m 421[2mms[22m[39m
+     [33m[2m✓[22m[39m submits form with correct data structure [33m 575[2mms[22m[39m
+     [33m[2m✓[22m[39m submits without tags and notes when optional fields are empty [33m 467[2mms[22m[39m
+     [32m✓[39m submits without channel when source is empty[32m 287[2mms[22m[39m
+     [33m[2m✓[22m[39m shows loading state during submission [33m 386[2mms[22m[39m
+     [33m[2m✓[22m[39m shows success state after successful submission [33m 353[2mms[22m[39m
+     [33m[2m✓[22m[39m shows error message on submission failure [33m 348[2mms[22m[39m
+     [33m[2m✓[22m[39m allows reset after successful submission [33m 367[2mms[22m[39m
+[31m     [31m×[31m passes returnTo to SuccessState when present in URL[39m[33m 307[2mms[22m[39m
+     [32m✓[39m shows "Browse Knowledge Bank" when no returnTo present[32m 256[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m2 failed[39m[22m[90m (2)[39m
+[2m      Tests [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m32 passed[39m[22m[90m (34)[39m
+[2m   Start at [22m 18:59:55
+[2m   Duration [22m 22.41s[2m (transform 271ms, setup 284ms, import 1.51s, tests 18.25s, environment 1.84s)[22m
+---
+timestamp: "2026-02-13 19:01:03"
+story: "2-context-aware-navigation"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 2 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/components/add-transcript/__tests__/AddTranscriptPage.test.tsx[2m > [22mAddTranscriptPage - returnTo Context[2m > [22mpasses returnTo to SuccessState when present in URL
+[31m[1mTestingLibraryElementError[22m[39m: Unable to find an element with the text: /back to discovery/i. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"p-6"[39m
+    [36m>[39m
+      [36m<h1[39m
+        [33mclass[39m=[32m"mb-2 text-2xl font-semibold"[39m
+      [36m>[39m
+        [0mAdd a Transcript[0m
+      [36m</h1>[39m
+      [36m<p[39m
+        [33mclass[39m=[32m"mb-8 text-muted-foreground"[39m
+      [36m>[39m
+        [0mImport meeting notes, podcast transcripts, or any text content.[0m
+      [36m</p>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"mx-auto max-w-2xl animate-in fade-in duration-200"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"rounded-lg border border-border bg-card p-8 text-center"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-check h-8 w-8 text-primary"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"3"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M20 6 9 17l-5-5"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</div>[39m
+          [36m<h2[39m
+            [33mclass[39m=[32m"mb-2 text-2xl font-semibold"[39m
+          [36m>[39m
+            [0mAdded to your Knowledge Bank![0m
+          [36m</h2>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"mb-8 text-muted-foreground"[39m
+          [36m>[39m
+            [0mYour transcript is ready to explore and generate plugin ideas.[0m
+          [36m</p>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"mb-8 flex items-center justify-center gap-4"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex h-16 w-28 items-center justify-center rounded-md bg-muted"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33maria-hidden[39m=[32m"true"[39m
+                [33mclass[39m=[32m"text-muted-foreground h-8 w-8"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"1.5"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M14 2v6h6"[39m
+                [36m/>[39m
+                [36m<line[39m
+                  [33mx1[39m=[32m"8"[39m
+                  [33mx2[39m=[32m"16"[39m
+                  [33my1[39m=[32m"13"[39m
+                  [33my2[39m=[32m"13"[39m
+                [36m/>[39m
+                [36m<line[39m
+                  [33mx1[39m=[32m"8"[39m
+                  [33mx2[39m=[32m"13"[39m
+                  [33my1[39m=[32m"17"[39m
+                  [33my2[39m=[32m"17"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+            [36m</div>[39m
+            [36m<p[39m
+              [33mclass[39m=[32m"max-w-md text-left text-sm font-medium"[39m
+            [36m>[39m
+              [0mTest Meeting[0m
+            [36m</p>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"space-y-3 text-left"[39m
+          [36m>[39m
+            [36m<p[39m
+              [33mclass[39m=[32m"text-sm font-medium text-muted-foreground"[39m
+            [36m>[39m
+              [0mWhat's next?[0m
+            [36m</p>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"flex w-full items-center gap-3 rou
+
+... [18841 characters truncated] ...
+
+<path[39m
+                      [33md[39m=[32m"M20 2v4"[39m
+                    [36m/>[39m
+                    ...
+[90m [2m❯[22m Proxy.waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:[2m163:27[22m[39m
+[36m [2m❯[22m src/components/add-video/__tests__/AddVideoPage.test.tsx:[2m573:11[22m[39m
+    [90m571| [39m
+    [90m572| [39m    [90m// Wait for success state[39m
+    [90m573| [39m    [35mawait[39m [34mwaitFor[39m(() [33m=>[39m {
+    [90m   | [39m          [31m^[39m
+    [90m574| [39m      expect(screen.getByText(/added to your knowledge bank/i)).toBeIn…
+    [90m575| [39m    }[33m,[39m { timeout[33m:[39m [34m3000[39m })
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/components/add-video/__tests__/AddVideoPage.test.tsx src/components/add-transcript/__tests__/AddTranscriptPage.test.tsx
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/components/add-video/__tests__/AddVideoPage.test.tsx [2m([22m[2m17 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 13048[2mms[22m[39m
+     [33m[2m✓[22m[39m debounces URL input and does not fetch immediately [33m 673[2mms[22m[39m
+     [33m[2m✓[22m[39m fetches transcript after metadata loads and debounce completes [33m 639[2mms[22m[39m
+     [33m[2m✓[22m[39m shows transcript fetch loading state [33m 609[2mms[22m[39m
+     [33m[2m✓[22m[39m shows auto-fetched indicator on success [33m 609[2mms[22m[39m
+     [33m[2m✓[22m[39m shows error with retry button on failure [33m 634[2mms[22m[39m
+     [33m[2m✓[22m[39m cancels pending fetch when URL changes [33m 721[2mms[22m[39m
+     [33m[2m✓[22m[39m allows manual paste when auto-fetch is available [33m 786[2mms[22m[39m
+     [33m[2m✓[22m[39m renders milestone message in success state after submission [33m 660[2mms[22m[39m
+     [33m[2m✓[22m[39m resets milestones when user clicks "Add Another" [33m 681[2mms[22m[39m
+     [33m[2m✓[22m[39m handles AbortError gracefully when request is cancelled [33m 1110[2mms[22m[39m
+     [32m✓[39m should prefill URL input when url query param is present[32m 5[2mms[22m[39m
+     [33m[2m✓[22m[39m should auto-fetch metadata when url query param is present [33m 515[2mms[22m[39m
+     [33m[2m✓[22m[39m should auto-fetch transcript when url query param is present [33m 513[2mms[22m[39m
+     [33m[2m✓[22m[39m should not prefill when url query param is empty [33m 604[2mms[22m[39m
+     [32m✓[39m should handle invalid URL in query param gracefully[32m 7[2mms[22m[39m
+[31m     [31m×[31m passes returnTo to SuccessState when present in URL[39m[33m 3643[2mms[22m[39m
+     [33m[2m✓[22m[39m shows "Browse Knowledge Bank" when no returnTo present [33m 635[2mms[22m[39m
+ [31m❯[39m src/components/add-transcript/__tests__/AddTranscriptPage.test.tsx [2m([22m[2m17 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 5037[2mms[22m[39m
+     [32m✓[39m renders all form fields[32m 55[2mms[22m[39m
+     [32m✓[39m shows character count for transcript field[32m 10[2mms[22m[39m
+     [32m✓[39m updates character count as user types[32m 258[2mms[22m[39m
+     [32m✓[39m submit button is disabled when form is empty[32m 34[2mms[22m[39m
+     [33m[2m✓[22m[39m submit button is disabled when title is missing [33m 382[2mms[22m[39m
+     [33m[2m✓[22m[39m submit button is enabled when source is empty (optional field) [33m 385[2mms[22m[39m
+     [32m✓[39m submit button is disabled when transcript is too short[32m 151[2mms[22m[39m
+     [33m[2m✓[22m[39m submit button is enabled when all required fields are valid [33m 425[2mms[22m[39m
+     [33m[2m✓[22m[39m submits form with correct data structure [33m 614[2mms[22m[39m
+     [33m[2m✓[22m[39m submits without tags and notes when optional fields are empty [33m 412[2mms[22m[39m
+     [32m✓[39m submits without channel when source is empty[32m 296[2mms[22m[39m
+     [33m[2m✓[22m[39m shows loading state during submission [33m 367[2mms[22m[39m
+     [33m[2m✓[22m[39m shows success state after successful submission [33m 348[2mms[22m[39m
+     [33m[2m✓[22m[39m shows error message on submission failure [33m 349[2mms[22m[39m
+     [33m[2m✓[22m[39m allows reset after successful submission [33m 384[2mms[22m[39m
+[31m     [31m×[31m passes returnTo to SuccessState when present in URL[39m[32m 297[2mms[22m[39m
+     [32m✓[39m shows "Browse Knowledge Bank" when no returnTo present[32m 269[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m2 failed[39m[22m[90m (2)[39m
+[2m      Tests [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m32 passed[39m[22m[90m (34)[39m
+[2m   Start at [22m 19:00:41
+[2m   Duration [22m 22.23s[2m (transform 263ms, setup 279ms, import 1.57s, tests 18.08s, environment 1.70s)[22m
+---
+timestamp: "2026-02-13 19:01:54"
+story: "2-context-aware-navigation"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/components/add-video/__tests__/AddVideoPage.test.tsx[2m > [22mAddVideoPage - returnTo Context[2m > [22mpasses returnTo to SuccessState when present in URL
+[31m[1mTestingLibraryElementError[22m[39m: Unable to find an element with the text: /added to your knowledge bank/i. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"p-6"[39m
+    [36m>[39m
+      [36m<h1[39m
+        [33mclass[39m=[32m"mb-2 text-2xl font-semibold"[39m
+      [36m>[39m
+        [0mAdd a Video[0m
+      [36m</h1>[39m
+      [36m<p[39m
+        [33mclass[39m=[32m"mb-8 text-muted-foreground"[39m
+      [36m>[39m
+        [0mExtract knowledge from YouTube videos and generate plugin ideas.[0m
+      [36m</p>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"mx-auto max-w-2xl space-y-6"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"space-y-3"[39m
+        [36m>[39m
+          [36m<label[39m
+            [33mclass[39m=[32m"flex items-center gap-2 font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50 text-base"[39m
+            [33mdata-slot[39m=[32m"label"[39m
+            [33mfor[39m=[32m"youtube-url"[39m
+          [36m>[39m
+            [0mWhat video would you like to add?[0m
+          [36m</label>[39m
+          [36m<input[39m
+            [33mclass[39m=[32m"file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive text-base"[39m
+            [33mdata-slot[39m=[32m"input"[39m
+            [33mid[39m=[32m"youtube-url"[39m
+            [33mplaceholder[39m=[32m"Paste a YouTube URL here..."[39m
+            [33mtype[39m=[32m"url"[39m
+            [33mvalue[39m=[32m"https://youtube.com/watch?v=abc123"[39m
+          [36m/>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"bg-card text-card-foreground flex flex-col gap-6 rounded-xl border shadow-sm p-4"[39m
+          [33mdata-slot[39m=[32m"card"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"p-0"[39m
+            [33mdata-slot[39m=[32m"card-content"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex items-start gap-4"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"relative h-[90px] w-[120px] flex-shrink-0 overflow-hidden rounded-md"[39m
+              [36m>[39m
+                [36m<img[39m
+                  [33malt[39m=[32m"Test Video Title"[39m
+                  [33mclass[39m=[32m"object-cover"[39m
+                  [33mdata-nimg[39m=[32m"fill"[39m
+                  [33mdecoding[39m=[32m"async"[39m
+                  [33mloading[39m=[32m"lazy"[39m
+                  [33msrc[39m=[32m"https://example.com/thumb.jpg"[39m
+                  [33mstyle[39m=[32m"position: absolute; height: 100%; width: 100%; left: 0px; top: 0px; right: 0px; bottom: 0px; color: transparent;"[39m
+                [36m/>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"flex-1 min-w-0"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"mb-2 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary"[39m
+                [36m>[39m
+                  [36m<span>[39m
+                    [0m✓[0m
+                  [36m</span>[39m
+                  [36m<span>[39m
+                    [0mLooks good[0m
+                  [36m</span>[39m
+                [36m</div>[39m
+                [36m<h3[39m
+                  [33mclass[39m=[32m"mb-1 font-semibold leading-tight"[39m
+                [36m>[39m
+                  [0mTest Video Title[0m
+                [36m</h3>[39m
+                [36m<p[39m
+                  [33mclass[39m=[32m"text-sm text-muted-foreground"[39m
+                [36m>[39m
+                  [0mTest Channel[0m
+                [36m</p>[39m
+      
+
+... [8931 characters truncated] ...
+
+viewBox[39m=[32m"0 0 24 24"[39m
+                    [33mwidth[39m=[32m"24"[39m
+                    [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+                  [36m>[39m
+                    [36m<path[39m
+                      [33md[39m=[32m"M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"[39m
+                    [36m/>[39m
+                    [36m<path[39m
+                      [33md[39m=[32m"M20 2v4"[39m
+                    [36m/>[39m
+                    ...
+[90m [2m❯[22m Proxy.waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:[2m163:27[22m[39m
+[36m [2m❯[22m src/components/add-video/__tests__/AddVideoPage.test.tsx:[2m573:11[22m[39m
+    [90m571| [39m
+    [90m572| [39m    [90m// Wait for success state[39m
+    [90m573| [39m    [35mawait[39m [34mwaitFor[39m(() [33m=>[39m {
+    [90m   | [39m          [31m^[39m
+    [90m574| [39m      expect(screen.getByText(/added to your knowledge bank/i)).toBeIn…
+    [90m575| [39m    }[33m,[39m { timeout[33m:[39m [34m3000[39m })
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/components/add-video/__tests__/AddVideoPage.test.tsx src/components/add-transcript/__tests__/AddTranscriptPage.test.tsx
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/components/add-video/__tests__/AddVideoPage.test.tsx [2m([22m[2m17 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 13288[2mms[22m[39m
+     [33m[2m✓[22m[39m debounces URL input and does not fetch immediately [33m 742[2mms[22m[39m
+     [33m[2m✓[22m[39m fetches transcript after metadata loads and debounce completes [33m 679[2mms[22m[39m
+     [33m[2m✓[22m[39m shows transcript fetch loading state [33m 639[2mms[22m[39m
+     [33m[2m✓[22m[39m shows auto-fetched indicator on success [33m 622[2mms[22m[39m
+     [33m[2m✓[22m[39m shows error with retry button on failure [33m 671[2mms[22m[39m
+     [33m[2m✓[22m[39m cancels pending fetch when URL changes [33m 740[2mms[22m[39m
+     [33m[2m✓[22m[39m allows manual paste when auto-fetch is available [33m 802[2mms[22m[39m
+     [33m[2m✓[22m[39m renders milestone message in success state after submission [33m 666[2mms[22m[39m
+     [33m[2m✓[22m[39m resets milestones when user clicks "Add Another" [33m 684[2mms[22m[39m
+     [33m[2m✓[22m[39m handles AbortError gracefully when request is cancelled [33m 1118[2mms[22m[39m
+     [32m✓[39m should prefill URL input when url query param is present[32m 5[2mms[22m[39m
+     [33m[2m✓[22m[39m should auto-fetch metadata when url query param is present [33m 515[2mms[22m[39m
+     [33m[2m✓[22m[39m should auto-fetch transcript when url query param is present [33m 509[2mms[22m[39m
+     [33m[2m✓[22m[39m should not prefill when url query param is empty [33m 603[2mms[22m[39m
+     [32m✓[39m should handle invalid URL in query param gracefully[32m 7[2mms[22m[39m
+[31m     [31m×[31m passes returnTo to SuccessState when present in URL[39m[33m 3644[2mms[22m[39m
+     [33m[2m✓[22m[39m shows "Browse Knowledge Bank" when no returnTo present [33m 640[2mms[22m[39m
+ [32m✓[39m src/components/add-transcript/__tests__/AddTranscriptPage.test.tsx [2m([22m[2m17 tests[22m[2m)[22m[33m 5109[2mms[22m[39m
+     [33m[2m✓[22m[39m submit button is disabled when title is missing [33m 404[2mms[22m[39m
+     [33m[2m✓[22m[39m submit button is enabled when source is empty (optional field) [33m 364[2mms[22m[39m
+     [33m[2m✓[22m[39m submit button is enabled when all required fields are valid [33m 398[2mms[22m[39m
+     [33m[2m✓[22m[39m submits form with correct data structure [33m 572[2mms[22m[39m
+     [33m[2m✓[22m[39m submits without tags and notes when optional fields are empty [33m 431[2mms[22m[39m
+     [33m[2m✓[22m[39m submits without channel when source is empty [33m 306[2mms[22m[39m
+     [33m[2m✓[22m[39m shows loading state during submission [33m 405[2mms[22m[39m
+     [33m[2m✓[22m[39m shows success state after successful submission [33m 356[2mms[22m[39m
+     [33m[2m✓[22m[39m shows error message on submission failure [33m 371[2mms[22m[39m
+     [33m[2m✓[22m[39m allows reset after successful submission [33m 382[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m33 passed[39m[22m[90m (34)[39m
+[2m   Start at [22m 19:01:30
+[2m   Duration [22m 23.21s[2m (transform 283ms, setup 397ms, import 1.72s, tests 18.40s, environment 2.06s)[22m
+---
+timestamp: "2026-02-13 19:03:17"
+story: "2-context-aware-navigation"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/components/add-video/__tests__/AddVideoPage.test.tsx[2m > [22mAddVideoPage - returnTo Context[2m > [22mpasses returnTo to SuccessState when present in URL
+[31m[1mError[22m: [2mexpect([22m[31melement[31m[2m).not.toBeDisabled()[22m
+
+Received element is disabled:
+  [31m<button
+  class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive bg-primary text-primary-foreground hover:bg-primary/90 h-10 rounded-md px-6 has-[>svg]:px-4 min-w-[200px]"
+  data-size="lg"
+  data-slot="button"
+  data-variant="default"
+  disabled=""
+/>[31m[39m
+[36m [2m❯[22m src/components/add-video/__tests__/AddVideoPage.test.tsx:[2m574:30[22m[39m
+    [90m572| [39m    [90m// Submit the form[39m
+    [90m573| [39m    const submitButton = screen.getByRole('button', { name: /add to kn…
+    [90m574| [39m    [34mexpect[39m(submitButton)[33m.[39mnot[33m.[39m[34mtoBeDisabled[39m()
+    [90m   | [39m                             [31m^[39m
+    [90m575| [39m    [35mawait[39m user[33m.[39m[34mclick[39m(submitButton)
+    [90m576| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/components/add-video/__tests__/AddVideoPage.test.tsx src/components/add-transcript/__tests__/AddTranscriptPage.test.tsx
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [32m✓[39m src/components/add-transcript/__tests__/AddTranscriptPage.test.tsx [2m([22m[2m17 tests[22m[2m)[22m[33m 4997[2mms[22m[39m
+     [33m[2m✓[22m[39m submit button is disabled when title is missing [33m 380[2mms[22m[39m
+     [33m[2m✓[22m[39m submit button is enabled when source is empty (optional field) [33m 370[2mms[22m[39m
+     [33m[2m✓[22m[39m submit button is enabled when all required fields are valid [33m 421[2mms[22m[39m
+     [33m[2m✓[22m[39m submits form with correct data structure [33m 572[2mms[22m[39m
+     [33m[2m✓[22m[39m submits without tags and notes when optional fields are empty [33m 427[2mms[22m[39m
+     [33m[2m✓[22m[39m shows loading state during submission [33m 398[2mms[22m[39m
+     [33m[2m✓[22m[39m shows success state after successful submission [33m 338[2mms[22m[39m
+     [33m[2m✓[22m[39m shows error message on submission failure [33m 329[2mms[22m[39m
+     [33m[2m✓[22m[39m allows reset after successful submission [33m 369[2mms[22m[39m
+ [31m❯[39m src/components/add-video/__tests__/AddVideoPage.test.tsx [2m([22m[2m17 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 10333[2mms[22m[39m
+     [33m[2m✓[22m[39m debounces URL input and does not fetch immediately [33m 713[2mms[22m[39m
+     [33m[2m✓[22m[39m fetches transcript after metadata loads and debounce completes [33m 676[2mms[22m[39m
+     [33m[2m✓[22m[39m shows transcript fetch loading state [33m 634[2mms[22m[39m
+     [33m[2m✓[22m[39m shows auto-fetched indicator on success [33m 629[2mms[22m[39m
+     [33m[2m✓[22m[39m shows error with retry button on failure [33m 663[2mms[22m[39m
+     [33m[2m✓[22m[39m cancels pending fetch when URL changes [33m 739[2mms[22m[39m
+     [33m[2m✓[22m[39m allows manual paste when auto-fetch is available [33m 792[2mms[22m[39m
+     [33m[2m✓[22m[39m renders milestone message in success state after submission [33m 665[2mms[22m[39m
+     [33m[2m✓[22m[39m resets milestones when user clicks "Add Another" [33m 677[2mms[22m[39m
+     [33m[2m✓[22m[39m handles AbortError gracefully when request is cancelled [33m 1117[2mms[22m[39m
+     [32m✓[39m should prefill URL input when url query param is present[32m 4[2mms[22m[39m
+     [33m[2m✓[22m[39m should auto-fetch metadata when url query param is present [33m 512[2mms[22m[39m
+     [33m[2m✓[22m[39m should auto-fetch transcript when url query param is present [33m 511[2mms[22m[39m
+     [33m[2m✓[22m[39m should not prefill when url query param is empty [33m 604[2mms[22m[39m
+     [32m✓[39m should handle invalid URL in query param gracefully[32m 7[2mms[22m[39m
+[31m     [31m×[31m passes returnTo to SuccessState when present in URL[39m[33m 738[2mms[22m[39m
+     [33m[2m✓[22m[39m shows "Browse Knowledge Bank" when no returnTo present [33m 650[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m33 passed[39m[22m[90m (34)[39m
+[2m   Start at [22m 19:02:57
+[2m   Duration [22m 19.71s[2m (transform 282ms, setup 285ms, import 1.54s, tests 15.33s, environment 1.90s)[22m
+---
+timestamp: "2026-02-13 19:03:49"
+story: "2-context-aware-navigation"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/components/add-video/__tests__/AddVideoPage.test.tsx[2m > [22mAddVideoPage - returnTo Context[2m > [22mpasses returnTo to SuccessState when present in URL
+[31m[1mError[22m[39m: [2mexpect([22m[31melement[39m[2m).not.toBeDisabled()[22m
+
+Received element is disabled:
+  [31m<button
+  class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive bg-primary text-primary-foreground hover:bg-primary/90 h-10 rounded-md px-6 has-[>svg]:px-4 min-w-[200px]"
+  data-size="lg"
+  data-slot="button"
+  data-variant="default"
+  disabled=""
+/>[39m
+
+Ignored nodes: comments, script, style
+[36m<html>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"p-6"[39m
+      [36m>[39m
+        [36m<h1[39m
+          [33mclass[39m=[32m"mb-2 text-2xl font-semibold"[39m
+        [36m>[39m
+          [0mAdd a Video[0m
+        [36m</h1>[39m
+        [36m<p[39m
+          [33mclass[39m=[32m"mb-8 text-muted-foreground"[39m
+        [36m>[39m
+          [0mExtract knowledge from YouTube videos and generate plugin ideas.[0m
+        [36m</p>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"mx-auto max-w-2xl space-y-6"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"space-y-3"[39m
+          [36m>[39m
+            [36m<label[39m
+              [33mclass[39m=[32m"flex items-center gap-2 font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50 text-base"[39m
+              [33mdata-slot[39m=[32m"label"[39m
+              [33mfor[39m=[32m"youtube-url"[39m
+            [36m>[39m
+              [0mWhat video would you like to add?[0m
+            [36m</label>[39m
+            [36m<input[39m
+              [33mclass[39m=[32m"file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive text-base"[39m
+              [33mdata-slot[39m=[32m"input"[39m
+              [33mid[39m=[32m"youtube-url"[39m
+              [33mplaceholder[39m=[32m"Paste a YouTube URL here..."[39m
+              [33mtype[39m=[32m"url"[39m
+              [33mvalue[39m=[32m"https://youtube.com/watch?v=abc123"[39m
+            [36m/>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"bg-card text-card-foreground flex flex-col gap-6 rounded-xl border shadow-sm p-4"[39m
+            [33mdata-slot[39m=[32m"card"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"p-0"[39m
+              [33mdata-slot[39m=[32m"card-content"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"flex items-start gap-4"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"relative h-[90px] w-[120px] flex-shrink-0 overflow-hidden rounded-md"[39m
+                [36m>[39m
+                  [36m<img[39m
+                    [33malt[39m=[32m"Test Video Title"[39m
+                    [33mclass[39m=[32m"object-cover"[39m
+                    [33mdata-nimg[39m=[32m"fill"[39m
+                    [33mdecoding[39m=[32m"async"[39m
+                    [33mloading[39m=[32m"lazy"[39m
+                    [33msrc[39m=[32m"https://example.com/thumb.jpg"[39m
+                    [33mstyle[39m=[32m"position: absolute; height: 100%; width: 100%; left: 0px; top: 0px; right: 0px; bottom: 0px; color: transparent;"[39m
+                  [36m/>[39m
+                [36m</div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"flex-1 min-w-0"[39m
+                [36m>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"mb-2 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-p
+
+... [2763 characters truncated] ...
+
+.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"[39m
+                    [36m/>[39m
+                    [36m<path[39m
+                      [33md[39m=[32m"M20 2v4"[39m
+                    [36m/>[39m
+                    ...
+[36m [2m❯[22m __vi_import_1__.waitFor.timeout src/components/add-video/__tests__/AddVideoPage.test.tsx:[2m572:32[22m[39m
+    [90m570| [39m    const submitButton = await screen.findByRole('button', { name: /ad…
+    [90m571| [39m    [35mawait[39m [34mwaitFor[39m(() [33m=>[39m {
+    [90m572| [39m      [34mexpect[39m(submitButton)[33m.[39mnot[33m.[39m[34mtoBeDisabled[39m()
+    [90m   | [39m                               [31m^[39m
+    [90m573| [39m    }[33m,[39m { timeout[33m:[39m [34m1000[39m })
+    [90m574| [39m
+[90m [2m❯[22m runWithExpensiveErrorDiagnosticsDisabled node_modules/@testing-library/dom/dist/config.js:[2m47:12[22m[39m
+[90m [2m❯[22m checkCallback node_modules/@testing-library/dom/dist/wait-for.js:[2m124:77[22m[39m
+[90m [2m❯[22m Timeout.checkRealTimersCallback node_modules/@testing-library/dom/dist/wait-for.js:[2m118:16[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/components/add-video/__tests__/AddVideoPage.test.tsx src/components/add-transcript/__tests__/AddTranscriptPage.test.tsx
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/components/add-video/__tests__/AddVideoPage.test.tsx [2m([22m[2m17 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 11297[2mms[22m[39m
+     [33m[2m✓[22m[39m debounces URL input and does not fetch immediately [33m 804[2mms[22m[39m
+     [33m[2m✓[22m[39m fetches transcript after metadata loads and debounce completes [33m 674[2mms[22m[39m
+     [33m[2m✓[22m[39m shows transcript fetch loading state [33m 634[2mms[22m[39m
+     [33m[2m✓[22m[39m shows auto-fetched indicator on success [33m 636[2mms[22m[39m
+     [33m[2m✓[22m[39m shows error with retry button on failure [33m 661[2mms[22m[39m
+     [33m[2m✓[22m[39m cancels pending fetch when URL changes [33m 725[2mms[22m[39m
+     [33m[2m✓[22m[39m allows manual paste when auto-fetch is available [33m 799[2mms[22m[39m
+     [33m[2m✓[22m[39m renders milestone message in success state after submission [33m 650[2mms[22m[39m
+     [33m[2m✓[22m[39m resets milestones when user clicks "Add Another" [33m 683[2mms[22m[39m
+     [33m[2m✓[22m[39m handles AbortError gracefully when request is cancelled [33m 1117[2mms[22m[39m
+     [32m✓[39m should prefill URL input when url query param is present[32m 5[2mms[22m[39m
+     [33m[2m✓[22m[39m should auto-fetch metadata when url query param is present [33m 512[2mms[22m[39m
+     [33m[2m✓[22m[39m should auto-fetch transcript when url query param is present [33m 509[2mms[22m[39m
+     [33m[2m✓[22m[39m should not prefill when url query param is empty [33m 603[2mms[22m[39m
+     [32m✓[39m should handle invalid URL in query param gracefully[32m 7[2mms[22m[39m
+[31m     [31m×[31m passes returnTo to SuccessState when present in URL[39m[33m 1639[2mms[22m[39m
+     [33m[2m✓[22m[39m shows "Browse Knowledge Bank" when no returnTo present [33m 636[2mms[22m[39m
+ [32m✓[39m src/components/add-transcript/__tests__/AddTranscriptPage.test.tsx [2m([22m[2m17 tests[22m[2m)[22m[33m 4983[2mms[22m[39m
+     [33m[2m✓[22m[39m submit button is disabled when title is missing [33m 373[2mms[22m[39m
+     [33m[2m✓[22m[39m submit button is enabled when source is empty (optional field) [33m 395[2mms[22m[39m
+     [33m[2m✓[22m[39m submit button is enabled when all required fields are valid [33m 416[2mms[22m[39m
+     [33m[2m✓[22m[39m submits form with correct data structure [33m 560[2mms[22m[39m
+     [33m[2m✓[22m[39m submits without tags and notes when optional fields are empty [33m 423[2mms[22m[39m
+     [33m[2m✓[22m[39m submits without channel when source is empty [33m 303[2mms[22m[39m
+     [33m[2m✓[22m[39m shows loading state during submission [33m 392[2mms[22m[39m
+     [33m[2m✓[22m[39m shows success state after successful submission [33m 350[2mms[22m[39m
+     [33m[2m✓[22m[39m shows error message on submission failure [33m 329[2mms[22m[39m
+     [33m[2m✓[22m[39m allows reset after successful submission [33m 376[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m33 passed[39m[22m[90m (34)[39m
+[2m   Start at [22m 19:03:28
+[2m   Duration [22m 20.28s[2m (transform 311ms, setup 259ms, import 1.52s, tests 16.28s, environment 1.74s)[22m
+---
+timestamp: "2026-02-13 19:04:30"
+story: "2-context-aware-navigation"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/components/add-video/__tests__/AddVideoPage.test.tsx[2m > [22mAddVideoPage - returnTo Context[2m > [22mpasses returnTo to SuccessState when present in URL
+[31m[1mError[22m[39m: [2mexpect([22m[31melement[39m[2m).not.toBeDisabled()[22m
+
+Received element is disabled:
+  [31m<button
+  class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive bg-primary text-primary-foreground hover:bg-primary/90 h-10 rounded-md px-6 has-[>svg]:px-4 min-w-[200px]"
+  data-size="lg"
+  data-slot="button"
+  data-variant="default"
+  disabled=""
+/>[39m
+
+Ignored nodes: comments, script, style
+[36m<html>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"p-6"[39m
+      [36m>[39m
+        [36m<h1[39m
+          [33mclass[39m=[32m"mb-2 text-2xl font-semibold"[39m
+        [36m>[39m
+          [0mAdd a Video[0m
+        [36m</h1>[39m
+        [36m<p[39m
+          [33mclass[39m=[32m"mb-8 text-muted-foreground"[39m
+        [36m>[39m
+          [0mExtract knowledge from YouTube videos and generate plugin ideas.[0m
+        [36m</p>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"mx-auto max-w-2xl space-y-6"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"space-y-3"[39m
+          [36m>[39m
+            [36m<label[39m
+              [33mclass[39m=[32m"flex items-center gap-2 font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50 text-base"[39m
+              [33mdata-slot[39m=[32m"label"[39m
+              [33mfor[39m=[32m"youtube-url"[39m
+            [36m>[39m
+              [0mWhat video would you like to add?[0m
+            [36m</label>[39m
+            [36m<input[39m
+              [33mclass[39m=[32m"file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive text-base"[39m
+              [33mdata-slot[39m=[32m"input"[39m
+              [33mid[39m=[32m"youtube-url"[39m
+              [33mplaceholder[39m=[32m"Paste a YouTube URL here..."[39m
+              [33mtype[39m=[32m"url"[39m
+              [33mvalue[39m=[32m"https://youtube.com/watch?v=abc123"[39m
+            [36m/>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"bg-card text-card-foreground flex flex-col gap-6 rounded-xl border shadow-sm p-4"[39m
+            [33mdata-slot[39m=[32m"card"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"p-0"[39m
+              [33mdata-slot[39m=[32m"card-content"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"flex items-start gap-4"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"relative h-[90px] w-[120px] flex-shrink-0 overflow-hidden rounded-md"[39m
+                [36m>[39m
+                  [36m<img[39m
+                    [33malt[39m=[32m"Test Video Title"[39m
+                    [33mclass[39m=[32m"object-cover"[39m
+                    [33mdata-nimg[39m=[32m"fill"[39m
+                    [33mdecoding[39m=[32m"async"[39m
+                    [33mloading[39m=[32m"lazy"[39m
+                    [33msrc[39m=[32m"https://example.com/thumb.jpg"[39m
+                    [33mstyle[39m=[32m"position: absolute; height: 100%; width: 100%; left: 0px; top: 0px; right: 0px; bottom: 0px; color: transparent;"[39m
+                  [36m/>[39m
+                [36m</div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"flex-1 min-w-0"[39m
+                [36m>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"mb-2 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-p
+
+... [2763 characters truncated] ...
+
+.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"[39m
+                    [36m/>[39m
+                    [36m<path[39m
+                      [33md[39m=[32m"M20 2v4"[39m
+                    [36m/>[39m
+                    ...
+[36m [2m❯[22m __vi_import_1__.waitFor.timeout src/components/add-video/__tests__/AddVideoPage.test.tsx:[2m568:32[22m[39m
+    [90m566| [39m    [35mawait[39m [34mwaitFor[39m(() [33m=>[39m {
+    [90m567| [39m      const submitButton = screen.getByRole('button', { name: /add to …
+    [90m568| [39m      [34mexpect[39m(submitButton)[33m.[39mnot[33m.[39m[34mtoBeDisabled[39m()
+    [90m   | [39m                               [31m^[39m
+    [90m569| [39m    }[33m,[39m { timeout[33m:[39m [34m5000[39m })
+    [90m570| [39m
+[90m [2m❯[22m runWithExpensiveErrorDiagnosticsDisabled node_modules/@testing-library/dom/dist/config.js:[2m47:12[22m[39m
+[90m [2m❯[22m checkCallback node_modules/@testing-library/dom/dist/wait-for.js:[2m124:77[22m[39m
+[90m [2m❯[22m Timeout.checkRealTimersCallback node_modules/@testing-library/dom/dist/wait-for.js:[2m118:16[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/components/add-video/__tests__/AddVideoPage.test.tsx src/components/add-transcript/__tests__/AddTranscriptPage.test.tsx
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/components/add-video/__tests__/AddVideoPage.test.tsx [2m([22m[2m17 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 15179[2mms[22m[39m
+     [33m[2m✓[22m[39m debounces URL input and does not fetch immediately [33m 710[2mms[22m[39m
+     [33m[2m✓[22m[39m fetches transcript after metadata loads and debounce completes [33m 671[2mms[22m[39m
+     [33m[2m✓[22m[39m shows transcript fetch loading state [33m 634[2mms[22m[39m
+     [33m[2m✓[22m[39m shows auto-fetched indicator on success [33m 622[2mms[22m[39m
+     [33m[2m✓[22m[39m shows error with retry button on failure [33m 661[2mms[22m[39m
+     [33m[2m✓[22m[39m cancels pending fetch when URL changes [33m 740[2mms[22m[39m
+     [33m[2m✓[22m[39m allows manual paste when auto-fetch is available [33m 788[2mms[22m[39m
+     [33m[2m✓[22m[39m renders milestone message in success state after submission [33m 660[2mms[22m[39m
+     [33m[2m✓[22m[39m resets milestones when user clicks "Add Another" [33m 676[2mms[22m[39m
+     [33m[2m✓[22m[39m handles AbortError gracefully when request is cancelled [33m 1113[2mms[22m[39m
+     [32m✓[39m should prefill URL input when url query param is present[32m 4[2mms[22m[39m
+     [33m[2m✓[22m[39m should auto-fetch metadata when url query param is present [33m 511[2mms[22m[39m
+     [33m[2m✓[22m[39m should auto-fetch transcript when url query param is present [33m 510[2mms[22m[39m
+     [33m[2m✓[22m[39m should not prefill when url query param is empty [33m 605[2mms[22m[39m
+     [32m✓[39m should handle invalid URL in query param gracefully[32m 6[2mms[22m[39m
+[31m     [31m×[31m passes returnTo to SuccessState when present in URL[39m[33m 5625[2mms[22m[39m
+     [33m[2m✓[22m[39m shows "Browse Knowledge Bank" when no returnTo present [33m 641[2mms[22m[39m
+ [32m✓[39m src/components/add-transcript/__tests__/AddTranscriptPage.test.tsx [2m([22m[2m17 tests[22m[2m)[22m[33m 4991[2mms[22m[39m
+     [33m[2m✓[22m[39m submit button is disabled when title is missing [33m 381[2mms[22m[39m
+     [33m[2m✓[22m[39m submit button is enabled when source is empty (optional field) [33m 361[2mms[22m[39m
+     [33m[2m✓[22m[39m submit button is enabled when all required fields are valid [33m 402[2mms[22m[39m
+     [33m[2m✓[22m[39m submits form with correct data structure [33m 559[2mms[22m[39m
+     [33m[2m✓[22m[39m submits without tags and notes when optional fields are empty [33m 414[2mms[22m[39m
+     [33m[2m✓[22m[39m submits without channel when source is empty [33m 309[2mms[22m[39m
+     [33m[2m✓[22m[39m shows loading state during submission [33m 389[2mms[22m[39m
+     [33m[2m✓[22m[39m shows success state after successful submission [33m 346[2mms[22m[39m
+     [33m[2m✓[22m[39m shows error message on submission failure [33m 365[2mms[22m[39m
+     [33m[2m✓[22m[39m allows reset after successful submission [33m 377[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m33 passed[39m[22m[90m (34)[39m
+[2m   Start at [22m 19:04:06
+[2m   Duration [22m 24.24s[2m (transform 270ms, setup 256ms, import 1.45s, tests 20.17s, environment 1.75s)[22m
+---
+timestamp: "2026-02-13 19:05:19"
+story: "2-context-aware-navigation"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/components/add-video/__tests__/AddVideoPage.test.tsx[2m > [22mAddVideoPage - returnTo Context[2m > [22mpasses returnTo to SuccessState when present in URL
+[31m[1mError[22m[39m: [2mexpect([22m[31melement[39m[2m).not.toBeDisabled()[22m
+
+Received element is disabled:
+  [31m<button
+  class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive bg-primary text-primary-foreground hover:bg-primary/90 h-10 rounded-md px-6 has-[>svg]:px-4 min-w-[200px]"
+  data-size="lg"
+  data-slot="button"
+  data-variant="default"
+  disabled=""
+/>[39m
+
+Ignored nodes: comments, script, style
+[36m<html>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"p-6"[39m
+      [36m>[39m
+        [36m<h1[39m
+          [33mclass[39m=[32m"mb-2 text-2xl font-semibold"[39m
+        [36m>[39m
+          [0mAdd a Video[0m
+        [36m</h1>[39m
+        [36m<p[39m
+          [33mclass[39m=[32m"mb-8 text-muted-foreground"[39m
+        [36m>[39m
+          [0mExtract knowledge from YouTube videos and generate plugin ideas.[0m
+        [36m</p>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"mx-auto max-w-2xl space-y-6"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"space-y-3"[39m
+          [36m>[39m
+            [36m<label[39m
+              [33mclass[39m=[32m"flex items-center gap-2 font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50 text-base"[39m
+              [33mdata-slot[39m=[32m"label"[39m
+              [33mfor[39m=[32m"youtube-url"[39m
+            [36m>[39m
+              [0mWhat video would you like to add?[0m
+            [36m</label>[39m
+            [36m<input[39m
+              [33mclass[39m=[32m"file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive text-base"[39m
+              [33mdata-slot[39m=[32m"input"[39m
+              [33mid[39m=[32m"youtube-url"[39m
+              [33mplaceholder[39m=[32m"Paste a YouTube URL here..."[39m
+              [33mtype[39m=[32m"url"[39m
+              [33mvalue[39m=[32m"https://youtube.com/watch?v=abc123"[39m
+            [36m/>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"bg-card text-card-foreground flex flex-col gap-6 rounded-xl border shadow-sm p-4"[39m
+            [33mdata-slot[39m=[32m"card"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"p-0"[39m
+              [33mdata-slot[39m=[32m"card-content"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"flex items-start gap-4"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"relative h-[90px] w-[120px] flex-shrink-0 overflow-hidden rounded-md"[39m
+                [36m>[39m
+                  [36m<img[39m
+                    [33malt[39m=[32m"Test Video Title"[39m
+                    [33mclass[39m=[32m"object-cover"[39m
+                    [33mdata-nimg[39m=[32m"fill"[39m
+                    [33mdecoding[39m=[32m"async"[39m
+                    [33mloading[39m=[32m"lazy"[39m
+                    [33msrc[39m=[32m"https://example.com/thumb.jpg"[39m
+                    [33mstyle[39m=[32m"position: absolute; height: 100%; width: 100%; left: 0px; top: 0px; right: 0px; bottom: 0px; color: transparent;"[39m
+                  [36m/>[39m
+                [36m</div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"flex-1 min-w-0"[39m
+                [36m>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"mb-2 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-p
+
+... [2770 characters truncated] ...
+
+1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"[39m
+                    [36m/>[39m
+                    [36m<path[39m
+                      [33md[39m=[32m"M20 2v4"[39m
+                    [36m/>[39m
+                    ...
+[36m [2m❯[22m __vi_import_1__.waitFor.timeout src/components/add-video/__tests__/AddVideoPage.test.tsx:[2m548:32[22m[39m
+    [90m546| [39m    [35mawait[39m [34mwaitFor[39m(() [33m=>[39m {
+    [90m547| [39m      const submitButton = screen.getByRole('button', { name: /add to …
+    [90m548| [39m      [34mexpect[39m(submitButton)[33m.[39mnot[33m.[39m[34mtoBeDisabled[39m()
+    [90m   | [39m                               [31m^[39m
+    [90m549| [39m    }[33m,[39m { timeout[33m:[39m [34m5000[39m })
+    [90m550| [39m
+[90m [2m❯[22m runWithExpensiveErrorDiagnosticsDisabled node_modules/@testing-library/dom/dist/config.js:[2m47:12[22m[39m
+[90m [2m❯[22m checkCallback node_modules/@testing-library/dom/dist/wait-for.js:[2m124:77[22m[39m
+[90m [2m❯[22m Timeout.checkRealTimersCallback node_modules/@testing-library/dom/dist/wait-for.js:[2m118:16[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/components/add-video/__tests__/AddVideoPage.test.tsx src/components/add-transcript/__tests__/AddTranscriptPage.test.tsx
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/components/add-video/__tests__/AddVideoPage.test.tsx [2m([22m[2m17 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 15086[2mms[22m[39m
+     [33m[2m✓[22m[39m debounces URL input and does not fetch immediately [33m 705[2mms[22m[39m
+     [33m[2m✓[22m[39m fetches transcript after metadata loads and debounce completes [33m 678[2mms[22m[39m
+     [33m[2m✓[22m[39m shows transcript fetch loading state [33m 635[2mms[22m[39m
+     [33m[2m✓[22m[39m shows auto-fetched indicator on success [33m 625[2mms[22m[39m
+     [33m[2m✓[22m[39m shows error with retry button on failure [33m 661[2mms[22m[39m
+     [33m[2m✓[22m[39m cancels pending fetch when URL changes [33m 739[2mms[22m[39m
+     [33m[2m✓[22m[39m allows manual paste when auto-fetch is available [33m 796[2mms[22m[39m
+     [33m[2m✓[22m[39m renders milestone message in success state after submission [33m 657[2mms[22m[39m
+     [33m[2m✓[22m[39m resets milestones when user clicks "Add Another" [33m 676[2mms[22m[39m
+     [33m[2m✓[22m[39m handles AbortError gracefully when request is cancelled [33m 1116[2mms[22m[39m
+     [32m✓[39m should prefill URL input when url query param is present[32m 6[2mms[22m[39m
+     [33m[2m✓[22m[39m should auto-fetch metadata when url query param is present [33m 511[2mms[22m[39m
+     [33m[2m✓[22m[39m should auto-fetch transcript when url query param is present [33m 509[2mms[22m[39m
+     [33m[2m✓[22m[39m should not prefill when url query param is empty [33m 603[2mms[22m[39m
+     [32m✓[39m should handle invalid URL in query param gracefully[32m 7[2mms[22m[39m
+[31m     [31m×[31m passes returnTo to SuccessState when present in URL[39m[33m 5519[2mms[22m[39m
+     [33m[2m✓[22m[39m shows "Browse Knowledge Bank" when no returnTo present [33m 642[2mms[22m[39m
+ [32m✓[39m src/components/add-transcript/__tests__/AddTranscriptPage.test.tsx [2m([22m[2m17 tests[22m[2m)[22m[33m 5111[2mms[22m[39m
+     [33m[2m✓[22m[39m submit button is disabled when title is missing [33m 397[2mms[22m[39m
+     [33m[2m✓[22m[39m submit button is enabled when source is empty (optional field) [33m 363[2mms[22m[39m
+     [33m[2m✓[22m[39m submit button is enabled when all required fields are valid [33m 424[2mms[22m[39m
+     [33m[2m✓[22m[39m submits form with correct data structure [33m 575[2mms[22m[39m
+     [33m[2m✓[22m[39m submits without tags and notes when optional fields are empty [33m 426[2mms[22m[39m
+     [33m[2m✓[22m[39m shows loading state during submission [33m 406[2mms[22m[39m
+     [33m[2m✓[22m[39m shows success state after successful submission [33m 350[2mms[22m[39m
+     [33m[2m✓[22m[39m shows error message on submission failure [33m 377[2mms[22m[39m
+     [33m[2m✓[22m[39m allows reset after successful submission [33m 368[2mms[22m[39m
+     [33m[2m✓[22m[39m passes returnTo to SuccessState when present in URL [33m 301[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m33 passed[39m[22m[90m (34)[39m
+[2m   Start at [22m 19:04:54
+[2m   Duration [22m 24.70s[2m (transform 280ms, setup 328ms, import 1.58s, tests 20.20s, environment 2.05s)[22m
+---
+timestamp: "2026-02-13 19:06:36"
+story: "2-context-aware-navigation"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/components/add-video/__tests__/AddVideoPage.test.tsx[2m > [22mAddVideoPage - returnTo Context[2m > [22mshows "Browse Knowledge Bank" when no returnTo present
+[31m[1mTestingLibraryElementError[22m[39m: Unable to find an element with the text: /added to your knowledge bank/i. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"p-6"[39m
+    [36m>[39m
+      [36m<h1[39m
+        [33mclass[39m=[32m"mb-2 text-2xl font-semibold"[39m
+      [36m>[39m
+        [0mAdd a Video[0m
+      [36m</h1>[39m
+      [36m<p[39m
+        [33mclass[39m=[32m"mb-8 text-muted-foreground"[39m
+      [36m>[39m
+        [0mExtract knowledge from YouTube videos and generate plugin ideas.[0m
+      [36m</p>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"mx-auto max-w-2xl space-y-6"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"space-y-3"[39m
+        [36m>[39m
+          [36m<label[39m
+            [33mclass[39m=[32m"flex items-center gap-2 font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50 text-base"[39m
+            [33mdata-slot[39m=[32m"label"[39m
+            [33mfor[39m=[32m"youtube-url"[39m
+          [36m>[39m
+            [0mWhat video would you like to add?[0m
+          [36m</label>[39m
+          [36m<input[39m
+            [33mclass[39m=[32m"file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive text-base"[39m
+            [33mdata-slot[39m=[32m"input"[39m
+            [33mid[39m=[32m"youtube-url"[39m
+            [33mplaceholder[39m=[32m"Paste a YouTube URL here..."[39m
+            [33mtype[39m=[32m"url"[39m
+            [33mvalue[39m=[32m"https://youtube.com/watch?v=abc123"[39m
+          [36m/>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"bg-card text-card-foreground flex flex-col gap-6 rounded-xl border shadow-sm p-4"[39m
+          [33mdata-slot[39m=[32m"card"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"p-0"[39m
+            [33mdata-slot[39m=[32m"card-content"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex items-start gap-4"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"relative h-[90px] w-[120px] flex-shrink-0 overflow-hidden rounded-md"[39m
+              [36m>[39m
+                [36m<img[39m
+                  [33malt[39m=[32m"Test Video Title"[39m
+                  [33mclass[39m=[32m"object-cover"[39m
+                  [33mdata-nimg[39m=[32m"fill"[39m
+                  [33mdecoding[39m=[32m"async"[39m
+                  [33mloading[39m=[32m"lazy"[39m
+                  [33msrc[39m=[32m"https://example.com/thumb.jpg"[39m
+                  [33mstyle[39m=[32m"position: absolute; height: 100%; width: 100%; left: 0px; top: 0px; right: 0px; bottom: 0px; color: transparent;"[39m
+                [36m/>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"flex-1 min-w-0"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"mb-2 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary"[39m
+                [36m>[39m
+                  [36m<span>[39m
+                    [0m✓[0m
+                  [36m</span>[39m
+                  [36m<span>[39m
+                    [0mLooks good[0m
+                  [36m</span>[39m
+                [36m</div>[39m
+                [36m<h3[39m
+                  [33mclass[39m=[32m"mb-1 font-semibold leading-tight"[39m
+                [36m>[39m
+                  [0mTest Video Title[0m
+                [36m</h3>[39m
+                [36m<p[39m
+                  [33mclass[39m=[32m"text-sm text-muted-foreground"[39m
+                [36m>[39m
+                  [0mTest Channel[0m
+                [36m</p>[39m
+   
+
+... [8970 characters truncated] ...
+
+                   [33mwidth[39m=[32m"24"[39m
+                    [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+                  [36m>[39m
+                    [36m<path[39m
+                      [33md[39m=[32m"M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"[39m
+                    [36m/>[39m
+                    [36m<path[39m
+                      [33md[39m=[32m"M20 2v4"[39m
+                    [36m/>[39m
+                    ...
+[90m [2m❯[22m Proxy.waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:[2m163:27[22m[39m
+[36m [2m❯[22m src/components/add-video/__tests__/AddVideoPage.test.tsx:[2m626:11[22m[39m
+    [90m624| [39m
+    [90m625| [39m    [90m// Wait for success state[39m
+    [90m626| [39m    [35mawait[39m [34mwaitFor[39m(() [33m=>[39m {
+    [90m   | [39m          [31m^[39m
+    [90m627| [39m      expect(screen.getByText(/added to your knowledge bank/i)).toBeIn…
+    [90m628| [39m    }[33m,[39m { timeout[33m:[39m [34m3000[39m })
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/components/add-video/__tests__/AddVideoPage.test.tsx src/components/add-transcript/__tests__/AddTranscriptPage.test.tsx
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/components/add-video/__tests__/AddVideoPage.test.tsx [2m([22m[2m17 tests[22m[2m | [22m[31m1 failed[39m[2m | [22m[33m1 skipped[39m[2m)[22m[33m 12779[2mms[22m[39m
+     [33m[2m✓[22m[39m debounces URL input and does not fetch immediately [33m 771[2mms[22m[39m
+     [33m[2m✓[22m[39m fetches transcript after metadata loads and debounce completes [33m 698[2mms[22m[39m
+     [33m[2m✓[22m[39m shows transcript fetch loading state [33m 646[2mms[22m[39m
+     [33m[2m✓[22m[39m shows auto-fetched indicator on success [33m 645[2mms[22m[39m
+     [33m[2m✓[22m[39m shows error with retry button on failure [33m 677[2mms[22m[39m
+     [33m[2m✓[22m[39m cancels pending fetch when URL changes [33m 729[2mms[22m[39m
+     [33m[2m✓[22m[39m allows manual paste when auto-fetch is available [33m 827[2mms[22m[39m
+     [33m[2m✓[22m[39m renders milestone message in success state after submission [33m 656[2mms[22m[39m
+     [33m[2m✓[22m[39m resets milestones when user clicks "Add Another" [33m 702[2mms[22m[39m
+     [33m[2m✓[22m[39m handles AbortError gracefully when request is cancelled [33m 1122[2mms[22m[39m
+     [32m✓[39m should prefill URL input when url query param is present[32m 5[2mms[22m[39m
+     [33m[2m✓[22m[39m should auto-fetch metadata when url query param is present [33m 515[2mms[22m[39m
+     [33m[2m✓[22m[39m should auto-fetch transcript when url query param is present [33m 512[2mms[22m[39m
+     [33m[2m✓[22m[39m should not prefill when url query param is empty [33m 607[2mms[22m[39m
+     [32m✓[39m should handle invalid URL in query param gracefully[32m 7[2mms[22m[39m
+     [2m[90m↓[39m[22m passes returnTo to SuccessState when present in URL
+[31m     [31m×[31m shows "Browse Knowledge Bank" when no returnTo present[39m[33m 3657[2mms[22m[39m
+ [32m✓[39m src/components/add-transcript/__tests__/AddTranscriptPage.test.tsx [2m([22m[2m17 tests[22m[2m)[22m[33m 4843[2mms[22m[39m
+     [33m[2m✓[22m[39m submit button is disabled when title is missing [33m 367[2mms[22m[39m
+     [33m[2m✓[22m[39m submit button is enabled when source is empty (optional field) [33m 354[2mms[22m[39m
+     [33m[2m✓[22m[39m submit button is enabled when all required fields are valid [33m 391[2mms[22m[39m
+     [33m[2m✓[22m[39m submits form with correct data structure [33m 556[2mms[22m[39m
+     [33m[2m✓[22m[39m submits without tags and notes when optional fields are empty [33m 415[2mms[22m[39m
+     [33m[2m✓[22m[39m submits without channel when source is empty [33m 307[2mms[22m[39m
+     [33m[2m✓[22m[39m shows loading state during submission [33m 349[2mms[22m[39m
+     [33m[2m✓[22m[39m shows success state after successful submission [33m 334[2mms[22m[39m
+     [33m[2m✓[22m[39m shows error message on submission failure [33m 354[2mms[22m[39m
+     [33m[2m✓[22m[39m allows reset after successful submission [33m 348[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m32 passed[39m[22m[2m | [22m[33m1 skipped[39m[90m (34)[39m
+[2m   Start at [22m 19:06:12
+[2m   Duration [22m 23.39s[2m (transform 361ms, setup 468ms, import 1.94s, tests 17.62s, environment 2.54s)[22m
+---
+timestamp: "2026-02-13 19:07:10"
+story: "2-context-aware-navigation"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+npm error Missing script: "typecheck"
+npm error
+npm error To see a list of scripts, run:
+npm error   npm run
+npm error A complete log of this run can be found in: /Users/darindrobinski/.npm/_logs/2026-02-14T01_07_10_760Z-debug-0.log

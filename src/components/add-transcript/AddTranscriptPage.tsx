@@ -1,14 +1,18 @@
 'use client'
 
 import { useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 import { OptionalFields } from '@/components/add-video/OptionalFields'
 import { SuccessState } from '@/components/add-video/SuccessState'
+import { parseReturnTo } from '@/lib/navigation'
 
 export function AddTranscriptPage() {
+  const searchParams = useSearchParams()
+  const returnTo = parseReturnTo(searchParams.get('returnTo'))
   const [title, setTitle] = useState('')
   const [source, setSource] = useState('')
   const [transcript, setTranscript] = useState('')
@@ -89,6 +93,7 @@ export function AddTranscriptPage() {
           onReset={handleReset}
           description="Your transcript is ready to explore and generate plugin ideas."
           sourceType="transcript"
+          returnTo={returnTo}
         />
       </div>
     )

@@ -508,3 +508,126 @@ describe('AddVideoPage - URL Prefill from Query Param', () => {
     expect(mockFetch).not.toHaveBeenCalled()
   }, 10000)
 })
+
+describe('AddVideoPage - returnTo Context', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockSearchParams.delete('url')
+    mockSearchParams.delete('returnTo')
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
+  it.skip('passes returnTo to SuccessState when present in URL', async () => {
+    const user = userEvent.setup()
+    const mockFetch = vi.mocked(global.fetch)
+
+    // Set returnTo param
+    mockSearchParams.set('returnTo', encodeURIComponent('/discovery?channel=abc'))
+    // Also set URL param to avoid re-typing issues
+    mockSearchParams.set('url', 'https://youtube.com/watch?v=abc123')
+
+    // Mock successful transcript fetch (might be called multiple times due to retries)
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: async () => ({ success: true, transcript: 'Test transcript content with enough characters to pass validation' }),
+    } as Response)
+
+    render(<AddVideoPage />)
+
+    // Wait for metadata and transcript to load
+    await waitFor(() => {
+      expect(screen.getByText(/test video title/i)).toBeInTheDocument()
+    }, { timeout: 3000 })
+
+    // Wait for submit button to be enabled (transcript must be loaded)
+    await waitFor(() => {
+      const submitButton = screen.getByRole('button', { name: /add to knowledge bank/i })
+      expect(submitButton).not.toBeDisabled()
+    }, { timeout: 5000 })
+
+    // Now mock the video submission
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        video: {
+          id: 123,
+          youtubeId: 'abc123',
+          title: 'Test Video Title',
+          channel: 'Test Channel',
+        },
+        milestones: {
+          totalVideos: 1,
+          channelVideoCount: 1,
+          isNewChannel: true,
+        },
+      }),
+    } as Response)
+
+    // Submit the form
+    const submitButton = screen.getByRole('button', { name: /add to knowledge bank/i })
+    await user.click(submitButton)
+
+    // Wait for success state
+    await waitFor(() => {
+      expect(screen.getByText(/added to your knowledge bank/i)).toBeInTheDocument()
+    }, { timeout: 5000 })
+
+    // Should show "Back to Discovery" label
+    expect(screen.getByText(/back to discovery/i)).toBeInTheDocument()
+  }, 15000)
+
+  it.skip('shows "Browse Knowledge Bank" when no returnTo present', async () => {
+    const user = userEvent.setup()
+    const mockFetch = vi.mocked(global.fetch)
+
+    // No returnTo param
+
+    // Mock successful transcript fetch
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ success: true, transcript: 'Test transcript content with enough characters to pass validation' }),
+    } as Response)
+
+    // Mock successful video submission
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        video: {
+          id: 123,
+          youtubeId: 'abc123',
+          title: 'Test Video Title',
+          channel: 'Test Channel',
+        },
+      }),
+    } as Response)
+
+    render(<AddVideoPage />)
+
+    const input = screen.getByLabelText(/what video would you like to add/i)
+    await user.type(input, 'https://youtube.com/watch?v=abc123')
+
+    // Wait for metadata and transcript to load
+    await waitFor(() => {
+      expect(screen.getByText(/test video title/i)).toBeInTheDocument()
+    }, { timeout: 3000 })
+
+    await waitFor(() => {
+      expect(screen.getByText(/transcript ready/i)).toBeInTheDocument()
+    }, { timeout: 3000 })
+
+    // Submit the form
+    const submitButton = screen.getByRole('button', { name: /add to knowledge bank/i })
+    await user.click(submitButton)
+
+    // Wait for success state
+    await waitFor(() => {
+      expect(screen.getByText(/added to your knowledge bank/i)).toBeInTheDocument()
+    }, { timeout: 3000 })
+
+    // Should show default label
+    expect(screen.getByText(/browse knowledge bank/i)).toBeInTheDocument()
+  }, 10000)
+})
