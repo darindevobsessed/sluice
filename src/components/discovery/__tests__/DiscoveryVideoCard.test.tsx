@@ -152,6 +152,104 @@ describe('DiscoveryVideoCard', () => {
     })
   })
 
+  describe('In-bank navigation', () => {
+    it('should link thumbnail to video detail page when bankVideoId is provided and video is in bank', () => {
+      const { container } = render(
+        <DiscoveryVideoCard
+          video={{ ...mockVideo, inBank: true }}
+          bankVideoId={42}
+        />
+      )
+
+      // Find the link that wraps the thumbnail
+      const thumbnailLink = container.querySelector('a[href="/videos/42"]')
+      expect(thumbnailLink).toBeInTheDocument()
+
+      // Verify the image is inside the link
+      const image = thumbnailLink?.querySelector('img')
+      expect(image).toBeInTheDocument()
+    })
+
+    it('should link title to video detail page when bankVideoId is provided and video is in bank', () => {
+      const { container } = render(
+        <DiscoveryVideoCard
+          video={{ ...mockVideo, inBank: true }}
+          bankVideoId={42}
+        />
+      )
+
+      // Find all links to the video detail page
+      const videoLinks = container.querySelectorAll('a[href="/videos/42"]')
+      expect(videoLinks.length).toBe(2) // thumbnail + title
+
+      // Find the title link (second one, inside the content div)
+      const titleLink = videoLinks[1] as Element
+      expect(titleLink).toBeInTheDocument()
+      expect(titleLink.querySelector('h3')).toBeInTheDocument()
+    })
+
+    it('should include returnTo query param in detail link when provided', () => {
+      const returnTo = encodeURIComponent('/discovery?channel=UCtest')
+      const { container } = render(
+        <DiscoveryVideoCard
+          video={{ ...mockVideo, inBank: true }}
+          bankVideoId={42}
+          returnTo={returnTo}
+        />
+      )
+
+      const expectedHref = `/videos/42?returnTo=${returnTo}`
+      const videoLinks = container.querySelectorAll(`a[href="${expectedHref}"]`)
+      expect(videoLinks.length).toBe(2) // thumbnail + title
+    })
+
+    it('should not render links when bankVideoId is undefined', () => {
+      const { container } = render(
+        <DiscoveryVideoCard
+          video={{ ...mockVideo, inBank: true }}
+          bankVideoId={undefined}
+        />
+      )
+
+      // Should not have links to /videos/*
+      const videoLinks = container.querySelectorAll('a[href^="/videos/"]')
+      expect(videoLinks).toHaveLength(0)
+    })
+
+    it('should not render links when video is not in bank', () => {
+      const { container } = render(
+        <DiscoveryVideoCard
+          video={{ ...mockVideo, inBank: false }}
+          bankVideoId={42}
+        />
+      )
+
+      // Should not have links to /videos/*
+      const videoLinks = container.querySelectorAll('a[href^="/videos/"]')
+      expect(videoLinks).toHaveLength(0)
+
+      // Should still have Add to Bank button
+      expect(screen.getByRole('link', { name: /add to bank/i })).toBeInTheDocument()
+    })
+
+    it('should render plain thumbnail when not clickable', () => {
+      const { container } = render(
+        <DiscoveryVideoCard
+          video={{ ...mockVideo, inBank: false }}
+          bankVideoId={undefined}
+        />
+      )
+
+      // Thumbnail should exist but not be wrapped in a link
+      const thumbnail = screen.getByAltText('Test Video Title')
+      expect(thumbnail).toBeInTheDocument()
+
+      // Should not have links to /videos/*
+      const videoLinks = container.querySelectorAll('a[href^="/videos/"]')
+      expect(videoLinks).toHaveLength(0)
+    })
+  })
+
   describe('Selection behavior', () => {
     it('should render checkbox when selectable and not in bank', () => {
       const onToggleSelect = vi.fn()

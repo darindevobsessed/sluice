@@ -1,14 +1,14 @@
 ---
 name: discovery-in-bank-navigation
 title: "Navigate to Video Detail from Discovery (In-Bank Videos)"
-status: active
+status: complete
 cycle: state-navigation
 story_number: 5
 created: 2026-02-14
 updated: 2026-02-14
 priority: high
 chunks_total: 2
-chunks_complete: 1
+chunks_complete: 2
 ---
 
 # Story: Navigate to Video Detail from Discovery (In-Bank Videos)

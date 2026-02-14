@@ -50,6 +50,11 @@ export function DiscoveryVideoCard({
   const thumbnailUrl = `https://i.ytimg.com/vi/${video.youtubeId}/mqdefault.jpg`
   const addUrl = `/add?url=https://youtube.com/watch?v=${video.youtubeId}${returnTo ? `&returnTo=${returnTo}` : ''}`
 
+  // Build detail URL when video is in bank
+  const detailUrl = bankVideoId && video.inBank
+    ? `/videos/${bankVideoId}${returnTo ? `?returnTo=${returnTo}` : ''}`
+    : undefined
+
   // Only show selection UI on not-saved cards
   const showSelectionUI = selectable && !video.inBank
 
@@ -72,65 +77,109 @@ export function DiscoveryVideoCard({
       )}
     >
       {/* Thumbnail */}
-      <div className="relative aspect-video w-full overflow-hidden">
-        <Image
-          src={thumbnailUrl}
-          alt={video.title}
-          fill
-          className="object-cover transition-transform duration-200 group-hover:scale-105"
-          unoptimized
-        />
-
-        {/* Selection checkbox */}
-        {showSelectionUI && (
-          <input
-            type="checkbox"
-            checked={selected}
-            onChange={() => {}}
-            onClick={handleCheckboxClick}
-            className={cn(
-              'absolute top-2 left-2 z-10 size-5 rounded border-2 accent-primary cursor-pointer transition-opacity duration-150',
-              selected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
-            )}
-            aria-label="Select video"
+      {detailUrl ? (
+        <Link href={detailUrl} className="relative aspect-video w-full overflow-hidden block cursor-pointer">
+          <Image
+            src={thumbnailUrl}
+            alt={video.title}
+            fill
+            className="object-cover transition-transform duration-200 group-hover:scale-105"
+            unoptimized
           />
-        )}
 
-        {/* Selection overlay */}
-        {selected && (
-          <div className="absolute inset-0 bg-primary/10 z-[5]" />
-        )}
+          {/* Green "new" dot - moved to right to avoid checkbox */}
+          {isNew && (
+            <div className="absolute top-2 right-2 size-3 rounded-full bg-[#059669]" aria-label="New video" />
+          )}
 
-        {/* Green "new" dot - moved to right to avoid checkbox */}
-        {isNew && (
-          <div className="absolute top-2 right-2 size-3 rounded-full bg-[#059669]" aria-label="New video" />
-        )}
+          {/* Batch status overlay */}
+          {batchStatus && batchStatus !== 'pending' && (
+            <div className="absolute inset-0 bg-background/60 flex items-center justify-center z-10">
+              {(batchStatus === 'fetching-transcript' || batchStatus === 'saving') && (
+                <Loader2 className="size-8 animate-spin text-primary" />
+              )}
+              {batchStatus === 'done' && (
+                <div className="bg-green-500/20 rounded-full p-3 animate-in fade-in duration-300">
+                  <Check className="size-8 text-green-600 dark:text-green-400" />
+                </div>
+              )}
+              {batchStatus === 'error' && (
+                <div className="bg-red-500/20 rounded-full p-3">
+                  <X className="size-8 text-red-600 dark:text-red-400" />
+                </div>
+              )}
+            </div>
+          )}
+        </Link>
+      ) : (
+        <div className="relative aspect-video w-full overflow-hidden">
+          <Image
+            src={thumbnailUrl}
+            alt={video.title}
+            fill
+            className="object-cover transition-transform duration-200 group-hover:scale-105"
+            unoptimized
+          />
 
-        {/* Batch status overlay */}
-        {batchStatus && batchStatus !== 'pending' && (
-          <div className="absolute inset-0 bg-background/60 flex items-center justify-center z-10">
-            {(batchStatus === 'fetching-transcript' || batchStatus === 'saving') && (
-              <Loader2 className="size-8 animate-spin text-primary" />
-            )}
-            {batchStatus === 'done' && (
-              <div className="bg-green-500/20 rounded-full p-3 animate-in fade-in duration-300">
-                <Check className="size-8 text-green-600 dark:text-green-400" />
-              </div>
-            )}
-            {batchStatus === 'error' && (
-              <div className="bg-red-500/20 rounded-full p-3">
-                <X className="size-8 text-red-600 dark:text-red-400" />
-              </div>
-            )}
-          </div>
-        )}
-      </div>
+          {/* Selection checkbox */}
+          {showSelectionUI && (
+            <input
+              type="checkbox"
+              checked={selected}
+              onChange={() => {}}
+              onClick={handleCheckboxClick}
+              className={cn(
+                'absolute top-2 left-2 z-10 size-5 rounded border-2 accent-primary cursor-pointer transition-opacity duration-150',
+                selected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+              )}
+              aria-label="Select video"
+            />
+          )}
+
+          {/* Selection overlay */}
+          {selected && (
+            <div className="absolute inset-0 bg-primary/10 z-[5]" />
+          )}
+
+          {/* Green "new" dot - moved to right to avoid checkbox */}
+          {isNew && (
+            <div className="absolute top-2 right-2 size-3 rounded-full bg-[#059669]" aria-label="New video" />
+          )}
+
+          {/* Batch status overlay */}
+          {batchStatus && batchStatus !== 'pending' && (
+            <div className="absolute inset-0 bg-background/60 flex items-center justify-center z-10">
+              {(batchStatus === 'fetching-transcript' || batchStatus === 'saving') && (
+                <Loader2 className="size-8 animate-spin text-primary" />
+              )}
+              {batchStatus === 'done' && (
+                <div className="bg-green-500/20 rounded-full p-3 animate-in fade-in duration-300">
+                  <Check className="size-8 text-green-600 dark:text-green-400" />
+                </div>
+              )}
+              {batchStatus === 'error' && (
+                <div className="bg-red-500/20 rounded-full p-3">
+                  <X className="size-8 text-red-600 dark:text-red-400" />
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Content */}
       <div className="p-3 space-y-2">
-        <h3 className="line-clamp-2 font-semibold leading-tight text-sm">
-          {video.title}
-        </h3>
+        {detailUrl ? (
+          <Link href={detailUrl}>
+            <h3 className="line-clamp-2 font-semibold leading-tight text-sm cursor-pointer hover:underline">
+              {video.title}
+            </h3>
+          </Link>
+        ) : (
+          <h3 className="line-clamp-2 font-semibold leading-tight text-sm">
+            {video.title}
+          </h3>
+        )}
         <p className="text-xs text-muted-foreground">
           {relativeTime}
         </p>
