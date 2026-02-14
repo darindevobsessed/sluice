@@ -8,8 +8,8 @@ updated: 2026-02-14
 cycle: state-navigation
 story_number: 3
 chunks_total: 3
-chunks_complete: 0
-current_chunk: 0
+chunks_complete: 1
+current_chunk: 2
 ---
 
 # Story: Active Filter Pills

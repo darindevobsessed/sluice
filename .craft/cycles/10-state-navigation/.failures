@@ -2584,3 +2584,47 @@ npm error
 npm error To see a list of scripts, run:
 npm error   npm run
 npm error A complete log of this run can be found in: /Users/darindrobinski/.npm/_logs/2026-02-14T01_39_28_110Z-debug-0.log
+---
+timestamp: "2026-02-14 08:53:08"
+story: "3-active-filter-pills"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Suites 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/components/filters/__tests__/FilterPillBar.test.tsx[2m [ src/components/filters/__tests__/FilterPillBar.test.tsx ][22m
+[31m[1mError[22m: Failed to resolve import "../FilterPillBar" from "src/components/filters/__tests__/FilterPillBar.test.tsx". Does the file exist?[39m
+  Plugin: [35mvite:import-analysis[39m
+  File: [36m/Users/darindrobinski/dev/repos/gold-miner/src/components/filters/__tests__/FilterPillBar.test.tsx[39m:4:30
+[33m  3  |  import { render, screen } from "@testing-library/react";
+  4  |  import userEvent from "@testing-library/user-event";
+  5  |  import { FilterPillBar } from "../FilterPillBar";
+     |                                 ^
+  6  |  describe("FilterPillBar", () => {
+  7  |    it("renders pills with correct label: value format", () => {[39m
+[90m [2m❯[22m TransformPluginContext._formatLog node_modules/vite/dist/node/chunks/config.js:[2m28999:43[22m[39m
+[90m [2m❯[22m TransformPluginContext.error node_modules/vite/dist/node/chunks/config.js:[2m28996:14[22m[39m
+[90m [2m❯[22m normalizeUrl node_modules/vite/dist/node/chunks/config.js:[2m27119:18[22m[39m
+[90m [2m❯[22m node_modules/vite/dist/node/chunks/config.js:[2m27177:32[22m[39m
+[90m [2m❯[22m TransformPluginContext.transform node_modules/vite/dist/node/chunks/config.js:[2m27145:4[22m[39m
+[90m [2m❯[22m EnvironmentPluginContainer.transform node_modules/vite/dist/node/chunks/config.js:[2m28797:14[22m[39m
+[90m [2m❯[22m loadAndTransform node_modules/vite/dist/node/chunks/config.js:[2m22670:26[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/components/filters/__tests__/FilterPillBar.test.tsx
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/components/filters/__tests__/FilterPillBar.test.tsx [2m([22m[2m0 test[22m[2m)[22m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [2mno tests[22m
+[2m   Start at [22m 08:53:04
+[2m   Duration [22m 3.75s[2m (transform 38ms, setup 393ms, import 0ms, tests 0ms, environment 2.98s)[22m
