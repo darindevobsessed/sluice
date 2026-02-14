@@ -49,6 +49,13 @@ describe('DiscoveryVideoCard', () => {
     expect(link).toHaveAttribute('href', '/add?url=https://youtube.com/watch?v=dQw4w9WgXcQ')
   })
 
+  it('should include returnTo in add link when provided', () => {
+    const returnTo = encodeURIComponent('/discovery?channel=UCtest')
+    render(<DiscoveryVideoCard video={mockVideo} returnTo={returnTo} />)
+    const link = screen.getByRole('link', { name: /add to bank/i })
+    expect(link).toHaveAttribute('href', `/add?url=https://youtube.com/watch?v=dQw4w9WgXcQ&returnTo=${returnTo}`)
+  })
+
   it('should render published date as relative time', () => {
     // Mock current time to be 5 days after published date
     vi.useFakeTimers()

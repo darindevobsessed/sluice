@@ -367,8 +367,11 @@ describe('POST /api/videos/[id]/insights (Postgres)', () => {
     });
     const params = Promise.resolve({ id: String(video!.id) });
 
-    // Should throw an error when parsing JSON
-    await expect(POST(request, { params })).rejects.toThrow();
+    // Should return 500 error (try/catch handles malformed JSON)
+    const response = await POST(request, { params });
+    expect(response.status).toBe(500);
+    const data = await response.json();
+    expect(data.error).toBe('Failed to save insights');
   });
 });
 

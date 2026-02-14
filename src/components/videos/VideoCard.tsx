@@ -21,6 +21,7 @@ interface VideoCardProps {
   focusAreas?: Pick<FocusArea, 'id' | 'name' | 'color'>[];
   allFocusAreas?: FocusArea[];
   onToggleFocusArea?: (focusAreaId: number) => void;
+  returnTo?: string;
 }
 
 /**
@@ -50,11 +51,12 @@ function formatDate(date: Date): string {
   });
 }
 
-export function VideoCard({ video, className, focusAreas, allFocusAreas, onToggleFocusArea }: VideoCardProps) {
-  const duration = formatDuration(video.duration);
-  const dateAdded = formatDate(video.createdAt);
-  const assignedIds = new Set(focusAreas?.map(fa => fa.id) ?? []);
-  const showDropdown = allFocusAreas && allFocusAreas.length > 0 && onToggleFocusArea;
+export function VideoCard({ video, className, focusAreas, allFocusAreas, onToggleFocusArea, returnTo }: VideoCardProps) {
+  const duration = formatDuration(video.duration)
+  const dateAdded = formatDate(video.createdAt)
+  const assignedIds = new Set(focusAreas?.map(fa => fa.id) ?? [])
+  const showDropdown = allFocusAreas && allFocusAreas.length > 0 && onToggleFocusArea
+  const detailHref = returnTo ? `/videos/${video.id}?returnTo=${returnTo}` : `/videos/${video.id}`
 
   return (
     <Card
@@ -64,7 +66,7 @@ export function VideoCard({ video, className, focusAreas, allFocusAreas, onToggl
       )}
     >
       {/* Overlay link — click-anywhere-to-navigate */}
-      <Link href={`/videos/${video.id}`} className="absolute inset-0 z-0" />
+      <Link href={detailHref} className="absolute inset-0 z-0" />
 
       {/* Thumbnail with duration badge */}
       <div className="relative aspect-video w-full overflow-hidden">

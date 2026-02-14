@@ -73,6 +73,19 @@ describe('VideoCard', () => {
     expect(link).toHaveAttribute('href', '/videos/1');
   });
 
+  it('includes returnTo in link when provided', () => {
+    const returnTo = encodeURIComponent('/?q=react&type=youtube');
+    render(<VideoCard video={mockVideo} returnTo={returnTo} />);
+    const link = screen.getByRole('link');
+    expect(link).toHaveAttribute('href', `/videos/1?returnTo=${returnTo}`);
+  });
+
+  it('links to video detail without returnTo when not provided', () => {
+    render(<VideoCard video={mockVideo} />);
+    const link = screen.getByRole('link');
+    expect(link).toHaveAttribute('href', '/videos/1');
+  });
+
   it('renders date added', () => {
     render(<VideoCard video={mockVideo} />);
     // Should show formatted date - timezone independent check

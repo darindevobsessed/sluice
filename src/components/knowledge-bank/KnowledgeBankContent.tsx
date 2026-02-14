@@ -14,6 +14,7 @@ import { useEnsemble } from '@/hooks/useEnsemble'
 import { usePageTitle } from '@/components/layout/PageTitleContext'
 import { useFocusArea } from '@/components/providers/FocusAreaProvider'
 import { useURLParams } from '@/hooks/useURLParams'
+import { buildReturnTo } from '@/lib/navigation'
 import type { Video, FocusArea } from '@/lib/db/schema'
 
 interface VideoStats {
@@ -44,8 +45,8 @@ export function KnowledgeBankContent() {
   const { selectedFocusAreaId, focusAreas } = useFocusArea();
 
   // URL state with validation
-  const { searchParams, updateParams } = useURLParams();
-  const urlQuery = searchParams.get('q') || '';
+  const { searchParams, updateParams } = useURLParams()
+  const urlQuery = searchParams.get('q') || ''
 
   // Validate content type
   const VALID_KB_TYPES = ['all', 'youtube', 'transcript'] as const
@@ -54,6 +55,9 @@ export function KnowledgeBankContent() {
   const contentType = (rawType && VALID_KB_TYPES.includes(rawType as KBContentType))
     ? (rawType as KBContentTypeValue)
     : 'all'
+
+  // Compute returnTo for video detail navigation
+  const returnTo = buildReturnTo('/', searchParams)
 
   // Use the search hook with URL query
   const { results, isLoading: isSearching } = useSearch({
@@ -247,6 +251,7 @@ export function KnowledgeBankContent() {
               focusAreaMap={focusAreaMap}
               allFocusAreas={focusAreas}
               onToggleFocusArea={handleToggleFocusArea}
+              returnTo={returnTo || undefined}
             />
           )}
         </>

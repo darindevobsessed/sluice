@@ -1,15 +1,16 @@
-'use client';
+'use client'
 
-import { use, useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { VideoPlayer } from '@/components/videos/VideoPlayer';
-import { VideoMetadata } from '@/components/videos/VideoMetadata';
-import { InsightsTabs } from '@/components/insights/InsightsTabs';
-import { EmbedButton } from '@/components/video/EmbedButton';
-import { FocusAreaAssignment } from '@/components/video/FocusAreaAssignment';
-import { usePageTitle } from '@/components/layout/PageTitleContext';
-import { Button } from '@/components/ui/button';
-import type { Video } from '@/lib/db/schema';
+import { use, useEffect, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { VideoPlayer } from '@/components/videos/VideoPlayer'
+import { VideoMetadata } from '@/components/videos/VideoMetadata'
+import { InsightsTabs } from '@/components/insights/InsightsTabs'
+import { EmbedButton } from '@/components/video/EmbedButton'
+import { FocusAreaAssignment } from '@/components/video/FocusAreaAssignment'
+import { usePageTitle } from '@/components/layout/PageTitleContext'
+import { Button } from '@/components/ui/button'
+import { parseReturnTo } from '@/lib/navigation'
+import type { Video } from '@/lib/db/schema'
 
 interface VideoDetailPageProps {
   params: Promise<{
@@ -18,15 +19,19 @@ interface VideoDetailPageProps {
 }
 
 export default function VideoDetailPage({ params }: VideoDetailPageProps) {
-  const { id } = use(params);
-  const router = useRouter();
-  const [video, setVideo] = useState<Video | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [seekTime, setSeekTime] = useState<number | undefined>(undefined);
+  const { id } = use(params)
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const [video, setVideo] = useState<Video | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [seekTime, setSeekTime] = useState<number | undefined>(undefined)
+
+  // Parse returnTo parameter
+  const returnTo = parseReturnTo(searchParams.get('returnTo'))
 
   // Set page title
-  const { setPageTitle } = usePageTitle();
+  const { setPageTitle } = usePageTitle()
 
   // Fetch video data
   useEffect(() => {
@@ -69,20 +74,23 @@ export default function VideoDetailPage({ params }: VideoDetailPageProps) {
 
   // Set page title when video loads or on error
   useEffect(() => {
+    const backHref = returnTo || '/'
+    const backLabel = returnTo?.startsWith('/discovery') ? 'Discovery' : 'Knowledge Bank'
+
     if (video) {
       setPageTitle({
         title: video.title,
-        backHref: '/',
-        backLabel: 'Knowledge Bank',
+        backHref,
+        backLabel,
       })
     } else if (error) {
       setPageTitle({
         title: 'Video Not Found',
-        backHref: '/',
-        backLabel: 'Knowledge Bank',
+        backHref,
+        backLabel,
       })
     }
-  }, [video, error, setPageTitle]);
+  }, [video, error, setPageTitle, returnTo])
 
   // Handle seek from transcript
   const handleSeek = (seconds: number) => {
@@ -102,6 +110,9 @@ export default function VideoDetailPage({ params }: VideoDetailPageProps) {
 
   // Error state (404 or other errors)
   if (error || !video) {
+    const backHref = returnTo || '/'
+    const backLabel = returnTo?.startsWith('/discovery') ? 'Discovery' : 'Knowledge Bank'
+
     return (
       <div className="p-6">
         <div className="mx-auto max-w-2xl rounded-lg border border-destructive/50 bg-destructive/10 p-8 text-center">
@@ -111,12 +122,12 @@ export default function VideoDetailPage({ params }: VideoDetailPageProps) {
           <p className="mb-4 text-sm text-muted-foreground">
             The video you&apos;re looking for doesn&apos;t exist or has been removed.
           </p>
-          <Button onClick={() => router.push('/')} variant="outline">
-            Return to Knowledge Bank
+          <Button onClick={() => router.push(backHref)} variant="outline">
+            Return to {backLabel}
           </Button>
         </div>
       </div>
-    );
+    )
   }
 
   return (
