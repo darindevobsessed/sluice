@@ -100,8 +100,8 @@ export default function VideoDetailPage({ params }: VideoDetailPageProps) {
   // Loading state
   if (isLoading) {
     return (
-      <div className="p-6">
-        <div className="mb-6 h-6 w-96 animate-pulse rounded bg-muted" />
+      <div className="p-4 sm:p-6">
+        <div className="mb-6 h-6 w-full max-w-96 animate-pulse rounded bg-muted" />
         <div className="mx-auto mb-8 aspect-video w-full max-w-[800px] animate-pulse rounded-lg bg-muted" />
         <div className="h-[400px] w-full animate-pulse rounded-lg bg-muted" />
       </div>
@@ -114,7 +114,7 @@ export default function VideoDetailPage({ params }: VideoDetailPageProps) {
     const backLabel = returnTo?.startsWith('/discovery') ? 'Discovery' : 'Knowledge Bank'
 
     return (
-      <div className="p-6">
+      <div className="p-4 sm:p-6">
         <div className="mx-auto max-w-2xl rounded-lg border border-destructive/50 bg-destructive/10 p-8 text-center">
           <h2 className="mb-2 text-xl font-semibold text-destructive">
             {error || 'Video not found'}
@@ -131,7 +131,7 @@ export default function VideoDetailPage({ params }: VideoDetailPageProps) {
   }
 
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6">
       {/* Metadata row */}
       <VideoMetadata video={video} className="mb-6" />
 

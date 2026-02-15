@@ -217,7 +217,7 @@ export function KnowledgeBankContent() {
   const showPanel = isQueryQuestion && urlQuery.trim().length > 0
 
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6">
       {/* Stats Header */}
       {isLoadingVideos && !stats ? (
         <StatsHeaderSkeleton />

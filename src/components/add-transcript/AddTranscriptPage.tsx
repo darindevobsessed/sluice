@@ -82,8 +82,8 @@ export function AddTranscriptPage() {
   // Show success state if submitted
   if (submitted) {
     return (
-      <div className="p-6">
-        <h1 className="mb-2 text-2xl font-semibold">Add a Transcript</h1>
+      <div className="p-4 sm:p-6">
+        <h1 className="mb-2 text-xl sm:text-2xl font-semibold">Add a Transcript</h1>
         <p className="mb-8 text-muted-foreground">
           Import meeting notes, podcast transcripts, or any text content.
         </p>
@@ -100,8 +100,8 @@ export function AddTranscriptPage() {
   }
 
   return (
-    <div className="p-6">
-      <h1 className="mb-2 text-2xl font-semibold">Add a Transcript</h1>
+    <div className="p-4 sm:p-6">
+      <h1 className="mb-2 text-xl sm:text-2xl font-semibold">Add a Transcript</h1>
       <p className="mb-8 text-muted-foreground">
         Import meeting notes, podcast transcripts, or any text content.
       </p>

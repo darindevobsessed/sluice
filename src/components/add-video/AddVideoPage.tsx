@@ -273,8 +273,8 @@ export function AddVideoPage() {
     const thumbnail = metadata?.thumbnail_url || null;
 
     return (
-      <div className="p-6">
-        <h1 className="mb-2 text-2xl font-semibold">Add a Video</h1>
+      <div className="p-4 sm:p-6">
+        <h1 className="mb-2 text-xl sm:text-2xl font-semibold">Add a Video</h1>
         <p className="mb-8 text-muted-foreground">
           Extract knowledge from YouTube videos and generate plugin ideas.
         </p>
@@ -291,8 +291,8 @@ export function AddVideoPage() {
   }
 
   return (
-    <div className="p-6">
-      <h1 className="mb-2 text-2xl font-semibold">Add a Video</h1>
+    <div className="p-4 sm:p-6">
+      <h1 className="mb-2 text-xl sm:text-2xl font-semibold">Add a Video</h1>
       <p className="mb-8 text-muted-foreground">
         Extract knowledge from YouTube videos and generate plugin ideas.
       </p>

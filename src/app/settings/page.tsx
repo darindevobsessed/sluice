@@ -7,8 +7,8 @@ export const metadata: Metadata = {
 
 export default function Settings() {
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-semibold mb-2">Settings</h1>
+    <div className="p-4 sm:p-6">
+      <h1 className="text-xl sm:text-2xl font-semibold mb-2">Settings</h1>
       <p className="text-muted-foreground mb-8">
         Manage your preferences and application settings.
       </p>
