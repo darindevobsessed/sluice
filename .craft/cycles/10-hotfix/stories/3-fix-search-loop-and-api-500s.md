@@ -1,15 +1,15 @@
 ---
 name: fix-search-loop-and-api-500s
 title: Fix search render loop and persistent API 500s
-status: active
+status: complete
 cycle: hotfix
 story_number: 3
 created: 2026-02-14
 updated: 2026-02-14
 priority: urgent
 chunks_total: 2
-chunks_complete: 1
-current_chunk: 2
+chunks_complete: 2
+current_chunk: 3
 ---
 
 # Story: Fix search render loop and persistent API 500s
