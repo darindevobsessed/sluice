@@ -8,11 +8,14 @@ const mockReplace = vi.fn()
 const mockPathname = '/discovery'
 let mockSearchParamsString = ''
 
+// Create stable router instance for referential stability tests
+const mockRouter = {
+  push: mockPush,
+  replace: mockReplace,
+}
+
 vi.mock('next/navigation', () => ({
-  useRouter: () => ({
-    push: mockPush,
-    replace: mockReplace,
-  }),
+  useRouter: () => mockRouter,
   usePathname: () => mockPathname,
   useSearchParams: () => ({
     toString: () => mockSearchParamsString,
@@ -27,6 +30,11 @@ describe('useURLParams', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockSearchParamsString = ''
+    // Mock window.location.search for the implementation to read from
+    Object.defineProperty(window, 'location', {
+      value: { search: '' },
+      writable: true,
+    })
   })
 
   it('should return searchParams that can read URL parameters', () => {
@@ -61,6 +69,10 @@ describe('useURLParams', () => {
 
   it('should call router.push when updateParams is called with push method', () => {
     mockSearchParamsString = 'page=1'
+    Object.defineProperty(window, 'location', {
+      value: { search: '?page=1' },
+      writable: true,
+    })
 
     const { result } = renderHook(() => useURLParams())
 
@@ -73,6 +85,10 @@ describe('useURLParams', () => {
 
   it('should remove parameter when value is null', () => {
     mockSearchParamsString = 'channel=abc&page=2'
+    Object.defineProperty(window, 'location', {
+      value: { search: '?channel=abc&page=2' },
+      writable: true,
+    })
 
     const { result } = renderHook(() => useURLParams())
 
@@ -83,6 +99,10 @@ describe('useURLParams', () => {
 
   it('should remove parameter when value is empty string', () => {
     mockSearchParamsString = 'channel=abc&page=2'
+    Object.defineProperty(window, 'location', {
+      value: { search: '?channel=abc&page=2' },
+      writable: true,
+    })
 
     const { result } = renderHook(() => useURLParams())
 
@@ -93,6 +113,10 @@ describe('useURLParams', () => {
 
   it('should update multiple parameters at once', () => {
     mockSearchParamsString = 'channel=abc'
+    Object.defineProperty(window, 'location', {
+      value: { search: '?channel=abc' },
+      writable: true,
+    })
 
     const { result } = renderHook(() => useURLParams())
 
@@ -103,6 +127,10 @@ describe('useURLParams', () => {
 
   it('should navigate to pathname without query string when all params are removed', () => {
     mockSearchParamsString = 'channel=abc'
+    Object.defineProperty(window, 'location', {
+      value: { search: '?channel=abc' },
+      writable: true,
+    })
 
     const { result } = renderHook(() => useURLParams())
 
@@ -113,6 +141,10 @@ describe('useURLParams', () => {
 
   it('should preserve existing params when adding new ones', () => {
     mockSearchParamsString = 'channel=abc&type=saved'
+    Object.defineProperty(window, 'location', {
+      value: { search: '?channel=abc&type=saved' },
+      writable: true,
+    })
 
     const { result } = renderHook(() => useURLParams())
 
@@ -123,11 +155,44 @@ describe('useURLParams', () => {
 
   it('should replace existing param value when updating', () => {
     mockSearchParamsString = 'channel=abc&type=saved'
+    Object.defineProperty(window, 'location', {
+      value: { search: '?channel=abc&type=saved' },
+      writable: true,
+    })
 
     const { result } = renderHook(() => useURLParams())
 
     result.current.updateParams({ type: 'not-saved' })
 
     expect(mockReplace).toHaveBeenCalledWith('/discovery?channel=abc&type=not-saved')
+  })
+
+  it('should maintain referential stability of updateParams across navigation changes', () => {
+    // Mock window.location.search for the implementation to read from
+    Object.defineProperty(window, 'location', {
+      value: { search: '?channel=abc' },
+      writable: true,
+    })
+
+    // Start with initial search params
+    mockSearchParamsString = 'channel=abc'
+
+    const { result, rerender } = renderHook(() => useURLParams())
+
+    // Capture the initial updateParams reference
+    const initialUpdateParams = result.current.updateParams
+
+    // Simulate navigation that changes searchParams
+    mockSearchParamsString = 'channel=abc&page=2'
+    Object.defineProperty(window, 'location', {
+      value: { search: '?channel=abc&page=2' },
+      writable: true,
+    })
+
+    // Re-render the hook with new searchParams
+    rerender()
+
+    // The updateParams reference should remain the same
+    expect(result.current.updateParams).toBe(initialUpdateParams)
   })
 })

@@ -984,3 +984,367 @@ npm error
 npm error To see a list of scripts, run:
 npm error   npm run
 npm error A complete log of this run can be found in: /Users/darindrobinski/.npm/_logs/2026-02-14T21_03_42_521Z-debug-0.log
+---
+timestamp: "2026-02-15 01:11:38"
+story: "3-fix-search-loop-and-api-500s"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/hooks/__tests__/useURLParams.test.ts[2m > [22museURLParams[2m > [22mshould maintain referential stability of updateParams across navigation changes
+[31m[1mAssertionError[22m: expected [Function] to be [Function] // Object.is equality[39m
+
+[2mCompared values have no visual difference.[22m
+
+[36m [2m❯[22m src/hooks/__tests__/useURLParams.test.ts:[2m150:41[22m[39m
+    [90m148| [39m
+    [90m149| [39m    [90m// The updateParams reference should remain the same[39m
+    [90m150| [39m    [34mexpect[39m(result[33m.[39mcurrent[33m.[39mupdateParams)[33m.[39m[34mtoBe[39m(initialUpdateParams)
+    [90m   | [39m                                        [31m^[39m
+    [90m151| [39m  })
+    [90m152| [39m})
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/hooks/__tests__/useURLParams.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/hooks/__tests__/useURLParams.test.ts [2m([22m[2m11 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 61[2mms[22m[39m
+     [32m✓[39m should return searchParams that can read URL parameters[32m 20[2mms[22m[39m
+     [32m✓[39m should return null for non-existent parameters[32m 2[2mms[22m[39m
+     [32m✓[39m should call router.replace when updateParams is called with default method[32m 5[2mms[22m[39m
+     [32m✓[39m should call router.push when updateParams is called with push method[32m 3[2mms[22m[39m
+     [32m✓[39m should remove parameter when value is null[32m 4[2mms[22m[39m
+     [32m✓[39m should remove parameter when value is empty string[32m 2[2mms[22m[39m
+     [32m✓[39m should update multiple parameters at once[32m 2[2mms[22m[39m
+     [32m✓[39m should navigate to pathname without query string when all params are removed[32m 2[2mms[22m[39m
+     [32m✓[39m should preserve existing params when adding new ones[32m 2[2mms[22m[39m
+     [32m✓[39m should replace existing param value when updating[32m 4[2mms[22m[39m
+[31m     [31m×[31m should maintain referential stability of updateParams across navigation changes[39m[32m 11[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m10 passed[39m[22m[90m (11)[39m
+[2m   Start at [22m 19:11:30
+[2m   Duration [22m 7.35s[2m (transform 112ms, setup 612ms, import 855ms, tests 61ms, environment 4.56s)[22m
+---
+timestamp: "2026-02-15 01:12:00"
+story: "3-fix-search-loop-and-api-500s"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/hooks/__tests__/useURLParams.test.ts[2m > [22museURLParams[2m > [22mshould maintain referential stability of updateParams across navigation changes
+[31m[1mAssertionError[22m: expected [Function] to be [Function] // Object.is equality[39m
+
+[2mCompared values have no visual difference.[22m
+
+[36m [2m❯[22m src/hooks/__tests__/useURLParams.test.ts:[2m155:41[22m[39m
+    [90m153| [39m
+    [90m154| [39m    [90m// The updateParams reference should remain the same[39m
+    [90m155| [39m    [34mexpect[39m(result[33m.[39mcurrent[33m.[39mupdateParams)[33m.[39m[34mtoBe[39m(initialUpdateParams)
+    [90m   | [39m                                        [31m^[39m
+    [90m156| [39m  })
+    [90m157| [39m})
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/hooks/__tests__/useURLParams.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/hooks/__tests__/useURLParams.test.ts [2m([22m[2m11 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 134[2mms[22m[39m
+     [32m✓[39m should return searchParams that can read URL parameters[32m 42[2mms[22m[39m
+     [32m✓[39m should return null for non-existent parameters[32m 8[2mms[22m[39m
+     [32m✓[39m should call router.replace when updateParams is called with default method[32m 10[2mms[22m[39m
+     [32m✓[39m should call router.push when updateParams is called with push method[32m 10[2mms[22m[39m
+     [32m✓[39m should remove parameter when value is null[32m 13[2mms[22m[39m
+     [32m✓[39m should remove parameter when value is empty string[32m 9[2mms[22m[39m
+     [32m✓[39m should update multiple parameters at once[32m 8[2mms[22m[39m
+     [32m✓[39m should navigate to pathname without query string when all params are removed[32m 3[2mms[22m[39m
+     [32m✓[39m should preserve existing params when adding new ones[32m 6[2mms[22m[39m
+     [32m✓[39m should replace existing param value when updating[32m 3[2mms[22m[39m
+[31m     [31m×[31m should maintain referential stability of updateParams across navigation changes[39m[32m 16[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m10 passed[39m[22m[90m (11)[39m
+[2m   Start at [22m 19:11:55
+[2m   Duration [22m 4.35s[2m (transform 182ms, setup 441ms, import 486ms, tests 134ms, environment 2.62s)[22m
+---
+timestamp: "2026-02-15 01:12:18"
+story: "3-fix-search-loop-and-api-500s"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 6 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/hooks/__tests__/useURLParams.test.ts[2m > [22museURLParams[2m > [22mshould remove parameter when value is null
+[31m[1mAssertionError[22m: expected "vi.fn()" to be called with arguments: [ '/discovery?channel=abc' ][90m
+
+Received: 
+
+[1m  1st vi.fn() call:
+
+[22m[2m  [[22m
+[32m-   "/discovery?channel=abc",[90m
+[31m+   "/discovery",[90m
+[2m  ][22m
+[31m[90m
+
+Number of calls: [1m1[22m
+[31m[39m
+[36m [2m❯[22m src/hooks/__tests__/useURLParams.test.ts:[2m81:25[22m[39m
+    [90m 79| [39m    result[33m.[39mcurrent[33m.[39m[34mupdateParams[39m({ page[33m:[39m [35mnull[39m })
+    [90m 80| [39m
+    [90m 81| [39m    [34mexpect[39m(mockReplace)[33m.[39m[34mtoHaveBeenCalledWith[39m([32m'/discovery?channel=abc'[39m)
+    [90m   | [39m                        [31m^[39m
+    [90m 82| [39m  })
+    [90m 83| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/hooks/__tests__/useURLParams.test.ts[2m > [22museURLParams[2m > [22mshould remove parameter when value is empty string
+[31m[1mAssertionError[22m: expected "vi.fn()" to be called with arguments: [ '/discovery?channel=abc' ][90m
+
+Received: 
+
+[1m  1st vi.fn() call:
+
+[22m[2m  [[22m
+[32m-   "/discovery?channel=abc",[90m
+[31m+   "/discovery",[90m
+[2m  ][22m
+[31m[90m
+
+Number of calls: [1m1[22m
+[31m[39m
+[36m [2m❯[22m src/hooks/__tests__/useURLParams.test.ts:[2m91:25[22m[39m
+    [90m 89| [39m    result[33m.[39mcurrent[33m.[39m[34mupdateParams[39m({ page[33m:[39m [32m''[39m })
+    [90m 90| [39m
+    [90m 91| [39m    [34mexpect[39m(mockReplace)[33m.[39m[34mtoHaveBeenCalledWith[39m([32m'/discovery?channel=abc'[39m)
+    [90m   | [39m                        [31m^[39m
+    [90m 92| [39m  })
+    [90m 93| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/hooks/__tests__/useURLParams.test.ts[2m > [22museURLParams[2m > [22mshould update multiple parameters at once
+[31m[1mAssertionError[22m: expected "vi.fn()" to be called with arguments: [ Array(1) ][90m
+
+Received: 
+
+[1m  1st vi.fn() call:
+
+[22m[2m  [[22m
+[32m-   "/discovery?channel=abc&type=saved&page=3",[90m
+[31m+   "/discovery?type=saved&page=3",[90m
+[2m  ][22m
+[31m[90m
+
+Number of calls: [1m1[22m
+[31m[39m
+[36m [2m❯[22m src/hooks/__tests__/useURLParams.test.ts:[2m101:25[22m[39m
+    [90m 99| [39m    result[33m.[39mcurrent[33m.[39m[34mupdateParams[39m({ type[33m:[39m [32m'saved'[39m[33m,[39m page[33m:[39m [32m'3'[39m })
+    [90m100| [39m
+    [90m101| [39m    expect(mockReplace).toHaveBeenCalledWith('/discovery?channel=abc&t…
+    [90m   | [39m                        [31m^[39m
+    [90m102| [39m  })
+    [90m103| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/6]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/hooks/__tests__/useURLParams.test.ts[2m > [22museURLParams[2m > [22mshould preserve existing params when adding new ones
+[31m[1mAssertionError[22m: expected "vi.fn()" to be called with arguments: [ Array(1) ][90m
+
+Received: 
+
+[1m  1st vi.fn() call:
+
+[22m[2m  [[22m
+[32m-   "/discovery?channel=abc&type=saved&page=2",[90m
+[31m+   "/discovery?page=2",[90m
+[2m  ][22m
+[31m[90m
+
+Number of calls: [1m1[22m
+[31m[39m
+[36m [2m❯[22m src/hooks/__tests__/useURLParams.test.ts:[2m121:25[22m[39m
+    [90m119| [39m    result[33m.[39mcurrent[33m.[39m[34mupdateParams[39m({ page[33m:[39m [32m'2'[39m })
+    [90m120| [39m
+    [90m121| [39m    expect(mockReplace).toHaveBeenCalledWith('/discovery?channel=abc&t…
+    [90m   | [39m                        [31m^[39m
+    [90m122| [39m  })
+    [90m123| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/6]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/hooks/__tests__/useURLParams.test.ts[2m > [22museURLParams[2m > [22mshould replace existing param value when updating
+[31m[1mAssertionError[22m: expected "vi.fn()" to be called with arguments: [ Array(1) ][90m
+
+Received: 
+
+[1m  1st vi.fn() call:
+
+[22m[2m  [[22m
+[32m-   "/discovery?channel=abc&type=not-saved",[90m
+[31m+   "/discovery?type=not-saved",[90m
+[2m  ][22m
+[31m[90m
+
+Number of calls: [1m1[22m
+[31m[39m
+[36m [2m❯[22m src/hooks/__tests__/useURLParams.test.ts:[2m131:25[22m[39m
+    [90m129| [39m    result[33m.[39mcurrent[33m.[39m[34mupdateParams[39m({ type[33m:[39m [32m'not-saved'[39m })
+    [90m130| [39m
+    [90m131| [39m    expect(mockReplace).toHaveBeenCalledWith('/discovery?channel=abc&t…
+    [90m   | [39m                        [31m^[39m
+    [90m132| [39m  })
+    [90m133| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/6]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/hooks/__tests__/useURLParams.test.ts[2m > [22museURLParams[2m > [22mshould maintain referential stability of updateParams across navigation changes
+[31m[1mAssertionError[22m: expected [Function] to be [Function] // Object.is equality[39m
+
+[2mCompared values have no visual difference.[22m
+
+[36m [2m❯[22m src/hooks/__tests__/useURLParams.test.ts:[2m155:41[22m[39m
+    [90m153| [39m
+    [90m154| [39m    [90m// The updateParams reference should remain the same[39m
+    [90m155| [39m    [34mexpect[39m(result[33m.[39mcurrent[33m.[39mupdateParams)[33m.[39m[34mtoBe[39m(initialUpdateParams)
+    [90m   | [39m                                        [31m^[39m
+    [90m156| [39m  })
+    [90m157| [39m})
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/6]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/hooks/__tests__/useURLParams.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/hooks/__tests__/useURLParams.test.ts [2m([22m[2m11 tests[22m[2m | [22m[31m6 failed[39m[2m)[22m[32m 65[2mms[22m[39m
+     [32m✓[39m should return searchParams that can read URL parameters[32m 24[2mms[22m[39m
+     [32m✓[39m should return null for non-existent parameters[32m 3[2mms[22m[39m
+     [32m✓[39m should call router.replace when updateParams is called with default method[32m 5[2mms[22m[39m
+     [32m✓[39m should call router.push when updateParams is called with push method[32m 5[2mms[22m[39m
+[31m     [31m×[31m should remove parameter when value is null[39m[32m 11[2mms[22m[39m
+[31m     [31m×[31m should remove parameter when value is empty string[39m[32m 2[2mms[22m[39m
+[31m     [31m×[31m should update multiple parameters at once[39m[32m 3[2mms[22m[39m
+     [32m✓[39m should navigate to pathname without query string when all params are removed[32m 2[2mms[22m[39m
+[31m     [31m×[31m should preserve existing params when adding new ones[39m[32m 3[2mms[22m[39m
+[31m     [31m×[31m should replace existing param value when updating[39m[32m 3[2mms[22m[39m
+[31m     [31m×[31m should maintain referential stability of updateParams across navigation changes[39m[32m 3[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m6 failed[39m[22m[2m | [22m[1m[32m5 passed[39m[22m[90m (11)[39m
+[2m   Start at [22m 19:12:15
+[2m   Duration [22m 3.04s[2m (transform 107ms, setup 335ms, import 412ms, tests 65ms, environment 1.82s)[22m
+---
+timestamp: "2026-02-15 01:13:16"
+story: "3-fix-search-loop-and-api-500s"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/hooks/__tests__/useURLParams.test.ts[2m > [22museURLParams[2m > [22mshould maintain referential stability of updateParams across navigation changes
+[31m[1mAssertionError[22m: expected [Function] to be [Function] // Object.is equality[39m
+
+[2mCompared values have no visual difference.[22m
+
+[36m [2m❯[22m src/hooks/__tests__/useURLParams.test.ts:[2m165:41[22m[39m
+    [90m163| [39m
+    [90m164| [39m    [90m// The updateParams reference should remain the same[39m
+    [90m165| [39m    [34mexpect[39m(result[33m.[39mcurrent[33m.[39mupdateParams)[33m.[39m[34mtoBe[39m(initialUpdateParams)
+    [90m   | [39m                                        [31m^[39m
+    [90m166| [39m  })
+    [90m167| [39m})
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/hooks/__tests__/useURLParams.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/hooks/__tests__/useURLParams.test.ts [2m([22m[2m11 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 223[2mms[22m[39m
+     [32m✓[39m should return searchParams that can read URL parameters[32m 80[2mms[22m[39m
+     [32m✓[39m should return null for non-existent parameters[32m 2[2mms[22m[39m
+     [32m✓[39m should call router.replace when updateParams is called with default method[32m 9[2mms[22m[39m
+     [32m✓[39m should call router.push when updateParams is called with push method[32m 5[2mms[22m[39m
+     [32m✓[39m should remove parameter when value is null[32m 3[2mms[22m[39m
+     [32m✓[39m should remove parameter when value is empty string[32m 46[2mms[22m[39m
+     [32m✓[39m should update multiple parameters at once[32m 2[2mms[22m[39m
+     [32m✓[39m should navigate to pathname without query string when all params are removed[32m 2[2mms[22m[39m
+     [32m✓[39m should preserve existing params when adding new ones[32m 3[2mms[22m[39m
+     [32m✓[39m should replace existing param value when updating[32m 2[2mms[22m[39m
+[31m     [31m×[31m should maintain referential stability of updateParams across navigation changes[39m[32m 65[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m10 passed[39m[22m[90m (11)[39m
+[2m   Start at [22m 19:13:09
+[2m   Duration [22m 6.53s[2m (transform 105ms, setup 535ms, import 1.00s, tests 223ms, environment 3.77s)[22m
+---
+timestamp: "2026-02-15 01:13:55"
+story: "3-fix-search-loop-and-api-500s"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+npm error Missing script: "typecheck"
+npm error
+npm error To see a list of scripts, run:
+npm error   npm run
+npm error A complete log of this run can be found in: /Users/darindrobinski/.npm/_logs/2026-02-15T01_13_54_479Z-debug-0.log
+---
+timestamp: "2026-02-15 01:14:33"
+story: "3-fix-search-loop-and-api-500s"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+> gold-miner@0.1.0 lint
+> eslint
+
+
+/Users/darindrobinski/dev/repos/gold-miner/src/hooks/__tests__/useURLParams.test.ts
+   34:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   35:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   70:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   83:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   94:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  105:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  116:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  127:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  138:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  149:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  150:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  162:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+✖ 12 problems (12 errors, 0 warnings)

@@ -12,8 +12,8 @@ export function useURLParams() {
     updates: Record<string, string | null>,
     method: 'replace' | 'push' = 'replace'
   ) => {
-    // Create new URLSearchParams from current params
-    const params = new URLSearchParams(searchParams.toString())
+    // Read current params from window.location.search for referential stability
+    const params = new URLSearchParams(window.location.search)
 
     // Apply updates
     Object.entries(updates).forEach(([key, value]) => {
@@ -30,7 +30,7 @@ export function useURLParams() {
 
     // Navigate
     router[method](url)
-  }, [searchParams, pathname, router])
+  }, [pathname, router])
 
   return { searchParams, updateParams }
 }
