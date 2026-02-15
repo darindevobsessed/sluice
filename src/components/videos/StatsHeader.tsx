@@ -15,7 +15,7 @@ interface StatCardProps {
 function StatCard({ value, label }: StatCardProps) {
   return (
     <div className="flex flex-col items-center rounded-lg bg-surface-secondary p-4 text-center">
-      <span className="text-3xl font-bold text-foreground">{value}</span>
+      <span className="text-2xl font-bold text-foreground sm:text-3xl">{value}</span>
       <span className="text-sm text-muted-foreground">{label}</span>
     </div>
   );

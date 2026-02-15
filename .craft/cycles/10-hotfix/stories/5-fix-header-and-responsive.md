@@ -1,15 +1,15 @@
 ---
 name: fix-header-and-responsive
 title: Fix header styling and responsive layout across all pages
-status: active
+status: complete
 cycle: hotfix
 story_number: 5
 created: 2026-02-15
 updated: 2026-02-15
 priority: high
 chunks_total: 3
-chunks_complete: 2
-current_chunk: 3
+chunks_complete: 3
+current_chunk: 4
 ---
 
 # Story: Fix header styling and responsive layout across all pages

@@ -35,11 +35,13 @@ export function InsightsTabs({ video, onSeek, className }: InsightsTabsProps) {
 
   return (
     <Tabs defaultValue="insights" className={className}>
-      <TabsList className="grid w-full grid-cols-3">
-        <TabsTrigger value="transcript">Transcript</TabsTrigger>
-        <TabsTrigger value="insights">Insights</TabsTrigger>
-        <TabsTrigger value="related">Related</TabsTrigger>
-      </TabsList>
+      <div className="overflow-x-auto">
+        <TabsList>
+          <TabsTrigger value="transcript">Transcript</TabsTrigger>
+          <TabsTrigger value="insights">Insights</TabsTrigger>
+          <TabsTrigger value="related">Related</TabsTrigger>
+        </TabsList>
+      </div>
 
       <TabsContent value="transcript" className="mt-6">
         <TranscriptView
