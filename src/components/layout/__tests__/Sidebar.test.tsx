@@ -41,36 +41,39 @@ describe('Sidebar', () => {
   describe('expanded state (default)', () => {
     it('renders at 240px width when expanded', () => {
       render(<SidebarTestWrapper />)
-      const sidebar = screen.getByRole('complementary')
+      const sidebars = screen.getAllByRole('complementary')
+      const desktopSidebar = sidebars[0]!
 
-      // Should have expanded width class or inline style
-      expect(
-        sidebar.classList.contains('w-60') ||
-        sidebar.style.width === '240px'
-      ).toBe(true)
+      // Should have expanded width inline style
+      expect(desktopSidebar.style.width).toBe('240px')
     })
 
     it('shows logo text when expanded', () => {
       render(<SidebarTestWrapper />)
-      expect(screen.getByText('Gold Miner')).toBeInTheDocument()
+      const logoTexts = screen.getAllByText('Gold Miner')
+      expect(logoTexts.length).toBeGreaterThan(0)
+      expect(logoTexts[0]).toBeInTheDocument()
     })
 
     it('shows left-pointing chevron in header when expanded', () => {
       render(<SidebarTestWrapper />)
-      const toggleButton = screen.getByRole('button', { name: /toggle sidebar/i })
+      const toggleButtons = screen.getAllByRole('button', { name: /toggle sidebar/i })
+      const desktopToggleButton = toggleButtons[0]!
 
       // ChevronLeft should be present (svg will have data-lucide="chevron-left")
-      const svg = toggleButton.querySelector('svg')
+      const svg = desktopToggleButton.querySelector('svg')
       expect(svg?.getAttribute('data-lucide')).toBe('chevron-left')
     })
 
     it('toggle button is in the header row', () => {
       render(<SidebarTestWrapper />)
-      const toggleButton = screen.getByRole('button', { name: /toggle sidebar/i })
-      const logoText = screen.getByText('Gold Miner')
+      const toggleButtons = screen.getAllByRole('button', { name: /toggle sidebar/i })
+      const desktopToggleButton = toggleButtons[0]!
+      const logoTexts = screen.getAllByText('Gold Miner')
+      const desktopLogoText = logoTexts[0]!
 
       // Both should be in the same parent container (the header)
-      expect(toggleButton.parentElement).toBe(logoText.parentElement)
+      expect(desktopToggleButton.parentElement).toBe(desktopLogoText.parentElement)
     })
   })
 
@@ -79,29 +82,34 @@ describe('Sidebar', () => {
       const user = userEvent.setup()
       render(<SidebarTestWrapper />)
 
-      const toggleButton = screen.getByRole('button', { name: /toggle sidebar/i })
-      await user.click(toggleButton)
+      const toggleButtons = screen.getAllByRole('button', { name: /toggle sidebar/i })
+      const desktopToggleButton = toggleButtons[0]!
+      await user.click(desktopToggleButton)
 
-      const sidebar = screen.getByRole('complementary')
-      expect(
-        sidebar.classList.contains('w-16') ||
-        sidebar.style.width === '64px'
-      ).toBe(true)
+      const sidebars = screen.getAllByRole('complementary')
+      const desktopSidebar = sidebars[0]!
+      expect(desktopSidebar.style.width).toBe('64px')
     })
 
     it('hides logo text when collapsed', async () => {
       const user = userEvent.setup()
       render(<SidebarTestWrapper />)
 
-      const toggleButton = screen.getByRole('button', { name: /toggle sidebar/i })
-      await user.click(toggleButton)
+      const toggleButtons = screen.getAllByRole('button', { name: /toggle sidebar/i })
+      const desktopToggleButton = toggleButtons[0]!
+      await user.click(desktopToggleButton)
 
-      // Text should not be visible (either removed from DOM or hidden)
-      const logoText = screen.queryByText('Gold Miner')
+      // Desktop logo text should not be visible (either removed from DOM or hidden)
+      // Mobile sidebar still shows text, so we need to check the desktop sidebar specifically
+      const sidebars = screen.getAllByRole('complementary')
+      const desktopSidebar = sidebars[0]!
+      const logoTexts = desktopSidebar.querySelectorAll('span')
+      const desktopLogoText = Array.from(logoTexts).find(span => span.textContent === 'Gold Miner')
+
       expect(
-        logoText === null ||
-        logoText.classList.contains('hidden') ||
-        logoText.classList.contains('opacity-0')
+        desktopLogoText === undefined ||
+        desktopLogoText.classList.contains('hidden') ||
+        desktopLogoText.classList.contains('opacity-0')
       ).toBe(true)
     })
 
@@ -109,10 +117,11 @@ describe('Sidebar', () => {
       const user = userEvent.setup()
       render(<SidebarTestWrapper />)
 
-      const toggleButton = screen.getByRole('button', { name: /toggle sidebar/i })
-      await user.click(toggleButton)
+      const toggleButtons = screen.getAllByRole('button', { name: /toggle sidebar/i })
+      const desktopToggleButton = toggleButtons[0]!
+      await user.click(desktopToggleButton)
 
-      const svg = toggleButton.querySelector('svg')
+      const svg = desktopToggleButton.querySelector('svg')
       expect(svg?.getAttribute('data-lucide')).toBe('chevron-right')
     })
   })
@@ -122,31 +131,30 @@ describe('Sidebar', () => {
       const user = userEvent.setup()
       render(<SidebarTestWrapper />)
 
-      const toggleButton = screen.getByRole('button', { name: /toggle sidebar/i })
+      const toggleButtons = screen.getAllByRole('button', { name: /toggle sidebar/i })
+      const desktopToggleButton = toggleButtons[0]!
+      const sidebars = screen.getAllByRole('complementary')
+      const desktopSidebar = sidebars[0]!
 
-      // Start expanded
-      expect(screen.getByText('Gold Miner')).toBeInTheDocument()
+      // Start expanded - should be 240px
+      expect(desktopSidebar.style.width).toBe('240px')
 
-      // Click to collapse
-      await user.click(toggleButton)
-      const logoTextAfterCollapse = screen.queryByText('Gold Miner')
-      expect(
-        logoTextAfterCollapse === null ||
-        logoTextAfterCollapse.classList.contains('hidden') ||
-        logoTextAfterCollapse.classList.contains('opacity-0')
-      ).toBe(true)
+      // Click to collapse - should be 64px
+      await user.click(desktopToggleButton)
+      expect(desktopSidebar.style.width).toBe('64px')
 
-      // Click to expand again
-      await user.click(toggleButton)
-      expect(screen.getByText('Gold Miner')).toBeInTheDocument()
+      // Click to expand again - should be 240px
+      await user.click(desktopToggleButton)
+      expect(desktopSidebar.style.width).toBe('240px')
     })
 
     it('persists collapsed state to localStorage', async () => {
       const user = userEvent.setup()
       render(<SidebarTestWrapper />)
 
-      const toggleButton = screen.getByRole('button', { name: /toggle sidebar/i })
-      await user.click(toggleButton)
+      const toggleButtons = screen.getAllByRole('button', { name: /toggle sidebar/i })
+      const desktopToggleButton = toggleButtons[0]!
+      await user.click(desktopToggleButton)
 
       expect(localStorageMock.getItem('gold-miner-sidebar-collapsed')).toBe('true')
     })
@@ -155,19 +163,21 @@ describe('Sidebar', () => {
   describe('CSS transition', () => {
     it('applies transition classes for smooth animation', () => {
       render(<SidebarTestWrapper />)
-      const sidebar = screen.getByRole('complementary')
+      const sidebars = screen.getAllByRole('complementary')
+      const desktopSidebar = sidebars[0]!
 
       // Should have the sidebar-container class which has CSS transition
-      expect(sidebar.classList.contains('sidebar-container')).toBe(true)
+      expect(desktopSidebar.classList.contains('sidebar-container')).toBe(true)
     })
 
     it('applies overflow-hidden to clip content during transition', () => {
       render(<SidebarTestWrapper />)
-      const sidebar = screen.getByRole('complementary')
+      const sidebars = screen.getAllByRole('complementary')
+      const desktopSidebar = sidebars[0]!
 
       expect(
-        sidebar.classList.contains('overflow-hidden') ||
-        sidebar.style.overflow === 'hidden'
+        desktopSidebar.classList.contains('overflow-hidden') ||
+        desktopSidebar.style.overflow === 'hidden'
       ).toBe(true)
     })
   })
@@ -175,25 +185,66 @@ describe('Sidebar', () => {
   describe('accessibility', () => {
     it('has proper ARIA role for sidebar', () => {
       render(<SidebarTestWrapper />)
-      expect(screen.getByRole('complementary')).toBeInTheDocument()
+      const sidebars = screen.getAllByRole('complementary')
+      expect(sidebars.length).toBe(2) // desktop and mobile
+      expect(sidebars[0]).toBeInTheDocument()
     })
 
     it('toggle button is keyboard accessible', async () => {
       const user = userEvent.setup()
       render(<SidebarTestWrapper />)
 
-      const toggleButton = screen.getByRole('button', { name: /toggle sidebar/i })
-      toggleButton.focus()
+      const toggleButtons = screen.getAllByRole('button', { name: /toggle sidebar/i })
+      const desktopToggleButton = toggleButtons[0]!
+      desktopToggleButton.focus()
 
-      expect(toggleButton).toHaveFocus()
+      expect(desktopToggleButton).toHaveFocus()
 
       // Should toggle on Enter
       await user.keyboard('{Enter}')
-      const sidebar = screen.getByRole('complementary')
-      expect(
-        sidebar.classList.contains('w-16') ||
-        sidebar.style.width === '64px'
-      ).toBe(true)
+      const sidebars = screen.getAllByRole('complementary')
+      const desktopSidebar = sidebars[0]!
+      expect(desktopSidebar.style.width).toBe('64px')
+    })
+  })
+
+  describe('mobile sidebar behavior', () => {
+    it('renders mobile sidebar as hidden by default (translate-x-full)', () => {
+      render(<SidebarTestWrapper />)
+      const mobileSidebar = screen.getAllByRole('complementary')[1]!
+
+      expect(mobileSidebar).toHaveClass('-translate-x-full')
+    })
+
+    it('mobile sidebar appears as fixed overlay with z-50', () => {
+      render(<SidebarTestWrapper />)
+      const mobileSidebar = screen.getAllByRole('complementary')[1]!
+
+      expect(mobileSidebar).toHaveClass('fixed')
+      expect(mobileSidebar).toHaveClass('z-50')
+    })
+
+    it('mobile sidebar is always 240px width (no collapsed state)', () => {
+      render(<SidebarTestWrapper />)
+      const mobileSidebar = screen.getAllByRole('complementary')[1]!
+
+      expect(mobileSidebar).toHaveClass('w-60')
+    })
+
+    it('desktop sidebar has md:hidden class for mobile', () => {
+      render(<SidebarTestWrapper />)
+      const desktopSidebar = screen.getAllByRole('complementary')[0]!
+
+      expect(desktopSidebar).toHaveClass('hidden')
+      expect(desktopSidebar).toHaveClass('md:flex')
+    })
+
+    it('backdrop is not visible when mobile sidebar is closed', () => {
+      const { container } = render(<SidebarTestWrapper />)
+
+      // Backdrop should exist but not be visible
+      const backdrop = container.querySelector('.bg-black\\/50')
+      expect(backdrop).toBeNull()
     })
   })
 })

@@ -153,4 +153,121 @@ describe('SidebarProvider', () => {
       expect(screen.getByTestId('test-child')).toBeInTheDocument()
     })
   })
+
+  describe('mobile sidebar state', () => {
+    it('should start with mobileOpen=false by default', () => {
+      const { result } = renderHook(() => useSidebar(), {
+        wrapper: SidebarProvider,
+      })
+
+      expect(result.current.mobileOpen).toBe(false)
+    })
+
+    it('should provide toggleMobile function', () => {
+      const { result } = renderHook(() => useSidebar(), {
+        wrapper: SidebarProvider,
+      })
+
+      expect(typeof result.current.toggleMobile).toBe('function')
+    })
+
+    it('should provide closeMobile function', () => {
+      const { result } = renderHook(() => useSidebar(), {
+        wrapper: SidebarProvider,
+      })
+
+      expect(typeof result.current.closeMobile).toBe('function')
+    })
+  })
+
+  describe('toggleMobile', () => {
+    it('should toggle mobileOpen from false to true', () => {
+      const { result } = renderHook(() => useSidebar(), {
+        wrapper: SidebarProvider,
+      })
+
+      act(() => {
+        result.current.toggleMobile()
+      })
+
+      expect(result.current.mobileOpen).toBe(true)
+    })
+
+    it('should toggle mobileOpen from true to false', () => {
+      const { result } = renderHook(() => useSidebar(), {
+        wrapper: SidebarProvider,
+      })
+
+      act(() => {
+        result.current.toggleMobile()
+      })
+      expect(result.current.mobileOpen).toBe(true)
+
+      act(() => {
+        result.current.toggleMobile()
+      })
+      expect(result.current.mobileOpen).toBe(false)
+    })
+
+    it('should not persist mobileOpen to localStorage', () => {
+      const { result } = renderHook(() => useSidebar(), {
+        wrapper: SidebarProvider,
+      })
+
+      act(() => {
+        result.current.toggleMobile()
+      })
+
+      expect(localStorage.getItem('gold-miner-sidebar-mobile-open')).toBeNull()
+    })
+
+    it('should be independent from collapsed state', () => {
+      const { result } = renderHook(() => useSidebar(), {
+        wrapper: SidebarProvider,
+      })
+
+      act(() => {
+        result.current.toggleSidebar()
+      })
+      expect(result.current.collapsed).toBe(true)
+      expect(result.current.mobileOpen).toBe(false)
+
+      act(() => {
+        result.current.toggleMobile()
+      })
+      expect(result.current.collapsed).toBe(true)
+      expect(result.current.mobileOpen).toBe(true)
+    })
+  })
+
+  describe('closeMobile', () => {
+    it('should close mobile sidebar when open', () => {
+      const { result } = renderHook(() => useSidebar(), {
+        wrapper: SidebarProvider,
+      })
+
+      act(() => {
+        result.current.toggleMobile()
+      })
+      expect(result.current.mobileOpen).toBe(true)
+
+      act(() => {
+        result.current.closeMobile()
+      })
+      expect(result.current.mobileOpen).toBe(false)
+    })
+
+    it('should do nothing when mobile sidebar already closed', () => {
+      const { result } = renderHook(() => useSidebar(), {
+        wrapper: SidebarProvider,
+      })
+
+      expect(result.current.mobileOpen).toBe(false)
+
+      act(() => {
+        result.current.closeMobile()
+      })
+      expect(result.current.mobileOpen).toBe(false)
+    })
+  })
 })

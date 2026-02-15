@@ -11,7 +11,7 @@ function MainContentInner({ children }: { children: React.ReactNode }) {
 
   return (
     <div
-      className={`main-content-container flex min-h-screen flex-col ${collapsed ? 'ml-16' : 'ml-60'}`}
+      className={`main-content-container flex min-h-screen flex-col ${collapsed ? 'md:ml-16' : 'md:ml-60'}`}
     >
       <TopBar title={title} backHref={backHref} backLabel={backLabel}>
         <FocusAreaDropdown />

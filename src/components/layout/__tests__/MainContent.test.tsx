@@ -52,7 +52,7 @@ describe('MainContent', () => {
   })
 
   describe('dynamic margin coordination', () => {
-    it('renders with 240px left margin when sidebar is expanded', () => {
+    it('renders with responsive margin classes (no margin on mobile, margin on desktop)', () => {
       render(
         <TestWrapper>
           <div data-testid="content">Test Content</div>
@@ -62,14 +62,11 @@ describe('MainContent', () => {
       const mainContent = screen.getByTestId('content').parentElement?.parentElement
       expect(mainContent).toBeTruthy()
 
-      // Should have ml-60 class (240px) or inline style
-      expect(
-        mainContent?.classList.contains('ml-60') ||
-        mainContent?.style.marginLeft === '240px'
-      ).toBe(true)
+      // Should have responsive classes: md:ml-60 (240px on desktop)
+      expect(mainContent?.classList.contains('md:ml-60')).toBe(true)
     })
 
-    it('renders with 64px left margin when sidebar is collapsed', async () => {
+    it('renders with responsive collapsed margin when sidebar is collapsed', async () => {
       const user = userEvent.setup()
       render(
         <TestWrapper>
@@ -77,18 +74,15 @@ describe('MainContent', () => {
         </TestWrapper>
       )
 
-      // Collapse the sidebar
-      const toggleButton = screen.getByRole('button', { name: /toggle sidebar/i })
-      await user.click(toggleButton)
+      // Collapse the sidebar (use first toggle button - desktop)
+      const toggleButtons = screen.getAllByRole('button', { name: /toggle sidebar/i })
+      await user.click(toggleButtons[0]!)
 
       const mainContent = screen.getByTestId('content').parentElement?.parentElement
       expect(mainContent).toBeTruthy()
 
-      // Should have ml-16 class (64px) or inline style
-      expect(
-        mainContent?.classList.contains('ml-16') ||
-        mainContent?.style.marginLeft === '64px'
-      ).toBe(true)
+      // Should have responsive classes: md:ml-16 (64px on desktop)
+      expect(mainContent?.classList.contains('md:ml-16')).toBe(true)
     })
 
     it('toggles margin in sync with sidebar width', async () => {
@@ -99,32 +93,25 @@ describe('MainContent', () => {
         </TestWrapper>
       )
 
-      const toggleButton = screen.getByRole('button', { name: /toggle sidebar/i })
+      const toggleButtons = screen.getAllByRole('button', { name: /toggle sidebar/i })
+      const desktopToggleButton = toggleButtons[0]!
       const mainContent = screen.getByTestId('content').parentElement?.parentElement
-      const sidebar = screen.getByRole('complementary')
+      const sidebars = screen.getAllByRole('complementary')
+      const desktopSidebar = sidebars[0]!
 
       // Start expanded - both should be in expanded state
-      expect(
-        mainContent?.classList.contains('ml-60') ||
-        mainContent?.style.marginLeft === '240px'
-      ).toBe(true)
-      expect(sidebar.style.width).toBe('240px')
+      expect(mainContent?.classList.contains('md:ml-60')).toBe(true)
+      expect(desktopSidebar.style.width).toBe('240px')
 
       // Click to collapse - both should be in collapsed state
-      await user.click(toggleButton)
-      expect(
-        mainContent?.classList.contains('ml-16') ||
-        mainContent?.style.marginLeft === '64px'
-      ).toBe(true)
-      expect(sidebar.style.width).toBe('64px')
+      await user.click(desktopToggleButton)
+      expect(mainContent?.classList.contains('md:ml-16')).toBe(true)
+      expect(desktopSidebar.style.width).toBe('64px')
 
       // Click to expand again - both should be in expanded state
-      await user.click(toggleButton)
-      expect(
-        mainContent?.classList.contains('ml-60') ||
-        mainContent?.style.marginLeft === '240px'
-      ).toBe(true)
-      expect(sidebar.style.width).toBe('240px')
+      await user.click(desktopToggleButton)
+      expect(mainContent?.classList.contains('md:ml-60')).toBe(true)
+      expect(desktopSidebar.style.width).toBe('240px')
     })
   })
 
@@ -151,10 +138,11 @@ describe('MainContent', () => {
       )
 
       const mainContent = screen.getByTestId('content').parentElement?.parentElement
-      const sidebar = screen.getByRole('complementary')
+      const sidebars = screen.getAllByRole('complementary')
+      const desktopSidebar = sidebars[0]!
 
       // Both should have their respective container classes with matching transitions
-      expect(sidebar.classList.contains('sidebar-container')).toBe(true)
+      expect(desktopSidebar.classList.contains('sidebar-container')).toBe(true)
       expect(mainContent?.classList.contains('main-content-container')).toBe(true)
     })
   })
@@ -182,9 +170,9 @@ describe('MainContent', () => {
       const content = screen.getByTestId('content')
       expect(content).toBeVisible()
 
-      // Toggle sidebar
-      const toggleButton = screen.getByRole('button', { name: /toggle sidebar/i })
-      await user.click(toggleButton)
+      // Toggle sidebar (use first toggle button - desktop)
+      const toggleButtons = screen.getAllByRole('button', { name: /toggle sidebar/i })
+      await user.click(toggleButtons[0]!)
 
       // Content should still be visible
       expect(content).toBeVisible()
@@ -201,29 +189,25 @@ describe('MainContent', () => {
         </TestWrapper>
       )
 
-      const toggleButton = screen.getByRole('button', { name: /toggle sidebar/i })
+      const toggleButtons = screen.getAllByRole('button', { name: /toggle sidebar/i })
+      const desktopToggleButton = toggleButtons[0]!
       const mainContent = screen.getByTestId('content').parentElement?.parentElement
-      const sidebar = screen.getByRole('complementary')
+      const sidebars = screen.getAllByRole('complementary')
+      const desktopSidebar = sidebars[0]!
 
       // Rapid toggle 3 times
-      await user.click(toggleButton) // collapse
-      await user.click(toggleButton) // expand
-      await user.click(toggleButton) // collapse
+      await user.click(desktopToggleButton) // collapse
+      await user.click(desktopToggleButton) // expand
+      await user.click(desktopToggleButton) // collapse
 
       // After 3 clicks (odd number), should be in collapsed state
-      expect(
-        mainContent?.classList.contains('ml-16') ||
-        mainContent?.style.marginLeft === '64px'
-      ).toBe(true)
-      expect(sidebar.style.width).toBe('64px')
+      expect(mainContent?.classList.contains('md:ml-16')).toBe(true)
+      expect(desktopSidebar.style.width).toBe('64px')
 
       // One more click to expand
-      await user.click(toggleButton)
-      expect(
-        mainContent?.classList.contains('ml-60') ||
-        mainContent?.style.marginLeft === '240px'
-      ).toBe(true)
-      expect(sidebar.style.width).toBe('240px')
+      await user.click(desktopToggleButton)
+      expect(mainContent?.classList.contains('md:ml-60')).toBe(true)
+      expect(desktopSidebar.style.width).toBe('240px')
     })
   })
 })

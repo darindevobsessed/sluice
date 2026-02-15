@@ -135,6 +135,16 @@
     transition: margin-left 300ms cubic-bezier(0.4, 0, 0.2, 1);
   }
 
+  /* Mobile responsive transitions */
+  @media (max-width: 767px) {
+    .sidebar-container {
+      transition: transform 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .main-content-container {
+      transition: none;
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .sidebar-container,
     .main-content-container {

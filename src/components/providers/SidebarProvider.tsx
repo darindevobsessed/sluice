@@ -5,6 +5,9 @@ import { createContext, useContext, useState, useCallback } from 'react'
 interface SidebarContextValue {
   collapsed: boolean
   toggleSidebar: () => void
+  mobileOpen: boolean
+  toggleMobile: () => void
+  closeMobile: () => void
 }
 
 const SidebarContext = createContext<SidebarContextValue | undefined>(undefined)
@@ -21,6 +24,8 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
     }
   })
 
+  const [mobileOpen, setMobileOpen] = useState<boolean>(false)
+
   const toggleSidebar = useCallback(() => {
     setCollapsed((prev) => {
       const newValue = !prev
@@ -33,8 +38,16 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
     })
   }, [])
 
+  const toggleMobile = useCallback(() => {
+    setMobileOpen((prev) => !prev)
+  }, [])
+
+  const closeMobile = useCallback(() => {
+    setMobileOpen(false)
+  }, [])
+
   return (
-    <SidebarContext.Provider value={{ collapsed, toggleSidebar }}>
+    <SidebarContext.Provider value={{ collapsed, toggleSidebar, mobileOpen, toggleMobile, closeMobile }}>
       {children}
     </SidebarContext.Provider>
   )
