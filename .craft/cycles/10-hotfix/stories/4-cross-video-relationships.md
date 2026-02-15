@@ -8,8 +8,8 @@ created: 2026-02-14
 updated: 2026-02-15
 priority: high
 chunks_total: 2
-chunks_complete: 0
-current_chunk: 0
+chunks_complete: 1
+current_chunk: 2
 ---
 
 # Story: Fix cross-video relationship computation for Related tab

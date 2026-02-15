@@ -1,19 +1,21 @@
-import { eq, and, sql } from 'drizzle-orm'
+import { sql } from 'drizzle-orm'
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres'
 import { db as database, chunks, relationships } from '@/lib/db'
 import type * as schema from '@/lib/db/schema'
 
 /**
- * Computes similarity-based relationships between chunks within a video.
+ * Computes similarity-based relationships between chunks for a video.
  *
- * Uses cosine similarity on existing embeddings to find related chunks.
+ * Uses pgvector's cosine distance operator (<=>) to find related chunks.
+ * Compares the video's chunks against ALL chunks (same-video + cross-video).
+ * Creates bidirectional relationships (A->B and B->A) for graph traversal.
  * Only creates edges where similarity > threshold (default 0.75).
  *
  * Algorithm:
- * 1. Fetch all chunks with embeddings for the video
- * 2. Compute pairwise similarity in-memory
- * 3. Filter by threshold
- * 4. Batch insert relationships (with conflict handling)
+ * 1. Use SQL with pgvector <=> to compare video chunks against ALL chunks
+ * 2. Filter by threshold in SQL
+ * 3. Insert bidirectional relationships (both directions)
+ * 4. Handle conflicts gracefully with onConflictDoNothing
  *
  * @param videoId - The video to compute relationships for
  * @param options - Optional configuration
@@ -33,69 +35,65 @@ export async function computeRelationships(
   const threshold = options?.threshold ?? 0.75
   const onProgress = options?.onProgress
 
-  // Fetch all chunks with embeddings for this video
-  const videoChunks = await db
-    .select({
-      id: chunks.id,
-      embedding: chunks.embedding,
-    })
-    .from(chunks)
-    .where(and(eq(chunks.videoId, videoId), sql`${chunks.embedding} IS NOT NULL`))
+  // Use pgvector to find similar chunks via SQL
+  // Compare this video's chunks against ALL chunks (cross-video + same-video)
+  // pgvector's <=> operator returns cosine distance (0 = identical, 2 = opposite)
+  // Convert to similarity: 1 - distance
+  const similarityResults = await db.execute<{
+    source_id: number
+    target_id: number
+    similarity: number
+  }>(sql`
+    SELECT
+      c1.id AS source_id,
+      c2.id AS target_id,
+      1 - (c1.embedding <=> c2.embedding) AS similarity
+    FROM ${chunks} c1
+    CROSS JOIN ${chunks} c2
+    WHERE c1.video_id = ${videoId}
+      AND c2.id != c1.id
+      AND c1.embedding IS NOT NULL
+      AND c2.embedding IS NOT NULL
+      AND 1 - (c1.embedding <=> c2.embedding) > ${threshold}
+  `)
 
-  // Early return if no chunks or only one chunk
-  if (videoChunks.length < 2) {
+  const similarChunks = similarityResults.rows
+
+  // Early return if no relationships to create
+  if (similarChunks.length === 0) {
+    if (onProgress) {
+      onProgress(0, 0)
+    }
     return { created: 0, skipped: 0 }
   }
 
-  // Convert embeddings from string to number arrays
-  const chunksWithVectors = videoChunks.map(chunk => ({
-    id: chunk.id,
-    vector: chunk.embedding as unknown as number[],
-  }))
+  // Progress: we know how many similarities we found
+  if (onProgress) {
+    onProgress(similarChunks.length, similarChunks.length)
+  }
 
-  // Compute pairwise similarities
+  // Create bidirectional relationships
+  // For each (A, B, similarity), insert both (A->B) and (B->A)
   const relationshipsToCreate: Array<{
     sourceChunkId: number
     targetChunkId: number
     similarity: number
   }> = []
 
-  const totalComparisons = (chunksWithVectors.length * (chunksWithVectors.length - 1)) / 2
-  let processed = 0
+  for (const row of similarChunks) {
+    // Forward direction: source -> target
+    relationshipsToCreate.push({
+      sourceChunkId: row.source_id,
+      targetChunkId: row.target_id,
+      similarity: row.similarity,
+    })
 
-  for (let i = 0; i < chunksWithVectors.length; i++) {
-    const source = chunksWithVectors[i]!
-
-    for (let j = i + 1; j < chunksWithVectors.length; j++) {
-      const target = chunksWithVectors[j]!
-
-      // Compute cosine similarity
-      const similarity = cosineSimilarity(source.vector, target.vector)
-
-      // Only create relationship if above threshold
-      if (similarity > threshold) {
-        relationshipsToCreate.push({
-          sourceChunkId: source.id,
-          targetChunkId: target.id,
-          similarity,
-        })
-      }
-
-      processed++
-      if (onProgress && processed % 10 === 0) {
-        onProgress(processed, totalComparisons)
-      }
-    }
-  }
-
-  // Final progress update
-  if (onProgress) {
-    onProgress(totalComparisons, totalComparisons)
-  }
-
-  // Early return if no relationships to create
-  if (relationshipsToCreate.length === 0) {
-    return { created: 0, skipped: 0 }
+    // Reverse direction: target -> source
+    relationshipsToCreate.push({
+      sourceChunkId: row.target_id,
+      targetChunkId: row.source_id,
+      similarity: row.similarity,
+    })
   }
 
   // Batch insert relationships

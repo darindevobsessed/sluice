@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, afterAll, vi } from 'vitest'
+import { eq } from 'drizzle-orm'
 import { setupTestDb, teardownTestDb, getTestDb, schema } from '@/lib/db/__tests__/setup'
 import { computeRelationships } from '../compute-relationships'
 
@@ -100,8 +101,9 @@ describe('computeRelationships', () => {
 
       const result = await computeRelationships(video!.id, undefined, db)
 
-      // With 3 chunks, we expect 3 relationships: 0->1, 0->2, 1->2 (directional, i < j only)
-      expect(result.created).toBe(3)
+      // With 3 chunks and bidirectional relationships:
+      // 3 pairs (0-1, 0-2, 1-2) × 2 directions = 6 relationships
+      expect(result.created).toBe(6)
     })
   })
 
@@ -148,8 +150,8 @@ describe('computeRelationships', () => {
       // Use default threshold 0.75
       const result = await computeRelationships(video!.id, undefined, db)
 
-      // Should only create relationship between first two chunks
-      expect(result.created).toBe(1)
+      // Should only create relationship between first two chunks (bidirectional = 2 rows)
+      expect(result.created).toBe(2)
     })
 
     it('respects custom threshold', async () => {
@@ -181,10 +183,10 @@ describe('computeRelationships', () => {
         },
       ])
 
-      // With threshold 0.99, identical embeddings should still pass
+      // With threshold 0.99, identical embeddings should still pass (bidirectional = 2 rows)
       const result = await computeRelationships(video!.id, { threshold: 0.99 }, db)
 
-      expect(result.created).toBe(1)
+      expect(result.created).toBe(2)
     })
   })
 
@@ -328,14 +330,14 @@ describe('computeRelationships', () => {
         },
       ])
 
-      // First run
+      // First run (bidirectional = 2 rows)
       const result1 = await computeRelationships(video!.id, undefined, db)
-      expect(result1.created).toBe(1)
+      expect(result1.created).toBe(2)
 
-      // Second run
+      // Second run - SQL finds same pair again, attempts to create bidirectional (4 attempts total)
       const result2 = await computeRelationships(video!.id, undefined, db)
       expect(result2.created).toBe(0) // No new relationships
-      expect(result2.skipped).toBe(1) // Existing relationship skipped
+      expect(result2.skipped).toBe(4) // 2 pairs × 2 directions = 4 skipped
     })
   })
 
@@ -417,6 +419,244 @@ describe('computeRelationships', () => {
 
       // Should not throw without progress callback
       await expect(computeRelationships(video!.id, undefined, db)).resolves.toBeDefined()
+    })
+  })
+
+  describe('cross-video relationships', () => {
+    it('creates relationships between chunks from different videos', async () => {
+      const db = getTestDb()
+
+      // Create two videos
+      const [videoA] = await db.insert(schema.videos).values({
+        youtubeId: 'video-a',
+        title: 'Video A',
+        channel: 'Test Channel',
+        transcript: 'Video A transcript',
+        duration: 600,
+      }).returning()
+
+      const [videoB] = await db.insert(schema.videos).values({
+        youtubeId: 'video-b',
+        title: 'Video B',
+        channel: 'Test Channel',
+        transcript: 'Video B transcript',
+        duration: 600,
+      }).returning()
+
+      // Create chunks with similar embeddings across videos
+      const similarEmbedding = new Array(384).fill(0.9)
+
+      const [chunkA] = await db.insert(schema.chunks).values({
+        videoId: videoA!.id,
+        content: 'Chunk from Video A',
+        startTime: 0,
+        endTime: 10,
+        embedding: similarEmbedding,
+      }).returning()
+
+      const [chunkB] = await db.insert(schema.chunks).values({
+        videoId: videoB!.id,
+        content: 'Chunk from Video B',
+        startTime: 0,
+        endTime: 10,
+        embedding: [...similarEmbedding],
+      }).returning()
+
+      // Compute relationships for video A
+      const result = await computeRelationships(videoA!.id, undefined, db)
+
+      expect(result.created).toBeGreaterThan(0)
+
+      // Verify cross-video relationship exists (A -> B)
+      const allRelationships = await db
+        .select()
+        .from(schema.relationships)
+
+      const crossVideoRelationship = allRelationships.find(
+        r => r.sourceChunkId === chunkA!.id && r.targetChunkId === chunkB!.id
+      )
+
+      expect(crossVideoRelationship).toBeDefined()
+      expect(crossVideoRelationship!.similarity).toBeGreaterThan(0.75)
+    })
+
+    it('creates bidirectional relationships', async () => {
+      const db = getTestDb()
+
+      // Create two videos
+      const [videoA] = await db.insert(schema.videos).values({
+        youtubeId: 'video-a',
+        title: 'Video A',
+        channel: 'Test Channel',
+        transcript: 'Video A transcript',
+        duration: 600,
+      }).returning()
+
+      const [videoB] = await db.insert(schema.videos).values({
+        youtubeId: 'video-b',
+        title: 'Video B',
+        channel: 'Test Channel',
+        transcript: 'Video B transcript',
+        duration: 600,
+      }).returning()
+
+      // Create chunks with similar embeddings
+      const embedding = new Array(384).fill(0.9)
+
+      const [chunkA] = await db.insert(schema.chunks).values({
+        videoId: videoA!.id,
+        content: 'Chunk from Video A',
+        startTime: 0,
+        endTime: 10,
+        embedding,
+      }).returning()
+
+      const [chunkB] = await db.insert(schema.chunks).values({
+        videoId: videoB!.id,
+        content: 'Chunk from Video B',
+        startTime: 0,
+        endTime: 10,
+        embedding: [...embedding],
+      }).returning()
+
+      // Compute relationships for video A
+      await computeRelationships(videoA!.id, undefined, db)
+
+      // Verify BOTH directions exist (A -> B and B -> A)
+      const allRelationships = await db
+        .select()
+        .from(schema.relationships)
+
+      const aToB = allRelationships.find(
+        r => r.sourceChunkId === chunkA!.id && r.targetChunkId === chunkB!.id
+      )
+      const bToA = allRelationships.find(
+        r => r.sourceChunkId === chunkB!.id && r.targetChunkId === chunkA!.id
+      )
+
+      expect(aToB).toBeDefined()
+      expect(bToA).toBeDefined()
+      expect(aToB!.similarity).toBe(bToA!.similarity)
+    })
+
+    it('enables traverse.ts to find relationships from either direction', async () => {
+      const db = getTestDb()
+
+      // Create two videos
+      const [videoA] = await db.insert(schema.videos).values({
+        youtubeId: 'video-a',
+        title: 'Video A',
+        channel: 'Test Channel',
+        transcript: 'Video A transcript',
+        duration: 600,
+      }).returning()
+
+      const [videoB] = await db.insert(schema.videos).values({
+        youtubeId: 'video-b',
+        title: 'Video B',
+        channel: 'Test Channel',
+        transcript: 'Video B transcript',
+        duration: 600,
+      }).returning()
+
+      // Create chunks with similar embeddings
+      const embedding = new Array(384).fill(0.9)
+
+      await db.insert(schema.chunks).values({
+        videoId: videoA!.id,
+        content: 'Chunk from Video A',
+        startTime: 0,
+        endTime: 10,
+        embedding,
+      })
+
+      await db.insert(schema.chunks).values({
+        videoId: videoB!.id,
+        content: 'Chunk from Video B',
+        startTime: 0,
+        endTime: 10,
+        embedding: [...embedding],
+      })
+
+      // Compute relationships for video A only
+      await computeRelationships(videoA!.id, undefined, db)
+
+      // Query from video B's perspective (should find relationship due to bidirectional insert)
+      const relationshipsFromB = await db
+        .select()
+        .from(schema.relationships)
+        .innerJoin(schema.chunks, eq(schema.relationships.sourceChunkId, schema.chunks.id))
+        .where(eq(schema.chunks.videoId, videoB!.id))
+
+      expect(relationshipsFromB.length).toBeGreaterThan(0)
+    })
+
+    it('compares against all existing chunks not just same video', async () => {
+      const db = getTestDb()
+
+      // Create three videos
+      const [videoA] = await db.insert(schema.videos).values({
+        youtubeId: 'video-a',
+        title: 'Video A',
+        channel: 'Test Channel',
+        transcript: 'Video A transcript',
+        duration: 600,
+      }).returning()
+
+      const [videoB] = await db.insert(schema.videos).values({
+        youtubeId: 'video-b',
+        title: 'Video B',
+        channel: 'Test Channel',
+        transcript: 'Video B transcript',
+        duration: 600,
+      }).returning()
+
+      const [videoC] = await db.insert(schema.videos).values({
+        youtubeId: 'video-c',
+        title: 'Video C',
+        channel: 'Test Channel',
+        transcript: 'Video C transcript',
+        duration: 600,
+      }).returning()
+
+      // Create similar chunks across all videos
+      const embedding = new Array(384).fill(0.9)
+
+      const [chunkA] = await db.insert(schema.chunks).values({
+        videoId: videoA!.id,
+        content: 'Chunk from Video A',
+        startTime: 0,
+        endTime: 10,
+        embedding,
+      }).returning()
+
+      await db.insert(schema.chunks).values({
+        videoId: videoB!.id,
+        content: 'Chunk from Video B',
+        startTime: 0,
+        endTime: 10,
+        embedding: [...embedding],
+      })
+
+      await db.insert(schema.chunks).values({
+        videoId: videoC!.id,
+        content: 'Chunk from Video C',
+        startTime: 0,
+        endTime: 10,
+        embedding: [...embedding],
+      })
+
+      // Compute relationships for video A
+      await computeRelationships(videoA!.id, undefined, db)
+
+      // Count relationships from chunk A
+      const relationshipsFromA = await db
+        .select()
+        .from(schema.relationships)
+        .where(eq(schema.relationships.sourceChunkId, chunkA!.id))
+
+      // Should have relationships to both B and C
+      expect(relationshipsFromA.length).toBeGreaterThanOrEqual(2)
     })
   })
 })

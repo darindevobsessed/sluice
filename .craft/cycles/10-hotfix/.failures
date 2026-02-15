@@ -1508,3 +1508,362 @@ This ensures that you're testing the behavior the user would see in the browser.
  [32m✓[39m src/components/discovery/__tests__/ChannelFilterDropdown.test.tsx [2m([22m[2m8 tests[22m[2m)[22m[33m 635[2mms[22m[39m
  [32m✓[39m src/hooks/__tests__/useEnsemble.test.ts [2m([22m[2m14 tests[22m[2m)[22m[33m 569[2mms[22m[39m
  [32m✓[39m src/components/insights/__tests__/InsightsPanel.test.tsx [2m([22m[2m21 tests[22m[2m)[22m[33m 506[2mms[22m[39m
+---
+timestamp: "2026-02-15 14:08:36"
+story: "4-cross-video-relationships"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 4 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/lib/graph/__tests__/compute-relationships.test.ts[2m > [22mcomputeRelationships[2m > [22mcross-video relationships[2m > [22mcreates relationships between chunks from different videos
+[31m[1mAssertionError[22m: expected 0 to be greater than 0[39m
+[36m [2m❯[22m src/lib/graph/__tests__/compute-relationships.test.ts:[2m466:30[22m[39m
+    [90m464| [39m      const result = await computeRelationships(videoA!.id, undefined,…
+    [90m465| [39m
+    [90m466| [39m      [34mexpect[39m(result[33m.[39mcreated)[33m.[39m[34mtoBeGreaterThan[39m([34m0[39m)
+    [90m   | [39m                             [31m^[39m
+    [90m467| [39m
+    [90m468| [39m      [90m// Verify cross-video relationship exists (A -> B)[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/lib/graph/__tests__/compute-relationships.test.ts[2m > [22mcomputeRelationships[2m > [22mcross-video relationships[2m > [22mcreates bidirectional relationships
+[31m[1mAssertionError[22m: expected undefined to be defined[39m
+[36m [2m❯[22m src/lib/graph/__tests__/compute-relationships.test.ts:[2m535:20[22m[39m
+    [90m533| [39m      )
+    [90m534| [39m
+    [90m535| [39m      [34mexpect[39m(aToB)[33m.[39m[34mtoBeDefined[39m()
+    [90m   | [39m                   [31m^[39m
+    [90m536| [39m      [34mexpect[39m(bToA)[33m.[39m[34mtoBeDefined[39m()
+    [90m537| [39m      [34mexpect[39m(aToB[33m![39m[33m.[39msimilarity)[33m.[39m[34mtoBe[39m(bToA[33m![39m[33m.[39msimilarity)
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/lib/graph/__tests__/compute-relationships.test.ts[2m > [22mcomputeRelationships[2m > [22mcross-video relationships[2m > [22menables traverse.ts to find relationships from either direction
+[31m[1mTypeError[22m: __vite_ssr_import_1__.schema.eq is not a function[39m
+[36m [2m❯[22m src/lib/graph/__tests__/compute-relationships.test.ts:[2m586:42[22m[39m
+    [90m584| [39m        [33m.[39m[34mselect[39m()
+    [90m585| [39m        [33m.[39m[35mfrom[39m(schema[33m.[39mrelationships)
+    [90m586| [39m        .innerJoin(schema.chunks, schema.eq(schema.relationships.sourc…
+    [90m   | [39m                                         [31m^[39m
+    [90m587| [39m        [33m.[39m[34mwhere[39m(schema[33m.[39m[34meq[39m(schema[33m.[39mchunks[33m.[39mvideoId[33m,[39m videoB[33m![39m[33m.[39mid))
+    [90m588| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/lib/graph/__tests__/compute-relationships.test.ts[2m > [22mcomputeRelationships[2m > [22mcross-video relationships[2m > [22mcompares against all existing chunks not just same video
+[31m[1mTypeError[22m: __vite_ssr_import_1__.schema.eq is not a function[39m
+[36m [2m❯[22m src/lib/graph/__tests__/compute-relationships.test.ts:[2m654:23[22m[39m
+    [90m652| [39m        [33m.[39m[34mselect[39m()
+    [90m653| [39m        [33m.[39m[35mfrom[39m(schema[33m.[39mrelationships)
+    [90m654| [39m        .where(schema.eq(schema.relationships.sourceChunkId, chunkA!.i…
+    [90m   | [39m                      [31m^[39m
+    [90m655| [39m
+    [90m656| [39m      [90m// Should have relationships to both B and C[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/lib/graph/__tests__/compute-relationships.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/lib/graph/__tests__/compute-relationships.test.ts [2m([22m[2m15 tests[22m[2m | [22m[31m4 failed[39m[2m)[22m[33m 1366[2mms[22m[39m
+       [32m✓[39m creates relationships between similar chunks[32m 215[2mms[22m[39m
+       [32m✓[39m returns correct counts[32m 81[2mms[22m[39m
+       [32m✓[39m only creates relationships above threshold[32m 85[2mms[22m[39m
+       [32m✓[39m respects custom threshold[32m 73[2mms[22m[39m
+       [32m✓[39m handles empty video (no chunks)[32m 68[2mms[22m[39m
+       [32m✓[39m handles video with single chunk[32m 82[2mms[22m[39m
+       [32m✓[39m handles chunks without embeddings[32m 79[2mms[22m[39m
+       [32m✓[39m skips self-relationships[32m 97[2mms[22m[39m
+       [32m✓[39m prevents duplicate relationships on re-run[32m 84[2mms[22m[39m
+       [32m✓[39m calls progress callback with updates[32m 82[2mms[22m[39m
+       [32m✓[39m works without progress callback[32m 85[2mms[22m[39m
+[31m       [31m×[31m creates relationships between chunks from different videos[39m[32m 94[2mms[22m[39m
+[31m       [31m×[31m creates bidirectional relationships[39m[32m 87[2mms[22m[39m
+[31m       [31m×[31m enables traverse.ts to find relationships from either direction[39m[32m 73[2mms[22m[39m
+[31m       [31m×[31m compares against all existing chunks not just same video[39m[32m 78[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m4 failed[39m[22m[2m | [22m[1m[32m11 passed[39m[22m[90m (15)[39m
+[2m   Start at [22m 08:08:30
+[2m   Duration [22m 5.75s[2m (transform 129ms, setup 409ms, import 832ms, tests 1.37s, environment 2.82s)[22m
+---
+timestamp: "2026-02-15 14:08:55"
+story: "4-cross-video-relationships"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 4 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/lib/graph/__tests__/compute-relationships.test.ts[2m > [22mcomputeRelationships[2m > [22mcross-video relationships[2m > [22mcreates relationships between chunks from different videos
+[31m[1mAssertionError[22m: expected 0 to be greater than 0[39m
+[36m [2m❯[22m src/lib/graph/__tests__/compute-relationships.test.ts:[2m467:30[22m[39m
+    [90m465| [39m      const result = await computeRelationships(videoA!.id, undefined,…
+    [90m466| [39m
+    [90m467| [39m      [34mexpect[39m(result[33m.[39mcreated)[33m.[39m[34mtoBeGreaterThan[39m([34m0[39m)
+    [90m   | [39m                             [31m^[39m
+    [90m468| [39m
+    [90m469| [39m      [90m// Verify cross-video relationship exists (A -> B)[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/lib/graph/__tests__/compute-relationships.test.ts[2m > [22mcomputeRelationships[2m > [22mcross-video relationships[2m > [22mcreates bidirectional relationships
+[31m[1mAssertionError[22m: expected undefined to be defined[39m
+[36m [2m❯[22m src/lib/graph/__tests__/compute-relationships.test.ts:[2m536:20[22m[39m
+    [90m534| [39m      )
+    [90m535| [39m
+    [90m536| [39m      [34mexpect[39m(aToB)[33m.[39m[34mtoBeDefined[39m()
+    [90m   | [39m                   [31m^[39m
+    [90m537| [39m      [34mexpect[39m(bToA)[33m.[39m[34mtoBeDefined[39m()
+    [90m538| [39m      [34mexpect[39m(aToB[33m![39m[33m.[39msimilarity)[33m.[39m[34mtoBe[39m(bToA[33m![39m[33m.[39msimilarity)
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/lib/graph/__tests__/compute-relationships.test.ts[2m > [22mcomputeRelationships[2m > [22mcross-video relationships[2m > [22menables traverse.ts to find relationships from either direction
+[31m[1mAssertionError[22m: expected 0 to be greater than 0[39m
+[36m [2m❯[22m src/lib/graph/__tests__/compute-relationships.test.ts:[2m590:41[22m[39m
+    [90m588| [39m        [33m.[39m[34mwhere[39m([34meq[39m(schema[33m.[39mchunks[33m.[39mvideoId[33m,[39m videoB[33m![39m[33m.[39mid))
+    [90m589| [39m
+    [90m590| [39m      [34mexpect[39m(relationshipsFromB[33m.[39mlength)[33m.[39m[34mtoBeGreaterThan[39m([34m0[39m)
+    [90m   | [39m                                        [31m^[39m
+    [90m591| [39m    })
+    [90m592| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/lib/graph/__tests__/compute-relationships.test.ts[2m > [22mcomputeRelationships[2m > [22mcross-video relationships[2m > [22mcompares against all existing chunks not just same video
+[31m[1mAssertionError[22m: expected 0 to be greater than or equal to 2[39m
+[36m [2m❯[22m src/lib/graph/__tests__/compute-relationships.test.ts:[2m658:41[22m[39m
+    [90m656| [39m
+    [90m657| [39m      [90m// Should have relationships to both B and C[39m
+    [90m658| [39m      [34mexpect[39m(relationshipsFromA[33m.[39mlength)[33m.[39m[34mtoBeGreaterThanOrEqual[39m([34m2[39m)
+    [90m   | [39m                                        [31m^[39m
+    [90m659| [39m    })
+    [90m660| [39m  })
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/lib/graph/__tests__/compute-relationships.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/lib/graph/__tests__/compute-relationships.test.ts [2m([22m[2m15 tests[22m[2m | [22m[31m4 failed[39m[2m)[22m[33m 1393[2mms[22m[39m
+       [32m✓[39m creates relationships between similar chunks[32m 138[2mms[22m[39m
+       [32m✓[39m returns correct counts[32m 94[2mms[22m[39m
+       [32m✓[39m only creates relationships above threshold[32m 73[2mms[22m[39m
+       [32m✓[39m respects custom threshold[32m 87[2mms[22m[39m
+       [32m✓[39m handles empty video (no chunks)[32m 100[2mms[22m[39m
+       [32m✓[39m handles video with single chunk[32m 96[2mms[22m[39m
+       [32m✓[39m handles chunks without embeddings[32m 98[2mms[22m[39m
+       [32m✓[39m skips self-relationships[32m 102[2mms[22m[39m
+       [32m✓[39m prevents duplicate relationships on re-run[32m 101[2mms[22m[39m
+       [32m✓[39m calls progress callback with updates[32m 91[2mms[22m[39m
+       [32m✓[39m works without progress callback[32m 86[2mms[22m[39m
+[31m       [31m×[31m creates relationships between chunks from different videos[39m[32m 87[2mms[22m[39m
+[31m       [31m×[31m creates bidirectional relationships[39m[32m 83[2mms[22m[39m
+[31m       [31m×[31m enables traverse.ts to find relationships from either direction[39m[32m 77[2mms[22m[39m
+[31m       [31m×[31m compares against all existing chunks not just same video[39m[32m 79[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m4 failed[39m[22m[2m | [22m[1m[32m11 passed[39m[22m[90m (15)[39m
+[2m   Start at [22m 08:08:51
+[2m   Duration [22m 3.82s[2m (transform 123ms, setup 164ms, import 750ms, tests 1.39s, environment 1.09s)[22m
+---
+timestamp: "2026-02-15 14:09:36"
+story: "4-cross-video-relationships"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 4 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/lib/graph/__tests__/compute-relationships.test.ts[2m > [22mcomputeRelationships[2m > [22mnormal operation[2m > [22mreturns correct counts
+[31m[1mAssertionError[22m: expected 6 to be 3 // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 3[39m
+[31m+ 6[39m
+
+[36m [2m❯[22m src/lib/graph/__tests__/compute-relationships.test.ts:[2m105:30[22m[39m
+    [90m103| [39m
+    [90m104| [39m      // With 3 chunks, we expect 3 relationships: 0->1, 0->2, 1->2 (d…
+    [90m105| [39m      [34mexpect[39m(result[33m.[39mcreated)[33m.[39m[34mtoBe[39m([34m3[39m)
+    [90m   | [39m                             [31m^[39m
+    [90m106| [39m    })
+    [90m107| [39m  })
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/lib/graph/__tests__/compute-relationships.test.ts[2m > [22mcomputeRelationships[2m > [22mthreshold filtering[2m > [22monly creates relationships above threshold
+[31m[1mAssertionError[22m: expected 2 to be 1 // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 1[39m
+[31m+ 2[39m
+
+[36m [2m❯[22m src/lib/graph/__tests__/compute-relationships.test.ts:[2m153:30[22m[39m
+    [90m151| [39m
+    [90m152| [39m      [90m// Should only create relationship between first two chunks[39m
+    [90m153| [39m      [34mexpect[39m(result[33m.[39mcreated)[33m.[39m[34mtoBe[39m([34m1[39m)
+    [90m   | [39m                             [31m^[39m
+    [90m154| [39m    })
+    [90m155| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/lib/graph/__tests__/compute-relationships.test.ts[2m > [22mcomputeRelationships[2m > [22mthreshold filtering[2m > [22mrespects custom threshold
+[31m[1mAssertionError[22m: expected 2 to be 1 // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 1[39m
+[31m+ 2[39m
+
+[36m [2m❯[22m src/lib/graph/__tests__/compute-relationships.test.ts:[2m188:30[22m[39m
+    [90m186| [39m      const result = await computeRelationships(video!.id, { threshold…
+    [90m187| [39m
+    [90m188| [39m      [34mexpect[39m(result[33m.[39mcreated)[33m.[39m[34mtoBe[39m([34m1[39m)
+    [90m   | [39m                             [31m^[39m
+    [90m189| [39m    })
+    [90m190| [39m  })
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/lib/graph/__tests__/compute-relationships.test.ts[2m > [22mcomputeRelationships[2m > [22medge cases[2m > [22mprevents duplicate relationships on re-run
+[31m[1mAssertionError[22m: expected 2 to be 1 // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 1[39m
+[31m+ 2[39m
+
+[36m [2m❯[22m src/lib/graph/__tests__/compute-relationships.test.ts:[2m334:31[22m[39m
+    [90m332| [39m      [90m// First run[39m
+    [90m333| [39m      const result1 = await computeRelationships(video!.id, undefined,…
+    [90m334| [39m      [34mexpect[39m(result1[33m.[39mcreated)[33m.[39m[34mtoBe[39m([34m1[39m)
+    [90m   | [39m                              [31m^[39m
+    [90m335| [39m
+    [90m336| [39m      [90m// Second run[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/lib/graph/__tests__/compute-relationships.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/lib/graph/__tests__/compute-relationships.test.ts [2m([22m[2m15 tests[22m[2m | [22m[31m4 failed[39m[2m)[22m[33m 1307[2mms[22m[39m
+       [32m✓[39m creates relationships between similar chunks[32m 133[2mms[22m[39m
+[31m       [31m×[31m returns correct counts[39m[32m 93[2mms[22m[39m
+[31m       [31m×[31m only creates relationships above threshold[39m[32m 84[2mms[22m[39m
+[31m       [31m×[31m respects custom threshold[39m[32m 88[2mms[22m[39m
+       [32m✓[39m handles empty video (no chunks)[32m 118[2mms[22m[39m
+       [32m✓[39m handles video with single chunk[32m 73[2mms[22m[39m
+       [32m✓[39m handles chunks without embeddings[32m 71[2mms[22m[39m
+       [32m✓[39m skips self-relationships[32m 82[2mms[22m[39m
+[31m       [31m×[31m prevents duplicate relationships on re-run[39m[32m 75[2mms[22m[39m
+       [32m✓[39m calls progress callback with updates[32m 81[2mms[22m[39m
+       [32m✓[39m works without progress callback[32m 73[2mms[22m[39m
+       [32m✓[39m creates relationships between chunks from different videos[32m 83[2mms[22m[39m
+       [32m✓[39m creates bidirectional relationships[32m 77[2mms[22m[39m
+       [32m✓[39m enables traverse.ts to find relationships from either direction[32m 84[2mms[22m[39m
+       [32m✓[39m compares against all existing chunks not just same video[32m 88[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m4 failed[39m[22m[2m | [22m[1m[32m11 passed[39m[22m[90m (15)[39m
+[2m   Start at [22m 08:09:32
+[2m   Duration [22m 3.51s[2m (transform 117ms, setup 172ms, import 704ms, tests 1.31s, environment 934ms)[22m
+---
+timestamp: "2026-02-15 14:10:04"
+story: "4-cross-video-relationships"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/lib/graph/__tests__/compute-relationships.test.ts[2m > [22mcomputeRelationships[2m > [22medge cases[2m > [22mprevents duplicate relationships on re-run
+[31m[1mAssertionError[22m: expected 4 to be 2 // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 2[39m
+[31m+ 4[39m
+
+[36m [2m❯[22m src/lib/graph/__tests__/compute-relationships.test.ts:[2m340:31[22m[39m
+    [90m338| [39m      const result2 = await computeRelationships(video!.id, undefined,…
+    [90m339| [39m      [34mexpect[39m(result2[33m.[39mcreated)[33m.[39m[34mtoBe[39m([34m0[39m) [90m// No new relationships[39m
+    [90m340| [39m      [34mexpect[39m(result2[33m.[39mskipped)[33m.[39m[34mtoBe[39m([34m2[39m) [90m// Both directions skipped[39m
+    [90m   | [39m                              [31m^[39m
+    [90m341| [39m    })
+    [90m342| [39m  })
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+
+> gold-miner@0.1.0 test
+> vitest run src/lib/graph/__tests__/compute-relationships.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/darindrobinski/dev/repos/gold-miner[39m
+
+ [31m❯[39m src/lib/graph/__tests__/compute-relationships.test.ts [2m([22m[2m15 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 1648[2mms[22m[39m
+       [32m✓[39m creates relationships between similar chunks[32m 153[2mms[22m[39m
+       [32m✓[39m returns correct counts[32m 95[2mms[22m[39m
+       [32m✓[39m only creates relationships above threshold[32m 75[2mms[22m[39m
+       [32m✓[39m respects custom threshold[32m 84[2mms[22m[39m
+       [32m✓[39m handles empty video (no chunks)[32m 100[2mms[22m[39m
+       [32m✓[39m handles video with single chunk[32m 102[2mms[22m[39m
+       [32m✓[39m handles chunks without embeddings[32m 113[2mms[22m[39m
+       [32m✓[39m skips self-relationships[32m 129[2mms[22m[39m
+[31m       [31m×[31m prevents duplicate relationships on re-run[39m[32m 149[2mms[22m[39m
+       [32m✓[39m calls progress callback with updates[32m 116[2mms[22m[39m
+       [32m✓[39m works without progress callback[32m 123[2mms[22m[39m
+       [32m✓[39m creates relationships between chunks from different videos[32m 112[2mms[22m[39m
+       [32m✓[39m creates bidirectional relationships[32m 102[2mms[22m[39m
+       [32m✓[39m enables traverse.ts to find relationships from either direction[32m 94[2mms[22m[39m
+       [32m✓[39m compares against all existing chunks not just same video[32m 99[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m14 passed[39m[22m[90m (15)[39m
+[2m   Start at [22m 08:10:00
+[2m   Duration [22m 3.87s[2m (transform 119ms, setup 174ms, import 703ms, tests 1.65s, environment 962ms)[22m
+---
+timestamp: "2026-02-15 14:10:45"
+story: "4-cross-video-relationships"
+chunk: "unknown"
+tool: "Bash"
+error: |
+  Exit code 1
+npm error Missing script: "typecheck"
+npm error
+npm error To see a list of scripts, run:
+npm error   npm run
+npm error A complete log of this run can be found in: /Users/darindrobinski/.npm/_logs/2026-02-15T14_10_45_613Z-debug-0.log
