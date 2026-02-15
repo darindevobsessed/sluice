@@ -1,15 +1,15 @@
 ---
 name: cross-video-relationships
 title: Fix cross-video relationship computation for Related tab
-status: active
+status: complete
 cycle: hotfix
 story_number: 4
 created: 2026-02-14
 updated: 2026-02-15
 priority: high
 chunks_total: 2
-chunks_complete: 1
-current_chunk: 2
+chunks_complete: 2
+current_chunk: 3
 ---
 
 # Story: Fix cross-video relationship computation for Related tab

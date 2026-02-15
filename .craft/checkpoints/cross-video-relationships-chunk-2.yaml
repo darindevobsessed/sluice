@@ -1,0 +1,17 @@
+story: "cross-video-relationships"
+chunk: 2
+total_chunks: 2
+cycle: "10-hotfix"
+timestamp: "2026-02-15T14:19:29Z"
+git_ref: "3345c76"
+git_branch: "main"
+state_CYCLE_STATUS: "active"
+state_CURRENT_STORY: "4-cross-video-relationships"
+state_CURRENT_CHUNK: "2"
+state_TOTAL_CHUNKS: "2"
+state_LAST_VALIDATION: "2026-02-15T14:19:22Z"
+story_status: "active"
+story_chunks_total: "2"
+story_chunks_complete: "1"
+test_status: ""
+modified_files: ".craft/.global-state .craft/checkpoints/cross-video-relationships-chunk-1.yaml .craft/cycles/10-hotfix/.failures .craft/cycles/10-hotfix/.state .craft/cycles/10-hotfix/stories/4-cross-video-relationships.md src/lib/graph/__tests__/compute-relationships.test.ts src/lib/graph/compute-relationships.ts "
