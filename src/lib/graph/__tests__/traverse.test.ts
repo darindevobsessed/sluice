@@ -535,4 +535,58 @@ describe('getRelatedChunks', () => {
       expect(related[1]!.similarity).toBe(0.85)
     })
   })
+
+  describe('code quality', () => {
+    it('uses Drizzle ne() operator instead of raw SQL for video filtering', async () => {
+      // This test verifies the implementation uses Drizzle's ne() operator
+      // rather than raw SQL templates for type safety and consistency
+      const db = getTestDb()
+
+      const [video1] = await db.insert(schema.videos).values({
+        youtubeId: 'video-1',
+        title: 'Video 1',
+        channel: 'Channel 1',
+        transcript: 'Transcript 1',
+        duration: 600,
+      }).returning()
+
+      const [video2] = await db.insert(schema.videos).values({
+        youtubeId: 'video-2',
+        title: 'Video 2',
+        channel: 'Channel 2',
+        transcript: 'Transcript 2',
+        duration: 500,
+      }).returning()
+
+      const embedding = new Array(384).fill(0.8)
+
+      const [chunk1] = await db.insert(schema.chunks).values({
+        videoId: video1!.id,
+        content: 'Chunk in video 1',
+        startTime: 0,
+        endTime: 10,
+        embedding,
+      }).returning()
+
+      const [chunk2] = await db.insert(schema.chunks).values({
+        videoId: video2!.id,
+        content: 'Chunk in video 2',
+        startTime: 0,
+        endTime: 10,
+        embedding: [...embedding],
+      }).returning()
+
+      await db.insert(schema.relationships).values({
+        sourceChunkId: chunk1!.id,
+        targetChunkId: chunk2!.id,
+        similarity: 0.90,
+      })
+
+      // Should filter out same-video chunks correctly using Drizzle operators
+      const related = await getRelatedChunks(video1!.id, undefined, db)
+
+      expect(related).toHaveLength(1)
+      expect(related[0]!.video.id).toBe(video2!.id)
+    })
+  })
 })

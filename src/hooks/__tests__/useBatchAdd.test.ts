@@ -407,5 +407,58 @@ describe('useBatchAdd', () => {
       expect(result.current.isRunning).toBe(false)
       expect(result.current.results).toEqual({ success: 0, failed: 0 })
     })
+
+    it('enforces maximum batch size limit', async () => {
+      const onComplete = vi.fn()
+
+      // Create 60 videos (over the 50 limit)
+      const videos: DiscoveryVideo[] = []
+      for (let i = 0; i < 60; i++) {
+        videos.push(createMockVideo(`video${i}`))
+      }
+
+      // Mock successful responses for all videos
+      mockFetch.mockImplementation(async () => ({
+        ok: true,
+        status: 201,
+        json: async () => ({ success: true, transcript: 'Test', id: 1 }),
+      }))
+
+      const { result } = renderHook(() => useBatchAdd({ onComplete }))
+
+      // Should throw error or truncate batch
+      expect(() => {
+        result.current.startBatch(videos)
+      }).toThrow(/batch size/i)
+    })
+
+    it('processes batches up to max size successfully', async () => {
+      const onComplete = vi.fn()
+
+      // Create exactly 50 videos (at the limit)
+      const videos: DiscoveryVideo[] = []
+      for (let i = 0; i < 50; i++) {
+        videos.push(createMockVideo(`video${i}`))
+      }
+
+      // Mock successful responses
+      mockFetch.mockImplementation(async () => ({
+        ok: true,
+        status: 201,
+        json: async () => ({ success: true, transcript: 'Test', id: 1 }),
+      }))
+
+      const { result } = renderHook(() => useBatchAdd({ onComplete }))
+
+      // Should NOT throw for exactly 50 videos
+      expect(() => {
+        result.current.startBatch(videos)
+      }).not.toThrow()
+
+      // Should initialize all 50 items
+      await waitFor(() => {
+        expect(result.current.batchStatus.size).toBe(50)
+      })
+    })
   })
 })

@@ -1,4 +1,4 @@
-import { eq, and, sql, desc, inArray } from 'drizzle-orm'
+import { eq, and, sql, desc, inArray, ne } from 'drizzle-orm'
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres'
 import { db as database, chunks, relationships, videos } from '@/lib/db'
 import type * as schema from '@/lib/db/schema'
@@ -38,7 +38,7 @@ export async function getRelatedChunks(
 
   // Filter out same-video chunks unless includeWithinVideo is true
   if (!includeWithinVideo) {
-    conditions.push(sql`${chunks.videoId} != ${videoId}`)
+    conditions.push(ne(chunks.videoId, videoId))
   }
 
   const results = await db

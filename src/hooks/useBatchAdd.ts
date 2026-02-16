@@ -21,6 +21,7 @@ interface UseBatchAddReturn {
 }
 
 const CONCURRENCY_LIMIT = 2
+const MAX_BATCH_SIZE = 50
 
 export function useBatchAdd(options?: UseBatchAddOptions): UseBatchAddReturn {
   const { onComplete } = options || {}
@@ -151,6 +152,11 @@ export function useBatchAdd(options?: UseBatchAddOptions): UseBatchAddReturn {
         onComplete()
       }
       return
+    }
+
+    // Enforce max batch size limit
+    if (videos.length > MAX_BATCH_SIZE) {
+      throw new Error(`Batch size (${videos.length}) exceeds maximum allowed (${MAX_BATCH_SIZE})`)
     }
 
     // Reset state
