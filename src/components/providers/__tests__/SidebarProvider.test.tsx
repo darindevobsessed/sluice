@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { render, screen, renderHook, act } from '@testing-library/react'
+import { render, screen, renderHook, act, waitFor } from '@testing-library/react'
 import { SidebarProvider, useSidebar } from '../SidebarProvider'
 
 describe('SidebarProvider', () => {
@@ -39,14 +39,17 @@ describe('SidebarProvider', () => {
       expect(result.current.collapsed).toBe(true)
     })
 
-    it('should toggle collapsed from true to false', () => {
+    it('should toggle collapsed from true to false', async () => {
       localStorage.setItem('gold-miner-sidebar-collapsed', 'true')
 
       const { result } = renderHook(() => useSidebar(), {
         wrapper: SidebarProvider,
       })
 
-      expect(result.current.collapsed).toBe(true)
+      // Wait for localStorage to be read
+      await vi.waitFor(() => {
+        expect(result.current.collapsed).toBe(true)
+      })
 
       act(() => {
         result.current.toggleSidebar()
@@ -83,23 +86,27 @@ describe('SidebarProvider', () => {
   })
 
   describe('localStorage persistence', () => {
-    it('should load collapsed=true from localStorage on mount', () => {
+    it('should load collapsed=true from localStorage after mount', async () => {
       localStorage.setItem('gold-miner-sidebar-collapsed', 'true')
 
       const { result } = renderHook(() => useSidebar(), {
         wrapper: SidebarProvider,
       })
 
-      expect(result.current.collapsed).toBe(true)
+      // Wait for useEffect to run and load from localStorage
+      await waitFor(() => {
+        expect(result.current.collapsed).toBe(true)
+      })
     })
 
-    it('should load collapsed=false from localStorage on mount', () => {
+    it('should load collapsed=false from localStorage after mount', async () => {
       localStorage.setItem('gold-miner-sidebar-collapsed', 'false')
 
       const { result } = renderHook(() => useSidebar(), {
         wrapper: SidebarProvider,
       })
 
+      // Should remain false
       expect(result.current.collapsed).toBe(false)
     })
 

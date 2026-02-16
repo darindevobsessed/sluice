@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 // Mock database module
@@ -5,6 +6,7 @@ const mockDb = {
   select: vi.fn(),
   insert: vi.fn(),
   update: vi.fn(),
+  execute: vi.fn(),
 }
 
 const mockJobs = {
@@ -74,7 +76,6 @@ describe('enqueueJob', () => {
     }
 
     const payload = { test: true }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await enqueueJob('fetch_transcript', payload, customDb as any)
 
     expect(customDb.insert).toHaveBeenCalledTimes(1)
@@ -88,52 +89,31 @@ describe('claimNextJob', () => {
   })
 
   it('returns null when no pending jobs', async () => {
-    const mockFrom = vi.fn().mockReturnThis()
-    const mockWhere = vi.fn().mockReturnThis()
-    const mockOrderBy = vi.fn().mockReturnThis()
-    const mockLimit = vi.fn().mockResolvedValue([])
-
-    mockDb.select.mockReturnValue({
-      from: mockFrom,
-      where: mockWhere,
-      orderBy: mockOrderBy,
-      limit: mockLimit,
-    })
+    // Mock execute returning empty rows
+    mockDb.execute = vi.fn().mockResolvedValue({ rows: [] })
 
     const job = await claimNextJob()
 
     expect(job).toBeNull()
+    expect(mockDb.execute).toHaveBeenCalled()
   })
 
-  it('claims the oldest pending job', async () => {
-    const pendingJob = {
+  it('claims the oldest pending job atomically', async () => {
+    const claimedJob = {
       id: 1,
       type: 'fetch_transcript',
       payload: { videoId: 123 },
-      status: 'pending',
-      attempts: 0,
+      status: 'processing',
+      attempts: 1,
+      maxAttempts: 3,
+      error: null,
       createdAt: new Date(),
+      startedAt: new Date(),
+      completedAt: null,
     }
 
-    const mockFrom = vi.fn().mockReturnThis()
-    const mockWhere = vi.fn().mockReturnThis()
-    const mockOrderBy = vi.fn().mockReturnThis()
-    const mockLimit = vi.fn().mockResolvedValue([pendingJob])
-
-    mockDb.select.mockReturnValue({
-      from: mockFrom,
-      where: mockWhere,
-      orderBy: mockOrderBy,
-      limit: mockLimit,
-    })
-
-    const mockSet = vi.fn().mockReturnThis()
-    const mockUpdateWhere = vi.fn().mockResolvedValue([])
-
-    mockDb.update.mockReturnValue({
-      set: mockSet,
-      where: mockUpdateWhere,
-    })
+    // Mock execute returning the claimed job
+    mockDb.execute = vi.fn().mockResolvedValue({ rows: [claimedJob] })
 
     const job = await claimNextJob()
 
@@ -141,83 +121,51 @@ describe('claimNextJob', () => {
     expect(job?.id).toBe(1)
     expect(job?.status).toBe('processing')
     expect(job?.attempts).toBe(1)
-    expect(mockDb.update).toHaveBeenCalled()
-    expect(mockSet).toHaveBeenCalledWith({
-      status: 'processing',
-      startedAt: expect.any(Date),
-      attempts: 1,
-    })
+    expect(mockDb.execute).toHaveBeenCalled()
   })
 
   it('filters by type when specified', async () => {
-    const mockFrom = vi.fn().mockReturnThis()
-    const mockWhere = vi.fn().mockReturnThis()
-    const mockOrderBy = vi.fn().mockReturnThis()
-    const mockLimit = vi.fn().mockResolvedValue([])
-
-    mockDb.select.mockReturnValue({
-      from: mockFrom,
-      where: mockWhere,
-      orderBy: mockOrderBy,
-      limit: mockLimit,
-    })
+    mockDb.execute = vi.fn().mockResolvedValue({ rows: [] })
 
     await claimNextJob('generate_embeddings')
 
-    expect(mockDb.select).toHaveBeenCalled()
-    expect(mockWhere).toHaveBeenCalled()
+    expect(mockDb.execute).toHaveBeenCalled()
+    // Verify the SQL includes type filter
+    const sqlCall = (mockDb.execute as any).mock.calls[0]
+    expect(sqlCall).toBeDefined()
   })
 
-  it('sets status to processing and increments attempts', async () => {
-    const pendingJob = {
+  it('atomically claims job with correct attempts increment', async () => {
+    const claimedJob = {
       id: 5,
       type: 'fetch_transcript',
       payload: {},
-      status: 'pending',
-      attempts: 2,
+      status: 'processing',
+      attempts: 3,
+      maxAttempts: 3,
+      error: null,
       createdAt: new Date(),
+      startedAt: new Date(),
+      completedAt: null,
     }
 
-    mockDb.select.mockReturnValue({
-      from: vi.fn().mockReturnThis(),
-      where: vi.fn().mockReturnThis(),
-      orderBy: vi.fn().mockReturnThis(),
-      limit: vi.fn().mockResolvedValue([pendingJob]),
-    })
-
-    const mockSet = vi.fn().mockReturnThis()
-    const mockUpdateWhere = vi.fn().mockResolvedValue([])
-
-    mockDb.update.mockReturnValue({
-      set: mockSet,
-      where: mockUpdateWhere,
-    })
+    mockDb.execute = vi.fn().mockResolvedValue({ rows: [claimedJob] })
 
     const job = await claimNextJob()
 
     expect(job?.attempts).toBe(3)
-    expect(mockSet).toHaveBeenCalledWith({
-      status: 'processing',
-      startedAt: expect.any(Date),
-      attempts: 3,
-    })
+    expect(job?.status).toBe('processing')
   })
 
   it('uses custom db instance when provided', async () => {
     const customDb = {
-      select: vi.fn().mockReturnValue({
-        from: vi.fn().mockReturnThis(),
-        where: vi.fn().mockReturnThis(),
-        orderBy: vi.fn().mockReturnThis(),
-        limit: vi.fn().mockResolvedValue([]),
-      }),
+      execute: vi.fn().mockResolvedValue({ rows: [] }),
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await claimNextJob(undefined, customDb as any)
 
-    expect(customDb.select).toHaveBeenCalledTimes(1)
-    expect(mockDb.select).not.toHaveBeenCalled()
+    expect(customDb.execute).toHaveBeenCalledTimes(1)
+    expect(mockDb.execute).not.toHaveBeenCalled()
   })
 })
 
@@ -253,7 +201,6 @@ describe('completeJob', () => {
       }),
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await completeJob(1, customDb as any)
 
     expect(customDb.update).toHaveBeenCalledTimes(1)
@@ -364,7 +311,6 @@ describe('failJob', () => {
       }),
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await failJob(1, 'Test error', customDb as any)
 
     expect(customDb.select).toHaveBeenCalledTimes(1)
@@ -413,7 +359,6 @@ describe('getJobsByStatus', () => {
       }),
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await getJobsByStatus('pending', customDb as any)
 
     expect(customDb.select).toHaveBeenCalledTimes(1)

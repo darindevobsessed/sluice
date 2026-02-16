@@ -166,14 +166,21 @@ export class AgentConnection {
     const id = nanoid()
     this.activeInsights.set(id, { id, callbacks })
 
-    this.ws.send(JSON.stringify({
-      type: 'generate_insight',
-      id,
-      ...options
-    }))
+    try {
+      this.ws.send(JSON.stringify({
+        type: 'generate_insight',
+        id,
+        ...options
+      }))
 
-    callbacks.onStart?.()
-    return id
+      callbacks.onStart?.()
+      return id
+    } catch (error) {
+      // WebSocket send failed, clean up and notify
+      this.activeInsights.delete(id)
+      callbacks.onError?.(error instanceof Error ? error.message : 'Failed to send message')
+      return id
+    }
   }
 
   cancelInsight(id: string) {

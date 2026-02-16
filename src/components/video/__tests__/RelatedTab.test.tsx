@@ -203,7 +203,7 @@ describe('RelatedTab', () => {
       render(<RelatedTab videoId={42} />)
 
       await waitFor(() => {
-        expect(global.fetch).toHaveBeenCalledWith('/api/videos/42/related')
+        expect(global.fetch).toHaveBeenCalledWith('/api/videos/42/related', { signal: expect.any(AbortSignal) })
       })
     })
   })

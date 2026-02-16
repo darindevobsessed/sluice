@@ -152,7 +152,7 @@ describe('SidebarNav', () => {
       renderNav()
 
       const links = screen.getAllByRole('link')
-      links[0].click() // Click first link (Knowledge Bank)
+      links[0]!.click() // Click first link (Knowledge Bank)
 
       expect(mockCloseMobile).toHaveBeenCalledOnce()
     })

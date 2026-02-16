@@ -1,6 +1,7 @@
 import { db as defaultDb } from '@/lib/db'
 import { jobs } from '@/lib/db/schema'
-import { eq, and, asc } from 'drizzle-orm'
+import type { Job } from '@/lib/db/schema'
+import { eq, asc, sql } from 'drizzle-orm'
 import type { JobType } from './types'
 
 /**
@@ -22,7 +23,8 @@ export async function enqueueJob(
 }
 
 /**
- * Claim the next pending job for processing
+ * Claim the next pending job for processing (atomically)
+ * Uses UPDATE...WHERE id = (SELECT...FOR UPDATE SKIP LOCKED) to prevent race conditions
  * @param type - Optional job type filter
  * @param dbInstance - Database instance (for testing)
  * @returns Job or null if none available
@@ -30,33 +32,31 @@ export async function enqueueJob(
 export async function claimNextJob(
   type?: JobType,
   dbInstance = defaultDb
-) {
-  // Build the WHERE conditions
-  const conditions = [eq(jobs.status, 'pending')]
-  if (type) {
-    conditions.push(eq(jobs.type, type))
-  }
+): Promise<Job | null> {
+  // Build the WHERE clause for the subquery
+  const typeFilter = type ? sql`AND type = ${type}` : sql``
 
-  // Find next pending job
-  const pending = await dbInstance.select()
-    .from(jobs)
-    .where(and(...conditions))
-    .orderBy(asc(jobs.createdAt))
-    .limit(1)
+  // Atomic UPDATE...RETURNING using a subquery with FOR UPDATE SKIP LOCKED
+  const result = await dbInstance.execute(sql`
+    UPDATE ${jobs}
+    SET
+      status = 'processing',
+      started_at = NOW(),
+      attempts = attempts + 1
+    WHERE id = (
+      SELECT id
+      FROM ${jobs}
+      WHERE status = 'pending'
+        ${typeFilter}
+      ORDER BY created_at ASC
+      LIMIT 1
+      FOR UPDATE SKIP LOCKED
+    )
+    RETURNING *
+  `)
 
-  const job = pending[0]
-  if (!job) return null
-
-  // Claim it
-  await dbInstance.update(jobs)
-    .set({
-      status: 'processing',
-      startedAt: new Date(),
-      attempts: job.attempts + 1,
-    })
-    .where(eq(jobs.id, job.id))
-
-  return { ...job, status: 'processing' as const, attempts: job.attempts + 1, startedAt: new Date() }
+  const claimed = result.rows[0] as Job | undefined
+  return claimed ?? null
 }
 
 /**

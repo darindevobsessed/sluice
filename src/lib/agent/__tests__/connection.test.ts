@@ -2,6 +2,7 @@
  * Tests for AgentConnection WebSocket client
  * Note: Full WebSocket integration tested manually; these tests cover core logic
  */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { AgentConnection } from '../connection'
 
@@ -106,6 +107,78 @@ describe('AgentConnection', () => {
           {}
         )
       }).not.toThrow()
+    })
+
+    it('calls onError when WebSocket send fails', () => {
+      // Create a mock WebSocket that throws on send
+      const mockWs = {
+        readyState: 1, // WebSocket.OPEN
+        send: vi.fn(() => {
+          throw new Error('Connection lost')
+        }),
+        close: vi.fn(),
+      }
+
+      // Manually set the connection's internal ws
+      ;(connection as any).ws = mockWs
+
+      const callbacks = {
+        onStart: vi.fn(),
+        onError: vi.fn(),
+      }
+
+      const id = connection.generateInsight(
+        {
+          insightType: 'test',
+          prompt: 'test',
+          systemPrompt: 'test'
+        },
+        callbacks
+      )
+
+      // Should return an id
+      expect(id).toBeTruthy()
+
+      // Should call onError due to send failure
+      expect(callbacks.onError).toHaveBeenCalledWith('Connection lost')
+
+      // Should not call onStart since send failed
+      expect(callbacks.onStart).not.toHaveBeenCalled()
+
+      // Clean up
+      ;(connection as any).ws = null
+    })
+
+    it('cleans up active insight when send fails', () => {
+      const mockWs = {
+        readyState: 1,
+        send: vi.fn(() => {
+          throw new Error('Send failed')
+        }),
+        close: vi.fn(),
+      }
+
+      ;(connection as any).ws = mockWs
+
+      const callbacks = {
+        onError: vi.fn(),
+      }
+
+      const id = connection.generateInsight(
+        {
+          insightType: 'test',
+          prompt: 'test',
+          systemPrompt: 'test'
+        },
+        callbacks
+      )
+
+      // Active insight should be cleaned up
+      const activeInsights = (connection as any).activeInsights
+      expect(activeInsights.has(id)).toBe(false)
+
+      // Clean up
+      ;(connection as any).ws = null
     })
   })
 

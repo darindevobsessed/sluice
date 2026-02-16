@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useState, useCallback } from 'react'
+import { createContext, useContext, useState, useCallback, useEffect } from 'react'
 
 interface SidebarContextValue {
   collapsed: boolean
@@ -15,16 +15,23 @@ const SidebarContext = createContext<SidebarContextValue | undefined>(undefined)
 const STORAGE_KEY = 'gold-miner-sidebar-collapsed'
 
 export function SidebarProvider({ children }: { children: React.ReactNode }) {
-  const [collapsed, setCollapsed] = useState<boolean>(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY)
-      return stored === 'true'
-    } catch {
-      return false
-    }
-  })
+  // Initialize to false to avoid SSR hydration mismatch
+  const [collapsed, setCollapsed] = useState<boolean>(false)
 
   const [mobileOpen, setMobileOpen] = useState<boolean>(false)
+
+  // Read from localStorage after mount to avoid SSR mismatch
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY)
+      if (stored === 'true') {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setCollapsed(true)
+      }
+    } catch {
+      // Silently fail if localStorage is not available
+    }
+  }, [])
 
   const toggleSidebar = useCallback(() => {
     setCollapsed((prev) => {
