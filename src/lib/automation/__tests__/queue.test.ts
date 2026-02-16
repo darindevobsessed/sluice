@@ -2,11 +2,15 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 // Mock database module
+const mockTx = {
+  select: vi.fn(),
+  update: vi.fn(),
+}
 const mockDb = {
   select: vi.fn(),
   insert: vi.fn(),
   update: vi.fn(),
-  execute: vi.fn(),
+  transaction: vi.fn(async (cb: (tx: typeof mockTx) => Promise<unknown>) => cb(mockTx)),
 }
 
 const mockJobs = {
@@ -89,31 +93,74 @@ describe('claimNextJob', () => {
   })
 
   it('returns null when no pending jobs', async () => {
-    // Mock execute returning empty rows
-    mockDb.execute = vi.fn().mockResolvedValue({ rows: [] })
+    // Mock transaction with select returning empty array
+    const mockFrom = vi.fn().mockReturnThis()
+    const mockWhere = vi.fn().mockReturnThis()
+    const mockOrderBy = vi.fn().mockReturnThis()
+    const mockLimit = vi.fn().mockReturnThis()
+    const mockFor = vi.fn().mockResolvedValue([])
+
+    mockTx.select.mockReturnValue({
+      from: mockFrom,
+      where: mockWhere,
+      orderBy: mockOrderBy,
+      limit: mockLimit,
+      for: mockFor,
+    })
 
     const job = await claimNextJob()
 
     expect(job).toBeNull()
-    expect(mockDb.execute).toHaveBeenCalled()
+    expect(mockDb.transaction).toHaveBeenCalled()
+    expect(mockTx.select).toHaveBeenCalled()
   })
 
   it('claims the oldest pending job atomically', async () => {
-    const claimedJob = {
+    const pendingJob = {
       id: 1,
       type: 'fetch_transcript',
       payload: { videoId: 123 },
-      status: 'processing',
-      attempts: 1,
+      status: 'pending',
+      attempts: 0,
       maxAttempts: 3,
       error: null,
       createdAt: new Date(),
-      startedAt: new Date(),
+      startedAt: null,
       completedAt: null,
     }
 
-    // Mock execute returning the claimed job
-    mockDb.execute = vi.fn().mockResolvedValue({ rows: [claimedJob] })
+    const claimedJob = {
+      ...pendingJob,
+      status: 'processing',
+      attempts: 1,
+      startedAt: new Date(),
+    }
+
+    // Mock select chain
+    const mockFrom = vi.fn().mockReturnThis()
+    const mockWhere = vi.fn().mockReturnThis()
+    const mockOrderBy = vi.fn().mockReturnThis()
+    const mockLimit = vi.fn().mockReturnThis()
+    const mockFor = vi.fn().mockResolvedValue([pendingJob])
+
+    mockTx.select.mockReturnValue({
+      from: mockFrom,
+      where: mockWhere,
+      orderBy: mockOrderBy,
+      limit: mockLimit,
+      for: mockFor,
+    })
+
+    // Mock update chain
+    const mockSet = vi.fn().mockReturnThis()
+    const mockUpdateWhere = vi.fn().mockReturnThis()
+    const mockReturning = vi.fn().mockResolvedValue([claimedJob])
+
+    mockTx.update.mockReturnValue({
+      set: mockSet,
+      where: mockUpdateWhere,
+      returning: mockReturning,
+    })
 
     const job = await claimNextJob()
 
@@ -121,35 +168,78 @@ describe('claimNextJob', () => {
     expect(job?.id).toBe(1)
     expect(job?.status).toBe('processing')
     expect(job?.attempts).toBe(1)
-    expect(mockDb.execute).toHaveBeenCalled()
+    expect(mockDb.transaction).toHaveBeenCalled()
   })
 
   it('filters by type when specified', async () => {
-    mockDb.execute = vi.fn().mockResolvedValue({ rows: [] })
+    // Mock select chain
+    const mockFrom = vi.fn().mockReturnThis()
+    const mockWhere = vi.fn().mockReturnThis()
+    const mockOrderBy = vi.fn().mockReturnThis()
+    const mockLimit = vi.fn().mockReturnThis()
+    const mockFor = vi.fn().mockResolvedValue([])
+
+    mockTx.select.mockReturnValue({
+      from: mockFrom,
+      where: mockWhere,
+      orderBy: mockOrderBy,
+      limit: mockLimit,
+      for: mockFor,
+    })
 
     await claimNextJob('generate_embeddings')
 
-    expect(mockDb.execute).toHaveBeenCalled()
-    // Verify the SQL includes type filter
-    const sqlCall = (mockDb.execute as any).mock.calls[0]
-    expect(sqlCall).toBeDefined()
+    expect(mockDb.transaction).toHaveBeenCalled()
+    expect(mockTx.select).toHaveBeenCalled()
+    expect(mockWhere).toHaveBeenCalled()
   })
 
   it('atomically claims job with correct attempts increment', async () => {
-    const claimedJob = {
+    const pendingJob = {
       id: 5,
       type: 'fetch_transcript',
       payload: {},
-      status: 'processing',
-      attempts: 3,
+      status: 'pending',
+      attempts: 2,
       maxAttempts: 3,
       error: null,
       createdAt: new Date(),
-      startedAt: new Date(),
+      startedAt: null,
       completedAt: null,
     }
 
-    mockDb.execute = vi.fn().mockResolvedValue({ rows: [claimedJob] })
+    const claimedJob = {
+      ...pendingJob,
+      status: 'processing',
+      attempts: 3,
+      startedAt: new Date(),
+    }
+
+    // Mock select chain
+    const mockFrom = vi.fn().mockReturnThis()
+    const mockWhere = vi.fn().mockReturnThis()
+    const mockOrderBy = vi.fn().mockReturnThis()
+    const mockLimit = vi.fn().mockReturnThis()
+    const mockFor = vi.fn().mockResolvedValue([pendingJob])
+
+    mockTx.select.mockReturnValue({
+      from: mockFrom,
+      where: mockWhere,
+      orderBy: mockOrderBy,
+      limit: mockLimit,
+      for: mockFor,
+    })
+
+    // Mock update chain
+    const mockSet = vi.fn().mockReturnThis()
+    const mockUpdateWhere = vi.fn().mockReturnThis()
+    const mockReturning = vi.fn().mockResolvedValue([claimedJob])
+
+    mockTx.update.mockReturnValue({
+      set: mockSet,
+      where: mockUpdateWhere,
+      returning: mockReturning,
+    })
 
     const job = await claimNextJob()
 
@@ -158,14 +248,33 @@ describe('claimNextJob', () => {
   })
 
   it('uses custom db instance when provided', async () => {
-    const customDb = {
-      execute: vi.fn().mockResolvedValue({ rows: [] }),
+    const customTx = {
+      select: vi.fn(),
+      update: vi.fn(),
     }
+    const customDb = {
+      transaction: vi.fn(async (cb: (tx: typeof customTx) => Promise<unknown>) => cb(customTx)),
+    }
+
+    // Mock select chain
+    const mockFrom = vi.fn().mockReturnThis()
+    const mockWhere = vi.fn().mockReturnThis()
+    const mockOrderBy = vi.fn().mockReturnThis()
+    const mockLimit = vi.fn().mockReturnThis()
+    const mockFor = vi.fn().mockResolvedValue([])
+
+    customTx.select.mockReturnValue({
+      from: mockFrom,
+      where: mockWhere,
+      orderBy: mockOrderBy,
+      limit: mockLimit,
+      for: mockFor,
+    })
 
     await claimNextJob(undefined, customDb as any)
 
-    expect(customDb.execute).toHaveBeenCalledTimes(1)
-    expect(mockDb.execute).not.toHaveBeenCalled()
+    expect(customDb.transaction).toHaveBeenCalledTimes(1)
+    expect(mockDb.transaction).not.toHaveBeenCalled()
   })
 })
 

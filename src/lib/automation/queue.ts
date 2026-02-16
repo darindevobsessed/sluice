@@ -1,7 +1,7 @@
 import { db as defaultDb } from '@/lib/db'
 import { jobs } from '@/lib/db/schema'
 import type { Job } from '@/lib/db/schema'
-import { eq, asc, sql } from 'drizzle-orm'
+import { eq, and, asc } from 'drizzle-orm'
 import type { JobType } from './types'
 
 /**
@@ -24,7 +24,7 @@ export async function enqueueJob(
 
 /**
  * Claim the next pending job for processing (atomically)
- * Uses UPDATE...WHERE id = (SELECT...FOR UPDATE SKIP LOCKED) to prevent race conditions
+ * Uses SELECT FOR UPDATE SKIP LOCKED in a transaction to prevent race conditions
  * @param type - Optional job type filter
  * @param dbInstance - Database instance (for testing)
  * @returns Job or null if none available
@@ -33,30 +33,33 @@ export async function claimNextJob(
   type?: JobType,
   dbInstance = defaultDb
 ): Promise<Job | null> {
-  // Build the WHERE clause for the subquery
-  const typeFilter = type ? sql`AND type = ${type}` : sql``
+  return dbInstance.transaction(async (tx) => {
+    // Build WHERE conditions
+    const conditions = [eq(jobs.status, 'pending')]
+    if (type) conditions.push(eq(jobs.type, type))
 
-  // Atomic UPDATE...RETURNING using a subquery with FOR UPDATE SKIP LOCKED
-  const result = await dbInstance.execute(sql`
-    UPDATE ${jobs}
-    SET
-      status = 'processing',
-      started_at = NOW(),
-      attempts = attempts + 1
-    WHERE id = (
-      SELECT id
-      FROM ${jobs}
-      WHERE status = 'pending'
-        ${typeFilter}
-      ORDER BY created_at ASC
-      LIMIT 1
-      FOR UPDATE SKIP LOCKED
-    )
-    RETURNING *
-  `)
+    // SELECT with FOR UPDATE SKIP LOCKED
+    const [nextJob] = await tx.select()
+      .from(jobs)
+      .where(and(...conditions))
+      .orderBy(asc(jobs.createdAt))
+      .limit(1)
+      .for('update', { skipLocked: true })
 
-  const claimed = result.rows[0] as Job | undefined
-  return claimed ?? null
+    if (!nextJob) return null
+
+    // UPDATE the claimed job
+    const [claimed] = await tx.update(jobs)
+      .set({
+        status: 'processing',
+        startedAt: new Date(),
+        attempts: nextJob.attempts + 1,
+      })
+      .where(eq(jobs.id, nextJob.id))
+      .returning()
+
+    return claimed ?? null
+  })
 }
 
 /**
