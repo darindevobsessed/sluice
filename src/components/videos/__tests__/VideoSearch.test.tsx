@@ -175,4 +175,50 @@ describe('VideoSearch', () => {
     rerender(<VideoSearch onSearch={onSearch} />);
     expect(input).toHaveValue('user typed');
   });
+
+  it('preserves input value when own debounce triggers defaultValue change', async () => {
+    const onSearch = vi.fn();
+
+    const { rerender } = render(<VideoSearch onSearch={onSearch} defaultValue="" />);
+
+    const input = screen.getByPlaceholderText('Ask a question or search...');
+
+    // User types "reac"
+    fireEvent.change(input, { target: { value: 'reac' } });
+    expect(input).toHaveValue('reac');
+
+    // Wait for debounce to fire
+    await waitFor(
+      () => {
+        expect(onSearch).toHaveBeenCalledWith('reac');
+      },
+      { timeout: 500 }
+    );
+
+    // User types "t" BEFORE the URL round-trip completes
+    fireEvent.change(input, { target: { value: 'react' } });
+    expect(input).toHaveValue('react');
+
+    // Simulate URL round-trip: parent updates defaultValue to match the OLD debounced value
+    // This triggers the bug - the component resets value to "reac", clobbering the "t"
+    rerender(<VideoSearch onSearch={onSearch} defaultValue="reac" />);
+
+    // Input should STILL show "react", not revert to "reac"
+    expect(input).toHaveValue('react');
+  });
+
+  it('still syncs with genuinely external defaultValue changes after fix', () => {
+    const onSearch = vi.fn();
+
+    const { rerender } = render(<VideoSearch onSearch={onSearch} defaultValue="first" />);
+
+    const input = screen.getByPlaceholderText('Ask a question or search...');
+    expect(input).toHaveValue('first');
+
+    // Rerender with completely different value (e.g., browser back/forward)
+    rerender(<VideoSearch onSearch={onSearch} defaultValue="completely different" />);
+
+    // Should sync to the new external value
+    expect(input).toHaveValue('completely different');
+  });
 });
