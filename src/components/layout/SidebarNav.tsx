@@ -17,7 +17,7 @@ const navItems = [
 
 export function SidebarNav() {
   const pathname = usePathname();
-  const { collapsed } = useSidebar();
+  const { collapsed, closeMobile } = useSidebar();
 
   return (
     <nav className="flex flex-col gap-1 px-2">
@@ -31,6 +31,7 @@ export function SidebarNav() {
               <TooltipTrigger asChild>
                 <Link
                   href={item.href}
+                  onClick={closeMobile}
                   className={cn(
                     "flex rounded-md py-2 text-sm font-medium transition-colors justify-center px-0",
                     isActive
@@ -52,6 +53,7 @@ export function SidebarNav() {
           <Link
             key={item.href}
             href={item.href}
+            onClick={closeMobile}
             className={cn(
               "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
               isActive

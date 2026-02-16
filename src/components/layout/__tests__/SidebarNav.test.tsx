@@ -16,14 +16,14 @@ vi.mock('next/link', () => ({
 }))
 
 // Mock useSidebar hook
-const mockUseSidebar = vi.fn(() => ({ collapsed: false, toggleSidebar: vi.fn() }))
+const mockUseSidebar = vi.fn(() => ({ collapsed: false, toggleSidebar: vi.fn(), closeMobile: vi.fn() }))
 vi.mock('@/components/providers/SidebarProvider', () => ({
   useSidebar: () => mockUseSidebar(),
 }))
 
 describe('SidebarNav', () => {
   beforeEach(() => {
-    mockUseSidebar.mockReturnValue({ collapsed: false, toggleSidebar: vi.fn() })
+    mockUseSidebar.mockReturnValue({ collapsed: false, toggleSidebar: vi.fn(), closeMobile: vi.fn() })
     mockUsePathname.mockReturnValue('/')
   })
 
@@ -78,7 +78,7 @@ describe('SidebarNav', () => {
 
   describe('collapsed state', () => {
     beforeEach(() => {
-      mockUseSidebar.mockReturnValue({ collapsed: true, toggleSidebar: vi.fn() })
+      mockUseSidebar.mockReturnValue({ collapsed: true, toggleSidebar: vi.fn(), closeMobile: vi.fn() })
     })
 
     it('hides labels when collapsed', () => {
@@ -121,6 +121,40 @@ describe('SidebarNav', () => {
       const activeLink = links[1] // /add is second link
       expect(activeLink).toHaveClass('bg-primary')
       expect(activeLink).toHaveClass('text-primary-foreground')
+    })
+  })
+
+  describe('mobile sidebar behavior', () => {
+    it('calls closeMobile when nav link is clicked', () => {
+      const mockCloseMobile = vi.fn()
+      mockUseSidebar.mockReturnValue({
+        collapsed: false,
+        toggleSidebar: vi.fn(),
+        closeMobile: mockCloseMobile
+      })
+
+      renderNav()
+
+      const knowledgeBankLink = screen.getByRole('link', { name: /Knowledge Bank/i })
+      knowledgeBankLink.click()
+
+      expect(mockCloseMobile).toHaveBeenCalledOnce()
+    })
+
+    it('calls closeMobile when collapsed nav link is clicked', () => {
+      const mockCloseMobile = vi.fn()
+      mockUseSidebar.mockReturnValue({
+        collapsed: true,
+        toggleSidebar: vi.fn(),
+        closeMobile: mockCloseMobile
+      })
+
+      renderNav()
+
+      const links = screen.getAllByRole('link')
+      links[0].click() // Click first link (Knowledge Bank)
+
+      expect(mockCloseMobile).toHaveBeenCalledOnce()
     })
   })
 })
