@@ -14,19 +14,28 @@ vi.mock('fs', () => ({
   }
 }))
 
+// Store original env
+const originalEnv = process.env.AGENT_AUTH_TOKEN
+
 describe('GET /api/agent/token', () => {
   const mockExistsSync = fs.existsSync as ReturnType<typeof vi.fn>
   const mockReadFileSync = fs.readFileSync as ReturnType<typeof vi.fn>
 
   beforeEach(() => {
     vi.clearAllMocks()
+    delete process.env.AGENT_AUTH_TOKEN
   })
 
   afterEach(() => {
     vi.restoreAllMocks()
+    if (originalEnv !== undefined) {
+      process.env.AGENT_AUTH_TOKEN = originalEnv
+    } else {
+      delete process.env.AGENT_AUTH_TOKEN
+    }
   })
 
-  it('returns token when file exists and is valid', async () => {
+  it('returns token with websocket transport when file exists and is valid', async () => {
     mockExistsSync.mockReturnValue(true)
     mockReadFileSync.mockReturnValue('abc-123-xyz')
 
@@ -36,7 +45,8 @@ describe('GET /api/agent/token', () => {
     expect(response.status).toBe(200)
     expect(data).toEqual({
       token: 'abc-123-xyz',
-      available: true
+      available: true,
+      transport: 'websocket',
     })
   })
 
@@ -48,62 +58,71 @@ describe('GET /api/agent/token', () => {
     const data = await response.json()
 
     expect(data.token).toBe('abc-123-xyz')
+    expect(data.transport).toBe('websocket')
   })
 
-  it('returns 503 when file does not exist', async () => {
+  it('falls back to env var when file does not exist', async () => {
     mockExistsSync.mockReturnValue(false)
+    process.env.AGENT_AUTH_TOKEN = 'env-token-123'
 
     const response = await GET()
     const data = await response.json()
 
-    expect(response.status).toBe(503)
+    expect(response.status).toBe(200)
     expect(data).toEqual({
-      error: 'Agent not running',
-      available: false
+      token: 'env-token-123',
+      available: true,
+      transport: 'sse',
     })
   })
 
-  it('returns 503 when token file is empty', async () => {
+  it('falls back to env var when token file is empty', async () => {
     mockExistsSync.mockReturnValue(true)
     mockReadFileSync.mockReturnValue('')
+    process.env.AGENT_AUTH_TOKEN = 'env-token-456'
 
     const response = await GET()
     const data = await response.json()
 
-    expect(response.status).toBe(503)
+    expect(response.status).toBe(200)
     expect(data).toEqual({
-      error: 'Token file is empty',
-      available: false
+      token: 'env-token-456',
+      available: true,
+      transport: 'sse',
     })
   })
 
-  it('returns 503 when token file is only whitespace', async () => {
+  it('falls back to env var when token file is only whitespace', async () => {
     mockExistsSync.mockReturnValue(true)
     mockReadFileSync.mockReturnValue('   \n  \t  ')
+    process.env.AGENT_AUTH_TOKEN = 'env-token-789'
 
     const response = await GET()
     const data = await response.json()
 
-    expect(response.status).toBe(503)
+    expect(response.status).toBe(200)
     expect(data).toEqual({
-      error: 'Token file is empty',
-      available: false
+      token: 'env-token-789',
+      available: true,
+      transport: 'sse',
     })
   })
 
-  it('returns 503 when file read fails', async () => {
+  it('falls back to env var when file read fails', async () => {
     mockExistsSync.mockReturnValue(true)
     mockReadFileSync.mockImplementation(() => {
       throw new Error('Permission denied')
     })
+    process.env.AGENT_AUTH_TOKEN = 'env-token-fallback'
 
     const response = await GET()
     const data = await response.json()
 
-    expect(response.status).toBe(503)
+    expect(response.status).toBe(200)
     expect(data).toEqual({
-      error: 'Failed to read token: Permission denied',
-      available: false
+      token: 'env-token-fallback',
+      available: true,
+      transport: 'sse',
     })
   })
 
@@ -118,16 +137,83 @@ describe('GET /api/agent/token', () => {
     expect(mockReadFileSync).toHaveBeenCalledWith(expectedPath, 'utf-8')
   })
 
-  it('handles non-Error exceptions', async () => {
-    mockExistsSync.mockReturnValue(true)
-    mockReadFileSync.mockImplementation(() => {
-      throw 'String error'
-    })
+  it('returns 503 when neither file nor env var available', async () => {
+    mockExistsSync.mockReturnValue(false)
+    delete process.env.AGENT_AUTH_TOKEN
 
     const response = await GET()
     const data = await response.json()
 
     expect(response.status).toBe(503)
-    expect(data.error).toBe('Failed to read token: Unknown error')
+    expect(data).toEqual({
+      error: 'Agent not available',
+      available: false,
+    })
+  })
+
+  it('returns 503 when file empty and no env var', async () => {
+    mockExistsSync.mockReturnValue(true)
+    mockReadFileSync.mockReturnValue('')
+    delete process.env.AGENT_AUTH_TOKEN
+
+    const response = await GET()
+    const data = await response.json()
+
+    expect(response.status).toBe(503)
+    expect(data).toEqual({
+      error: 'Agent not available',
+      available: false,
+    })
+  })
+
+  it('returns 503 when file read fails and no env var', async () => {
+    mockExistsSync.mockReturnValue(true)
+    mockReadFileSync.mockImplementation(() => {
+      throw new Error('Permission denied')
+    })
+    delete process.env.AGENT_AUTH_TOKEN
+
+    const response = await GET()
+    const data = await response.json()
+
+    expect(response.status).toBe(503)
+    expect(data).toEqual({
+      error: 'Agent not available',
+      available: false,
+    })
+  })
+
+  it('falls back to env var when non-Error exception occurs', async () => {
+    mockExistsSync.mockReturnValue(true)
+    mockReadFileSync.mockImplementation(() => {
+      throw 'String error'
+    })
+    process.env.AGENT_AUTH_TOKEN = 'env-token-exception'
+
+    const response = await GET()
+    const data = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(data).toEqual({
+      token: 'env-token-exception',
+      available: true,
+      transport: 'sse',
+    })
+  })
+
+  it('prefers filesystem token over env var', async () => {
+    mockExistsSync.mockReturnValue(true)
+    mockReadFileSync.mockReturnValue('file-token')
+    process.env.AGENT_AUTH_TOKEN = 'env-token'
+
+    const response = await GET()
+    const data = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(data).toEqual({
+      token: 'file-token',
+      available: true,
+      transport: 'websocket',
+    })
   })
 })
