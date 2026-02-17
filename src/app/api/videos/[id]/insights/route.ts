@@ -1,5 +1,6 @@
-import { getExtractionForVideo, upsertExtraction } from '@/lib/db/insights';
-import type { ExtractionResult } from '@/lib/claude/prompts/types';
+import { NextResponse } from 'next/server'
+import { getExtractionForVideo, upsertExtraction } from '@/lib/db/insights'
+import type { ExtractionResult } from '@/lib/claude/prompts/types'
 
 /**
  * GET /api/videos/[id]/insights
@@ -15,25 +16,25 @@ export async function GET(
     const videoId = parseInt(id, 10);
 
     if (isNaN(videoId)) {
-      return Response.json({ error: 'Invalid video ID' }, { status: 400 });
+      return NextResponse.json({ error: 'Invalid video ID' }, { status: 400 });
     }
 
     const result = await getExtractionForVideo(videoId);
 
     if (!result) {
-      return Response.json({
+      return NextResponse.json({
         extraction: null,
         generatedAt: null,
       });
     }
 
-    return Response.json({
+    return NextResponse.json({
       extraction: result.extraction,
       generatedAt: result.updatedAt.toISOString(),
     });
   } catch (error) {
     console.error('Error fetching insights:', error);
-    return Response.json(
+    return NextResponse.json(
       { error: 'Failed to fetch insights' },
       { status: 500 }
     );
@@ -54,13 +55,13 @@ export async function POST(
     const videoId = parseInt(id, 10);
 
     if (isNaN(videoId)) {
-      return Response.json({ error: 'Invalid video ID' }, { status: 400 });
+      return NextResponse.json({ error: 'Invalid video ID' }, { status: 400 });
     }
 
     const body = (await request.json()) as { extraction?: ExtractionResult };
 
     if (!body.extraction) {
-      return Response.json(
+      return NextResponse.json(
         { error: 'Missing extraction in request body' },
         { status: 400 }
       );
@@ -70,7 +71,7 @@ export async function POST(
 
     // Validate extraction has required fields
     if (!extraction.contentType || !extraction.summary) {
-      return Response.json(
+      return NextResponse.json(
         { error: 'Invalid extraction format' },
         { status: 400 }
       );
@@ -78,13 +79,13 @@ export async function POST(
 
     const result = await upsertExtraction(videoId, extraction);
 
-    return Response.json({
+    return NextResponse.json({
       extraction: result.extraction,
       generatedAt: result.updatedAt.toISOString(),
     });
   } catch (error) {
     console.error('Error saving insights:', error);
-    return Response.json(
+    return NextResponse.json(
       { error: 'Failed to save insights' },
       { status: 500 }
     );
