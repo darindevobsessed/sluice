@@ -58,7 +58,7 @@ export class EmbeddingPipeline {
     }
 
     // Start initialization - cast to our simplified type
-    const pipelinePromise = pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2')
+    const pipelinePromise = pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2', { dtype: 'fp32' })
     this.initPromise = pipelinePromise as unknown as Promise<EmbeddingPipelineType>
 
     try {

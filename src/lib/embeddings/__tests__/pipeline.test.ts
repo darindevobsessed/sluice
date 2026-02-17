@@ -55,7 +55,8 @@ describe('EmbeddingPipeline', () => {
 
       expect(pipeline).toHaveBeenCalledWith(
         'feature-extraction',
-        'Xenova/all-MiniLM-L6-v2'
+        'Xenova/all-MiniLM-L6-v2',
+        { dtype: 'fp32' }
       )
     })
   })
