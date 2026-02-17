@@ -206,7 +206,7 @@ Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for setup inst
 
 ## License
 
-[MIT](LICENSE) © 2026 Darin Drobinski
+[MIT](LICENSE) © 2026 DevObsessed
 
 ---
 
