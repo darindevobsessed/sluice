@@ -18,6 +18,7 @@ export function VideoSearch({
 }: VideoSearchProps) {
   const [value, setValue] = useState(defaultValue || '');
   const [prevDefault, setPrevDefault] = useState(defaultValue);
+  const [lastOnSearchValue, setLastOnSearchValue] = useState<string | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -25,7 +26,14 @@ export function VideoSearch({
   // Uses "adjusting state during rendering" pattern (React docs)
   if (prevDefault !== defaultValue) {
     setPrevDefault(defaultValue);
-    setValue(defaultValue || '');
+    // Only sync if this isn't our own update echoing back
+    if (defaultValue !== lastOnSearchValue) {
+      setValue(defaultValue || '');
+    }
+    // Reset tracking after we've handled this defaultValue
+    if (defaultValue === lastOnSearchValue) {
+      setLastOnSearchValue(null);
+    }
   }
 
   useEffect(() => {
@@ -42,6 +50,7 @@ export function VideoSearch({
     // Debounce the search with 300ms delay
     timeoutRef.current = setTimeout(() => {
       abortControllerRef.current = new AbortController();
+      setLastOnSearchValue(value);
       onSearch(value);
     }, 300);
 

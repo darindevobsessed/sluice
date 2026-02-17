@@ -42,7 +42,8 @@
       "Bash(node -e:*)",
       "Bash(psql:*)",
       "mcp__plugin_craft_chrome-devtools__performance_start_trace",
-      "mcp__plugin_craft_chrome-devtools__wait_for"
+      "mcp__plugin_craft_chrome-devtools__wait_for",
+      "Bash(done)"
     ]
   }
 }
