@@ -1,4 +1,5 @@
 import { pipeline, env } from '@huggingface/transformers'
+import { rm } from 'fs/promises'
 
 /**
  * Type for the embedding pipeline function.
@@ -22,6 +23,7 @@ export class EmbeddingPipeline {
   private static instance: EmbeddingPipeline | null = null
   private pipeline: EmbeddingPipelineType | null = null
   private initPromise: Promise<EmbeddingPipelineType> | null = null
+  private hasRetried = false
 
   private constructor() {
     // Configure Transformers.js for Vercel compatibility
@@ -65,6 +67,34 @@ export class EmbeddingPipeline {
       this.pipeline = await this.initPromise
       return this.pipeline
     } catch (error) {
+      // Check if this is a corruption error that can be recovered
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      const isCorruption =
+        errorMessage.includes('Protobuf') ||
+        errorMessage.includes('failed to load model') ||
+        errorMessage.includes('Invalid model')
+
+      if (isCorruption && !this.hasRetried) {
+        // Mark that we've attempted recovery
+        this.hasRetried = true
+
+        // Try to clear the corrupted cache
+        try {
+          await rm('/tmp/.cache/Xenova/all-MiniLM-L6-v2', {
+            recursive: true,
+            force: true
+          })
+        } catch (cleanupError) {
+          // Log but don't fail on cleanup error
+          console.warn('Failed to clear cache:', cleanupError)
+        }
+
+        // Reset state and retry initialization
+        this.initPromise = null
+        this.pipeline = null
+        return this.initialize()
+      }
+
       // Reset state on failure so it can be retried
       this.initPromise = null
       throw error

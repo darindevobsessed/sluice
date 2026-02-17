@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach, vi, type Mock } from 'vitest'
 
 // Mock the @huggingface/transformers module
 vi.mock('@huggingface/transformers', () => {
@@ -163,5 +163,96 @@ describe('generateEmbedding', () => {
 
     // @ts-expect-error - testing runtime error handling
     await expect(generateEmbedding(123)).rejects.toThrow()
+  })
+})
+
+describe('corruption recovery', () => {
+  beforeEach(() => {
+    // Reset singleton instance between tests
+    // @ts-expect-error - accessing private static property for testing
+    EmbeddingPipeline.instance = null
+    vi.clearAllMocks()
+  })
+
+  it('recovers from corrupted model by retrying initialization', async () => {
+    // Mock pipeline to throw Protobuf error on first call, succeed on second
+    const mockPipelineFunction = vi.fn().mockImplementation(async () => ({
+      data: new Float32Array(384).fill(0.1),
+    }))
+
+    let callCount = 0
+    ;(pipeline as unknown as Mock).mockImplementation(() => {
+      callCount++
+      if (callCount === 1) {
+        return Promise.reject(new Error('Protobuf parsing failed'))
+      }
+      return Promise.resolve(mockPipelineFunction)
+    })
+
+    // Should recover and succeed
+    const instance = await EmbeddingPipeline.getInstance()
+    const embedding = await instance.embed('test text')
+
+    // Verify pipeline was called twice (initial failure + retry after cache clear)
+    expect(pipeline).toHaveBeenCalledTimes(2)
+
+    // Verify embedding works after recovery
+    expect(embedding).toBeInstanceOf(Float32Array)
+    expect(embedding.length).toBe(384)
+  })
+
+  it('only retries once for corruption errors', async () => {
+    // Mock pipeline to always throw Protobuf error
+    vi.mocked(pipeline).mockRejectedValue(new Error('Protobuf parsing failed'))
+
+    // Should throw after one retry
+    await expect(EmbeddingPipeline.getInstance()).rejects.toThrow('Protobuf parsing failed')
+
+    // Verify pipeline was called twice (initial + one retry)
+    expect(pipeline).toHaveBeenCalledTimes(2)
+  })
+
+  it('does not retry for non-corruption errors', async () => {
+    // Mock pipeline to throw a non-corruption error
+    vi.mocked(pipeline).mockRejectedValue(new Error('Network timeout'))
+
+    // Should throw without retrying
+    await expect(EmbeddingPipeline.getInstance()).rejects.toThrow('Network timeout')
+
+    // Verify pipeline was called once only (no retry)
+    expect(pipeline).toHaveBeenCalledTimes(1)
+  })
+
+  it('detects corruption error patterns', async () => {
+    // Test all three corruption patterns
+    const corruptionErrors = [
+      'Protobuf parsing failed',
+      'failed to load model weights',
+      'Invalid model file format'
+    ]
+
+    for (const errorMsg of corruptionErrors) {
+      // Reset between iterations
+      // @ts-expect-error - accessing private static property for testing
+      EmbeddingPipeline.instance = null
+      vi.clearAllMocks()
+
+      let callCount = 0
+      ;(pipeline as unknown as Mock).mockImplementation(() => {
+        callCount++
+        if (callCount === 1) {
+          return Promise.reject(new Error(errorMsg))
+        }
+        return Promise.resolve(vi.fn().mockImplementation(async () => ({
+          data: new Float32Array(384).fill(0.1),
+        })))
+      })
+
+      // Should detect corruption and retry
+      await EmbeddingPipeline.getInstance()
+
+      // Verify retry happened
+      expect(pipeline).toHaveBeenCalledTimes(2)
+    }
   })
 })
