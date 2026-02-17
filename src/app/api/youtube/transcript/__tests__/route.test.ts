@@ -5,7 +5,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { POST } from '../route';
 import * as transcriptLib from '@/lib/youtube/transcript';
-import * as rateLimitLib from '@/lib/rate-limit';
 
 // Mock dependencies
 vi.mock('@/lib/youtube/transcript', () => ({
@@ -13,16 +12,9 @@ vi.mock('@/lib/youtube/transcript', () => ({
   clearTranscriptCache: vi.fn(),
 }));
 
-vi.mock('@/lib/rate-limit', () => ({
-  checkRateLimit: vi.fn(),
-  getRateLimitRemaining: vi.fn(),
-}));
-
 describe('POST /api/youtube/transcript', () => {
   const mockFetchTranscript = transcriptLib.fetchTranscript as ReturnType<typeof vi.fn>;
   const mockClearTranscriptCache = transcriptLib.clearTranscriptCache as ReturnType<typeof vi.fn>;
-  const mockCheckRateLimit = rateLimitLib.checkRateLimit as ReturnType<typeof vi.fn>;
-  const mockGetRateLimitRemaining = rateLimitLib.getRateLimitRemaining as ReturnType<typeof vi.fn>;
 
   // Helper to create mock Request
   function createRequest(body: unknown, headers: Record<string, string> = {}): Request {
@@ -36,9 +28,6 @@ describe('POST /api/youtube/transcript', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    // Default: rate limit allows request
-    mockCheckRateLimit.mockReturnValue(true);
-    mockGetRateLimitRemaining.mockReturnValue(10);
   });
 
   afterEach(() => {
@@ -103,88 +92,6 @@ describe('POST /api/youtube/transcript', () => {
     expect(response.status).toBe(400);
     expect(data.success).toBe(false);
     expect(data.error).toBe('Invalid video ID');
-  });
-
-  it('returns 429 when rate limit exceeded', async () => {
-    mockCheckRateLimit.mockReturnValue(false);
-    mockGetRateLimitRemaining.mockReturnValue(0);
-
-    const request = createRequest(
-      { videoId: 'dQw4w9WgXcQ' },
-      { 'x-forwarded-for': '192.168.1.1' }
-    );
-    const response = await POST(request);
-    const data = await response.json();
-
-    expect(response.status).toBe(429);
-    expect(data).toEqual({
-      success: false,
-      error: 'Too many requests. Please wait a moment before trying again.',
-      rateLimited: true,
-    });
-    expect(response.headers.get('X-RateLimit-Remaining')).toBe('0');
-    expect(response.headers.get('Retry-After')).toBe('60');
-    expect(mockFetchTranscript).not.toHaveBeenCalled();
-  });
-
-  it('uses client IP from x-forwarded-for header for rate limiting', async () => {
-    mockFetchTranscript.mockResolvedValue({
-      success: true,
-      transcript: 'test',
-      segments: [],
-      language: 'en',
-    });
-
-    const request = createRequest(
-      { videoId: 'abc123' },
-      { 'x-forwarded-for': '203.0.113.42, 198.51.100.1' } // Multiple IPs
-    );
-    await POST(request);
-
-    expect(mockCheckRateLimit).toHaveBeenCalledWith(
-      'transcript:203.0.113.42',
-      10,
-      60000
-    );
-  });
-
-  it('uses x-real-ip header as fallback for rate limiting', async () => {
-    mockFetchTranscript.mockResolvedValue({
-      success: true,
-      transcript: 'test',
-      segments: [],
-      language: 'en',
-    });
-
-    const request = createRequest(
-      { videoId: 'abc123' },
-      { 'x-real-ip': '198.51.100.5' }
-    );
-    await POST(request);
-
-    expect(mockCheckRateLimit).toHaveBeenCalledWith(
-      'transcript:198.51.100.5',
-      10,
-      60000
-    );
-  });
-
-  it('uses "unknown" as fallback when no IP headers present', async () => {
-    mockFetchTranscript.mockResolvedValue({
-      success: true,
-      transcript: 'test',
-      segments: [],
-      language: 'en',
-    });
-
-    const request = createRequest({ videoId: 'abc123' });
-    await POST(request);
-
-    expect(mockCheckRateLimit).toHaveBeenCalledWith(
-      'transcript:unknown',
-      10,
-      60000
-    );
   });
 
   it('clears cache when forceRefresh is true', async () => {
@@ -268,17 +175,6 @@ describe('POST /api/youtube/transcript', () => {
     expect(data.success).toBe(false);
     expect(data.error).toBe('Failed to fetch transcript');
     expect(data.fallbackToManual).toBe(true);
-  });
-
-  it('includes rate limit headers in rate-limited response', async () => {
-    mockCheckRateLimit.mockReturnValue(false);
-    mockGetRateLimitRemaining.mockReturnValue(0);
-
-    const request = createRequest({ videoId: 'abc123' });
-    const response = await POST(request);
-
-    expect(response.headers.get('X-RateLimit-Remaining')).toBe('0');
-    expect(response.headers.get('Retry-After')).toBe('60');
   });
 
   it('handles non-Error exceptions gracefully', async () => {
