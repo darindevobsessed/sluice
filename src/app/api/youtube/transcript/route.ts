@@ -1,10 +1,6 @@
 import { NextResponse } from 'next/server';
 import { fetchTranscript, clearTranscriptCache } from '@/lib/youtube/transcript';
-import { checkRateLimit, getRateLimitRemaining } from '@/lib/rate-limit';
 import { z } from 'zod';
-
-const RATE_LIMIT = 10; // requests
-const RATE_WINDOW = 60 * 1000; // 1 minute
 
 const requestSchema = z.object({
   videoId: z.string().min(1).max(20),
@@ -13,30 +9,6 @@ const requestSchema = z.object({
 
 export async function POST(request: Request) {
   try {
-    // Get client IP for rate limiting
-    const clientIp = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
-      || request.headers.get('x-real-ip')
-      || 'unknown';
-
-    // Check rate limit
-    if (!checkRateLimit(`transcript:${clientIp}`, RATE_LIMIT, RATE_WINDOW)) {
-      const remaining = getRateLimitRemaining(`transcript:${clientIp}`, RATE_LIMIT);
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'Too many requests. Please wait a moment before trying again.',
-          rateLimited: true,
-        },
-        {
-          status: 429,
-          headers: {
-            'X-RateLimit-Remaining': String(remaining),
-            'Retry-After': '60',
-          },
-        }
-      );
-    }
-
     const body = await request.json();
     const { videoId, forceRefresh } = requestSchema.parse(body);
 
