@@ -3,14 +3,21 @@
  * Note: Full WebSocket integration tested manually; these tests cover core logic
  */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
 import { AgentConnection } from '../connection'
 
 describe('AgentConnection', () => {
   let connection: AgentConnection
+  let originalFetch: typeof global.fetch
 
   beforeEach(() => {
     connection = new AgentConnection()
+    originalFetch = global.fetch
+  })
+
+  afterEach(() => {
+    global.fetch = originalFetch
+    vi.restoreAllMocks()
   })
 
   describe('initial state', () => {
@@ -238,6 +245,392 @@ describe('AgentConnection', () => {
       const status = connection.getStatus()
       const validStatuses = ['disconnected', 'connecting', 'connected', 'error']
       expect(validStatuses).toContain(status)
+    })
+  })
+
+  describe('SSE transport', () => {
+    describe('connect with SSE', () => {
+      it('marks as connected immediately without network call', async () => {
+        const statusListener = vi.fn()
+        connection.onStatusChange(statusListener)
+
+        await connection.connect('test-token', 'sse')
+
+        expect(connection.getStatus()).toBe('connected')
+        expect(statusListener).toHaveBeenCalledWith('connected')
+      })
+
+      it('can connect multiple times without error', async () => {
+        await connection.connect('test-token', 'sse')
+        await connection.connect('test-token', 'sse')
+
+        expect(connection.getStatus()).toBe('connected')
+      })
+    })
+
+    describe('generateInsight with SSE', () => {
+      beforeEach(async () => {
+        await connection.connect('test-token', 'sse')
+      })
+
+      it('makes POST request to /api/agent/stream', async () => {
+        const mockFetch = vi.fn().mockResolvedValue({
+          ok: true,
+          body: {
+            getReader: () => ({
+              read: vi.fn()
+                .mockResolvedValueOnce({ done: false, value: new TextEncoder().encode('data: {"type":"text","content":"Hello"}\n\n') })
+                .mockResolvedValueOnce({ done: false, value: new TextEncoder().encode('data: {"type":"done","fullContent":"Hello World"}\n\n') })
+                .mockResolvedValueOnce({ done: true })
+            })
+          }
+        })
+        global.fetch = mockFetch as any
+
+        const callbacks = {
+          onStart: vi.fn(),
+          onText: vi.fn(),
+          onDone: vi.fn()
+        }
+
+        connection.generateInsight(
+          {
+            insightType: 'test',
+            prompt: 'test prompt',
+            systemPrompt: 'test system'
+          },
+          callbacks
+        )
+
+        // Wait for async processing
+        await new Promise(resolve => setTimeout(resolve, 10))
+
+        expect(mockFetch).toHaveBeenCalledWith(
+          '/api/agent/stream',
+          expect.objectContaining({
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: expect.stringContaining('"prompt":"test prompt"')
+          })
+        )
+      })
+
+      it('streams text events to onText callback', async () => {
+        const mockFetch = vi.fn().mockResolvedValue({
+          ok: true,
+          body: {
+            getReader: () => ({
+              read: vi.fn()
+                .mockResolvedValueOnce({ done: false, value: new TextEncoder().encode('data: {"type":"text","content":"Hello "}\n\n') })
+                .mockResolvedValueOnce({ done: false, value: new TextEncoder().encode('data: {"type":"text","content":"World"}\n\n') })
+                .mockResolvedValueOnce({ done: false, value: new TextEncoder().encode('data: {"type":"done","fullContent":"Hello World"}\n\n') })
+                .mockResolvedValueOnce({ done: true })
+            })
+          }
+        })
+        global.fetch = mockFetch as any
+
+        const callbacks = {
+          onText: vi.fn(),
+          onDone: vi.fn()
+        }
+
+        connection.generateInsight(
+          {
+            insightType: 'test',
+            prompt: 'test prompt',
+            systemPrompt: 'test system'
+          },
+          callbacks
+        )
+
+        // Wait for async processing
+        await new Promise(resolve => setTimeout(resolve, 20))
+
+        expect(callbacks.onText).toHaveBeenCalledWith('Hello ')
+        expect(callbacks.onText).toHaveBeenCalledWith('World')
+        expect(callbacks.onDone).toHaveBeenCalledWith('Hello World')
+      })
+
+      it('calls onDone callback with full content', async () => {
+        const mockFetch = vi.fn().mockResolvedValue({
+          ok: true,
+          body: {
+            getReader: () => ({
+              read: vi.fn()
+                .mockResolvedValueOnce({ done: false, value: new TextEncoder().encode('data: {"type":"done","fullContent":"Complete"}\n\n') })
+                .mockResolvedValueOnce({ done: true })
+            })
+          }
+        })
+        global.fetch = mockFetch as any
+
+        const callbacks = {
+          onDone: vi.fn()
+        }
+
+        connection.generateInsight(
+          {
+            insightType: 'test',
+            prompt: 'test prompt',
+            systemPrompt: 'test system'
+          },
+          callbacks
+        )
+
+        await new Promise(resolve => setTimeout(resolve, 10))
+
+        expect(callbacks.onDone).toHaveBeenCalledWith('Complete')
+      })
+
+      it('calls onError callback on error event', async () => {
+        const mockFetch = vi.fn().mockResolvedValue({
+          ok: true,
+          body: {
+            getReader: () => ({
+              read: vi.fn()
+                .mockResolvedValueOnce({ done: false, value: new TextEncoder().encode('data: {"type":"error","error":"Test error"}\n\n') })
+                .mockResolvedValueOnce({ done: true })
+            })
+          }
+        })
+        global.fetch = mockFetch as any
+
+        const callbacks = {
+          onError: vi.fn()
+        }
+
+        connection.generateInsight(
+          {
+            insightType: 'test',
+            prompt: 'test prompt',
+            systemPrompt: 'test system'
+          },
+          callbacks
+        )
+
+        await new Promise(resolve => setTimeout(resolve, 10))
+
+        expect(callbacks.onError).toHaveBeenCalledWith('Test error')
+      })
+
+      it('calls onCancel callback on cancelled event', async () => {
+        const mockFetch = vi.fn().mockResolvedValue({
+          ok: true,
+          body: {
+            getReader: () => ({
+              read: vi.fn()
+                .mockResolvedValueOnce({ done: false, value: new TextEncoder().encode('data: {"type":"cancelled"}\n\n') })
+                .mockResolvedValueOnce({ done: true })
+            })
+          }
+        })
+        global.fetch = mockFetch as any
+
+        const callbacks = {
+          onCancel: vi.fn()
+        }
+
+        connection.generateInsight(
+          {
+            insightType: 'test',
+            prompt: 'test prompt',
+            systemPrompt: 'test system'
+          },
+          callbacks
+        )
+
+        await new Promise(resolve => setTimeout(resolve, 10))
+
+        expect(callbacks.onCancel).toHaveBeenCalled()
+      })
+
+      it('handles chunked SSE data split across reads', async () => {
+        const mockFetch = vi.fn().mockResolvedValue({
+          ok: true,
+          body: {
+            getReader: () => ({
+              read: vi.fn()
+                .mockResolvedValueOnce({ done: false, value: new TextEncoder().encode('data: {"type":"tex') })
+                .mockResolvedValueOnce({ done: false, value: new TextEncoder().encode('t","content":"Hello"}\n\n') })
+                .mockResolvedValueOnce({ done: false, value: new TextEncoder().encode('data: {"type":"done","fullContent":"Hello"}\n\n') })
+                .mockResolvedValueOnce({ done: true })
+            })
+          }
+        })
+        global.fetch = mockFetch as any
+
+        const callbacks = {
+          onText: vi.fn(),
+          onDone: vi.fn()
+        }
+
+        connection.generateInsight(
+          {
+            insightType: 'test',
+            prompt: 'test prompt',
+            systemPrompt: 'test system'
+          },
+          callbacks
+        )
+
+        await new Promise(resolve => setTimeout(resolve, 20))
+
+        expect(callbacks.onText).toHaveBeenCalledWith('Hello')
+        expect(callbacks.onDone).toHaveBeenCalledWith('Hello')
+      })
+
+      it('calls onError when fetch fails', async () => {
+        const mockFetch = vi.fn().mockRejectedValue(new Error('Network error'))
+        global.fetch = mockFetch as any
+
+        const callbacks = {
+          onError: vi.fn()
+        }
+
+        connection.generateInsight(
+          {
+            insightType: 'test',
+            prompt: 'test prompt',
+            systemPrompt: 'test system'
+          },
+          callbacks
+        )
+
+        await new Promise(resolve => setTimeout(resolve, 10))
+
+        expect(callbacks.onError).toHaveBeenCalledWith('Network error')
+      })
+
+      it('calls onError when response is not ok', async () => {
+        const mockFetch = vi.fn().mockResolvedValue({
+          ok: false,
+          statusText: 'Internal Server Error'
+        })
+        global.fetch = mockFetch as any
+
+        const callbacks = {
+          onError: vi.fn()
+        }
+
+        connection.generateInsight(
+          {
+            insightType: 'test',
+            prompt: 'test prompt',
+            systemPrompt: 'test system'
+          },
+          callbacks
+        )
+
+        await new Promise(resolve => setTimeout(resolve, 10))
+
+        expect(callbacks.onError).toHaveBeenCalledWith('Internal Server Error')
+      })
+
+      it('returns unique id for each insight request', () => {
+        const id1 = connection.generateInsight(
+          { insightType: 'test', prompt: 'test1', systemPrompt: 'test' },
+          {}
+        )
+        const id2 = connection.generateInsight(
+          { insightType: 'test', prompt: 'test2', systemPrompt: 'test' },
+          {}
+        )
+
+        expect(id1).toBeTruthy()
+        expect(id2).toBeTruthy()
+        expect(id1).not.toBe(id2)
+      })
+    })
+
+    describe('cancelInsight with SSE', () => {
+      beforeEach(async () => {
+        await connection.connect('test-token', 'sse')
+      })
+
+      it('aborts fetch request and calls cancel endpoint', async () => {
+        const mockReader = {
+          read: vi.fn()
+            .mockResolvedValueOnce({ done: false, value: new TextEncoder().encode('data: {"type":"text","content":"Start"}\n\n') })
+            .mockImplementation(() => new Promise(() => {})) // Hang to allow cancel
+        }
+
+        const mockFetch = vi.fn()
+          .mockResolvedValueOnce({
+            ok: true,
+            body: { getReader: () => mockReader }
+          })
+          .mockResolvedValueOnce({ ok: true }) // For cancel endpoint
+
+        global.fetch = mockFetch as any
+
+        const callbacks = {
+          onText: vi.fn()
+        }
+
+        const id = connection.generateInsight(
+          {
+            insightType: 'test',
+            prompt: 'test prompt',
+            systemPrompt: 'test system'
+          },
+          callbacks
+        )
+
+        await new Promise(resolve => setTimeout(resolve, 10))
+
+        connection.cancelInsight(id)
+
+        await new Promise(resolve => setTimeout(resolve, 10))
+
+        // Should call cancel endpoint
+        expect(mockFetch).toHaveBeenCalledWith(
+          '/api/agent/cancel',
+          expect.objectContaining({
+            method: 'POST',
+            body: expect.stringContaining(`"id":"${id}"`)
+          })
+        )
+      })
+
+      it('does not throw when cancelling non-existent insight', () => {
+        expect(() => {
+          connection.cancelInsight('non-existent-id')
+        }).not.toThrow()
+      })
+    })
+
+    describe('disconnect with SSE', () => {
+      it('aborts all active SSE requests', async () => {
+        await connection.connect('test-token', 'sse')
+
+        const mockReader = {
+          read: vi.fn().mockImplementation(() => new Promise(() => {})) // Hang
+        }
+
+        const mockFetch = vi.fn().mockResolvedValue({
+          ok: true,
+          body: { getReader: () => mockReader }
+        })
+        global.fetch = mockFetch as any
+
+        // Start multiple insights
+        connection.generateInsight(
+          { insightType: 'test', prompt: 'test1', systemPrompt: 'test' },
+          { onError: vi.fn() }
+        )
+        connection.generateInsight(
+          { insightType: 'test', prompt: 'test2', systemPrompt: 'test' },
+          { onError: vi.fn() }
+        )
+
+        await new Promise(resolve => setTimeout(resolve, 10))
+
+        // Disconnect should abort all
+        connection.disconnect()
+
+        expect(connection.getStatus()).toBe('disconnected')
+      })
     })
   })
 })

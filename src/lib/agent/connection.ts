@@ -4,6 +4,7 @@
 import { nanoid } from 'nanoid'
 
 export type ConnectionStatus = 'disconnected' | 'connecting' | 'connected' | 'error'
+export type TransportMode = 'websocket' | 'sse'
 
 interface InsightOptions {
   insightType: string
@@ -29,6 +30,9 @@ export class AgentConnection {
   private status: ConnectionStatus = 'disconnected'
   private statusListeners = new Set<(status: ConnectionStatus) => void>()
   private activeInsights = new Map<string, ActiveInsight>()
+  private transport: TransportMode = 'websocket'
+  private token: string = ''
+  private activeAbortControllers = new Map<string, AbortController>()
 
   getStatus(): ConnectionStatus {
     return this.status
@@ -44,7 +48,21 @@ export class AgentConnection {
     this.statusListeners.forEach(listener => listener(status))
   }
 
-  async connect(token: string): Promise<void> {
+  async connect(token: string, transport: TransportMode = 'websocket'): Promise<void> {
+    this.transport = transport
+    this.token = token
+
+    if (transport === 'sse') {
+      // SSE mode: mark as connected immediately (no persistent connection)
+      this.setStatus('connected')
+      return
+    }
+
+    // WebSocket mode: use existing logic
+    return this.connectWebSocket(token)
+  }
+
+  private async connectWebSocket(token: string): Promise<void> {
     if (this.ws?.readyState === WebSocket.OPEN) {
       return
     }
@@ -158,6 +176,13 @@ export class AgentConnection {
   }
 
   generateInsight(options: InsightOptions, callbacks: InsightCallbacks): string {
+    if (this.transport === 'sse') {
+      return this.generateInsightSSE(options, callbacks)
+    }
+    return this.generateInsightWS(options, callbacks)
+  }
+
+  private generateInsightWS(options: InsightOptions, callbacks: InsightCallbacks): string {
     if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
       callbacks.onError?.('Not connected to agent')
       return ''
@@ -183,7 +208,135 @@ export class AgentConnection {
     }
   }
 
+  private generateInsightSSE(options: InsightOptions, callbacks: InsightCallbacks): string {
+    const id = nanoid()
+    this.activeInsights.set(id, { id, callbacks })
+
+    const abortController = new AbortController()
+    this.activeAbortControllers.set(id, abortController)
+
+    // Start SSE stream
+    this.streamSSE(id, options, callbacks, abortController.signal)
+      .catch((error) => {
+        if (error.name === 'AbortError') {
+          // Request was cancelled, callback already fired
+          return
+        }
+        callbacks.onError?.(error instanceof Error ? error.message : 'Stream failed')
+      })
+      .finally(() => {
+        this.activeInsights.delete(id)
+        this.activeAbortControllers.delete(id)
+      })
+
+    callbacks.onStart?.()
+    return id
+  }
+
+  private async streamSSE(
+    id: string,
+    options: InsightOptions,
+    callbacks: InsightCallbacks,
+    signal: AbortSignal
+  ): Promise<void> {
+    const response = await fetch('/api/agent/stream', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        id,
+        prompt: options.prompt,
+        systemPrompt: options.systemPrompt,
+        token: this.token,
+      }),
+      signal,
+    })
+
+    if (!response.ok) {
+      throw new Error(response.statusText)
+    }
+
+    if (!response.body) {
+      throw new Error('Response body is null')
+    }
+
+    const reader = response.body.getReader()
+    const decoder = new TextDecoder()
+    let buffer = ''
+
+    while (true) {
+      const { done, value } = await reader.read()
+
+      if (done) break
+
+      // Append chunk to buffer
+      buffer += decoder.decode(value, { stream: true })
+
+      // Process complete lines
+      const lines = buffer.split('\n')
+      // Keep incomplete line in buffer
+      buffer = lines.pop() || ''
+
+      for (const line of lines) {
+        if (line.startsWith('data: ')) {
+          const data = line.slice(6) // Remove 'data: ' prefix
+          if (data.trim()) {
+            try {
+              const message = JSON.parse(data)
+              this.handleSSEMessage(message, callbacks)
+            } catch (error) {
+              console.error('[AgentConnection] Failed to parse SSE message:', error)
+            }
+          }
+        }
+      }
+    }
+  }
+
+  private handleSSEMessage(
+    message: {
+      type: string
+      content?: string
+      fullContent?: string
+      error?: string
+    },
+    callbacks: InsightCallbacks
+  ) {
+    switch (message.type) {
+      case 'text':
+        if (message.content) {
+          callbacks.onText?.(message.content)
+        }
+        break
+
+      case 'done':
+        if (message.fullContent) {
+          callbacks.onDone?.(message.fullContent)
+        }
+        break
+
+      case 'error':
+        if (message.error) {
+          callbacks.onError?.(message.error)
+        }
+        break
+
+      case 'cancelled':
+        callbacks.onCancel?.()
+        break
+    }
+  }
+
   cancelInsight(id: string) {
+    if (this.transport === 'sse') {
+      this.cancelInsightSSE(id)
+    } else {
+      this.cancelInsightWS(id)
+    }
+  }
+
+  private cancelInsightWS(id: string) {
     if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
       return
     }
@@ -194,10 +347,38 @@ export class AgentConnection {
     }))
   }
 
+  private cancelInsightSSE(id: string) {
+    const abortController = this.activeAbortControllers.get(id)
+    if (abortController) {
+      abortController.abort()
+      this.activeAbortControllers.delete(id)
+    }
+
+    // Also notify server to cancel
+    fetch('/api/agent/cancel', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ id, token: this.token }),
+    }).catch((error) => {
+      console.error('[AgentConnection] Failed to send cancel request:', error)
+    })
+  }
+
   disconnect() {
+    // Abort all active SSE requests
+    this.activeAbortControllers.forEach((controller) => {
+      controller.abort()
+    })
+    this.activeAbortControllers.clear()
+
+    // Close WebSocket if present
     if (this.ws) {
       this.ws.close()
       this.ws = null
     }
+
+    this.setStatus('disconnected')
   }
 }
