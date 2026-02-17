@@ -1,475 +1,213 @@
 <div align="center">
-  <h1>Gold Miner</h1>
-  <p>A knowledge extraction platform that transforms YouTube content into a searchable knowledge bank with AI-powered personas and ensemble queries.</p>
 
-  <p>
-    <img src="https://img.shields.io/badge/Next.js_16-black?style=flat-square&logo=next.js" alt="Next.js" />
-    <img src="https://img.shields.io/badge/React_19-61DAFB?style=flat-square&logo=react&logoColor=black" alt="React" />
-    <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript" />
-    <img src="https://img.shields.io/badge/PostgreSQL+pgvector-4169E1?style=flat-square&logo=postgresql&logoColor=white" alt="PostgreSQL" />
-    <img src="https://img.shields.io/badge/Drizzle_ORM-C5F74F?style=flat-square&logo=drizzle&logoColor=black" alt="Drizzle" />
-    <img src="https://img.shields.io/badge/Tailwind_v4-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" alt="Tailwind" />
-  </p>
+# Gold Miner
+
+Transform YouTube content into a searchable knowledge bank with AI-powered personas and Claude Code integration
+
+<!-- TODO: Add hero banner image -->
+
+![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue?style=flat-square&logo=typescript)
+![Next.js 16](https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-316192?style=flat-square&logo=postgresql)
+![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)
+
 </div>
 
 ---
 
-## Table of Contents
+## What is Gold Miner?
 
-- [Overview](#overview)
-- [Features](#features)
-- [Architecture](#architecture)
-- [Quick Start](#quick-start)
-- [Environment Setup](#environment-setup)
-- [Database](#database)
-- [Development](#development)
-- [API Reference](#api-reference)
-- [Search and Embeddings](#search-and-embeddings)
-- [MCP Integration](#mcp-integration)
-- [Personas and Ensemble AI](#personas-and-ensemble-ai)
-- [Testing](#testing)
-- [License](#license)
+Gold Miner transforms YouTube videos into a searchable, AI-augmented knowledge bank. Paste a YouTube URL, and it automatically fetches the transcript, generates vector embeddings, and makes the content discoverable through hybrid search. The result is a personal knowledge base where you can surface insights across hundreds of videos in seconds.
 
-## Overview
+What makes Gold Miner unique is its combination of advanced RAG techniques with creator-focused AI features. Hybrid search fuses vector similarity (pgvector) with keyword matching using Reciprocal Rank Fusion. AI-generated personas capture each creator's expertise and communication style, letting you query channels as if chatting with the creator themselves. Ensemble queries ("Ask the Panel") stream parallel responses from multiple personas, grounded in their respective content via RAG. And the entire knowledge bank is exposed to Claude Code via Model Context Protocol (MCP), turning your video library into a queryable context source for AI workflows.
 
-Gold Miner ingests YouTube videos (and plain text transcripts), extracts transcripts, chunks them with vector embeddings, and builds a searchable knowledge bank using hybrid vector + keyword search with Reciprocal Rank Fusion. It auto-generates AI personas from creator content and supports "Ask the Panel" ensemble queries that stream responses from multiple expert perspectives simultaneously. The knowledge bank is also exposed as MCP tools for use inside Claude Code.
+<!-- TODO: Add screenshot of dashboard (docs/assets/dashboard-screenshot.png) -->
+
+---
 
 ## Features
 
-- **YouTube Ingestion** -- Add videos by URL with automatic transcript extraction, or paste plain text transcripts from meetings, podcasts, and documents
-- **Hybrid Search** -- Vector similarity + keyword search combined via Reciprocal Rank Fusion (RRF), with optional temporal decay for recency boosting
-- **Graph RAG** -- Chunk-to-chunk relationship edges enable knowledge graph traversal and related content discovery
-- **AI Insights** -- Claude-powered extraction of summaries, key insights, action items, and Claude Code plugin suggestions from transcripts
-- **AI Personas** -- Auto-generated expert personas from YouTube creators (30+ video threshold), each with a system prompt derived from their content
-- **Ensemble Queries** -- "Ask the Panel" streams answers from the top 3 most relevant personas in parallel via SSE, with semantic "who's best" routing
-- **Channel Discovery** -- Follow YouTube channels via RSS, discover similar creators through content centroid similarity, and auto-fetch new videos
-- **Focus Areas** -- User-defined categories for organizing and filtering the knowledge bank
-- **MCP Tools** -- Model Context Protocol integration exposing search, creator listing, persona chat, and ensemble queries to Claude Code
+### YouTube Ingestion
+Paste any YouTube URL and Gold Miner automatically fetches the transcript using the YouTube Transcript API, pulling metadata via oEmbed. Alternatively, upload plain text transcripts for content without YouTube sources. All processing happens in a background job queue with automatic retry logic, so ingestion is reliable even for large batches.
+
+### Hybrid RAG Search
+Search combines vector similarity (pgvector cosine distance on 384-dimensional FastEmbed embeddings) with keyword matching (PostgreSQL case-insensitive ILIKE), then fuses results using Reciprocal Rank Fusion (k=60) to balance semantic and lexical relevance. Optional temporal decay boosts recent content in rankings. Results are aggregated by video, showing the top matching chunk per video for clean, scannable output.
+
+### Graph RAG
+Every chunk stores similarity edges to related chunks across the entire knowledge bank, enabling cross-video content discovery through graph traversal. When you find a relevant passage, Graph RAG surfaces conceptually similar content from other videos, even if they use different terminology. This turns isolated transcripts into a connected knowledge graph.
+
+### AI Insights
+Claude analyzes each video to extract structured insights: content type classification (dev/meeting/educational/thought-leadership), multi-level summary (tldr, overview, key points), timestamped key insights, action items, knowledge transfer prompts (questions to deepen understanding), and Claude Code plugin suggestions (skills, commands, agents, hooks, rules). Insights are stored as JSONB for fast querying and displayed alongside search results.
+
+### Creator Personas
+AI-generated personas capture each YouTube channel's expertise and communication style by analyzing their full transcript corpus. Personas are auto-suggested once a channel reaches 30 videos. Each persona has an expertise embedding (the centroid of all chunk embeddings for that channel) used for relevance routing. Query personas individually via chat interface or invoke multiple personas in ensemble mode.
+
+### Ensemble Queries ("Ask the Panel")
+Ask a question and get parallel streaming responses (Server-Sent Events) from the top 3 most relevant creator personas simultaneously. "Who's best?" routing uses cosine similarity between your query embedding and each persona's expertise centroid. Each persona's response is grounded in their own channel's content via RAG search, so answers cite specific videos. The result feels like consulting a panel of experts, each speaking from their domain.
+
+### MCP Integration
+Expose your entire knowledge bank to Claude Code via 4 MCP tools. Search the knowledge base, list all creators, chat with a specific persona, or run ensemble queries—all accessible from your terminal. MCP turns Gold Miner into a queryable context source for Claude workflows, letting you pull insights from your video library directly into coding sessions, research, or planning.
+
+### Channel Discovery
+Follow YouTube channels via RSS feeds with delta detection—Gold Miner automatically fetches new videos as they're published, no manual checking required. The Similar Creators feature uses average centroid similarity (cosine distance of 0.6 threshold) to recommend channels with related content. Discovery tiles show new channels and trending topics with horizontal scroll and CSS scroll-snap for quick scanning.
+
+### Focus Areas
+User-defined categories let you organize videos by topic (e.g., "TypeScript", "Design Systems", "DevOps"). Assign optional colors for visual differentiation. Filter the entire knowledge bank or search results by focus area. Focus areas persist in localStorage and sync across sessions, giving you a personalized taxonomy without backend complexity.
+
+---
 
 ## Architecture
 
 ```mermaid
-graph TB
-    subgraph Client["Client (React 19)"]
-        KB[Knowledge Bank]
-        DIS[Discovery]
-        VD[Video Detail]
-        ADD[Add Video / Transcript]
-    end
-
-    subgraph API["API Routes (Next.js App Router)"]
-        VID["/api/videos"]
-        SEARCH["/api/search"]
-        CHAN["/api/channels"]
-        PERS["/api/personas"]
-        ENS["/api/personas/ensemble"]
-        MCP["/api/mcp/transport"]
-        CRON["/api/cron/*"]
-    end
-
-    subgraph Services
-        EMB["FastEmbed<br/>all-MiniLM-L6-v2<br/>(384 dim, local)"]
-        CLAUDE["Claude API<br/>(insights, personas)"]
-        YT["YouTube<br/>(oEmbed, transcripts, RSS)"]
-        AGENT["Background Agent<br/>(job processing)"]
-    end
-
-    subgraph Storage
-        PG[("PostgreSQL + pgvector")]
-    end
-
-    Client --> API
-    SEARCH --> EMB
-    SEARCH --> PG
-    VID --> PG
-    CHAN --> YT
-    PERS --> CLAUDE
-    ENS -->|"SSE stream"| Client
-    MCP -->|"MCP protocol"| EXT["Claude Code"]
-    CRON --> AGENT
-    AGENT --> PG
-    EMB --> PG
+graph TD
+    A[YouTube URL] --> B[Transcript Fetch]
+    B --> C[Chunk & Embed]
+    C --> D[(pgvector Storage)]
+    D --> E[Hybrid Search]
+    D --> F[Graph RAG]
+    D --> G[AI Personas]
+    E --> H[Knowledge Bank UI]
+    F --> H
+    G --> I[Ensemble Queries]
+    D --> J[MCP Tools]
+    J --> K[Claude Code]
 ```
+
+The pipeline flows from YouTube URL ingestion through transcript fetching, then splits into ~300-word chunks with ~50-word overlap. FastEmbed generates 384-dimensional vectors stored in PostgreSQL with the pgvector extension. From there, content is accessible via four paths: hybrid search (vector + keyword fusion), graph RAG (similarity edges for related content), AI personas (channel-specific expertise models), and MCP tools (exposing the knowledge bank to Claude Code). The UI aggregates all access methods into a unified search and discovery experience.
+
+---
+
+## MCP Tools
+
+Gold Miner's MCP integration is what makes it a true knowledge infrastructure tool for Claude Code workflows. Once connected, Claude can query your video library, consult creator personas, and pull context from your knowledge bank—all without leaving the terminal.
+
+| Tool | Description |
+|------|-------------|
+| `search_rag` | Hybrid search with vector + keyword + RRF fusion, optional creator filtering |
+| `get_list_of_creators` | List all YouTube channels in knowledge bank with video counts |
+| `chat_with_persona` | Query a specific creator persona with RAG-grounded responses |
+| `ensemble_query` | Ask multiple personas simultaneously, get top 3 parallel responses |
+
+### Connecting to Claude Code
+
+Add Gold Miner to your `mcp.json` configuration:
+
+```json
+{
+  "mcpServers": {
+    "gold-miner": {
+      "type": "sse",
+      "url": "http://localhost:3001/api/mcp/sse"
+    }
+  }
+}
+```
+
+Once connected, Claude Code can search your knowledge bank, query creator personas, and get context from your video library. For example: "Search my knowledge bank for videos about React Server Components" or "Ask the panel: what are best practices for database indexing?"
+
+---
 
 ## Quick Start
 
-**Prerequisites:** Node.js 20+, and either [Docker](https://docs.docker.com/get-docker/) or PostgreSQL 16+ with [pgvector](https://github.com/pgvector/pgvector)
-
-### Option A: Docker (recommended)
-
+### 1. Clone the repository
 ```bash
-# Clone and install
-git clone <repo-url>
+git clone https://github.com/yourusername/gold-miner.git
 cd gold-miner
-npm install
+```
 
-# Create .env from defaults (matches Docker credentials out of the box)
-cp .env.example .env
-# Optional: add your ANTHROPIC_API_KEY for AI features (insights, personas)
-
-# Start PostgreSQL with pgvector (auto-enables the extension)
+### 2. Start PostgreSQL with pgvector
+```bash
 docker compose up -d
-
-# Wait for Postgres to be healthy, then push the schema
-docker compose exec postgres pg_isready -U goldminer && npm run db:push
-
-# Start dev server + background agent
-npm run dev
 ```
+This starts PostgreSQL 16 with the pgvector extension enabled. The default configuration matches `.env.example` values, so no manual database setup is needed.
 
-The Docker Compose file runs `pgvector/pgvector:pg16` with credentials that match `.env.example` out of the box. The init script (`scripts/init-db.sql`) automatically enables the `vector` extension and creates a test database.
-
-> **Note:** The app works without `ANTHROPIC_API_KEY` for browsing, search, and discovery. AI features (insights extraction, persona creation, ensemble queries) require the key. See [Environment Setup](#environment-setup) for all variables.
-
-### Option B: Existing PostgreSQL
-
+### 3. Configure environment variables
 ```bash
-git clone <repo-url>
-cd gold-miner
-npm install
-
-# Configure your database connection
 cp .env.example .env
-# Edit .env: set DATABASE_URL to your PostgreSQL instance
-# Optional: add your ANTHROPIC_API_KEY for AI features
+```
+Edit `.env` and configure three key variables:
+- `DATABASE_URL` — PostgreSQL connection string (default `postgresql://goldminer:goldminer@localhost:5432/goldminer` matches Docker)
+- `NEXT_PUBLIC_AGENT_PORT` — Agent WebSocket port (default `9334`, must match `AGENT_PORT`)
+- `ANTHROPIC_API_KEY` — Claude API key for insights and personas (required for AI features, get at https://console.anthropic.com/)
 
-# Enable pgvector and push schema
-psql $DATABASE_URL -c "CREATE EXTENSION IF NOT EXISTS vector;"
+### 4. Install dependencies
+```bash
+npm install
+```
+
+### 5. Initialize the database
+```bash
 npm run db:push
+```
+This applies the Drizzle ORM schema to your PostgreSQL instance, creating all 11 tables with proper indexes and foreign keys.
 
-# Start dev server + background agent
+### 6. Start the development servers
+```bash
 npm run dev
 ```
+Starts two servers in parallel:
+- Next.js dev server on `http://localhost:3001`
+- Agent WebSocket server on port `9334`
 
-The app starts at [http://localhost:3001](http://localhost:3001). The background agent starts concurrently on a WebSocket server (port 9334).
+Open `http://localhost:3001` and start adding YouTube videos to build your knowledge bank.
 
-## Environment Setup
+---
 
-Copy `.env.example` to `.env` and configure:
-
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `DATABASE_URL` | Yes | PostgreSQL connection string, e.g. `postgresql://user:pass@localhost:5432/goldminer` |
-| `NEXT_PUBLIC_AGENT_PORT` | Yes | WebSocket port for the background agent. Must be set to `9334` to match the npm scripts (included in `.env.example`) |
-| `ANTHROPIC_API_KEY` | For AI features | Claude API key -- required for insights extraction, persona generation, and ensemble queries |
-| `CRON_SECRET` | For automation | Bearer token for authenticating cron endpoints (`/api/cron/*`) |
-| `MCP_AUTH_ENABLED` | No | Set to `true` to require bearer token auth on MCP endpoints (default: disabled) |
-| `MCP_AUTH_TOKEN` | If MCP auth enabled | Bearer token for MCP endpoint authentication |
-
-**Ports:** Next.js defaults to **3001** and the agent WebSocket to **9334** (configured in `package.json` scripts). Override with `PORT` and `AGENT_PORT` env vars if needed. `NEXT_PUBLIC_AGENT_PORT` must match `AGENT_PORT` so the client connects to the right WebSocket.
-
-If using Docker (`docker compose up -d`), the pgvector extension is enabled automatically by the init script. For manual PostgreSQL setups, run `CREATE EXTENSION IF NOT EXISTS vector;` before pushing the schema.
-
-Embeddings are generated locally using [FastEmbed](https://huggingface.co/Xenova/all-MiniLM-L6-v2) (all-MiniLM-L6-v2, 384 dimensions) -- no external embedding API is needed.
-
-## Database
-
-Gold Miner uses [Drizzle ORM](https://orm.drizzle.team/) with PostgreSQL + pgvector. The schema is defined in [`src/lib/db/schema.ts`](src/lib/db/schema.ts).
-
-### Commands
-
-```bash
-npm run db:push          # Push schema changes to database
-npm run db:studio        # Open Drizzle Studio (visual DB browser)
-npm run db:migrate-data  # Run data migrations
-```
-
-### Schema Overview
+## Database Schema
 
 | Table | Purpose |
 |-------|---------|
-| `videos` | Video metadata, transcripts, source type (youtube / transcript) |
+| `videos` | Video metadata, transcripts, duration, published_at |
 | `chunks` | Transcript chunks with 384-dim vector embeddings |
-| `relationships` | Chunk-to-chunk similarity edges for Graph RAG |
-| `temporal_metadata` | Version mentions and release dates extracted from chunks |
-| `insights` | AI-generated extraction results (1:1 with videos) |
-| `channels` | Followed YouTube channels with RSS feed URLs |
-| `personas` | AI personas with system prompts and expertise embeddings |
-| `focus_areas` | User-defined categories for organizing videos |
-| `video_focus_areas` | Many-to-many junction (videos to focus areas) |
-| `jobs` | Database-backed job queue for async processing |
-| `settings` | Key-value store for app configuration |
+| `insights` | AI extraction results (JSONB) with summaries, key insights, action items |
+| `relationships` | Graph RAG chunk-to-chunk similarity edges |
+| `temporal_metadata` | Version mentions and release dates for temporal decay |
+| `channels` | Followed YouTube channels with RSS feeds |
+| `personas` | AI-generated personas with expertise embeddings |
+| `focus_areas` | User-defined categories |
+| `video_focus_areas` | Many-to-many junction table |
+| `jobs` | Database-backed job queue with retry logic |
+| `settings` | Key-value app configuration |
 
-### Key Relationships
+All tables use auto-incrementing serial primary keys with cascade deletes on foreign keys. Indexes on commonly queried fields (e.g., `chunks.video_id`, `videos.channel`).
 
-- `videos` 1:N `chunks` (cascade delete)
-- `videos` 1:1 `insights` (cascade delete)
-- `chunks` N:N `chunks` via `relationships` (Graph RAG edges)
-- `videos` N:N `focus_areas` via `video_focus_areas`
-- `personas` have an `expertise_embedding` (vector centroid for semantic routing)
+---
 
-## Development
+## Tech Stack
 
-### Commands
+- [Next.js 16](https://nextjs.org/) — App Router with React Server Components
+- [React 19](https://react.dev/) — UI framework
+- [TypeScript](https://www.typescriptlang.org/) — Type safety with strict mode
+- [PostgreSQL 16](https://www.postgresql.org/) + [pgvector](https://github.com/pgvector/pgvector) — Vector database
+- [Drizzle ORM](https://orm.drizzle.team/) — Type-safe database queries
+- [Tailwind CSS v4](https://tailwindcss.com/) — Utility-first styling
+- [shadcn/ui](https://ui.shadcn.com/) — Component library
+- [FastEmbed](https://github.com/qdrant/fastembed) — Local embeddings (all-MiniLM-L6-v2)
+- [Claude API](https://www.anthropic.com/claude) — AI insights and personas
+- [MCP SDK](https://github.com/modelcontextprotocol/typescript-sdk) — Model Context Protocol integration
+- [Vitest](https://vitest.dev/) — Testing framework
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start Next.js + background agent concurrently |
-| `npm run next:dev` | Start Next.js only |
-| `npm run agent` | Start background agent only |
-| `npm run build` | Production build |
-| `npm test` | Run all tests (Vitest) |
-| `npm run test:watch` | Run tests in watch mode |
-| `npm run lint` | Run ESLint |
-| `npm run db:push` | Push Drizzle schema to database |
-| `npm run db:studio` | Open Drizzle Studio |
+---
 
-### Project Structure
+## Documentation
 
-```
-gold-miner/
-├── src/
-│   ├── app/                    # Next.js App Router
-│   │   ├── page.tsx            # Knowledge Bank (home)
-│   │   ├── add/                # Add YouTube video
-│   │   ├── add-transcript/     # Add plain text transcript
-│   │   ├── discovery/          # Channel discovery
-│   │   ├── videos/[id]/        # Video detail page
-│   │   ├── settings/           # Settings page
-│   │   └── api/                # API routes (27 endpoints)
-│   │       ├── videos/         # CRUD, embed, insights, related
-│   │       ├── search/         # Hybrid search
-│   │       ├── channels/       # Follow, similar, automation
-│   │       ├── personas/       # CRUD, query, ensemble, suggest
-│   │       ├── focus-areas/    # CRUD
-│   │       ├── mcp/            # MCP protocol handler
-│   │       ├── youtube/        # Transcript fetching
-│   │       └── cron/           # Feed checking, job processing
-│   ├── agent/                  # Background agent (WebSocket server)
-│   ├── components/             # React components
-│   │   ├── ui/                 # shadcn/ui primitives
-│   │   ├── layout/             # Sidebar, TopBar, MainContent
-│   │   ├── videos/             # VideoCard, VideoGrid, VideoPlayer
-│   │   ├── search/             # SearchResults, ChunkResult
-│   │   ├── discovery/          # Channel tiles, similar creators
-│   │   ├── personas/           # PersonaPanel, ensemble UI
-│   │   ├── insights/           # InsightsPanel, extraction display
-│   │   └── providers/          # FocusArea, Theme, Agent contexts
-│   └── lib/                    # Core business logic
-│       ├── db/                 # Drizzle schema, connection, queries
-│       ├── search/             # Hybrid search, RRF, aggregation
-│       ├── embeddings/         # FastEmbed pipeline, chunker
-│       ├── graph/              # Graph RAG traversal
-│       ├── personas/           # Persona service, ensemble, context
-│       ├── claude/             # Prompts, extraction
-│       ├── mcp/                # MCP tool definitions
-│       ├── automation/         # RSS, delta detection, job queue
-│       ├── channels/           # Similarity computation
-│       └── youtube/            # oEmbed, transcript fetching
-├── CLAUDE.md                   # AI assistant project guidance
-├── drizzle.config.ts           # Drizzle ORM configuration
-└── package.json
-```
+- [CLAUDE.md](CLAUDE.md) — Comprehensive developer reference (architecture, API routes, code conventions)
+- [CONTRIBUTING.md](CONTRIBUTING.md) — Contribution guidelines and setup instructions
+- [.env.example](.env.example) — Environment variable template
 
-### Code Style
+---
 
-- TypeScript strict mode, no semicolons, single quotes, trailing commas
-- Named exports only (no default exports)
-- `@/*` path alias for all imports
-- Zod validation at API boundaries (`safeParse()`, first error in 400 response)
-- shadcn/ui components with CVA variants and `cn()` for class merging
+## Contributing
 
-## API Reference
+Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for setup instructions, code style guidelines, and PR process.
 
-### Videos
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/videos` | List videos with optional `focusAreaId` filter |
-| POST | `/api/videos` | Create video (YouTube or transcript source) |
-| GET | `/api/videos/[id]` | Get single video by ID |
-| POST | `/api/videos/[id]/embed` | Trigger embedding generation |
-| GET | `/api/videos/[id]/embed/status` | Check embedding progress |
-| GET/POST | `/api/videos/[id]/insights` | Get or save AI extraction results |
-| GET | `/api/videos/[id]/related` | Find related chunks via Graph RAG |
-| POST/DELETE | `/api/videos/[id]/focus-areas` | Assign or unassign a focus area |
-
-### Search
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/search?q=...` | Hybrid search. Params: `mode` (vector/keyword/hybrid), `limit`, `temporalDecay`, `halfLifeDays`, `focusAreaId` |
-
-### Channels
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET/POST | `/api/channels` | List or follow a channel |
-| GET/PATCH/DELETE | `/api/channels/[id]` | Get, update, or unfollow |
-| GET | `/api/channels/[id]/videos` | Fetch channel videos via RSS |
-| PATCH | `/api/channels/[id]/automation` | Toggle auto-fetch |
-| GET | `/api/channels/videos` | All discovery videos across channels |
-| GET | `/api/channels/similar` | Find similar creators by content similarity |
-| POST | `/api/channels/similar/follow` | Follow a recommended channel |
-
-### Personas
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET/POST | `/api/personas` | List or create a persona |
-| GET/DELETE | `/api/personas/[id]` | Get or delete a persona |
-| POST | `/api/personas/[id]/query` | Query single persona (SSE stream) |
-| POST | `/api/personas/ensemble` | Ensemble query -- top 3 personas (SSE stream) |
-| GET | `/api/personas/suggest` | Check if persona creation is suggested |
-
-### Other
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET/POST | `/api/mcp/[transport]` | MCP protocol handler (SSE or HTTP) |
-| GET/POST | `/api/focus-areas` | List or create focus areas |
-| PATCH/DELETE | `/api/focus-areas/[id]` | Update or delete a focus area |
-| POST | `/api/youtube/transcript` | Fetch YouTube transcript by video ID |
-| GET | `/api/cron/check-feeds` | Check RSS feeds for new videos (auth required) |
-| GET | `/api/cron/process-jobs` | Process pending job queue (auth required) |
-| GET | `/api/agent/token` | Get MCP authentication token |
-
-## Search and Embeddings
-
-Gold Miner implements a three-mode search system:
-
-**Vector search** generates a query embedding via FastEmbed (all-MiniLM-L6-v2, 384 dimensions, runs locally in Node.js) and finds similar chunks using cosine similarity in pgvector.
-
-**Keyword search** performs case-insensitive matching against chunk content in PostgreSQL.
-
-**Hybrid search** (default) runs both in parallel and combines results using Reciprocal Rank Fusion:
-
-```
-RRF score = sum( 1 / (k + rank) )   where k = 60
-```
-
-Results are aggregated by video -- chunks are grouped under their parent video with the maximum similarity score bubbled up.
-
-**Temporal decay** can be enabled to boost recent content:
-
-```
-adjusted_score = similarity * exp(-ln(2) * age_days / half_life_days)
-```
-
-**Graph RAG** computes chunk-to-chunk relationship edges during embedding generation. The `/api/videos/[id]/related` endpoint traverses these edges to find topically related content across videos.
-
-### Embedding Pipeline
-
-1. Transcript is split into ~300-word chunks with ~50-word overlap
-2. Embeddings are generated locally via FastEmbed (no external API calls)
-3. Chunks and embeddings are stored in PostgreSQL with pgvector
-4. Cross-chunk similarity edges are computed for Graph RAG
-5. Temporal metadata (version mentions, release dates) is extracted
-
-## MCP Integration
-
-Gold Miner exposes its knowledge bank as [Model Context Protocol](https://modelcontextprotocol.io/) tools, allowing Claude Code and Claude Desktop to search and query the knowledge base directly.
-
-### Endpoints
-
-| Transport | Endpoint | Use case |
-|-----------|----------|----------|
-| Streamable HTTP | `/api/mcp/mcp` | Claude Desktop, `mcp-remote` |
-| SSE | `/api/mcp/sse` | Legacy SSE clients |
-| SSE Messages | `/api/mcp/message` | SSE message posting |
-
-### Available Tools
-
-| Tool | Description | Parameters |
-|------|-------------|------------|
-| `search_rag` | Search the knowledge base | `topic` (required), `creator` (optional), `limit` (optional) |
-| `get_list_of_creators` | List all creators with video counts | none |
-| `chat_with_persona` | Query a single persona by name | `personaName`, `question` |
-| `ensemble_query` | Query all personas (returns top 3) | `question` |
-
-Tools are defined in [`src/lib/mcp/tools.ts`](src/lib/mcp/tools.ts) with Zod schema validation.
-
-### Claude Desktop Setup
-
-Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_desktop_config.json`):
-
-```json
-{
-  "mcpServers": {
-    "gold-miner": {
-      "command": "npx",
-      "args": ["-y", "mcp-remote", "http://localhost:3001/api/mcp/mcp"]
-    }
-  }
-}
-```
-
-### Claude Code Setup
-
-Add to your project's `.mcp.json`:
-
-```json
-{
-  "mcpServers": {
-    "gold-miner": {
-      "command": "npx",
-      "args": ["-y", "mcp-remote", "http://localhost:3001/api/mcp/mcp"]
-    }
-  }
-}
-```
-
-### Authentication
-
-Auth is **disabled by default** for local development. To enable authentication (recommended for production):
-
-```bash
-MCP_AUTH_ENABLED=true
-MCP_AUTH_TOKEN=your-secret-token
-```
-
-When auth is enabled, clients must include the token in requests:
-
-```
-Authorization: Bearer your-secret-token
-```
-
-The background agent also generates a separate bearer token on startup (saved to `.agent-token`) for the WebSocket-based agent protocol.
-
-## Personas and Ensemble AI
-
-### Persona Creation
-
-When a channel has 30+ videos with embeddings, the system suggests creating an AI persona. The creation process:
-
-1. Samples transcripts from the channel
-2. Uses Claude to analyze the creator's expertise, style, and tone
-3. Generates a system prompt that embodies the creator's perspective
-4. Computes an expertise embedding (centroid of all channel chunk embeddings)
-5. Extracts expertise topics for display
-
-### Ensemble Queries ("Ask the Panel")
-
-When a user types a question in the search bar, the ensemble system:
-
-1. Generates a query embedding from the question
-2. Computes cosine similarity against each persona's expertise centroid
-3. Selects the top 3 most relevant personas
-4. Queries all 3 in parallel with channel-scoped context (vector search limited to each creator's content)
-5. Streams responses via SSE with tagged events (`persona_X_content`, `persona_X_done`, `all_done`)
-
-The UI renders responses in a three-column layout as they stream in.
-
-## Testing
-
-Tests use [Vitest](https://vitest.dev/) with React Testing Library. Database tests use better-sqlite3 in-memory to avoid requiring a running PostgreSQL server.
-
-```bash
-npm test           # Run all tests
-npm run test:watch # Watch mode
-```
-
-Test files are colocated with source code in `__tests__/` directories.
-
-### Coverage
-
-- UI components (render, interaction, accessibility)
-- Search algorithms (RRF fusion, aggregation)
-- Transcript chunking and parsing
-- API route validation (Zod schemas)
-- MCP tool definitions
-- Persona service logic
+---
 
 ## License
 
-Private -- not yet licensed for distribution.
+[MIT](LICENSE) © 2026 Darin Drobinski
+
+---
+
+**Built with [Claude Code](https://claude.ai/claude-code) and inspired by the power of connecting knowledge across conversations.**
