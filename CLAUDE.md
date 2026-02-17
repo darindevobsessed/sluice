@@ -192,6 +192,7 @@ Required environment variables (see `.env.example` for template):
 ### Optional
 - `PORT` - Next.js dev server port (default: `3001`)
 - `AGENT_PORT` - Agent WebSocket server port (default: `9334`)
+- `AGENT_AUTH_TOKEN` - Authentication token for agent operations (SSE and WebSocket)
 - `CRON_SECRET` - Secret for authenticating `/api/cron/*` endpoints
 - `MCP_AUTH_ENABLED` - Enable MCP authentication (default: `false`)
 - `MCP_AUTH_TOKEN` - Token for MCP authentication
@@ -271,6 +272,14 @@ Tools registered in `src/lib/mcp/tools.ts` with Zod schema validation. Optional 
 - **Status tracking**: pending → processing → completed/failed
 - **Cron endpoints**: `/api/cron/fetch-new-videos` (RSS delta detection), `/api/cron/process-jobs`
 - **Auth**: secured with `CRON_SECRET` env var
+
+### Dual Transport Agent
+Gold Miner supports two transport mechanisms for AI agent operations:
+- **WebSocket (local dev)**: Standalone agent server via `npm run agent` on port 9334
+- **SSE (production)**: Server-Sent Events via `/api/agent/stream` for serverless deployment (Vercel)
+- **Auto-detection**: Token endpoint `/api/agent/token` returns `transport: 'websocket'` (local) or `transport: 'sse'` (production)
+- **Unified interface**: `AgentConnection` class abstracts both transports with same public API
+- **Zero consumer changes**: Components (`ExtractionProvider`, `InsightsTabs`, `InsightsPanel`) work identically across environments
 
 ### SSE Streaming
 Server-Sent Events (SSE) for real-time AI responses:
