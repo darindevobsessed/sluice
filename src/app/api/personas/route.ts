@@ -69,3 +69,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Failed to create persona' }, { status: 500 })
   }
 }
+
+/**
+ * Configure route segment for Vercel
+ * maxDuration allows longer-running operations (requires Pro plan)
+ */
+export const maxDuration = 60
