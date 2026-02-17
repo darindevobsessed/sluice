@@ -3,18 +3,27 @@ import { render, waitFor, screen } from '@testing-library/react';
 import { AgentProvider, useAgent } from '../AgentProvider';
 import { AgentConnection } from '../connection';
 
+// Create mock functions that will be reused
+const mockConnect = vi.fn().mockResolvedValue(undefined);
+const mockDisconnect = vi.fn();
+const mockOnStatusChange = vi.fn(() => () => {});
+
 // Mock the AgentConnection class
 vi.mock('../connection', () => {
+  const MockAgentConnection = vi.fn(function(
+    this: {
+      onStatusChange: typeof mockOnStatusChange
+      connect: typeof mockConnect
+      disconnect: typeof mockDisconnect
+    }
+  ) {
+    this.onStatusChange = mockOnStatusChange;
+    this.connect = mockConnect;
+    this.disconnect = mockDisconnect;
+  });
+
   return {
-    AgentConnection: vi.fn().mockImplementation(() => {
-      return {
-        onStatusChange: vi.fn(() => {
-          return () => {};
-        }),
-        connect: vi.fn().mockResolvedValue(undefined),
-        disconnect: vi.fn(),
-      };
-    }),
+    AgentConnection: MockAgentConnection,
   };
 });
 
@@ -58,7 +67,7 @@ describe('AgentProvider', () => {
   it('should fetch token and connect on mount', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      json: async () => ({ available: true, token: 'test-token' }),
+      json: async () => ({ available: true, token: 'test-token', transport: 'websocket' }),
     });
 
     render(
@@ -116,6 +125,40 @@ describe('AgentProvider', () => {
     }).toThrow('useAgent must be used within AgentProvider');
 
     consoleError.mockRestore();
+  });
+
+  it('should pass transport hint to connection.connect', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ available: true, token: 'test-token', transport: 'sse' }),
+    });
+
+    render(
+      <AgentProvider>
+        <TestComponent />
+      </AgentProvider>
+    );
+
+    await waitFor(() => {
+      expect(mockConnect).toHaveBeenCalledWith('test-token', 'sse');
+    });
+  });
+
+  it('should default to websocket transport when hint missing', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ available: true, token: 'test-token' }),
+    });
+
+    render(
+      <AgentProvider>
+        <TestComponent />
+      </AgentProvider>
+    );
+
+    await waitFor(() => {
+      expect(mockConnect).toHaveBeenCalledWith('test-token', 'websocket');
+    });
   });
 
   // Note: disconnect on unmount is tested implicitly through cleanup

@@ -5,7 +5,7 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, useRef, type ReactNode } from 'react';
-import { AgentConnection, type ConnectionStatus } from './connection';
+import { AgentConnection, type ConnectionStatus, type TransportMode } from './connection';
 
 interface AgentContextValue {
   status: ConnectionStatus;
@@ -42,11 +42,13 @@ export function AgentProvider({ children }: AgentProviderProps) {
           return;
         }
 
+        const transport: TransportMode = data.transport || 'websocket';
+
         const connection = new AgentConnection();
         connectionRef.current = connection;
         connection.onStatusChange(setStatus);
 
-        await connection.connect(data.token);
+        await connection.connect(data.token, transport);
         if (!cancelled) {
           setAgent(connection);
           setError(null);
