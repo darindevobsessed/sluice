@@ -110,3 +110,68 @@ In the Vercel dashboard, go to **Settings > Environment Variables** for your pro
 > **Note:** Do NOT set `PORT` or `AGENT_PORT` -- these are local dev settings. Vercel manages ports automatically.
 
 > **Security:** Generate tokens with `openssl rand -hex 32` for cryptographic randomness. Do not reuse tokens across variables.
+
+---
+
+## 4. Deploy
+
+- [ ] In the Vercel dashboard, trigger the first deployment:
+  - If you skipped the initial deploy in Section 1: click **Deploy** now
+  - If it already deployed (with missing env vars): go to **Deployments**, click the latest, and **Redeploy** (check "Use existing Build Cache" = OFF for a clean build)
+- [ ] Watch the build logs for:
+  - `npm install` completing without errors
+  - `next build` completing successfully
+  - No warnings about missing environment variables in build output
+- [ ] Verify the deployment URL works (e.g., `https://gold-miner-xxx.vercel.app`)
+- [ ] Check the Function logs (Vercel dashboard > Logs) for startup -- you should NOT see:
+  - `Warning: ANTHROPIC_API_KEY not set` (means env var is missing)
+  - `Warning: CRON_SECRET not set` (means cron endpoints are unsecured)
+
+> **Troubleshooting: Build fails with ONNX errors**
+> The embedding pipeline uses `@huggingface/transformers` which downloads the model at runtime to `/tmp/.cache`. If the build itself tries to import this during static page generation, it may fail. All embedding-using routes are API routes (not pages), so this should not happen. If it does, check that no page component imports from `@/lib/embeddings/` directly.
+
+> **Troubleshooting: Function timeout on first request**
+> The first request to an embedding route (search, embed) downloads the ~23MB all-MiniLM-L6-v2 model to `/tmp/.cache`. This cold start can take 10-15 seconds. Subsequent requests reuse the cached model (within the same serverless function instance). This is normal.
+
+---
+
+## 5. Domain Configuration (Optional)
+
+Skip this section if the default `*.vercel.app` domain is sufficient.
+
+- [ ] Go to Vercel dashboard > **Settings > Domains**
+- [ ] Add your custom domain (e.g., `goldminer.yourdomain.com`)
+- [ ] Configure DNS at your domain registrar:
+  - **CNAME record:** `goldminer` -> `cname.vercel-dns.com`
+  - OR for apex domain: **A record** -> `76.76.21.21`
+- [ ] Wait for DNS propagation (usually 1-5 minutes, can take up to 48 hours)
+- [ ] Vercel auto-provisions SSL certificate via Let's Encrypt
+- [ ] Verify HTTPS works: `https://goldminer.yourdomain.com`
+
+---
+
+## 6. Verify Cron Jobs
+
+Gold Miner uses two Vercel Cron Jobs defined in `vercel.json`:
+
+| Cron Job | Schedule | Path | Purpose |
+|----------|----------|------|---------|
+| Check Feeds | Every 12 hours (`0 */12 * * *`) | `/api/cron/check-feeds` | Polls RSS feeds for new videos from followed channels |
+| Process Jobs | Every 5 minutes (`*/5 * * * *`) | `/api/cron/process-jobs` | Processes queued jobs (transcript fetch, embedding generation) |
+
+- [ ] Go to Vercel dashboard > **Settings > Cron Jobs**
+- [ ] Verify both cron jobs appear with correct schedules
+- [ ] Vercel automatically sends `Authorization: Bearer <CRON_SECRET>` header to cron endpoints
+- [ ] To manually trigger a cron job for testing:
+  ```bash
+  # Check feeds
+  curl -H "Authorization: Bearer YOUR_CRON_SECRET" https://your-domain.vercel.app/api/cron/check-feeds
+
+  # Process jobs
+  curl -H "Authorization: Bearer YOUR_CRON_SECRET" https://your-domain.vercel.app/api/cron/process-jobs
+  ```
+- [ ] Expected responses:
+  - `check-feeds`: `{"checked": 0, "queued": 0}` (0 channels followed initially)
+  - `process-jobs`: `{"processed": 0, "failed": 0}` (no jobs queued initially)
+
+> **Note:** Vercel Cron Jobs require the Pro plan. On Hobby, crons run at most once per day. On Pro, the minimum interval is 1 minute.
