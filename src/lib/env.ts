@@ -23,7 +23,6 @@ if (!process.env.BETTER_AUTH_SECRET) {
   console.warn('Warning: BETTER_AUTH_SECRET not set. Auth will use an insecure default in development.')
 }
 
-// Note: NEXT_PUBLIC_AGENT_PORT and MCP_AUTH_TOKEN are not validated
-// These are optional and have sensible defaults or fallbacks
+// Note: NEXT_PUBLIC_AGENT_PORT is not validated -- it has a sensible default
 
 export {}

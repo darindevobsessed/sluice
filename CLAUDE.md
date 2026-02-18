@@ -196,8 +196,6 @@ Required environment variables (see `.env.example` for template):
 ### Optional
 - `PORT` - Next.js dev server port (default: `3001`)
 - `AGENT_PORT` - Agent WebSocket server port (default: `9334`)
-- `MCP_AUTH_ENABLED` - Enable MCP authentication (default: `false`)
-- `MCP_AUTH_TOKEN` - Token for MCP authentication
 
 ## Database Schema
 
@@ -265,7 +263,7 @@ Gold Miner exposes 4 MCP tools for Claude Code workflows:
 3. `chat_with_persona` - Query a specific creator persona
 4. `ensemble_query` - Ask multiple personas simultaneously
 
-Tools registered in `src/lib/mcp/tools.ts` with Zod schema validation. Optional authentication via `MCP_AUTH_TOKEN`.
+Tools registered in `src/lib/mcp/tools.ts` with Zod schema validation. Authentication via Better Auth OAuth in production. Open in development.
 
 ### Automation & Job Queue
 **Database-backed job queue** for reliable async processing:

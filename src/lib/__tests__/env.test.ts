@@ -62,19 +62,15 @@ describe('env validation', () => {
     expect(consoleWarnSpy).not.toHaveBeenCalled()
   })
 
-  it('does not validate NEXT_PUBLIC_AGENT_PORT or MCP_AUTH_TOKEN', async () => {
+  it('does not validate NEXT_PUBLIC_AGENT_PORT', async () => {
     process.env.DATABASE_URL = 'postgresql://test'
     delete process.env.NEXT_PUBLIC_AGENT_PORT
-    delete process.env.MCP_AUTH_TOKEN
 
     await import('../env')
 
-    // Should not throw or warn about these
+    // Should not throw or warn about this optional var
     expect(consoleWarnSpy).not.toHaveBeenCalledWith(
       expect.stringContaining('NEXT_PUBLIC_AGENT_PORT')
-    )
-    expect(consoleWarnSpy).not.toHaveBeenCalledWith(
-      expect.stringContaining('MCP_AUTH_TOKEN')
     )
   })
 })
