@@ -10,6 +10,8 @@ import { ExtractionProvider } from "@/components/providers/ExtractionProvider";
 import { FocusAreaProvider } from "@/components/providers/FocusAreaProvider";
 import { SidebarProvider } from "@/components/providers/SidebarProvider";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { Analytics } from '@vercel/analytics/next'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 
 const inter = Inter({
   variable: "--font-inter",
@@ -50,6 +52,8 @@ export default function RootLayout({
             </ExtractionProvider>
           </AgentProvider>
         </ThemeProvider>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
