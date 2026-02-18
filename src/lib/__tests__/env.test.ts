@@ -55,6 +55,7 @@ describe('env validation', () => {
     process.env.DATABASE_URL = 'postgresql://test'
     process.env.ANTHROPIC_API_KEY = 'test-key'
     process.env.CRON_SECRET = 'test-secret'
+    process.env.BETTER_AUTH_SECRET = 'test-auth-secret'
 
     await import('../env')
 

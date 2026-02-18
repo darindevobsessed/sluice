@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { signIn, signUp, signOut, useSession } from '@/lib/auth-client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -37,7 +38,7 @@ export default function SignInPage() {
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">
               You are already signed in. You can return to the{' '}
-              <a href="/" className="text-primary underline">Knowledge Bank</a>
+              <Link href="/" className="text-primary underline">Knowledge Bank</Link>
               {' '}or sign out below.
             </p>
             <Button
