@@ -5,6 +5,7 @@ import { parseTranscript } from '@/lib/transcript/parse';
 import { chunkTranscript } from '@/lib/embeddings/chunker';
 import { embedChunks } from '@/lib/embeddings/service';
 import type { TranscriptSegment } from '@/lib/embeddings/types';
+import { startApiTimer } from '@/lib/api-timing';
 
 interface EmbedResponse {
   success: boolean;
@@ -29,11 +30,13 @@ export async function POST(
   request: Request,
   context: RouteContext
 ): Promise<NextResponse<EmbedResponse>> {
+  const { id } = await context.params;
+  const videoId = parseInt(id, 10);
+  const timer = startApiTimer(`/api/videos/${id}/embed`, 'POST')
   try {
-    const { id } = await context.params;
-    const videoId = parseInt(id, 10);
 
     if (isNaN(videoId)) {
+      timer.end(400)
       return NextResponse.json(
         {
           success: false,
@@ -52,6 +55,7 @@ export async function POST(
       .limit(1);
 
     if (!video) {
+      timer.end(404)
       return NextResponse.json(
         {
           success: false,
@@ -64,6 +68,7 @@ export async function POST(
 
     // Check if video has transcript
     if (!video.transcript) {
+      timer.end(400)
       return NextResponse.json(
         {
           success: false,
@@ -87,6 +92,7 @@ export async function POST(
     const chunkedSegments = chunkTranscript(segments);
 
     if (chunkedSegments.length === 0) {
+      timer.end(400)
       return NextResponse.json(
         {
           success: false,
@@ -101,6 +107,7 @@ export async function POST(
     const embeddingResult = await embedChunks(chunkedSegments, undefined, videoId);
 
     if (embeddingResult.errorCount > 0) {
+      timer.end(500, { chunkCount: embeddingResult.successCount })
       return NextResponse.json(
         {
           success: false,
@@ -111,6 +118,7 @@ export async function POST(
       );
     }
 
+    timer.end(200, { chunkCount: embeddingResult.successCount })
     return NextResponse.json({
       success: true,
       alreadyEmbedded: false,
@@ -120,6 +128,7 @@ export async function POST(
     });
   } catch (error) {
     console.error('Error generating embeddings:', error);
+    timer.end(500)
     return NextResponse.json(
       {
         success: false,

@@ -7,6 +7,7 @@ import { chunkTranscript } from '@/lib/embeddings/chunker'
 import { embedChunks } from '@/lib/embeddings/service'
 import type { TranscriptSegment } from '@/lib/embeddings/types'
 import { fetchVideoPageMetadata } from '@/lib/youtube/metadata'
+import { startApiTimer } from '@/lib/api-timing'
 
 const videoSchema = z.object({
   youtubeId: z.string().min(1).optional(),
@@ -107,6 +108,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const timer = startApiTimer('/api/videos', 'POST')
   try {
     const body = await request.json();
 
@@ -115,6 +117,7 @@ export async function POST(request: Request) {
 
     if (!validationResult.success) {
       const firstError = validationResult.error.issues[0];
+      timer.end(400)
       return NextResponse.json(
         { error: firstError?.message || "Invalid request data" },
         { status: 400 }
@@ -125,6 +128,7 @@ export async function POST(request: Request) {
 
     // Conditional validation: YouTube type requires youtubeId
     if (sourceType === 'youtube' && !youtubeId) {
+      timer.end(400)
       return NextResponse.json(
         { error: "YouTube ID is required for YouTube videos" },
         { status: 400 }
@@ -143,6 +147,7 @@ export async function POST(request: Request) {
         .limit(1);
 
       if (existingVideo.length > 0) {
+        timer.end(409)
         return NextResponse.json(
           { error: "This video has already been added to your Knowledge Bank" },
           { status: 409 }
@@ -223,6 +228,7 @@ export async function POST(request: Request) {
     }
 
     if (!createdVideo) {
+      timer.end(500)
       return NextResponse.json(
         { error: "Failed to create video" },
         { status: 500 }
@@ -236,6 +242,7 @@ export async function POST(request: Request) {
       ? channels.find(c => c.channel === createdVideo.channel)?.videoCount ?? 0
       : 0
 
+    timer.end(201, { videoId: createdVideo.id, sourceType })
     return NextResponse.json(
       {
         video: createdVideo,
@@ -249,6 +256,7 @@ export async function POST(request: Request) {
     );
   } catch (error) {
     console.error("Error creating video:", error);
+    timer.end(500)
     return NextResponse.json(
       { error: "Failed to save video. Please try again." },
       { status: 500 }

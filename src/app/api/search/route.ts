@@ -4,6 +4,7 @@ import { db, chunks, videoFocusAreas } from '@/lib/db';
 import { hybridSearch } from '@/lib/search/hybrid-search';
 import { aggregateByVideo, type VideoResult } from '@/lib/search/aggregate';
 import type { SearchResult } from '@/lib/search/types';
+import { startApiTimer } from '@/lib/api-timing';
 
 /**
  * Search mode: vector, keyword, or hybrid (RRF)
@@ -61,7 +62,7 @@ export async function GET(request: Request) {
   const temporalDecay = temporalDecayParam === 'true';
   const halfLifeDays = parseInt(searchParams.get('halfLifeDays') || '365', 10);
 
-  const start = performance.now();
+  const timer = startApiTimer('/api/search', 'GET')
 
   // Check if any embeddings exist
   const embeddingCount = await db
@@ -72,6 +73,7 @@ export async function GET(request: Request) {
 
   // If no query, return empty results
   if (!query.trim()) {
+    timer.end(200, { empty: true })
     const response: SearchResponse = {
       chunks: [],
       videos: [],
@@ -107,7 +109,7 @@ export async function GET(request: Request) {
 
   const videoResults = aggregateByVideo(chunkResults);
 
-  const timing = Math.round(performance.now() - start);
+  const timing = timer.end(200, { mode, resultCount: videoResults.length, hasEmbeddings })
 
   const response: SearchResponse = {
     chunks: chunkResults.slice(0, limit),
