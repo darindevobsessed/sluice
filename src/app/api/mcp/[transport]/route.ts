@@ -1,7 +1,7 @@
 import { createMcpHandler } from 'mcp-handler'
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { registerSearchRag, registerGetListOfCreators, registerChatWithPersona, registerEnsembleQuery } from '@/lib/mcp/tools'
-import { validateMcpAuth } from '@/lib/mcp/auth'
+import { auth } from '@/lib/auth'
 
 /**
  * MCP Route Handler for Gold Miner
@@ -52,13 +52,16 @@ const handler = createMcpHandler(
  * MCP protocol requires both methods to be available
  */
 async function wrappedHandler(request: Request): Promise<Response> {
-  // Check authentication before processing
-  const auth = validateMcpAuth(request)
-  if (!auth.valid) {
-    return new Response(JSON.stringify({ error: auth.error }), {
-      status: 401,
-      headers: { 'Content-Type': 'application/json' },
-    })
+  // In production, verify OAuth session via Better Auth MCP plugin
+  // In development, skip auth so local MCP tools work without OAuth setup
+  if (process.env.NODE_ENV === 'production') {
+    const session = await auth.api.getMcpSession({ headers: request.headers })
+    if (!session) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    }
   }
 
   // MCP handler requires Accept header for streamable HTTP transport

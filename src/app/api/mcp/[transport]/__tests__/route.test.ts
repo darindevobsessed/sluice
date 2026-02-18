@@ -5,20 +5,24 @@ vi.mock('@/lib/db', () => ({
   db: {},
 }))
 
-// Store original env vars
-const originalEnv = {
-  MCP_AUTH_ENABLED: process.env.MCP_AUTH_ENABLED,
-  MCP_AUTH_TOKEN: process.env.MCP_AUTH_TOKEN,
-}
+// Mock Better Auth — control getMcpSession per test
+const mockGetMcpSession = vi.fn()
+vi.mock('@/lib/auth', () => ({
+  auth: {
+    api: {
+      getMcpSession: mockGetMcpSession,
+    },
+  },
+}))
 
 // Import after mocking
 const routeModule = await import('../route')
 
 describe('MCP Route Handler', () => {
-  // Clean up after each test
-  afterEach(() => {
-    process.env.MCP_AUTH_ENABLED = originalEnv.MCP_AUTH_ENABLED
-    process.env.MCP_AUTH_TOKEN = originalEnv.MCP_AUTH_TOKEN
+  beforeEach(() => {
+    vi.clearAllMocks()
+    // Default: authenticated
+    mockGetMcpSession.mockResolvedValue({ user: { id: 'user-1' } })
   })
 
   it('exports GET handler', () => {
@@ -95,14 +99,18 @@ describe('MCP Route Handler', () => {
     expect(response.status).toBe(200)
   }, 10000)
 
-  describe('authentication', () => {
+  describe('authentication (production only)', () => {
     beforeEach(() => {
-      // Ensure auth is disabled for default tests
-      delete process.env.MCP_AUTH_ENABLED
-      delete process.env.MCP_AUTH_TOKEN
+      vi.stubEnv('NODE_ENV', 'production')
     })
 
-    it('allows requests when auth is disabled (default)', async () => {
+    afterEach(() => {
+      vi.unstubAllEnvs()
+    })
+
+    it('rejects unauthenticated requests with 401 in production', async () => {
+      mockGetMcpSession.mockResolvedValue(null)
+
       const request = new Request('http://localhost:3000/api/mcp/mcp', {
         method: 'POST',
         headers: {
@@ -116,10 +124,36 @@ describe('MCP Route Handler', () => {
           params: {
             protocolVersion: '2024-11-05',
             capabilities: {},
-            clientInfo: {
-              name: 'test-client',
-              version: '1.0.0',
-            },
+            clientInfo: { name: 'test-client', version: '1.0.0' },
+          },
+        }),
+      })
+
+      const response = await routeModule.POST(request)
+      expect(response.status).toBe(401)
+
+      const body = await response.json()
+      expect(body.error).toBe('Unauthorized')
+    })
+
+    it('allows authenticated requests through to MCP handler in production', async () => {
+      mockGetMcpSession.mockResolvedValue({ user: { id: 'user-1' } })
+
+      const request = new Request('http://localhost:3000/api/mcp/mcp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json, text/event-stream',
+          'Authorization': 'Bearer valid-oauth-token',
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'initialize',
+          params: {
+            protocolVersion: '2024-11-05',
+            capabilities: {},
+            clientInfo: { name: 'test-client', version: '1.0.0' },
           },
         }),
       })
@@ -128,48 +162,34 @@ describe('MCP Route Handler', () => {
       expect(response.status).toBe(200)
     }, 10000)
 
-    it('rejects requests without token when auth is enabled', async () => {
-      process.env.MCP_AUTH_ENABLED = 'true'
-      process.env.MCP_AUTH_TOKEN = 'test-token-123'
+    it('passes request headers to getMcpSession in production', async () => {
+      mockGetMcpSession.mockResolvedValue(null)
 
       const request = new Request('http://localhost:3000/api/mcp/mcp', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json, text/event-stream',
+          'Authorization': 'Bearer some-token',
         },
-        body: JSON.stringify({
-          jsonrpc: '2.0',
-          id: 1,
-          method: 'initialize',
-          params: {
-            protocolVersion: '2024-11-05',
-            capabilities: {},
-            clientInfo: {
-              name: 'test-client',
-              version: '1.0.0',
-            },
-          },
-        }),
+        body: '{}',
       })
 
-      const response = await routeModule.POST(request)
-      expect(response.status).toBe(401)
+      await routeModule.POST(request)
 
-      const body = await response.json()
-      expect(body.error).toBe('Missing authorization header')
+      expect(mockGetMcpSession).toHaveBeenCalledOnce()
+      const callArg = mockGetMcpSession.mock.calls[0]?.[0]
+      expect(callArg).toHaveProperty('headers')
     })
 
-    it('rejects requests with invalid token when auth is enabled', async () => {
-      process.env.MCP_AUTH_ENABLED = 'true'
-      process.env.MCP_AUTH_TOKEN = 'test-token-123'
+    it('skips auth check in development', async () => {
+      vi.stubEnv('NODE_ENV', 'development')
+      mockGetMcpSession.mockResolvedValue(null)
 
       const request = new Request('http://localhost:3000/api/mcp/mcp', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json, text/event-stream',
-          'Authorization': 'Bearer wrong-token',
         },
         body: JSON.stringify({
           jsonrpc: '2.0',
@@ -178,49 +198,15 @@ describe('MCP Route Handler', () => {
           params: {
             protocolVersion: '2024-11-05',
             capabilities: {},
-            clientInfo: {
-              name: 'test-client',
-              version: '1.0.0',
-            },
+            clientInfo: { name: 'test-client', version: '1.0.0' },
           },
         }),
       })
 
       const response = await routeModule.POST(request)
-      expect(response.status).toBe(401)
-
-      const body = await response.json()
-      expect(body.error).toBe('Invalid token')
-    })
-
-    it('allows requests with valid token when auth is enabled', async () => {
-      process.env.MCP_AUTH_ENABLED = 'true'
-      process.env.MCP_AUTH_TOKEN = 'test-token-123'
-
-      const request = new Request('http://localhost:3000/api/mcp/mcp', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json, text/event-stream',
-          'Authorization': 'Bearer test-token-123',
-        },
-        body: JSON.stringify({
-          jsonrpc: '2.0',
-          id: 1,
-          method: 'initialize',
-          params: {
-            protocolVersion: '2024-11-05',
-            capabilities: {},
-            clientInfo: {
-              name: 'test-client',
-              version: '1.0.0',
-            },
-          },
-        }),
-      })
-
-      const response = await routeModule.POST(request)
+      // Should pass through to MCP handler, not 401
       expect(response.status).toBe(200)
+      expect(mockGetMcpSession).not.toHaveBeenCalled()
     }, 10000)
   })
 })
