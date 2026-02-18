@@ -325,3 +325,14 @@ Server-Sent Events (SSE) for real-time AI responses:
 - **Docker**: Use `docker-compose up -d` to start PostgreSQL + pgvector locally
 - **Migrations**: Use `npm run db:push` to apply Drizzle schema changes
 - **Database GUI**: Use `npm run db:studio` to inspect database with Drizzle Studio
+
+## Deployment
+
+Gold Miner deploys to **Vercel** with a **Neon PostgreSQL** database. See [`DEPLOY.md`](./DEPLOY.md) for the full step-by-step deployment checklist.
+
+**Key production details:**
+- Vercel Pro plan required (60s function timeout for 9 heavy API routes)
+- Neon PostgreSQL with pgvector extension for vector embeddings
+- SSE agent transport (auto-detected via `AGENT_AUTH_TOKEN` env var)
+- Vercel Cron Jobs: check-feeds (12h), process-jobs (5min)
+- Embedding model downloads to `/tmp/.cache` on cold start (~23MB, 10-15s)

@@ -175,3 +175,158 @@ Gold Miner uses two Vercel Cron Jobs defined in `vercel.json`:
   - `process-jobs`: `{"processed": 0, "failed": 0}` (no jobs queued initially)
 
 > **Note:** Vercel Cron Jobs require the Pro plan. On Hobby, crons run at most once per day. On Pro, the minimum interval is 1 minute.
+
+---
+
+## 7. End-to-End Verification
+
+Work through each feature to confirm the production deployment is fully functional.
+
+### 7.1 Video Ingestion
+
+- [ ] Navigate to `/add`
+- [ ] Paste a YouTube URL (e.g., `https://www.youtube.com/watch?v=dQw4w9WgXcQ`)
+- [ ] Verify video preview loads (thumbnail, title, channel from oEmbed)
+- [ ] Paste a transcript and click "Add to Knowledge Bank"
+- [ ] Verify success state with video thumbnail
+- [ ] Verify video appears in Knowledge Bank (`/`)
+
+### 7.2 Embedding Generation
+
+- [ ] Navigate to the video detail page (`/videos/[id]`)
+- [ ] Embeddings generate automatically after video creation (via `after()` hook or job queue)
+- [ ] Alternatively, check via API:
+  ```bash
+  curl https://your-domain.vercel.app/api/videos/VIDEO_ID/embed
+  ```
+- [ ] Verify chunks exist in database (Neon SQL Editor):
+  ```sql
+  SELECT count(*) FROM chunks WHERE video_id = VIDEO_ID;
+  ```
+
+> **Note:** First embedding request triggers model download (~23MB) to `/tmp/.cache`. Allow 15-30 seconds for cold start.
+
+### 7.3 Hybrid Search
+
+- [ ] Go to Knowledge Bank (`/`)
+- [ ] Type a search query in the search bar
+- [ ] Verify results appear (requires at least one video with embeddings)
+- [ ] Results should show video cards with relevant chunk previews
+- [ ] Verify search works via API:
+  ```bash
+  curl "https://your-domain.vercel.app/api/search?q=your+query&mode=hybrid"
+  ```
+
+### 7.4 AI Insights Generation
+
+- [ ] Navigate to a video detail page (`/videos/[id]`)
+- [ ] Click the **Insights** tab
+- [ ] Click **Generate** on any insight card (Extract Insights, Summarize, or Suggest Plugins)
+- [ ] Verify streaming text appears in real-time (SSE transport)
+- [ ] Verify the insight persists after page refresh
+
+> **Requires:** `ANTHROPIC_API_KEY` and `AGENT_AUTH_TOKEN` both set correctly. If insights fail, check Vercel Function logs for auth errors.
+
+### 7.5 Discovery and Channel Following
+
+- [ ] Navigate to `/discovery`
+- [ ] Click "Follow a Channel"
+- [ ] Paste a YouTube channel URL (e.g., `https://www.youtube.com/@fireship`)
+- [ ] Verify channel appears with recent videos
+- [ ] Verify "Add to Bank" button works on discovery cards
+
+### 7.6 Persona Queries (if applicable)
+
+Personas require 30+ videos from a single channel. Skip if you do not have enough content yet.
+
+- [ ] Navigate to Knowledge Bank
+- [ ] Persona UI appears above search results if personas exist
+- [ ] Click a persona to open chat
+- [ ] Send a question and verify streaming response
+- [ ] Verify response references the creator's actual content/expertise
+
+### 7.7 Ensemble SSE Streaming (if applicable)
+
+Requires multiple personas. Skip if fewer than 2 personas exist.
+
+- [ ] In the persona UI, click "Ask the Panel"
+- [ ] Type a question and submit
+- [ ] Verify responses stream from multiple personas simultaneously
+- [ ] Verify `all_done` event fires (responses complete cleanly, no hanging spinners)
+- [ ] Test via API:
+  ```bash
+  curl -X POST https://your-domain.vercel.app/api/personas/ensemble \
+    -H "Content-Type: application/json" \
+    -d '{"question": "What is the best way to learn programming?"}'
+  ```
+
+### 7.8 MCP Tools
+
+Test MCP endpoints if you use Gold Miner with Claude Code.
+
+- [ ] Test search_rag tool:
+  ```bash
+  curl -X POST https://your-domain.vercel.app/api/mcp/mcp \
+    -H "Content-Type: application/json" \
+    -H "Accept: application/json, text/event-stream" \
+    -d '{"jsonrpc": "2.0", "id": 1, "method": "tools/list"}'
+  ```
+- [ ] Verify response lists 4 tools: `search_rag`, `get_list_of_creators`, `chat_with_persona`, `ensemble_query`
+- [ ] If `MCP_AUTH_ENABLED=true`, include auth header:
+  ```bash
+  -H "Authorization: Bearer YOUR_MCP_AUTH_TOKEN"
+  ```
+
+### 7.9 Cron Jobs (End-to-End)
+
+- [ ] Follow at least one channel with auto-fetch enabled (via Discovery page)
+- [ ] Manually trigger check-feeds:
+  ```bash
+  curl -H "Authorization: Bearer YOUR_CRON_SECRET" \
+    https://your-domain.vercel.app/api/cron/check-feeds
+  ```
+- [ ] Verify response shows `"checked": 1` (or however many channels you follow)
+- [ ] If new videos were found, trigger process-jobs:
+  ```bash
+  curl -H "Authorization: Bearer YOUR_CRON_SECRET" \
+    https://your-domain.vercel.app/api/cron/process-jobs
+  ```
+- [ ] Verify jobs process (transcripts fetched, embeddings generated)
+
+---
+
+## Quick Reference
+
+### Environment Variables Summary
+
+| Variable | Required | Used For |
+|----------|----------|----------|
+| `DATABASE_URL` | Yes | PostgreSQL connection (Neon) |
+| `ANTHROPIC_API_KEY` | Yes | Claude API for AI features |
+| `AGENT_AUTH_TOKEN` | Yes | SSE agent authentication |
+| `CRON_SECRET` | Yes | Cron endpoint security |
+| `MCP_AUTH_ENABLED` | No | MCP endpoint auth toggle |
+| `MCP_AUTH_TOKEN` | No | MCP auth token (when enabled) |
+
+### Key URLs
+
+| Path | Purpose |
+|------|---------|
+| `/` | Knowledge Bank (main page) |
+| `/add` | Add YouTube video |
+| `/add-transcript` | Upload raw transcript |
+| `/discovery` | Channel discovery |
+| `/videos/[id]` | Video detail + insights |
+| `/settings` | User settings |
+| `/api/mcp/mcp` | MCP streamable HTTP endpoint |
+| `/api/mcp/sse` | MCP SSE endpoint |
+| `/api/agent/token` | Agent transport detection |
+| `/api/cron/check-feeds` | RSS feed checker (cron) |
+| `/api/cron/process-jobs` | Job queue processor (cron) |
+
+### Architecture Notes
+
+- **Agent transport:** Auto-detects based on environment. If `AGENT_AUTH_TOKEN` env var is set, uses SSE via `/api/agent/stream`. If `.agent-token` file exists (local dev only), uses WebSocket on port 9334.
+- **DB pool:** Auto-sizes based on `DATABASE_URL`. Neon URLs (`neon.tech`) get 3 connections with 10s idle timeout. Local PostgreSQL gets 10 connections with 30s idle timeout.
+- **Embeddings:** Model downloads to `/tmp/.cache` on first use (~23MB). Cached within the serverless function instance lifetime. Cold starts take 10-15 seconds.
+- **Cron:** Vercel automatically sends `CRON_SECRET` as `Authorization: Bearer` header to cron endpoints.
