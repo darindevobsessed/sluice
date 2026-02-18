@@ -181,6 +181,34 @@ describe('MCP Route Handler', () => {
       expect(callArg).toHaveProperty('headers')
     })
 
+    it('adds Accept header when missing for authenticated requests', async () => {
+      mockGetMcpSession.mockResolvedValue({ user: { id: 'user-1' }, session: { id: 'session-1' } })
+
+      // Request without Accept header — should still reach MCP handler after auth passes
+      const request = new Request('http://localhost:3000/api/mcp/mcp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer valid-oauth-token',
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'initialize',
+          params: {
+            protocolVersion: '2024-11-05',
+            capabilities: {},
+            clientInfo: { name: 'test-client', version: '1.0.0' },
+          },
+        }),
+      })
+
+      const response = await routeModule.POST(request)
+      // Auth passed and Accept header was injected — MCP handler should respond 200
+      expect(response).toBeInstanceOf(Response)
+      expect(response.status).toBe(200)
+    }, 10000)
+
     it('skips auth check in development', async () => {
       vi.stubEnv('NODE_ENV', 'development')
       mockGetMcpSession.mockResolvedValue(null)
