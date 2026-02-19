@@ -52,7 +52,8 @@
       "mcp__plugin_craft_chrome-devtools__select_page",
       "mcp__plugin_craft_chrome-devtools__list_network_requests",
       "mcp__plugin_craft_chrome-devtools__performance_analyze_insight",
-      "mcp__plugin_craft_chrome-devtools__get_network_request"
+      "mcp__plugin_craft_chrome-devtools__get_network_request",
+      "mcp__gold-miner__chat_with_persona"
     ]
   }
 }
