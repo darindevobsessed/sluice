@@ -82,4 +82,36 @@ describe('VideoGrid', () => {
     expect(grid).toHaveClass('xl:grid-cols-5');
     expect(grid).toHaveClass('gap-6');
   });
+
+  it('forwards insight summary to the matching video card', () => {
+    const summaryMap: Record<number, string> = {
+      1: 'React fundamentals explained clearly.',
+    };
+    render(<VideoGrid videos={mockVideos} isLoading={false} summaryMap={summaryMap} />);
+
+    expect(screen.getByText('React fundamentals explained clearly.')).toBeInTheDocument();
+  });
+
+  it('does not render insight summary for videos not in summaryMap', () => {
+    const summaryMap: Record<number, string> = {
+      1: 'React fundamentals explained clearly.',
+    };
+    render(<VideoGrid videos={mockVideos} isLoading={false} summaryMap={summaryMap} />);
+
+    // Video 2 (TypeScript Tips) has no summary — no second insight-summary element
+    const summaries = document.querySelectorAll('[data-testid="insight-summary"]');
+    expect(summaries).toHaveLength(1);
+  });
+
+  it('renders no insight summaries when summaryMap is empty', () => {
+    render(<VideoGrid videos={mockVideos} isLoading={false} summaryMap={{}} />);
+
+    expect(document.querySelectorAll('[data-testid="insight-summary"]')).toHaveLength(0);
+  });
+
+  it('renders no insight summaries when summaryMap is not provided', () => {
+    render(<VideoGrid videos={mockVideos} isLoading={false} />);
+
+    expect(document.querySelectorAll('[data-testid="insight-summary"]')).toHaveLength(0);
+  });
 });

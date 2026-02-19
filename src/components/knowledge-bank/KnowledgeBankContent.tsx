@@ -33,6 +33,7 @@ interface ApiResponse {
   videos: VideoListItem[];
   stats: VideoStats;
   focusAreaMap: Record<number, FocusAreaMapEntry[]>;
+  summaryMap: Record<number, string>;
 }
 
 export function KnowledgeBankContent() {
@@ -40,6 +41,7 @@ export function KnowledgeBankContent() {
   const [stats, setStats] = useState<VideoStats | null>(null);
   const [isLoadingVideos, setIsLoadingVideos] = useState(true);
   const [focusAreaMap, setFocusAreaMap] = useState<Record<number, FocusAreaMapEntry[]>>({});
+  const [summaryMap, setSummaryMap] = useState<Record<number, string>>({});
   const [hasActivePersonas, setHasActivePersonas] = useState(false);
 
   // Set page title
@@ -104,11 +106,13 @@ export function KnowledgeBankContent() {
         setVideos(mappedVideos);
         setStats(data.stats);
         setFocusAreaMap(data.focusAreaMap || {});
+        setSummaryMap(data.summaryMap || {});
       } catch (error) {
         console.error('Error fetching videos:', error);
         setVideos([]);
         setStats({ count: 0, totalHours: 0, channels: 0 });
         setFocusAreaMap({});
+        setSummaryMap({});
       } finally {
         setIsLoadingVideos(false);
       }
@@ -274,6 +278,7 @@ export function KnowledgeBankContent() {
               allFocusAreas={focusAreas}
               onToggleFocusArea={handleToggleFocusArea}
               returnTo={returnTo || undefined}
+              summaryMap={summaryMap}
             />
           )}
         </>

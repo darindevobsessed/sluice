@@ -13,6 +13,7 @@ interface VideoGridProps {
   allFocusAreas?: FocusArea[];
   onToggleFocusArea?: (videoId: number, focusAreaId: number) => void;
   returnTo?: string;
+  summaryMap?: Record<number, string>;
 }
 
 export function VideoGrid({
@@ -24,6 +25,7 @@ export function VideoGrid({
   allFocusAreas,
   onToggleFocusArea,
   returnTo,
+  summaryMap,
 }: VideoGridProps) {
   if (isLoading) {
     return (
@@ -61,6 +63,7 @@ export function VideoGrid({
             allFocusAreas={allFocusAreas}
             onToggleFocusArea={onToggleFocusArea ? (faId) => onToggleFocusArea(video.id, faId) : undefined}
             returnTo={returnTo}
+            insightSummary={summaryMap?.[video.id]}
           />
         </div>
       ))}
