@@ -44,7 +44,15 @@
       "mcp__plugin_craft_chrome-devtools__performance_start_trace",
       "mcp__plugin_craft_chrome-devtools__wait_for",
       "Bash(done)",
-      "WebFetch(domain:raw.githubusercontent.com)"
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "mcp__tech-council__consult_experts",
+      "mcp__gold-miner__search_rag",
+      "mcp__plugin_craft_chrome-devtools__list_pages",
+      "mcp__plugin_craft_chrome-devtools__new_page",
+      "mcp__plugin_craft_chrome-devtools__select_page",
+      "mcp__plugin_craft_chrome-devtools__list_network_requests",
+      "mcp__plugin_craft_chrome-devtools__performance_analyze_insight",
+      "mcp__plugin_craft_chrome-devtools__get_network_request"
     ]
   }
 }

@@ -95,7 +95,7 @@ In the Vercel dashboard, go to **Settings > Environment Variables** for your pro
 | Variable | Value | Notes |
 |----------|-------|-------|
 | `DATABASE_URL` | `postgresql://...@...neon.tech/...?sslmode=require` | Your Neon connection string from Section 2. Pool auto-sizes to 3 connections for Neon. |
-| `ANTHROPIC_API_KEY` | `sk-ant-...` | Claude API key for insights, personas, ensemble queries. Get at [console.anthropic.com](https://console.anthropic.com). |
+| `AI_GATEWAY_KEY` | `sk-ant-...` | AI gateway key for insights, personas, ensemble queries. Get at [console.anthropic.com](https://console.anthropic.com). |
 | `AGENT_AUTH_TOKEN` | Any secure random string (e.g., `openssl rand -hex 32`) | Authenticates SSE agent transport in production. When this is set, the `/api/agent/token` endpoint returns `transport: 'sse'` instead of `transport: 'websocket'`. |
 | `CRON_SECRET` | Any secure random string (e.g., `openssl rand -hex 32`) | Secures `/api/cron/*` endpoints. Vercel sends this as `Authorization: Bearer <token>` header. |
 
@@ -124,7 +124,7 @@ In the Vercel dashboard, go to **Settings > Environment Variables** for your pro
   - No warnings about missing environment variables in build output
 - [ ] Verify the deployment URL works (e.g., `https://gold-miner-xxx.vercel.app`)
 - [ ] Check the Function logs (Vercel dashboard > Logs) for startup -- you should NOT see:
-  - `Warning: ANTHROPIC_API_KEY not set` (means env var is missing)
+  - `Warning: AI_GATEWAY_KEY not set` (means env var is missing)
   - `Warning: CRON_SECRET not set` (means cron endpoints are unsecured)
 
 > **Troubleshooting: Build fails with ONNX errors**
@@ -225,7 +225,7 @@ Work through each feature to confirm the production deployment is fully function
 - [ ] Verify streaming text appears in real-time (SSE transport)
 - [ ] Verify the insight persists after page refresh
 
-> **Requires:** `ANTHROPIC_API_KEY` and `AGENT_AUTH_TOKEN` both set correctly. If insights fail, check Vercel Function logs for auth errors.
+> **Requires:** `AI_GATEWAY_KEY` and `AGENT_AUTH_TOKEN` both set correctly. If insights fail, check Vercel Function logs for auth errors.
 
 ### 7.5 Discovery and Channel Following
 
@@ -302,7 +302,7 @@ Test MCP endpoints if you use Gold Miner with Claude Code.
 | Variable | Required | Used For |
 |----------|----------|----------|
 | `DATABASE_URL` | Yes | PostgreSQL connection (Neon) |
-| `ANTHROPIC_API_KEY` | Yes | Claude API for AI features |
+| `AI_GATEWAY_KEY` | Yes | AI gateway key for AI features |
 | `AGENT_AUTH_TOKEN` | Yes | SSE agent authentication |
 | `CRON_SECRET` | Yes | Cron endpoint security |
 | `MCP_AUTH_ENABLED` | No | MCP endpoint auth toggle |

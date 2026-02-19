@@ -129,7 +129,7 @@ cp .env.example .env
 Edit `.env` and configure three key variables:
 - `DATABASE_URL` — PostgreSQL connection string (default `postgresql://goldminer:goldminer@localhost:5432/goldminer` matches Docker)
 - `NEXT_PUBLIC_AGENT_PORT` — Agent WebSocket port (default `9334`, must match `AGENT_PORT`)
-- `ANTHROPIC_API_KEY` — Claude API key for insights and personas (required for AI features, get at https://console.anthropic.com/)
+- `AI_GATEWAY_KEY` — AI gateway key for insights and personas (required for AI features, get at https://console.anthropic.com/)
 
 ### 4. Install dependencies
 ```bash

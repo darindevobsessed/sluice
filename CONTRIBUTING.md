@@ -64,7 +64,7 @@ Configure the following variables in `.env`:
   - Default: `9334`
   - Must match `AGENT_PORT` in npm scripts (already configured in `package.json`)
 
-- **`ANTHROPIC_API_KEY`** — Claude API key for AI features (insights, personas, ensemble queries)
+- **`AI_GATEWAY_KEY`** — AI gateway key for AI features (insights, personas, ensemble queries)
   - Optional for development (you can ingest and search videos without it)
   - Required for AI features (insights generation, personas, ensemble queries)
   - Get your key at [https://console.anthropic.com/](https://console.anthropic.com/)

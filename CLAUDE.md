@@ -184,12 +184,12 @@ All commands use **npm** as the package manager:
 
 Required environment variables (see `.env.example` for template):
 
-**App validates these at startup** — missing `DATABASE_URL` throws, missing `ANTHROPIC_API_KEY` or `CRON_SECRET` warns.
+**App validates these at startup** — missing `DATABASE_URL` throws, missing `AI_GATEWAY_KEY` or `CRON_SECRET` warns.
 
 ### Required
 - `DATABASE_URL` - PostgreSQL connection string (default: `postgresql://goldminer:goldminer@localhost:5432/goldminer`). DB pool auto-sizes: 3 connections for Neon (serverless), 10 for local PostgreSQL.
 - `NEXT_PUBLIC_AGENT_PORT` - Agent WebSocket port (default: `9334`, must match `AGENT_PORT`)
-- `ANTHROPIC_API_KEY` - Claude API key for insights and personas (get at https://console.anthropic.com/)
+- `AI_GATEWAY_KEY` - AI gateway key for insights and personas (get at https://console.anthropic.com/). Bridged to `ANTHROPIC_API_KEY` at startup for SDK compatibility.
 - `AGENT_AUTH_TOKEN` - Token for SSE agent transport in production (local dev uses .agent-token file)
 - `CRON_SECRET` - Secret for authenticating `/api/cron/*` endpoints
 
