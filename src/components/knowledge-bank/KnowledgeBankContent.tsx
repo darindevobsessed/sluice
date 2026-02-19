@@ -51,6 +51,7 @@ export function KnowledgeBankContent() {
   // URL state with validation
   const { searchParams, updateParams } = useURLParams()
   const urlQuery = searchParams.get('q') || ''
+  const urlChannel = searchParams.get('channel') || ''
 
   // Compute returnTo for video detail navigation
   const returnTo = buildReturnTo('/', searchParams)
@@ -80,6 +81,9 @@ export function KnowledgeBankContent() {
         const params = new URLSearchParams();
         if (selectedFocusAreaId !== null) {
           params.set('focusAreaId', String(selectedFocusAreaId));
+        }
+        if (urlChannel) {
+          params.set('channel', urlChannel);
         }
         const url = `/api/videos${params.toString() ? `?${params}` : ''}`;
         const response = await fetch(url);
@@ -111,7 +115,7 @@ export function KnowledgeBankContent() {
     }
 
     fetchVideos();
-  }, [selectedFocusAreaId]);
+  }, [selectedFocusAreaId, urlChannel]);
 
   // Chip filters — provides chips, activeIds, filtered videos, and toggle handler
   const { chips, activeIds, filteredVideos: chipFilteredVideos, handleToggle } = useChipFilters({

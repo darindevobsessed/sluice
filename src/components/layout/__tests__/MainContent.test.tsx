@@ -3,9 +3,17 @@ import { render, screen } from '@testing-library/react'
 import { userEvent } from '@testing-library/user-event'
 import { MainContent } from '../MainContent'
 import { SidebarProvider } from '@/components/providers/SidebarProvider'
+import { SidebarDataProvider } from '@/components/providers/SidebarDataProvider'
 import { FocusAreaProvider } from '@/components/providers/FocusAreaProvider'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { Sidebar } from '../Sidebar'
+
+// Mock next/navigation — SidebarChannels and SidebarFocusAreas use useRouter and useSearchParams
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ push: vi.fn() }),
+  useSearchParams: () => ({ get: vi.fn(() => null) }),
+  usePathname: () => '/',
+}))
 
 // Mock localStorage
 const localStorageMock = (() => {
@@ -25,23 +33,25 @@ Object.defineProperty(window, 'localStorage', {
   value: localStorageMock,
 })
 
-// Mock fetch for FocusAreaProvider
+// Mock fetch for SidebarDataProvider and FocusAreaProvider
 global.fetch = vi.fn(() =>
   Promise.resolve({
     ok: true,
-    json: () => Promise.resolve({ focusAreas: [] }),
+    json: () => Promise.resolve({ channels: [], focusAreas: [] }),
   } as Response)
 )
 
 function TestWrapper({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
-      <FocusAreaProvider>
-        <TooltipProvider>
-          <Sidebar />
-          <MainContent>{children}</MainContent>
-        </TooltipProvider>
-      </FocusAreaProvider>
+      <SidebarDataProvider>
+        <FocusAreaProvider>
+          <TooltipProvider>
+            <Sidebar />
+            <MainContent>{children}</MainContent>
+          </TooltipProvider>
+        </FocusAreaProvider>
+      </SidebarDataProvider>
     </SidebarProvider>
   )
 }

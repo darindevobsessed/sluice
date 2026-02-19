@@ -1,9 +1,18 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { userEvent } from '@testing-library/user-event'
 import { Sidebar } from '../Sidebar'
 import { SidebarProvider } from '@/components/providers/SidebarProvider'
 import { TooltipProvider } from '@/components/ui/tooltip'
+import { SidebarDataProvider } from '@/components/providers/SidebarDataProvider'
+import { FocusAreaProvider } from '@/components/providers/FocusAreaProvider'
+
+// Mock next/navigation — SidebarChannels and SidebarFocusAreas use useRouter and useSearchParams
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ push: vi.fn() }),
+  useSearchParams: () => ({ get: vi.fn(() => null) }),
+  usePathname: () => '/',
+}))
 
 // Mock localStorage
 const localStorageMock = (() => {
@@ -23,12 +32,24 @@ Object.defineProperty(window, 'localStorage', {
   value: localStorageMock,
 })
 
+// Mock fetch so SidebarDataProvider and FocusAreaProvider don't make real network calls
+global.fetch = vi.fn(() =>
+  Promise.resolve({
+    ok: true,
+    json: () => Promise.resolve({ channels: [], focusAreas: [] }),
+  })
+) as unknown as typeof fetch
+
 function SidebarTestWrapper() {
   return (
     <SidebarProvider>
-      <TooltipProvider>
-        <Sidebar />
-      </TooltipProvider>
+      <SidebarDataProvider>
+        <FocusAreaProvider>
+          <TooltipProvider>
+            <Sidebar />
+          </TooltipProvider>
+        </FocusAreaProvider>
+      </SidebarDataProvider>
     </SidebarProvider>
   )
 }
@@ -245,6 +266,24 @@ describe('Sidebar', () => {
       // Backdrop should exist but not be visible
       const backdrop = container.querySelector('.bg-black\\/50')
       expect(backdrop).toBeNull()
+    })
+  })
+
+  describe('section structure', () => {
+    it('renders a scrollable content wrapper inside each sidebar', () => {
+      const { container } = render(<SidebarTestWrapper />)
+
+      // The overflow-y-auto wrapper should exist inside each sidebar
+      const scrollContainers = container.querySelectorAll('.overflow-y-auto')
+      expect(scrollContainers.length).toBeGreaterThanOrEqual(2) // one per sidebar
+    })
+
+    it('renders a separator between nav and channel sections', () => {
+      const { container } = render(<SidebarTestWrapper />)
+
+      // border-t separator divs should be present
+      const separators = container.querySelectorAll('.border-t')
+      expect(separators.length).toBeGreaterThanOrEqual(2) // one per sidebar
     })
   })
 })

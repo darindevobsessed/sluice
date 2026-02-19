@@ -20,7 +20,7 @@ export function SidebarNav() {
   const { collapsed, closeMobile } = useSidebar();
 
   return (
-    <nav className="flex flex-col gap-1 px-2">
+    <nav className="flex flex-col gap-1 px-2 pb-1">
       {navItems.map((item) => {
         const isActive = pathname === item.href;
         const Icon = item.icon;

@@ -1,8 +1,11 @@
 'use client'
 
+import { Suspense } from 'react'
 import { useSidebar } from '@/components/providers/SidebarProvider'
 import { SidebarLogo } from './SidebarLogo'
 import { SidebarNav } from './SidebarNav'
+import { SidebarChannels } from './SidebarChannels'
+import { SidebarFocusAreas } from './SidebarFocusAreas'
 
 export function Sidebar() {
   const { collapsed, mobileOpen, closeMobile } = useSidebar()
@@ -18,7 +21,14 @@ export function Sidebar() {
         role="complementary"
       >
         <SidebarLogo collapsed={collapsed} />
-        <SidebarNav />
+        <div className="flex-1 overflow-y-auto">
+          <SidebarNav />
+          <div className="mx-3 my-2 border-t" />
+          <Suspense>
+            <SidebarChannels />
+          </Suspense>
+          <SidebarFocusAreas />
+        </div>
       </aside>
 
       {/* Mobile Sidebar - slide-in overlay */}
@@ -29,7 +39,14 @@ export function Sidebar() {
         role="complementary"
       >
         <SidebarLogo collapsed={false} />
-        <SidebarNav />
+        <div className="flex-1 overflow-y-auto">
+          <SidebarNav />
+          <div className="mx-3 my-2 border-t" />
+          <Suspense>
+            <SidebarChannels />
+          </Suspense>
+          <SidebarFocusAreas />
+        </div>
       </aside>
 
       {/* Backdrop for mobile sidebar */}
