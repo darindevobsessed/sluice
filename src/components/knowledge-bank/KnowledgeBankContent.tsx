@@ -9,9 +9,11 @@ import { SearchResults } from '@/components/search/SearchResults'
 import { PersonaPanel } from '@/components/personas/PersonaPanel'
 import { PersonaStatus } from '@/components/personas/PersonaStatus'
 import { ChipBar } from '@/components/filters/ChipBar'
+import { SortDropdown } from '@/components/filters/SortDropdown'
 import { useSearch } from '@/hooks/useSearch'
 import { useEnsemble } from '@/hooks/useEnsemble'
 import { useChipFilters } from '@/hooks/useChipFilters'
+import { useVideoSort } from '@/hooks/useVideoSort'
 import { usePageTitle } from '@/components/layout/PageTitleContext'
 import { useFocusArea } from '@/components/providers/FocusAreaProvider'
 import { useURLParams } from '@/hooks/useURLParams'
@@ -112,10 +114,15 @@ export function KnowledgeBankContent() {
   }, [selectedFocusAreaId]);
 
   // Chip filters — provides chips, activeIds, filtered videos, and toggle handler
-  const { chips, activeIds, filteredVideos, handleToggle } = useChipFilters({
+  const { chips, activeIds, filteredVideos: chipFilteredVideos, handleToggle } = useChipFilters({
     videos,
     focusAreas,
     focusAreaMap,
+  })
+
+  // Sort — applies after chip filtering so changing chips doesn't reset sort
+  const { sortedVideos, sortOption, setSortOption } = useVideoSort({
+    videos: chipFilteredVideos,
   })
 
   // Search handler - updates URL query param
@@ -215,14 +222,20 @@ export function KnowledgeBankContent() {
             )}
           </div>
 
-          {/* Chip Bar - visible when browsing (not searching) */}
+          {/* Toolbar: Chip Bar + Sort — visible when browsing (not searching) */}
           {!showSearchResults && videos.length > 0 && (
-            <ChipBar
-              chips={chips}
-              activeIds={activeIds}
-              onToggle={handleToggle}
-              className="mb-6"
-            />
+            <div className="mb-6 flex items-center gap-3">
+              <ChipBar
+                chips={chips}
+                activeIds={activeIds}
+                onToggle={handleToggle}
+                className="min-w-0 flex-1"
+              />
+              <SortDropdown
+                value={sortOption}
+                onChange={setSortOption}
+              />
+            </div>
           )}
 
           {/* Persona Panel - shows above search results when question detected */}
@@ -237,7 +250,7 @@ export function KnowledgeBankContent() {
             <SearchResults results={results} isLoading={isSearching} />
           ) : (
             <VideoGrid
-              videos={filteredVideos}
+              videos={sortedVideos}
               isLoading={isLoadingVideos}
               emptyMessage={
                 activeIds.size > 0

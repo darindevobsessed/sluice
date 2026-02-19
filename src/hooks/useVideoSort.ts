@@ -2,7 +2,6 @@
 
 import { useMemo, useCallback } from 'react'
 import { useURLParams } from '@/hooks/useURLParams'
-import type { Video } from '@/lib/db/schema'
 
 export const SORT_OPTIONS = [
   { id: 'added', label: 'Date Added' },
@@ -15,17 +14,25 @@ export type SortOptionId = typeof SORT_OPTIONS[number]['id']
 
 const VALID_SORT_IDS = new Set<string>(SORT_OPTIONS.map(o => o.id))
 
-interface UseVideoSortOptions {
-  videos: Video[]
+/** Minimal shape required for sorting — satisfied by both Video and VideoListItem */
+interface SortableVideo {
+  createdAt: Date
+  publishedAt: Date | null
+  duration: number | null
+  title: string
 }
 
-interface UseVideoSortResult {
-  sortedVideos: Video[]
+interface UseVideoSortOptions<T extends SortableVideo> {
+  videos: T[]
+}
+
+interface UseVideoSortResult<T extends SortableVideo> {
+  sortedVideos: T[]
   sortOption: SortOptionId
   setSortOption: (id: SortOptionId) => void
 }
 
-export function useVideoSort({ videos }: UseVideoSortOptions): UseVideoSortResult {
+export function useVideoSort<T extends SortableVideo>({ videos }: UseVideoSortOptions<T>): UseVideoSortResult<T> {
   const { searchParams, updateParams } = useURLParams()
 
   const rawSort = searchParams.get('sort') ?? ''
@@ -38,7 +45,7 @@ export function useVideoSort({ videos }: UseVideoSortOptions): UseVideoSortResul
   }, [updateParams])
 
   const sortedVideos = useMemo(() => {
-    const arr = [...videos]
+    const arr: T[] = [...videos]
     switch (sortOption) {
       case 'added':
         return arr.sort((a, b) =>
