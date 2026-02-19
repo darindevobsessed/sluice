@@ -106,6 +106,26 @@ describe('VideoCard', () => {
     expect(screen.queryByText('Fireship')).not.toBeInTheDocument();
     expect(screen.getByText('React Tutorial for Beginners')).toBeInTheDocument();
   });
+
+  it('renders insight summary when provided', () => {
+    const summary = 'This video covers the fundamentals of React hooks and state management.';
+    render(<VideoCard video={mockVideo} insightSummary={summary} />);
+    expect(screen.getByText(summary)).toBeInTheDocument();
+  });
+
+  it('does not render insight summary section when not provided', () => {
+    render(<VideoCard video={mockVideo} />);
+    expect(document.querySelector('[data-testid="insight-summary"]')).not.toBeInTheDocument();
+  });
+
+  it('truncates long insight summary with line-clamp', () => {
+    const longSummary = 'This is a very long summary that should be truncated because it exceeds the two line limit set by the line-clamp-2 class applied to the paragraph element.';
+    render(<VideoCard video={mockVideo} insightSummary={longSummary} />);
+    const summaryEl = document.querySelector('[data-testid="insight-summary"]');
+    expect(summaryEl).toBeInTheDocument();
+    expect(summaryEl).toHaveClass('line-clamp-2');
+    expect(summaryEl).toHaveTextContent(longSummary);
+  });
 });
 
 describe('VideoCardSkeleton', () => {

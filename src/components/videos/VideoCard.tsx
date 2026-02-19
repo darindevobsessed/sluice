@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { Tag } from 'lucide-react';
+import { Sparkles, Tag } from 'lucide-react';
 import { TranscriptIcon } from '@/components/icons/TranscriptIcon';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -23,6 +23,7 @@ interface VideoCardProps {
   allFocusAreas?: FocusArea[];
   onToggleFocusArea?: (focusAreaId: number) => void;
   returnTo?: string;
+  insightSummary?: string;
 }
 
 /**
@@ -52,7 +53,7 @@ function formatDate(date: Date): string {
   });
 }
 
-export function VideoCard({ video, className, focusAreas, allFocusAreas, onToggleFocusArea, returnTo }: VideoCardProps) {
+export function VideoCard({ video, className, focusAreas, allFocusAreas, onToggleFocusArea, returnTo, insightSummary }: VideoCardProps) {
   const duration = formatDuration(video.duration)
   const dateAdded = formatDate(video.createdAt)
   const assignedIds = new Set(focusAreas?.map(fa => fa.id) ?? [])
@@ -139,6 +140,14 @@ export function VideoCard({ video, className, focusAreas, allFocusAreas, onToggl
             ))}
           </div>
         )}
+        {insightSummary && (
+          <div className="mt-2 flex gap-1.5">
+            <Sparkles className="mt-0.5 h-3 w-3 shrink-0 text-primary" />
+            <p data-testid="insight-summary" className="line-clamp-2 text-xs leading-relaxed text-muted-foreground">
+              {insightSummary}
+            </p>
+          </div>
+        )}
       </div>
     </Card>
   );
@@ -156,6 +165,7 @@ export function VideoCardSkeleton() {
         <div className="h-4 w-3/4 animate-pulse rounded bg-muted" />
         <div className="h-3 w-1/2 animate-pulse rounded bg-muted" />
         <div className="h-3 w-1/3 animate-pulse rounded bg-muted" />
+        <div className="h-3 w-5/6 animate-pulse rounded bg-muted" />
       </div>
     </div>
   );
