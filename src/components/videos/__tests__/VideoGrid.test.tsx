@@ -61,7 +61,7 @@ describe('VideoGrid', () => {
     render(<VideoGrid videos={[]} isLoading={true} />);
 
     const skeletons = screen.getAllByTestId('video-card-skeleton');
-    expect(skeletons).toHaveLength(8);
+    expect(skeletons).toHaveLength(10);
   });
 
   it('renders empty state when no videos and not loading', () => {
@@ -77,9 +77,9 @@ describe('VideoGrid', () => {
     const grid = container.querySelector('.grid');
     expect(grid).toHaveClass('grid-cols-1');
     expect(grid).toHaveClass('sm:grid-cols-2');
-    expect(grid).toHaveClass('md:grid-cols-2');
-    expect(grid).toHaveClass('lg:grid-cols-3');
-    expect(grid).toHaveClass('xl:grid-cols-4');
+    expect(grid).toHaveClass('md:grid-cols-3');
+    expect(grid).toHaveClass('lg:grid-cols-4');
+    expect(grid).toHaveClass('xl:grid-cols-5');
     expect(grid).toHaveClass('gap-6');
   });
 });
