@@ -1,4 +1,4 @@
-import { db, videos, searchVideos, getVideoStats, getDistinctChannels, videoFocusAreas, focusAreas } from "@/lib/db";
+import { db, videos, searchVideos, getVideoStats, getDistinctChannels, videoFocusAreas, focusAreas, insights } from "@/lib/db";
 import { eq, inArray } from "drizzle-orm";
 import { NextResponse, after } from "next/server";
 import { z } from "zod";
@@ -102,8 +102,29 @@ export async function GET(request: Request) {
       }
     }
 
+    // Build summary map for insight previews
+    const summaryMap: Record<number, string> = {}
+
+    if (videoIds.length > 0) {
+      const insightRows = await db
+        .select({
+          videoId: insights.videoId,
+          extraction: insights.extraction,
+        })
+        .from(insights)
+        .where(inArray(insights.videoId, videoIds))
+
+      for (const row of insightRows) {
+        const extraction = row.extraction as { summary?: { tldr?: string } }
+        const tldr = extraction?.summary?.tldr
+        if (tldr) {
+          summaryMap[row.videoId] = tldr
+        }
+      }
+    }
+
     return NextResponse.json(
-      { videos: videoResults, stats, focusAreaMap },
+      { videos: videoResults, stats, focusAreaMap, summaryMap },
       { status: 200 }
     );
   } catch (error) {

@@ -868,6 +868,147 @@ describe('GET /api/videos', () => {
     expect(data.videos).toEqual([])
   })
 
+  it('returns summaryMap field in GET response', async () => {
+    const request = new Request('http://localhost:3000/api/videos')
+    const response = await GET(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(data).toHaveProperty('summaryMap')
+    expect(typeof data.summaryMap).toBe('object')
+  })
+
+  it('summaryMap is empty when no videos have insights', async () => {
+    await testDb.insert(schema.videos).values({
+      youtubeId: 'no-insights-video',
+      title: 'No Insights Video',
+      channel: 'Test Channel',
+      transcript: 'Some transcript content here',
+    })
+
+    const request = new Request('http://localhost:3000/api/videos')
+    const response = await GET(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(data.videos).toHaveLength(1)
+    expect(data.summaryMap).toEqual({})
+  })
+
+  it('summaryMap includes tldr for videos with insights', async () => {
+    const videoRows = await testDb.insert(schema.videos).values({
+      youtubeId: 'video-with-insights',
+      title: 'Video With Insights',
+      channel: 'Test Channel',
+      transcript: 'Some transcript content here',
+    }).returning()
+    const video = videoRows[0]!
+
+    await testDb.insert(schema.insights).values({
+      id: `insight-${video.id}`,
+      videoId: video.id,
+      contentType: 'educational',
+      extraction: {
+        summary: { tldr: 'This video covers React hooks patterns.' },
+      },
+    })
+
+    const request = new Request('http://localhost:3000/api/videos')
+    const response = await GET(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(data.summaryMap).toHaveProperty(String(video.id))
+    expect(data.summaryMap[video.id]).toBe('This video covers React hooks patterns.')
+  })
+
+  it('summaryMap excludes videos whose insights have no summary.tldr', async () => {
+    const videoRows = await testDb.insert(schema.videos).values({
+      youtubeId: 'insight-no-tldr',
+      title: 'Insight Without TLDR',
+      channel: 'Test Channel',
+      transcript: 'Some transcript content here',
+    }).returning()
+    const video = videoRows[0]!
+
+    await testDb.insert(schema.insights).values({
+      id: `insight-no-tldr-${video.id}`,
+      videoId: video.id,
+      contentType: 'general',
+      extraction: {
+        summary: { key_points: ['point 1', 'point 2'] },
+        // no tldr field
+      },
+    })
+
+    const request = new Request('http://localhost:3000/api/videos')
+    const response = await GET(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(data.summaryMap).not.toHaveProperty(String(video.id))
+  })
+
+  it('summaryMap handles mix of videos with and without insights', async () => {
+    const videoRows = await testDb.insert(schema.videos).values([
+      {
+        youtubeId: 'with-insight',
+        title: 'Video With Insight',
+        channel: 'Test Channel',
+        transcript: 'Transcript content here',
+      },
+      {
+        youtubeId: 'without-insight',
+        title: 'Video Without Insight',
+        channel: 'Test Channel',
+        transcript: 'More transcript content',
+      },
+    ]).returning()
+    const withInsight = videoRows[0]!
+    const withoutInsight = videoRows[1]!
+
+    await testDb.insert(schema.insights).values({
+      id: `insight-mix-${withInsight.id}`,
+      videoId: withInsight.id,
+      contentType: 'dev',
+      extraction: {
+        summary: { tldr: 'A concise summary of the video content.' },
+      },
+    })
+
+    const request = new Request('http://localhost:3000/api/videos')
+    const response = await GET(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(data.videos).toHaveLength(2)
+    expect(data.summaryMap).toHaveProperty(String(withInsight.id))
+    expect(data.summaryMap[withInsight.id]).toBe('A concise summary of the video content.')
+    expect(data.summaryMap).not.toHaveProperty(String(withoutInsight.id))
+  })
+
+  it('summaryMap is empty when no videos are returned', async () => {
+    const request = new Request('http://localhost:3000/api/videos')
+    const response = await GET(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(data.videos).toEqual([])
+    expect(data.summaryMap).toEqual({})
+  })
+
+  it('existing response fields (videos, stats, focusAreaMap) still present alongside summaryMap', async () => {
+    const request = new Request('http://localhost:3000/api/videos')
+    const response = await GET(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(data).toHaveProperty('videos')
+    expect(data).toHaveProperty('stats')
+    expect(data).toHaveProperty('focusAreaMap')
+    expect(data).toHaveProperty('summaryMap')
+  })
+
   it('channel filter can be combined with focusAreaId filter', async () => {
     const focusAreaRows = await testDb.insert(schema.focusAreas).values({
       name: 'Frontend',
