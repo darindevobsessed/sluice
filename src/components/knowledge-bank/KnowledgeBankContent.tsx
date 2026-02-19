@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { StatsHeader, StatsHeaderSkeleton } from '@/components/videos/StatsHeader'
 import { VideoSearch } from '@/components/videos/VideoSearch'
 import { VideoGrid } from '@/components/videos/VideoGrid'
@@ -8,10 +8,10 @@ import { EmptyState } from '@/components/videos/EmptyState'
 import { SearchResults } from '@/components/search/SearchResults'
 import { PersonaPanel } from '@/components/personas/PersonaPanel'
 import { PersonaStatus } from '@/components/personas/PersonaStatus'
-import { ContentTypeFilter, type KBContentTypeValue } from '@/components/videos/ContentTypeFilter'
-import { FilterPillBar, type FilterPill } from '@/components/filters/FilterPillBar'
+import { ChipBar } from '@/components/filters/ChipBar'
 import { useSearch } from '@/hooks/useSearch'
 import { useEnsemble } from '@/hooks/useEnsemble'
+import { useChipFilters } from '@/hooks/useChipFilters'
 import { usePageTitle } from '@/components/layout/PageTitleContext'
 import { useFocusArea } from '@/components/providers/FocusAreaProvider'
 import { useURLParams } from '@/hooks/useURLParams'
@@ -49,14 +49,6 @@ export function KnowledgeBankContent() {
   // URL state with validation
   const { searchParams, updateParams } = useURLParams()
   const urlQuery = searchParams.get('q') || ''
-
-  // Validate content type
-  const VALID_KB_TYPES = ['all', 'youtube', 'transcript'] as const
-  type KBContentType = typeof VALID_KB_TYPES[number]
-  const rawType = searchParams.get('type')
-  const contentType = (rawType && VALID_KB_TYPES.includes(rawType as KBContentType))
-    ? (rawType as KBContentTypeValue)
-    : 'all'
 
   // Compute returnTo for video detail navigation
   const returnTo = buildReturnTo('/', searchParams)
@@ -119,46 +111,16 @@ export function KnowledgeBankContent() {
     fetchVideos();
   }, [selectedFocusAreaId]);
 
-  // Filter videos by content type
-  const filteredVideos = useMemo(() => {
-    if (contentType === 'all') return videos
-    return videos.filter(v => v.sourceType === contentType)
-  }, [videos, contentType])
-
-  // Build filter pills
-  const filterPills = useMemo(() => {
-    const pills: FilterPill[] = []
-    if (contentType !== 'all') {
-      const typeLabel = contentType === 'youtube' ? 'YouTube' : 'Transcript'
-      pills.push({
-        label: 'Type',
-        value: typeLabel,
-        onDismiss: () => updateParams({ type: null }),
-      })
-    }
-    if (urlQuery.trim()) {
-      pills.push({
-        label: 'Search',
-        value: `"${urlQuery}"`,
-        onDismiss: () => updateParams({ q: null }),
-      })
-    }
-    return pills
-  }, [contentType, urlQuery, updateParams])
-
-  // Clear all filters handler
-  const handleClearAllFilters = useCallback(() => {
-    updateParams({ type: null, q: null })
-  }, [updateParams])
+  // Chip filters — provides chips, activeIds, filtered videos, and toggle handler
+  const { chips, activeIds, filteredVideos, handleToggle } = useChipFilters({
+    videos,
+    focusAreas,
+    focusAreaMap,
+  })
 
   // Search handler - updates URL query param
   const handleSearch = useCallback((q: string) => {
     updateParams({ q: q || null })
-  }, [updateParams])
-
-  // Type handler - updates URL type param
-  const handleTypeChange = useCallback((type: string) => {
-    updateParams({ type: type === 'all' ? null : type })
   }, [updateParams])
 
   // Optimistic toggle handler for focus area assignment
@@ -244,7 +206,7 @@ export function KnowledgeBankContent() {
       ) : (
         <>
           {/* Search Bar */}
-          <div className="mb-8">
+          <div className="mb-4">
             <VideoSearch onSearch={handleSearch} defaultValue={urlQuery} />
             {hasActivePersonas && (
               <p className="mt-2 text-xs text-muted-foreground">
@@ -253,24 +215,20 @@ export function KnowledgeBankContent() {
             )}
           </div>
 
+          {/* Chip Bar - visible when browsing (not searching) */}
+          {!showSearchResults && videos.length > 0 && (
+            <ChipBar
+              chips={chips}
+              activeIds={activeIds}
+              onToggle={handleToggle}
+              className="mb-6"
+            />
+          )}
+
           {/* Persona Panel - shows above search results when question detected */}
           {showPanel && (
             <div className="mb-8">
               <PersonaPanel question={urlQuery} state={ensembleState} onRetry={retryEnsemble} />
-            </div>
-          )}
-
-          {/* Filter Pills */}
-          <FilterPillBar
-            pills={filterPills}
-            onClearAll={handleClearAllFilters}
-            className="mb-4"
-          />
-
-          {/* Content Type Filter - only visible when browsing grid */}
-          {!showSearchResults && videos.length > 0 && (
-            <div className="flex items-center gap-2 mb-4">
-              <ContentTypeFilter selected={contentType} onChange={handleTypeChange} />
             </div>
           )}
 
@@ -281,8 +239,20 @@ export function KnowledgeBankContent() {
             <VideoGrid
               videos={filteredVideos}
               isLoading={isLoadingVideos}
-              emptyMessage={selectedFocusAreaId ? 'No videos in this focus area' : undefined}
-              emptyHint={selectedFocusAreaId ? 'Assign videos from their detail page or use the tag icon on cards' : undefined}
+              emptyMessage={
+                activeIds.size > 0
+                  ? 'No videos match these filters'
+                  : selectedFocusAreaId
+                    ? 'No videos in this focus area'
+                    : undefined
+              }
+              emptyHint={
+                activeIds.size > 0
+                  ? 'Try removing some filters'
+                  : selectedFocusAreaId
+                    ? 'Assign videos from their detail page or use the tag icon on cards'
+                    : undefined
+              }
               focusAreaMap={focusAreaMap}
               allFocusAreas={focusAreas}
               onToggleFocusArea={handleToggleFocusArea}
