@@ -92,12 +92,12 @@ export function VideoCard({ video, className, focusAreas, allFocusAreas, onToggl
       </div>
 
       {/* Content */}
-      <div className="p-4">
-        <h3 className="mb-1 line-clamp-2 font-semibold leading-tight">
+      <div className="p-3">
+        <h3 className="mb-1 line-clamp-2 text-sm font-semibold leading-tight">
           {video.title}
         </h3>
         {video.channel && (
-          <p className="mb-1 text-sm text-muted-foreground">
+          <p className="mb-1 text-xs text-muted-foreground">
             {video.channel}
           </p>
         )}
@@ -151,10 +151,10 @@ export function VideoCardSkeleton() {
       <div className="aspect-video w-full animate-pulse bg-muted" />
 
       {/* Content skeleton */}
-      <div className="p-4 space-y-2">
-        <div className="h-5 w-full animate-pulse rounded bg-muted" />
-        <div className="h-5 w-3/4 animate-pulse rounded bg-muted" />
-        <div className="h-4 w-1/2 animate-pulse rounded bg-muted" />
+      <div className="p-3 space-y-2">
+        <div className="h-4 w-full animate-pulse rounded bg-muted" />
+        <div className="h-4 w-3/4 animate-pulse rounded bg-muted" />
+        <div className="h-3 w-1/2 animate-pulse rounded bg-muted" />
         <div className="h-3 w-1/3 animate-pulse rounded bg-muted" />
       </div>
     </div>
