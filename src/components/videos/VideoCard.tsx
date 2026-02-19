@@ -13,10 +13,11 @@ import {
   DropdownMenuCheckboxItem,
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
-import type { Video, FocusArea } from '@/lib/db/schema';
+import type { FocusArea } from '@/lib/db/schema';
+import type { VideoListItem } from '@/lib/db/search';
 
 interface VideoCardProps {
-  video: Video;
+  video: VideoListItem;
   className?: string;
   focusAreas?: Pick<FocusArea, 'id' | 'name' | 'color'>[];
   allFocusAreas?: FocusArea[];

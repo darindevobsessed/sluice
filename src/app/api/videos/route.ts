@@ -48,8 +48,12 @@ export async function GET(request: Request) {
       focusAreaId = parsed;
     }
 
-    // Search videos (empty query returns all videos)
-    let videoResults = await searchVideos(query);
+    // Search videos and stats in parallel
+    const [searchResults, stats] = await Promise.all([
+      searchVideos(query),
+      getVideoStats(),
+    ])
+    let videoResults = searchResults
 
     // Filter by focus area if provided
     if (focusAreaId !== null) {
@@ -57,20 +61,17 @@ export async function GET(request: Request) {
       const assignedVideos = await db
         .select({ videoId: videoFocusAreas.videoId })
         .from(videoFocusAreas)
-        .where(eq(videoFocusAreas.focusAreaId, focusAreaId));
+        .where(eq(videoFocusAreas.focusAreaId, focusAreaId))
 
-      const videoIds = assignedVideos.map(v => v.videoId);
+      const videoIds = assignedVideos.map(v => v.videoId)
 
       // Filter videos to only those assigned to the focus area
       if (videoIds.length === 0) {
-        videoResults = [];
+        videoResults = []
       } else {
-        videoResults = videoResults.filter(v => videoIds.includes(v.id));
+        videoResults = videoResults.filter(v => videoIds.includes(v.id))
       }
     }
-
-    // Get stats
-    const stats = await getVideoStats();
 
     // Build focus area map for all returned videos
     const videoIds = videoResults.map(v => v.id);

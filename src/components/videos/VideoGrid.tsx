@@ -1,10 +1,11 @@
 'use client';
 
 import { VideoCard, VideoCardSkeleton } from '@/components/videos/VideoCard';
-import type { Video, FocusArea } from '@/lib/db/schema';
+import type { FocusArea } from '@/lib/db/schema';
+import type { VideoListItem } from '@/lib/db/search';
 
 interface VideoGridProps {
-  videos: Video[];
+  videos: VideoListItem[];
   isLoading?: boolean;
   emptyMessage?: string;
   emptyHint?: string;

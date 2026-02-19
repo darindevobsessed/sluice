@@ -16,7 +16,8 @@ import { usePageTitle } from '@/components/layout/PageTitleContext'
 import { useFocusArea } from '@/components/providers/FocusAreaProvider'
 import { useURLParams } from '@/hooks/useURLParams'
 import { buildReturnTo } from '@/lib/navigation'
-import type { Video, FocusArea } from '@/lib/db/schema'
+import type { FocusArea } from '@/lib/db/schema'
+import type { VideoListItem } from '@/lib/db/search'
 
 interface VideoStats {
   count: number;
@@ -27,13 +28,13 @@ interface VideoStats {
 type FocusAreaMapEntry = Pick<FocusArea, 'id' | 'name' | 'color'>
 
 interface ApiResponse {
-  videos: Video[];
+  videos: VideoListItem[];
   stats: VideoStats;
   focusAreaMap: Record<number, FocusAreaMapEntry[]>;
 }
 
 export function KnowledgeBankContent() {
-  const [videos, setVideos] = useState<Video[]>([]);
+  const [videos, setVideos] = useState<VideoListItem[]>([]);
   const [stats, setStats] = useState<VideoStats | null>(null);
   const [isLoadingVideos, setIsLoadingVideos] = useState(true);
   const [focusAreaMap, setFocusAreaMap] = useState<Record<number, FocusAreaMapEntry[]>>({});
