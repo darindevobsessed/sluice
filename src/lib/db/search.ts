@@ -1,23 +1,47 @@
-import { db as defaultDb } from './index';
-import { videos, type Video } from './schema';
-import { desc, or, ilike, sql } from 'drizzle-orm';
+import { db as defaultDb } from './index'
+import { videos, type Video } from './schema'
+import { desc, or, ilike, sql } from 'drizzle-orm'
 
 /**
- * Search videos using simple ILIKE pattern matching
- * Temporary replacement for FTS5 until vector search (Story 4)
+ * Columns for video list views — everything except transcript.
+ * Transcript is 10-100KB per video and unused by list/card components.
+ */
+const videoListColumns = {
+  id: videos.id,
+  youtubeId: videos.youtubeId,
+  sourceType: videos.sourceType,
+  title: videos.title,
+  channel: videos.channel,
+  thumbnail: videos.thumbnail,
+  duration: videos.duration,
+  description: videos.description,
+  createdAt: videos.createdAt,
+  updatedAt: videos.updatedAt,
+  publishedAt: videos.publishedAt,
+}
+
+/**
+ * Type for video list views — all Video fields except transcript.
+ * Components that display video cards/grids should use this type.
+ */
+export type VideoListItem = Omit<Video, 'transcript'>
+
+/**
+ * Search videos using simple ILIKE pattern matching.
+ * Returns all columns EXCEPT transcript for payload size optimization.
  * @param query - Search query string
  * @param dbInstance - Optional database instance (for testing)
  */
-export async function searchVideos(query: string, dbInstance = defaultDb): Promise<Video[]> {
-  const trimmed = query.trim();
+export async function searchVideos(query: string, dbInstance = defaultDb): Promise<VideoListItem[]> {
+  const trimmed = query.trim()
 
   if (!trimmed) {
-    return dbInstance.select().from(videos).orderBy(desc(videos.createdAt));
+    return dbInstance.select(videoListColumns).from(videos).orderBy(desc(videos.createdAt))
   }
 
-  const pattern = `%${trimmed}%`;
+  const pattern = `%${trimmed}%`
 
-  return dbInstance.select()
+  return dbInstance.select(videoListColumns)
     .from(videos)
     .where(
       or(
@@ -26,34 +50,32 @@ export async function searchVideos(query: string, dbInstance = defaultDb): Promi
         ilike(videos.transcript, pattern)
       )
     )
-    .orderBy(desc(videos.createdAt));
+    .orderBy(desc(videos.createdAt))
 }
 
 /**
- * Get statistics about the video knowledge bank
+ * Get statistics about the video knowledge bank.
+ * Single query combining count, total duration, and unique channels.
  * @param dbInstance - Optional database instance (for testing)
  */
 export async function getVideoStats(dbInstance = defaultDb): Promise<{
-  count: number;
-  totalHours: number;
-  channels: number;
+  count: number
+  totalHours: number
+  channels: number
 }> {
-  const countResult = await dbInstance.select({ count: sql<number>`count(*)` })
-    .from(videos);
+  const result = await dbInstance.select({
+    count: sql<number>`count(*)`,
+    totalDuration: sql<number>`coalesce(sum(duration), 0)`,
+    channels: sql<number>`count(distinct channel)`,
+  }).from(videos)
 
-  const durationResult = await dbInstance.select({
-    total: sql<number>`coalesce(sum(duration), 0)`
-  }).from(videos);
-
-  const channelsResult = await dbInstance.select({
-    channels: sql<number>`count(distinct channel)`
-  }).from(videos);
+  const row = result[0]
 
   return {
-    count: Number(countResult[0]?.count ?? 0),
-    totalHours: Math.round((Number(durationResult[0]?.total ?? 0) / 3600) * 10) / 10,
-    channels: Number(channelsResult[0]?.channels ?? 0),
-  };
+    count: Number(row?.count ?? 0),
+    totalHours: Math.round((Number(row?.totalDuration ?? 0) / 3600) * 10) / 10,
+    channels: Number(row?.channels ?? 0),
+  }
 }
 
 /**

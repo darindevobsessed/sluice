@@ -151,6 +151,46 @@ describe('searchVideos (Postgres)', () => {
     const lowerResults = await searchVideos('javascript', db);
     expect(lowerResults).toHaveLength(1);
   });
+
+  it('excludes transcript from returned results', async () => {
+    const db = getTestDb();
+
+    await db.insert(schema.videos).values([
+      {
+        youtubeId: 'ds-vid1',
+        title: 'Video With Transcript',
+        channel: 'Channel A',
+        transcript: 'This is a long transcript that should not be in the response',
+        duration: 600,
+      },
+    ]);
+
+    const results = await searchVideos('', db);
+    expect(results).toHaveLength(1);
+    expect(results[0]?.title).toBe('Video With Transcript');
+    // Verify transcript is NOT in the returned object
+    expect('transcript' in results[0]!).toBe(false);
+  });
+
+  it('still matches against transcript content even though transcript is excluded from results', async () => {
+    const db = getTestDb();
+
+    await db.insert(schema.videos).values([
+      {
+        youtubeId: 'ds-vid1',
+        title: 'Generic Title',
+        channel: 'Channel A',
+        transcript: 'This video discusses unique-search-term-xyz patterns',
+        duration: 600,
+      },
+    ]);
+
+    const results = await searchVideos('unique-search-term-xyz', db);
+    expect(results).toHaveLength(1);
+    expect(results[0]?.title).toBe('Generic Title');
+    // Found via transcript match, but transcript not in response
+    expect('transcript' in results[0]!).toBe(false);
+  });
 });
 
 describe('getVideoStats (Postgres)', () => {

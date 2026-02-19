@@ -1,3 +1,6 @@
+/** Minimum video count before suggesting a persona for a channel */
+export const PERSONA_THRESHOLD = 5
+
 import { eq, sql } from 'drizzle-orm'
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres'
 import { db as database, videos, chunks, personas } from '@/lib/db'

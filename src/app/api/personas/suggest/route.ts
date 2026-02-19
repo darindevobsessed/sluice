@@ -2,7 +2,7 @@ import { db, videos, personas } from '@/lib/db'
 import { NextResponse } from 'next/server'
 import { sql } from 'drizzle-orm'
 
-export const PERSONA_THRESHOLD = 5
+import { PERSONA_THRESHOLD } from '@/lib/personas/service'
 
 export async function GET() {
   try {
