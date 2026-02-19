@@ -777,4 +777,143 @@ describe('GET /api/videos', () => {
     expect(response.status).toBe(400)
     expect(data.error).toBeDefined()
   })
+
+  it('filters videos by channel when channel param is provided', async () => {
+    await testDb.insert(schema.videos).values([
+      {
+        youtubeId: 'fireship-1',
+        title: 'React in 100 Seconds',
+        channel: 'Fireship',
+        transcript: 'React content from Fireship',
+      },
+      {
+        youtubeId: 'fireship-2',
+        title: 'TypeScript in 100 Seconds',
+        channel: 'Fireship',
+        transcript: 'TypeScript content from Fireship',
+      },
+      {
+        youtubeId: 'theo-1',
+        title: 'Why I use TypeScript',
+        channel: 'Theo',
+        transcript: 'TypeScript thoughts from Theo',
+      },
+    ])
+
+    const request = new Request('http://localhost:3000/api/videos?channel=Fireship')
+    const response = await GET(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(data.videos).toHaveLength(2)
+    expect(data.videos.every((v: { channel: string }) => v.channel === 'Fireship')).toBe(true)
+  })
+
+  it('returns all videos when channel param is not provided (backward compatible)', async () => {
+    await testDb.insert(schema.videos).values([
+      {
+        youtubeId: 'channel-a-1',
+        title: 'Video A1',
+        channel: 'Channel A',
+        transcript: 'Content from Channel A',
+      },
+      {
+        youtubeId: 'channel-b-1',
+        title: 'Video B1',
+        channel: 'Channel B',
+        transcript: 'Content from Channel B',
+      },
+    ])
+
+    const request = new Request('http://localhost:3000/api/videos')
+    const response = await GET(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(data.videos).toHaveLength(2)
+  })
+
+  it('returns empty list when channel param matches no videos', async () => {
+    await testDb.insert(schema.videos).values({
+      youtubeId: 'some-video',
+      title: 'Some Video',
+      channel: 'Known Channel',
+      transcript: 'Some content here',
+    })
+
+    const request = new Request('http://localhost:3000/api/videos?channel=NonExistentChannel')
+    const response = await GET(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(data.videos).toEqual([])
+  })
+
+  it('channel filter is case-sensitive exact match', async () => {
+    await testDb.insert(schema.videos).values([
+      {
+        youtubeId: 'fireship-exact',
+        title: 'Exact Case Video',
+        channel: 'Fireship',
+        transcript: 'Content from Fireship',
+      },
+    ])
+
+    // Lowercase 'fireship' should NOT match 'Fireship'
+    const request = new Request('http://localhost:3000/api/videos?channel=fireship')
+    const response = await GET(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(data.videos).toEqual([])
+  })
+
+  it('channel filter can be combined with focusAreaId filter', async () => {
+    const focusAreaRows = await testDb.insert(schema.focusAreas).values({
+      name: 'Frontend',
+      color: '#61dafb',
+    }).returning()
+    const focusArea = focusAreaRows[0]!
+
+    const videoRows = await testDb.insert(schema.videos).values([
+      {
+        youtubeId: 'fireship-frontend',
+        title: 'React Tutorial',
+        channel: 'Fireship',
+        transcript: 'React content',
+      },
+      {
+        youtubeId: 'fireship-backend',
+        title: 'Node Tutorial',
+        channel: 'Fireship',
+        transcript: 'Node content',
+      },
+      {
+        youtubeId: 'theo-frontend',
+        title: 'Theo Frontend',
+        channel: 'Theo',
+        transcript: 'Theo frontend content',
+      },
+    ]).returning()
+
+    const fireshipFrontendId = videoRows[0]!.id
+    const theoFrontendId = videoRows[2]!.id
+
+    // Assign fireship-frontend and theo-frontend to focus area
+    await testDb.insert(schema.videoFocusAreas).values([
+      { videoId: fireshipFrontendId, focusAreaId: focusArea.id },
+      { videoId: theoFrontendId, focusAreaId: focusArea.id },
+    ])
+
+    // Filter by both Fireship channel AND frontend focus area
+    const request = new Request(
+      `http://localhost:3000/api/videos?channel=Fireship&focusAreaId=${focusArea.id}`
+    )
+    const response = await GET(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(data.videos).toHaveLength(1)
+    expect(data.videos[0].youtubeId).toBe('fireship-frontend')
+  })
 })

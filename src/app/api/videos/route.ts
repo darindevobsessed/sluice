@@ -48,12 +48,19 @@ export async function GET(request: Request) {
       focusAreaId = parsed;
     }
 
+    const channelParam = searchParams.get('channel');
+
     // Search videos and stats in parallel
     const [searchResults, stats] = await Promise.all([
       searchVideos(query),
       getVideoStats(),
     ])
     let videoResults = searchResults
+
+    // Filter by channel if provided (case-sensitive exact match)
+    if (channelParam) {
+      videoResults = videoResults.filter(v => v.channel === channelParam)
+    }
 
     // Filter by focus area if provided
     if (focusAreaId !== null) {
