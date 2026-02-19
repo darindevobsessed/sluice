@@ -42,7 +42,7 @@ export function StatsHeader({ count, totalHours, channels, className }: StatsHea
 
 export function StatsHeaderSkeleton() {
   return (
-    <div data-testid="stats-header-skeleton" className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+    <div data-testid="stats-header-skeleton" className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
       {[1, 2, 3].map((i) => (
         <div key={i} className="flex flex-col items-center rounded-lg bg-muted/50 p-4">
           <div className="mb-2 h-9 w-16 animate-pulse rounded bg-muted" />

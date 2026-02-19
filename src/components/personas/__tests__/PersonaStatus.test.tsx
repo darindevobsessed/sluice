@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { PersonaStatus } from '../PersonaStatus'
+import { PersonaStatus, PersonaStatusSkeleton } from '../PersonaStatus'
 
 // Mock fetch globally
 global.fetch = vi.fn()
@@ -16,8 +16,8 @@ describe('PersonaStatus', () => {
 
     render(<PersonaStatus />)
 
-    // Should show shimmer/loading indicator
-    expect(screen.getByTestId('persona-status-loading')).toBeInTheDocument()
+    // Should show skeleton with pill placeholders
+    expect(screen.getByTestId('persona-status-skeleton')).toBeInTheDocument()
   })
 
   it('does not render when no channels exist', async () => {
@@ -570,6 +570,36 @@ describe('PersonaStatus', () => {
 
     // Toggle button should still exist and show correct count
     expect(screen.getByText(/show all 7 channels/i)).toBeInTheDocument()
+  })
+
+  describe('PersonaStatusSkeleton', () => {
+    it('renders skeleton with data-testid', () => {
+      render(<PersonaStatusSkeleton />)
+      expect(screen.getByTestId('persona-status-skeleton')).toBeInTheDocument()
+    })
+
+    it('renders 4 pill-shaped placeholders', () => {
+      const { container } = render(<PersonaStatusSkeleton />)
+      const pills = container.querySelectorAll('.rounded-full.animate-pulse')
+      expect(pills).toHaveLength(4)
+    })
+
+    it('renders pill placeholders with h-8 height', () => {
+      const { container } = render(<PersonaStatusSkeleton />)
+      const pills = container.querySelectorAll('.rounded-full.animate-pulse')
+      pills.forEach(pill => {
+        expect(pill).toHaveClass('h-8')
+      })
+    })
+
+    it('renders a label placeholder row above the pills', () => {
+      const { container } = render(<PersonaStatusSkeleton />)
+      // The label row has two small rectangular placeholders
+      const labelRow = container.querySelector('.flex.items-center.gap-2')
+      expect(labelRow).toBeInTheDocument()
+      const labelPlaceholders = labelRow?.querySelectorAll('.animate-pulse')
+      expect(labelPlaceholders?.length).toBeGreaterThanOrEqual(2)
+    })
   })
 
   describe('Uniform pill sizing (Chunk 2)', () => {

@@ -42,4 +42,10 @@ describe('StatsHeaderSkeleton', () => {
     render(<StatsHeaderSkeleton />);
     expect(document.querySelector('[data-testid="stats-header-skeleton"]')).toBeInTheDocument();
   });
+
+  it('has mb-6 bottom margin class', () => {
+    render(<StatsHeaderSkeleton />);
+    const skeleton = screen.getByTestId('stats-header-skeleton');
+    expect(skeleton).toHaveClass('mb-6');
+  });
 });
