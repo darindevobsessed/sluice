@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { VideoGrid } from '../VideoGrid';
-import type { Video } from '@/lib/db/schema';
+import type { VideoListItem } from '@/lib/db/search';
 
 // Mock next/image
 vi.mock('next/image', () => ({
@@ -18,7 +18,7 @@ vi.mock('next/link', () => ({
   ),
 }));
 
-const mockVideos: Video[] = [
+const mockVideos: VideoListItem[] = [
   {
     id: 1,
     youtubeId: 'abc123',
@@ -28,7 +28,6 @@ const mockVideos: Video[] = [
     thumbnail: 'https://i.ytimg.com/vi/abc123/hqdefault.jpg',
     duration: 600,
     description: null,
-    transcript: 'Transcript content',
     createdAt: new Date('2026-01-15'),
     updatedAt: new Date('2026-01-15'),
     publishedAt: null,
@@ -42,7 +41,6 @@ const mockVideos: Video[] = [
     thumbnail: 'https://i.ytimg.com/vi/def456/hqdefault.jpg',
     duration: 900,
     description: null,
-    transcript: 'More transcript',
     createdAt: new Date('2026-01-16'),
     updatedAt: new Date('2026-01-16'),
     publishedAt: null,

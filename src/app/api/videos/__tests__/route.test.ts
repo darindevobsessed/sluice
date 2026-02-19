@@ -662,6 +662,8 @@ describe('GET /api/videos', () => {
     })
     expect(data.videos[0].publishedAt).toBeDefined()
     expect(new Date(data.videos[0].publishedAt).getTime()).toBe(publishedDate.getTime())
+    // Transcript is a large field excluded from list responses
+    expect(data.videos[0]).not.toHaveProperty('transcript')
   })
 
   it('filters videos by focusAreaId when provided', async () => {
