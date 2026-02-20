@@ -82,39 +82,37 @@ export async function GET(request: Request) {
       }
     }
 
-    // Build focus area map for all returned videos
-    const videoIds = videoResults.map(v => v.id);
-    const focusAreaMap: Record<number, { id: number; name: string; color: string | null }[]> = {};
+    // Build focus area map and summary map in parallel
+    const videoIds = videoResults.map(v => v.id)
 
-    if (videoIds.length > 0) {
-      const assignments = await db
-        .select({
-          videoId: videoFocusAreas.videoId,
-          id: focusAreas.id,
-          name: focusAreas.name,
-          color: focusAreas.color,
-        })
-        .from(videoFocusAreas)
-        .innerJoin(focusAreas, eq(videoFocusAreas.focusAreaId, focusAreas.id))
-        .where(inArray(videoFocusAreas.videoId, videoIds));
-
-      for (const row of assignments) {
-        const list = focusAreaMap[row.videoId] ?? (focusAreaMap[row.videoId] = []);
-        list.push({ id: row.id, name: row.name, color: row.color });
-      }
-    }
-
-    // Build summary map for insight previews
+    const focusAreaMap: Record<number, { id: number; name: string; color: string | null }[]> = {}
     const summaryMap: Record<number, string> = {}
 
     if (videoIds.length > 0) {
-      const insightRows = await db
-        .select({
-          videoId: insights.videoId,
-          extraction: insights.extraction,
-        })
-        .from(insights)
-        .where(inArray(insights.videoId, videoIds))
+      const [assignments, insightRows] = await Promise.all([
+        db
+          .select({
+            videoId: videoFocusAreas.videoId,
+            id: focusAreas.id,
+            name: focusAreas.name,
+            color: focusAreas.color,
+          })
+          .from(videoFocusAreas)
+          .innerJoin(focusAreas, eq(videoFocusAreas.focusAreaId, focusAreas.id))
+          .where(inArray(videoFocusAreas.videoId, videoIds)),
+        db
+          .select({
+            videoId: insights.videoId,
+            extraction: insights.extraction,
+          })
+          .from(insights)
+          .where(inArray(insights.videoId, videoIds)),
+      ])
+
+      for (const row of assignments) {
+        const list = focusAreaMap[row.videoId] ?? (focusAreaMap[row.videoId] = [])
+        list.push({ id: row.id, name: row.name, color: row.color })
+      }
 
       for (const row of insightRows) {
         const extraction = row.extraction as { summary?: { tldr?: string } }
