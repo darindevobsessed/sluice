@@ -1,5 +1,76 @@
 import { XMLParser } from 'fast-xml-parser'
+import { db } from '@/lib/db'
+import { discoveryVideos, channels } from '@/lib/db/schema'
+import { sql } from 'drizzle-orm'
 import type { RSSFeedResult, RSSVideo } from './types'
+
+export interface RefreshDiscoveryResult {
+  videoCount: number
+  channelCount: number
+  errors: string[]
+}
+
+/**
+ * Fetch all followed channels' RSS feeds and upsert into discovery_videos.
+ * Called by the cron job and the manual refresh endpoint.
+ * Uses Promise.allSettled for graceful per-channel error handling.
+ */
+export async function refreshDiscoveryVideos(): Promise<RefreshDiscoveryResult> {
+  const allChannels = await db.select().from(channels)
+  const errors: string[] = []
+  const allVideos: RSSVideo[] = []
+
+  if (allChannels.length === 0) {
+    return { videoCount: 0, channelCount: 0, errors }
+  }
+
+  const feedResults = await Promise.allSettled(
+    allChannels.map((channel) => fetchChannelFeed(channel.channelId))
+  )
+
+  feedResults.forEach((result, i) => {
+    if (result.status === 'fulfilled') {
+      allVideos.push(...result.value.videos)
+    } else {
+      const channelId = allChannels[i]?.channelId ?? 'unknown'
+      const reason: unknown = result.reason
+      const message = reason instanceof Error ? reason.message : String(reason)
+      errors.push(`${channelId}: ${message}`)
+    }
+  })
+
+  if (allVideos.length > 0) {
+    await db
+      .insert(discoveryVideos)
+      .values(
+        allVideos.map((v) => ({
+          youtubeId: v.youtubeId,
+          title: v.title,
+          channelId: v.channelId,
+          channelName: v.channelName,
+          publishedAt: v.publishedAt,
+          description: v.description,
+          cachedAt: new Date(),
+        }))
+      )
+      .onConflictDoUpdate({
+        target: discoveryVideos.youtubeId,
+        set: {
+          title: sql`EXCLUDED.title`,
+          channelName: sql`EXCLUDED.channel_name`,
+          publishedAt: sql`EXCLUDED.published_at`,
+          description: sql`EXCLUDED.description`,
+          cachedAt: sql`EXCLUDED.cached_at`,
+        },
+      })
+  }
+
+  return {
+    videoCount: allVideos.length,
+    channelCount: allChannels.length,
+    errors,
+  }
+}
 
 export function getFeedUrl(channelId: string): string {
   return `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`

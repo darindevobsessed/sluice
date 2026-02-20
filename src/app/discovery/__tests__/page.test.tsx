@@ -210,7 +210,14 @@ describe('Discovery Page', () => {
       json: async () => ({ channel: mockNewChannel }),
     })
 
-    // Mock videos fetch after follow
+    // Updated: chunk 2 added /api/channels/videos/refresh POST call before fetchVideos
+    // Mock refresh endpoint
+    ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ videoCount: 1, channelCount: 1, errors: [] }),
+    })
+
+    // Mock /api/channels/videos GET (called by fetchVideos)
     ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
       ok: true,
       json: async () => [{

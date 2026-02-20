@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { fetchChannelFeed } from '@/lib/automation/rss'
+import { fetchChannelFeed, refreshDiscoveryVideos } from '@/lib/automation/rss'
 import { getChannelsForAutoFetch, updateChannelLastFetched } from '@/lib/automation/queries'
 import { findNewVideos, createVideoFromRSS } from '@/lib/automation/delta'
 import { enqueueJob } from '@/lib/automation/queue'
@@ -31,6 +31,14 @@ export async function GET(request: Request) {
         // Log per-channel errors but continue processing other channels
         console.error(`Error processing channel ${channel.channelId}:`, error)
       }
+    }
+
+    // Refresh discovery_videos cache so Discovery page reflects latest RSS data
+    try {
+      await refreshDiscoveryVideos()
+    } catch (error) {
+      // Non-fatal: log but don't fail the cron job
+      console.error('Error refreshing discovery videos cache:', error)
     }
 
     return NextResponse.json({ checked: channels.length, queued: newVideosQueued })

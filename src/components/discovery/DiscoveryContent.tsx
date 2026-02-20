@@ -180,11 +180,23 @@ export function DiscoveryContent() {
 
   const handleChannelFollowed = async (newChannel: Channel) => {
     setChannels((prev) => [newChannel, ...prev])
-    // Refetch videos after following a new channel
+    // Refresh RSS cache then re-fetch cached data so new channel videos appear immediately
+    try {
+      await fetch('/api/channels/videos/refresh', { method: 'POST' })
+    } catch {
+      // Non-fatal: cached data will still load
+    }
     await fetchVideos()
   }
 
   const handleRefresh = async () => {
+    // Trigger fresh RSS fetch into DB cache, then reload from DB
+    setIsLoadingVideos(true)
+    try {
+      await fetch('/api/channels/videos/refresh', { method: 'POST' })
+    } catch {
+      // Non-fatal: will still reload whatever is cached
+    }
     await fetchVideos()
   }
 

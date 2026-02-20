@@ -1,89 +1,48 @@
-import { db, channels, videos } from '@/lib/db'
+import { db, discoveryVideos, videos } from '@/lib/db'
 import { NextResponse } from 'next/server'
-import { fetchChannelFeed } from '@/lib/automation/rss'
-import { inArray } from 'drizzle-orm'
-import type { RSSVideo } from '@/lib/automation/types'
+import { desc, inArray } from 'drizzle-orm'
 import { startApiTimer } from '@/lib/api-timing'
 
-interface DiscoveryVideo {
+interface DiscoveryVideoResponse {
   youtubeId: string
   title: string
   channelId: string
   channelName: string
-  publishedAt: string
+  publishedAt: string | null
   description: string
   inBank: boolean
 }
 
-export async function GET(request: Request): Promise<NextResponse> {
+export async function GET(_request: Request): Promise<NextResponse> {
   const timer = startApiTimer('/api/channels/videos', 'GET')
   try {
-    const { searchParams } = new URL(request.url)
-    const since = searchParams.get('since')
+    // Read cached videos from DB — no live RSS fetch on page load
+    const cached = await db
+      .select()
+      .from(discoveryVideos)
+      .orderBy(desc(discoveryVideos.publishedAt))
 
-    // Validate since parameter if provided
-    let sinceDate: Date | null = null
-    if (since) {
-      sinceDate = new Date(since)
-      if (isNaN(sinceDate.getTime())) {
-        timer.end(400)
-        return NextResponse.json(
-          { error: 'Invalid since timestamp' },
-          { status: 400 }
-        )
-      }
-    }
-
-    // Fetch all followed channels
-    const followedChannels = await db.select().from(channels)
-
-    if (followedChannels.length === 0) {
+    if (cached.length === 0) {
       timer.end(200)
       return NextResponse.json([])
     }
 
-    // Fetch RSS feeds for all channels using Promise.allSettled
-    const feedPromises = followedChannels.map((channel) =>
-      fetchChannelFeed(channel.channelId)
-    )
+    // Check which videos are already in the knowledge bank
+    // Select only youtubeId to avoid fetching large transcript columns
+    const youtubeIds = cached.map((v) => v.youtubeId)
+    const inBankRows = await db
+      .select({ youtubeId: videos.youtubeId })
+      .from(videos)
+      .where(inArray(videos.youtubeId, youtubeIds))
 
-    const feedResults = await Promise.allSettled(feedPromises)
+    const inBankSet = new Set(inBankRows.map((v) => v.youtubeId))
 
-    // Extract videos from successful feeds
-    let allVideos: RSSVideo[] = []
-    for (const result of feedResults) {
-      if (result.status === 'fulfilled') {
-        allVideos = allVideos.concat(result.value.videos)
-      }
-      // Silently skip failed feeds (graceful degradation)
-    }
-
-    // Filter by since timestamp if provided
-    if (sinceDate) {
-      allVideos = allVideos.filter((video) => video.publishedAt > sinceDate)
-    }
-
-    // Sort chronologically (newest first)
-    allVideos.sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime())
-
-    // Check which videos are in the bank
-    const youtubeIds = allVideos.map((v) => v.youtubeId)
-    const videosInBank = youtubeIds.length > 0
-      ? await db
-          .select()
-          .from(videos)
-          .where(inArray(videos.youtubeId, youtubeIds))
-      : []
-
-    const inBankSet = new Set(videosInBank.map((v) => v.youtubeId))
-
-    // Map to response format
-    const response: DiscoveryVideo[] = allVideos.map((video) => ({
+    const response: DiscoveryVideoResponse[] = cached.map((video) => ({
       youtubeId: video.youtubeId,
       title: video.title,
       channelId: video.channelId,
       channelName: video.channelName,
-      publishedAt: video.publishedAt.toISOString(),
+      publishedAt: video.publishedAt ? video.publishedAt.toISOString() : null,
       description: video.description,
       inBank: inBankSet.has(video.youtubeId),
     }))

@@ -37,6 +37,25 @@ export const channels = pgTable('channels', {
 });
 
 /**
+ * Discovery Videos table - cached RSS feed videos for Discovery page
+ * Populated by the cron job and manual refresh endpoint.
+ * Eliminates live RSS fetches on every Discovery page load.
+ */
+export const discoveryVideos = pgTable('discovery_videos', {
+  id: serial('id').primaryKey(),
+  youtubeId: text('youtube_id').notNull(),
+  title: text('title').notNull(),
+  channelId: text('channel_id').notNull(),
+  channelName: text('channel_name').notNull(),
+  publishedAt: timestamp('published_at'),
+  description: text('description').notNull().default(''),
+  cachedAt: timestamp('cached_at').defaultNow().notNull(),
+}, (table) => ({
+  youtubeIdUnique: uniqueIndex('discovery_videos_youtube_id_unique').on(table.youtubeId),
+  channelIdIdx: index('discovery_videos_channel_id_idx').on(table.channelId),
+}))
+
+/**
  * Insights table - stores AI-generated extraction results for videos
  * One extraction per video (unique constraint on videoId)
  */
@@ -282,6 +301,9 @@ export const oauthConsent = pgTable('oauth_consent', {
 // Type exports for use in application code
 export type Video = typeof videos.$inferSelect;
 export type NewVideo = typeof videos.$inferInsert;
+
+export type DiscoveryVideo = typeof discoveryVideos.$inferSelect;
+export type NewDiscoveryVideo = typeof discoveryVideos.$inferInsert;
 
 export type Channel = typeof channels.$inferSelect;
 export type NewChannel = typeof channels.$inferInsert;
