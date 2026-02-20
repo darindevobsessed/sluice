@@ -1,17 +1,20 @@
 import { db, videos } from "@/lib/db";
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
+import { startApiTimer } from '@/lib/api-timing'
 
 export async function GET(
   _request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const timer = startApiTimer('/api/videos/[id]', 'GET')
   try {
     const { id } = await params;
     const videoId = parseInt(id, 10);
 
     // Validate ID is a valid number
     if (isNaN(videoId)) {
+      timer.end(400)
       return NextResponse.json(
         { error: "Invalid video ID" },
         { status: 400 }
@@ -27,6 +30,7 @@ export async function GET(
 
     // Return 404 if not found
     if (result.length === 0) {
+      timer.end(404)
       return NextResponse.json(
         { error: "Video not found" },
         { status: 404 }
@@ -35,12 +39,14 @@ export async function GET(
 
     const video = result[0];
 
+    timer.end(200)
     return NextResponse.json(
       { video },
       { status: 200 }
     );
   } catch (error) {
     console.error("Error fetching video:", error);
+    timer.end(500)
     return NextResponse.json(
       { error: "Failed to fetch video. Please try again." },
       { status: 500 }

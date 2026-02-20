@@ -2,17 +2,20 @@ import { db, videos, focusAreas, videoFocusAreas } from '@/lib/db'
 import { eq, and } from 'drizzle-orm'
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
+import { startApiTimer } from '@/lib/api-timing'
 
 const assignFocusAreaSchema = z.object({
   focusAreaId: z.number().int().positive('Focus area ID is required'),
 })
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const timer = startApiTimer('/api/videos/[id]/focus-areas', 'GET')
   try {
     const { id: idParam } = await params
     const videoId = parseInt(idParam, 10)
 
     if (isNaN(videoId)) {
+      timer.end(400)
       return NextResponse.json({ error: 'Invalid video ID' }, { status: 400 })
     }
 
@@ -20,6 +23,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     const [video] = await db.select().from(videos).where(eq(videos.id, videoId)).limit(1)
 
     if (!video) {
+      timer.end(404)
       return NextResponse.json({ error: 'Video not found' }, { status: 404 })
     }
 
@@ -35,9 +39,11 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
       .innerJoin(focusAreas, eq(videoFocusAreas.focusAreaId, focusAreas.id))
       .where(eq(videoFocusAreas.videoId, videoId))
 
+    timer.end(200)
     return NextResponse.json({ focusAreas: videoFocusAreasResult }, { status: 200 })
   } catch (error) {
     console.error('Error fetching video focus areas:', error)
+    timer.end(500)
     return NextResponse.json(
       { error: 'Failed to fetch focus areas. Please try again.' },
       { status: 500 }
@@ -46,11 +52,13 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 }
 
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const timer = startApiTimer('/api/videos/[id]/focus-areas', 'POST')
   try {
     const { id: idParam } = await params
     const videoId = parseInt(idParam, 10)
 
     if (isNaN(videoId)) {
+      timer.end(400)
       return NextResponse.json({ error: 'Invalid video ID' }, { status: 400 })
     }
 
@@ -60,6 +68,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
     if (!validationResult.success) {
       const firstError = validationResult.error.issues[0]
+      timer.end(400)
       return NextResponse.json(
         { error: firstError?.message || 'Invalid request data' },
         { status: 400 }
@@ -72,6 +81,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     const [video] = await db.select().from(videos).where(eq(videos.id, videoId)).limit(1)
 
     if (!video) {
+      timer.end(404)
       return NextResponse.json({ error: 'Video not found' }, { status: 404 })
     }
 
@@ -83,6 +93,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       .limit(1)
 
     if (!focusArea) {
+      timer.end(404)
       return NextResponse.json({ error: 'Focus area not found' }, { status: 404 })
     }
 
@@ -99,6 +110,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       .limit(1)
 
     if (existingAssignment) {
+      timer.end(409)
       return NextResponse.json(
         { error: 'Focus area already assigned to this video' },
         { status: 409 }
@@ -111,9 +123,11 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       focusAreaId,
     })
 
+    timer.end(201)
     return new Response(null, { status: 201 })
   } catch (error) {
     console.error('Error assigning focus area:', error)
+    timer.end(500)
     return NextResponse.json(
       { error: 'Failed to assign focus area. Please try again.' },
       { status: 500 }
@@ -122,11 +136,13 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 }
 
 export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const timer = startApiTimer('/api/videos/[id]/focus-areas', 'DELETE')
   try {
     const { id: idParam } = await params
     const videoId = parseInt(idParam, 10)
 
     if (isNaN(videoId)) {
+      timer.end(400)
       return NextResponse.json({ error: 'Invalid video ID' }, { status: 400 })
     }
 
@@ -134,6 +150,7 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
     const focusAreaIdParam = searchParams.get('focusAreaId')
 
     if (!focusAreaIdParam) {
+      timer.end(400)
       return NextResponse.json(
         { error: 'focusAreaId query parameter is required' },
         { status: 400 }
@@ -143,6 +160,7 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
     const focusAreaId = parseInt(focusAreaIdParam, 10)
 
     if (isNaN(focusAreaId)) {
+      timer.end(400)
       return NextResponse.json({ error: 'Invalid focus area ID' }, { status: 400 })
     }
 
@@ -150,6 +168,7 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
     const [video] = await db.select().from(videos).where(eq(videos.id, videoId)).limit(1)
 
     if (!video) {
+      timer.end(404)
       return NextResponse.json({ error: 'Video not found' }, { status: 404 })
     }
 
@@ -166,6 +185,7 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
       .limit(1)
 
     if (!existingAssignment) {
+      timer.end(404)
       return NextResponse.json(
         { error: 'Focus area not assigned to this video' },
         { status: 404 }
@@ -182,9 +202,11 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
         )
       )
 
+    timer.end(204)
     return new Response(null, { status: 204 })
   } catch (error) {
     console.error('Error removing focus area:', error)
+    timer.end(500)
     return NextResponse.json(
       { error: 'Failed to remove focus area. Please try again.' },
       { status: 500 }

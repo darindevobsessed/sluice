@@ -2,6 +2,7 @@ import { db, focusAreas } from '@/lib/db'
 import { eq } from 'drizzle-orm'
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
+import { startApiTimer } from '@/lib/api-timing'
 
 const createFocusAreaSchema = z.object({
   name: z.string().min(1, 'Name is required').transform((val) => val.trim()),
@@ -9,12 +10,15 @@ const createFocusAreaSchema = z.object({
 })
 
 export async function GET() {
+  const timer = startApiTimer('/api/focus-areas', 'GET')
   try {
     const allFocusAreas = await db.select().from(focusAreas)
 
+    timer.end(200)
     return NextResponse.json({ focusAreas: allFocusAreas }, { status: 200 })
   } catch (error) {
     console.error('Error fetching focus areas:', error)
+    timer.end(500)
     return NextResponse.json(
       { error: 'Failed to fetch focus areas. Please try again.' },
       { status: 500 }
@@ -23,6 +27,7 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const timer = startApiTimer('/api/focus-areas', 'POST')
   try {
     const body = await request.json()
 
@@ -30,6 +35,7 @@ export async function POST(request: Request) {
 
     if (!validationResult.success) {
       const firstError = validationResult.error.issues[0]
+      timer.end(400)
       return NextResponse.json(
         { error: firstError?.message || 'Invalid request data' },
         { status: 400 }
@@ -46,6 +52,7 @@ export async function POST(request: Request) {
       .limit(1)
 
     if (existingFocusArea.length > 0) {
+      timer.end(409)
       return NextResponse.json(
         { error: 'A focus area with this name already exists' },
         { status: 409 }
@@ -60,9 +67,11 @@ export async function POST(request: Request) {
       })
       .returning()
 
+    timer.end(201)
     return NextResponse.json({ focusArea }, { status: 201 })
   } catch (error) {
     console.error('Error creating focus area:', error)
+    timer.end(500)
     return NextResponse.json(
       { error: 'Failed to create focus area. Please try again.' },
       { status: 500 }

@@ -2,6 +2,7 @@ import { db, focusAreas } from '@/lib/db'
 import { eq } from 'drizzle-orm'
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
+import { startApiTimer } from '@/lib/api-timing'
 
 const updateFocusAreaSchema = z.object({
   name: z
@@ -16,11 +17,13 @@ export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const timer = startApiTimer('/api/focus-areas/[id]', 'PATCH')
   try {
     const { id: idParam } = await params
     const id = parseInt(idParam, 10)
 
     if (isNaN(id)) {
+      timer.end(400)
       return NextResponse.json({ error: 'Invalid focus area ID' }, { status: 400 })
     }
 
@@ -30,6 +33,7 @@ export async function PATCH(
 
     if (!validationResult.success) {
       const firstError = validationResult.error.issues[0]
+      timer.end(400)
       return NextResponse.json(
         { error: firstError?.message || 'Invalid request data' },
         { status: 400 }
@@ -46,6 +50,7 @@ export async function PATCH(
       .limit(1)
 
     if (!existingFocusArea) {
+      timer.end(404)
       return NextResponse.json({ error: 'Focus area not found' }, { status: 404 })
     }
 
@@ -58,6 +63,7 @@ export async function PATCH(
         .limit(1)
 
       if (conflictingFocusArea) {
+        timer.end(409)
         return NextResponse.json(
           { error: 'A focus area with this name already exists' },
           { status: 409 }
@@ -76,9 +82,11 @@ export async function PATCH(
       .where(eq(focusAreas.id, id))
       .returning()
 
+    timer.end(200)
     return NextResponse.json({ focusArea: updatedFocusArea }, { status: 200 })
   } catch (error) {
     console.error('Error updating focus area:', error)
+    timer.end(500)
     return NextResponse.json(
       { error: 'Failed to update focus area. Please try again.' },
       { status: 500 }
@@ -90,11 +98,13 @@ export async function DELETE(
   _request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const timer = startApiTimer('/api/focus-areas/[id]', 'DELETE')
   try {
     const { id: idParam } = await params
     const id = parseInt(idParam, 10)
 
     if (isNaN(id)) {
+      timer.end(400)
       return NextResponse.json({ error: 'Invalid focus area ID' }, { status: 400 })
     }
 
@@ -106,15 +116,18 @@ export async function DELETE(
       .limit(1)
 
     if (!existingFocusArea) {
+      timer.end(404)
       return NextResponse.json({ error: 'Focus area not found' }, { status: 404 })
     }
 
     // Delete (cascade will handle video_focus_areas)
     await db.delete(focusAreas).where(eq(focusAreas.id, id))
 
+    timer.end(204)
     return new Response(null, { status: 204 })
   } catch (error) {
     console.error('Error deleting focus area:', error)
+    timer.end(500)
     return NextResponse.json(
       { error: 'Failed to delete focus area. Please try again.' },
       { status: 500 }

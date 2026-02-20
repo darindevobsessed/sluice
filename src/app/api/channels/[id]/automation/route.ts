@@ -3,6 +3,7 @@ import { eq } from 'drizzle-orm'
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { updateChannelAutomation } from '@/lib/automation/queries'
+import { startApiTimer } from '@/lib/api-timing'
 
 const automationSchema = z.object({
   autoFetch: z.boolean().optional(),
@@ -16,12 +17,14 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const timer = startApiTimer('/api/channels/[id]/automation', 'GET')
   try {
     const { id } = await params
 
     // Validate channel ID
     const idValidation = channelIdSchema.safeParse(id)
     if (!idValidation.success) {
+      timer.end(400)
       return NextResponse.json(
         { error: idValidation.error.issues[0]?.message || 'Invalid channel ID' },
         { status: 400 }
@@ -40,6 +43,7 @@ export async function GET(
     const channelData = channel[0]
 
     if (!channelData) {
+      timer.end(404)
       return NextResponse.json(
         { error: 'Channel not found' },
         { status: 404 }
@@ -47,6 +51,7 @@ export async function GET(
     }
 
     // Return automation settings
+    timer.end(200)
     return NextResponse.json({
       feedUrl: channelData.feedUrl,
       autoFetch: channelData.autoFetch,
@@ -55,6 +60,7 @@ export async function GET(
     })
   } catch (error) {
     console.error('Error fetching automation settings:', error)
+    timer.end(500)
     return NextResponse.json(
       { error: 'Failed to fetch automation settings' },
       { status: 500 }
@@ -66,12 +72,14 @@ export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const timer = startApiTimer('/api/channels/[id]/automation', 'PATCH')
   try {
     const { id } = await params
 
     // Validate channel ID
     const idValidation = channelIdSchema.safeParse(id)
     if (!idValidation.success) {
+      timer.end(400)
       return NextResponse.json(
         { error: idValidation.error.issues[0]?.message || 'Invalid channel ID' },
         { status: 400 }
@@ -86,6 +94,7 @@ export async function PATCH(
 
     if (!validationResult.success) {
       const firstError = validationResult.error.issues[0]
+      timer.end(400)
       return NextResponse.json(
         { error: firstError?.message || 'Invalid request data' },
         { status: 400 }
@@ -100,6 +109,7 @@ export async function PATCH(
       .limit(1)
 
     if (!existingChannel[0]) {
+      timer.end(404)
       return NextResponse.json(
         { error: 'Channel not found' },
         { status: 404 }
@@ -112,11 +122,13 @@ export async function PATCH(
       validationResult.data
     )
 
+    timer.end(200)
     return NextResponse.json({
       channel: updatedChannel[0],
     })
   } catch (error) {
     console.error('Error updating automation settings:', error)
+    timer.end(500)
     return NextResponse.json(
       { error: 'Failed to update automation settings' },
       { status: 500 }

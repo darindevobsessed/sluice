@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import { fetchChannelFeed } from '@/lib/automation/rss'
 import { inArray } from 'drizzle-orm'
 import type { RSSVideo } from '@/lib/automation/types'
+import { startApiTimer } from '@/lib/api-timing'
 
 interface DiscoveryVideo {
   youtubeId: string
@@ -15,6 +16,7 @@ interface DiscoveryVideo {
 }
 
 export async function GET(request: Request): Promise<NextResponse> {
+  const timer = startApiTimer('/api/channels/videos', 'GET')
   try {
     const { searchParams } = new URL(request.url)
     const since = searchParams.get('since')
@@ -24,6 +26,7 @@ export async function GET(request: Request): Promise<NextResponse> {
     if (since) {
       sinceDate = new Date(since)
       if (isNaN(sinceDate.getTime())) {
+        timer.end(400)
         return NextResponse.json(
           { error: 'Invalid since timestamp' },
           { status: 400 }
@@ -35,6 +38,7 @@ export async function GET(request: Request): Promise<NextResponse> {
     const followedChannels = await db.select().from(channels)
 
     if (followedChannels.length === 0) {
+      timer.end(200)
       return NextResponse.json([])
     }
 
@@ -84,9 +88,11 @@ export async function GET(request: Request): Promise<NextResponse> {
       inBank: inBankSet.has(video.youtubeId),
     }))
 
+    timer.end(200)
     return NextResponse.json(response)
   } catch (error) {
     console.error('Failed to fetch videos:', error)
+    timer.end(500)
     return NextResponse.json(
       { error: 'Failed to fetch videos' },
       { status: 500 }

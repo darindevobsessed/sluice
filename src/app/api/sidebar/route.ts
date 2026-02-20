@@ -1,6 +1,7 @@
 import { db, videos, focusAreas } from '@/lib/db'
 import { sql } from 'drizzle-orm'
 import { NextResponse } from 'next/server'
+import { startApiTimer } from '@/lib/api-timing'
 
 /**
  * GET /api/sidebar
@@ -13,6 +14,7 @@ import { NextResponse } from 'next/server'
  * "creators in the knowledge bank" — any video with a non-null channel field.
  */
 export async function GET() {
+  const timer = startApiTimer('/api/sidebar', 'GET')
   try {
     // Get distinct channels with video counts, sorted by count descending
     const channelResults = await db
@@ -34,9 +36,11 @@ export async function GET() {
     // Get all focus areas
     const allFocusAreas = await db.select().from(focusAreas)
 
+    timer.end(200)
     return NextResponse.json({ channels, focusAreas: allFocusAreas })
   } catch (error) {
     console.error('Error fetching sidebar data:', error)
+    timer.end(500)
     return NextResponse.json(
       { error: 'Failed to fetch sidebar data' },
       { status: 500 }

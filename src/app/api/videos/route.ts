@@ -33,6 +33,7 @@ const videoSchema = z.object({
 });
 
 export async function GET(request: Request) {
+  const timer = startApiTimer('/api/videos', 'GET')
   try {
     const { searchParams } = new URL(request.url);
     const query = searchParams.get('q') || '';
@@ -43,6 +44,7 @@ export async function GET(request: Request) {
     if (focusAreaIdParam) {
       const parsed = parseInt(focusAreaIdParam, 10);
       if (isNaN(parsed)) {
+        timer.end(400)
         return NextResponse.json({ error: 'Invalid focus area ID' }, { status: 400 });
       }
       focusAreaId = parsed;
@@ -123,12 +125,14 @@ export async function GET(request: Request) {
       }
     }
 
+    timer.end(200)
     return NextResponse.json(
       { videos: videoResults, stats, focusAreaMap, summaryMap },
       { status: 200 }
     );
   } catch (error) {
     console.error("Error fetching videos:", error);
+    timer.end(500)
     return NextResponse.json(
       { error: "Failed to fetch videos. Please try again." },
       { status: 500 }

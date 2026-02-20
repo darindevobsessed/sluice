@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { db, channels } from '@/lib/db'
 import { findSimilarChannels } from '@/lib/channels/similarity'
+import { startApiTimer } from '@/lib/api-timing'
 
 const queryParamsSchema = z.object({
   limit: z
@@ -12,6 +13,7 @@ const queryParamsSchema = z.object({
 })
 
 export async function GET(request: Request) {
+  const timer = startApiTimer('/api/channels/similar', 'GET')
   try {
     // Parse and validate query parameters
     const { searchParams } = new URL(request.url)
@@ -21,6 +23,7 @@ export async function GET(request: Request) {
 
     if (!parseResult.success) {
       const firstError = parseResult.error.issues[0]
+      timer.end(400)
       return NextResponse.json(
         { error: firstError?.message || 'Invalid query parameters' },
         { status: 400 }
@@ -34,6 +37,7 @@ export async function GET(request: Request) {
 
     // Handle no followed channels
     if (followedChannels.length === 0) {
+      timer.end(200)
       return NextResponse.json({
         suggestions: [],
         message: 'No followed channels to base recommendations on',
@@ -48,6 +52,7 @@ export async function GET(request: Request) {
 
     // Handle no similar channels found
     if (similarChannels.length === 0) {
+      timer.end(200)
       return NextResponse.json({
         suggestions: [],
         message: 'No similar channels found',
@@ -55,11 +60,13 @@ export async function GET(request: Request) {
     }
 
     // Return successful response
+    timer.end(200)
     return NextResponse.json({
       suggestions: similarChannels,
     })
   } catch (error) {
     console.error('Error fetching similar channels:', error)
+    timer.end(500)
     return NextResponse.json(
       { error: 'Failed to fetch similar channels' },
       { status: 500 }

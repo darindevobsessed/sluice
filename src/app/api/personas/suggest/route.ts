@@ -3,8 +3,10 @@ import { NextResponse } from 'next/server'
 import { sql } from 'drizzle-orm'
 
 import { PERSONA_THRESHOLD } from '@/lib/personas/service'
+import { startApiTimer } from '@/lib/api-timing'
 
 export async function GET() {
+  const timer = startApiTimer('/api/personas/suggest', 'GET')
   try {
     // Get existing persona channel names
     const existingPersonas = await db.select({ channelName: personas.channelName }).from(personas)
@@ -29,9 +31,11 @@ export async function GET() {
       }))
       .sort((a, b) => b.videoCount - a.videoCount) // Sort by video count descending
 
+    timer.end(200)
     return NextResponse.json({ suggestions })
   } catch (error) {
     console.error('Error fetching persona suggestions:', error)
+    timer.end(500)
     return NextResponse.json(
       { error: 'Failed to fetch persona suggestions' },
       { status: 500 }
