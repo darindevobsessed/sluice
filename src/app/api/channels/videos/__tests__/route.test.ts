@@ -27,7 +27,7 @@ describe('GET /api/channels/videos', () => {
     vi.restoreAllMocks()
   })
 
-  it('returns all videos from discovery_videos table', async () => {
+  it('returns all videos from discovery_videos table with bankVideoId and focusAreas fields', async () => {
     const mockDiscoveryVideos = [
       {
         id: 1,
@@ -57,11 +57,13 @@ describe('GET /api/channels/videos', () => {
       orderBy: vi.fn().mockResolvedValue(mockDiscoveryVideos),
     } as never)
 
-    // Second call: select youtubeId from videos (inBank check)
+    // Second call: select youtubeId + id from videos (inBank check)
     mockDb.select.mockReturnValueOnce({
       from: vi.fn().mockReturnThis(),
       where: vi.fn().mockResolvedValue([]),
     } as never)
+
+    // No third call — bankVideoIds is empty, focus area query is skipped
 
     const request = new Request('http://localhost/api/channels/videos')
     const response = await GET(request)
@@ -73,6 +75,11 @@ describe('GET /api/channels/videos', () => {
     expect(data[1]?.youtubeId).toBe('vid1')
     expect(data[0]?.inBank).toBe(false)
     expect(data[1]?.inBank).toBe(false)
+    // New fields
+    expect(data[0]?.bankVideoId).toBeNull()
+    expect(data[1]?.bankVideoId).toBeNull()
+    expect(data[0]?.focusAreas).toEqual([])
+    expect(data[1]?.focusAreas).toEqual([])
   })
 
   it('marks videos as inBank when they exist in videos table', async () => {
@@ -99,15 +106,23 @@ describe('GET /api/channels/videos', () => {
       },
     ]
 
+    // First call: select from discoveryVideos
     mockDb.select.mockReturnValueOnce({
       from: vi.fn().mockReturnThis(),
       orderBy: vi.fn().mockResolvedValue(mockDiscoveryVideos),
     } as never)
 
-    // vid2 is in bank
+    // Second call: select youtubeId + id — vid2 is in bank with DB id 42
     mockDb.select.mockReturnValueOnce({
       from: vi.fn().mockReturnThis(),
-      where: vi.fn().mockResolvedValue([{ youtubeId: 'vid2' }]),
+      where: vi.fn().mockResolvedValue([{ youtubeId: 'vid2', id: 42 }]),
+    } as never)
+
+    // Third call: focus area query — no focus areas for video 42
+    mockDb.select.mockReturnValueOnce({
+      from: vi.fn().mockReturnThis(),
+      innerJoin: vi.fn().mockReturnThis(),
+      where: vi.fn().mockResolvedValue([]),
     } as never)
 
     const request = new Request('http://localhost/api/channels/videos')
@@ -120,6 +135,165 @@ describe('GET /api/channels/videos', () => {
     expect(data[0]?.inBank).toBe(true)
     expect(data[1]?.youtubeId).toBe('vid1')
     expect(data[1]?.inBank).toBe(false)
+  })
+
+  it('includes bankVideoId for in-bank videos', async () => {
+    const mockDiscoveryVideos = [
+      {
+        id: 1,
+        youtubeId: 'vid1',
+        title: 'Video 1',
+        channelId: 'UCtest1',
+        channelName: 'Channel 1',
+        publishedAt: new Date('2026-02-01T10:00:00Z'),
+        description: 'Desc',
+        cachedAt: new Date(),
+      },
+    ]
+
+    // First call: discoveryVideos
+    mockDb.select.mockReturnValueOnce({
+      from: vi.fn().mockReturnThis(),
+      orderBy: vi.fn().mockResolvedValue(mockDiscoveryVideos),
+    } as never)
+
+    // Second call: videos in bank — vid1 has DB id 7
+    mockDb.select.mockReturnValueOnce({
+      from: vi.fn().mockReturnThis(),
+      where: vi.fn().mockResolvedValue([{ youtubeId: 'vid1', id: 7 }]),
+    } as never)
+
+    // Third call: focus areas — none
+    mockDb.select.mockReturnValueOnce({
+      from: vi.fn().mockReturnThis(),
+      innerJoin: vi.fn().mockReturnThis(),
+      where: vi.fn().mockResolvedValue([]),
+    } as never)
+
+    const request = new Request('http://localhost/api/channels/videos')
+    const response = await GET(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(data[0]?.bankVideoId).toBe(7)
+    expect(data[0]?.inBank).toBe(true)
+  })
+
+  it('includes focusAreas for in-bank videos that have assignments', async () => {
+    const mockDiscoveryVideos = [
+      {
+        id: 1,
+        youtubeId: 'vid1',
+        title: 'Video 1',
+        channelId: 'UCtest1',
+        channelName: 'Channel 1',
+        publishedAt: new Date('2026-02-01T10:00:00Z'),
+        description: 'Desc',
+        cachedAt: new Date(),
+      },
+    ]
+
+    // First call: discoveryVideos
+    mockDb.select.mockReturnValueOnce({
+      from: vi.fn().mockReturnThis(),
+      orderBy: vi.fn().mockResolvedValue(mockDiscoveryVideos),
+    } as never)
+
+    // Second call: videos in bank — vid1 is bank video id 10
+    mockDb.select.mockReturnValueOnce({
+      from: vi.fn().mockReturnThis(),
+      where: vi.fn().mockResolvedValue([{ youtubeId: 'vid1', id: 10 }]),
+    } as never)
+
+    // Third call: focus area assignments for video 10
+    mockDb.select.mockReturnValueOnce({
+      from: vi.fn().mockReturnThis(),
+      innerJoin: vi.fn().mockReturnThis(),
+      where: vi.fn().mockResolvedValue([
+        { videoId: 10, id: 1, name: 'Engineering', color: '#3b82f6' },
+        { videoId: 10, id: 2, name: 'Architecture', color: '#10b981' },
+      ]),
+    } as never)
+
+    const request = new Request('http://localhost/api/channels/videos')
+    const response = await GET(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(data[0]?.focusAreas).toHaveLength(2)
+    expect(data[0]?.focusAreas[0]).toEqual({ id: 1, name: 'Engineering', color: '#3b82f6' })
+    expect(data[0]?.focusAreas[1]).toEqual({ id: 2, name: 'Architecture', color: '#10b981' })
+  })
+
+  it('returns empty focusAreas for out-of-bank videos', async () => {
+    const mockDiscoveryVideos = [
+      {
+        id: 1,
+        youtubeId: 'vid1',
+        title: 'Video 1',
+        channelId: 'UCtest1',
+        channelName: 'Channel 1',
+        publishedAt: new Date('2026-02-01T10:00:00Z'),
+        description: 'Desc',
+        cachedAt: new Date(),
+      },
+    ]
+
+    // First call: discoveryVideos
+    mockDb.select.mockReturnValueOnce({
+      from: vi.fn().mockReturnThis(),
+      orderBy: vi.fn().mockResolvedValue(mockDiscoveryVideos),
+    } as never)
+
+    // Second call: not in bank
+    mockDb.select.mockReturnValueOnce({
+      from: vi.fn().mockReturnThis(),
+      where: vi.fn().mockResolvedValue([]),
+    } as never)
+
+    // No third call — no bank video ids
+
+    const request = new Request('http://localhost/api/channels/videos')
+    const response = await GET(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(data[0]?.focusAreas).toEqual([])
+    expect(data[0]?.bankVideoId).toBeNull()
+  })
+
+  it('skips focus area query when no videos are in bank', async () => {
+    const mockDiscoveryVideos = [
+      {
+        id: 1,
+        youtubeId: 'vid1',
+        title: 'Video 1',
+        channelId: 'UCtest1',
+        channelName: 'Channel 1',
+        publishedAt: new Date('2026-02-01T10:00:00Z'),
+        description: 'Desc',
+        cachedAt: new Date(),
+      },
+    ]
+
+    // First call: discoveryVideos
+    mockDb.select.mockReturnValueOnce({
+      from: vi.fn().mockReturnThis(),
+      orderBy: vi.fn().mockResolvedValue(mockDiscoveryVideos),
+    } as never)
+
+    // Second call: none in bank
+    mockDb.select.mockReturnValueOnce({
+      from: vi.fn().mockReturnThis(),
+      where: vi.fn().mockResolvedValue([]),
+    } as never)
+
+    const request = new Request('http://localhost/api/channels/videos')
+    const response = await GET(request)
+
+    expect(response.status).toBe(200)
+    // db.select should only have been called twice (no focus area query)
+    expect(mockDb.select).toHaveBeenCalledTimes(2)
   })
 
   it('returns empty array when discovery_videos table is empty', async () => {
@@ -213,5 +387,66 @@ describe('GET /api/channels/videos', () => {
 
     expect(response.status).toBe(200)
     expect(data[0]?.publishedAt).toBeNull()
+  })
+
+  it('handles multiple in-bank videos with different focus areas', async () => {
+    const mockDiscoveryVideos = [
+      {
+        id: 1,
+        youtubeId: 'vid-a',
+        title: 'Video A',
+        channelId: 'UCtest1',
+        channelName: 'Channel 1',
+        publishedAt: new Date('2026-02-02T10:00:00Z'),
+        description: 'Desc A',
+        cachedAt: new Date(),
+      },
+      {
+        id: 2,
+        youtubeId: 'vid-b',
+        title: 'Video B',
+        channelId: 'UCtest1',
+        channelName: 'Channel 1',
+        publishedAt: new Date('2026-02-01T10:00:00Z'),
+        description: 'Desc B',
+        cachedAt: new Date(),
+      },
+    ]
+
+    // First call: discoveryVideos
+    mockDb.select.mockReturnValueOnce({
+      from: vi.fn().mockReturnThis(),
+      orderBy: vi.fn().mockResolvedValue(mockDiscoveryVideos),
+    } as never)
+
+    // Second call: both videos in bank
+    mockDb.select.mockReturnValueOnce({
+      from: vi.fn().mockReturnThis(),
+      where: vi.fn().mockResolvedValue([
+        { youtubeId: 'vid-a', id: 20 },
+        { youtubeId: 'vid-b', id: 21 },
+      ]),
+    } as never)
+
+    // Third call: focus area assignments — vid-a has one, vid-b has none
+    mockDb.select.mockReturnValueOnce({
+      from: vi.fn().mockReturnThis(),
+      innerJoin: vi.fn().mockReturnThis(),
+      where: vi.fn().mockResolvedValue([
+        { videoId: 20, id: 5, name: 'AI', color: '#8b5cf6' },
+      ]),
+    } as never)
+
+    const request = new Request('http://localhost/api/channels/videos')
+    const response = await GET(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(data[0]?.youtubeId).toBe('vid-a')
+    expect(data[0]?.bankVideoId).toBe(20)
+    expect(data[0]?.focusAreas).toEqual([{ id: 5, name: 'AI', color: '#8b5cf6' }])
+    expect(data[1]?.youtubeId).toBe('vid-b')
+    expect(data[1]?.bankVideoId).toBe(21)
+    expect(data[1]?.focusAreas).toEqual([])
   })
 })

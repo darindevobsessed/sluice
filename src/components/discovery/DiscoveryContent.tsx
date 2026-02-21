@@ -28,27 +28,9 @@ interface Channel {
   createdAt: Date
 }
 
-interface BankVideo {
-  id: number
-  youtubeId: string
-  title: string
-  channel: string
-  transcript: string
-  thumbnail: string | null
-  publishedAt: Date | null
-  createdAt: Date
-}
-
-interface FocusArea {
-  id: number
-  name: string
-  color: string | null
-}
-
-interface VideosAPIResponse {
-  videos: BankVideo[]
-  stats: Record<string, unknown>
-  focusAreaMap: Record<number, FocusArea[]>
+interface DiscoveryVideoWithBank extends DiscoveryVideo {
+  bankVideoId: number | null
+  focusAreas: { id: number; name: string; color: string | null }[]
 }
 
 export function DiscoveryContent() {
@@ -91,14 +73,13 @@ export function DiscoveryContent() {
     setPageTitle({ title: 'Discovery' })
   }, [setPageTitle])
 
-  // Fetch videos and focus area map
+  // Fetch videos — single API call returns bankVideoId and focusAreas for in-bank videos
   const fetchVideos = useCallback(async () => {
     setIsLoadingVideos(true)
     try {
-      // Fetch all discovery videos
-      const videosResponse = await fetch('/api/channels/videos')
+      const response = await fetch('/api/channels/videos')
 
-      if (!videosResponse.ok) {
+      if (!response.ok) {
         console.error('Failed to fetch discovery videos')
         setDiscoveryVideos([])
         setFocusAreaMap({})
@@ -106,40 +87,28 @@ export function DiscoveryContent() {
         return
       }
 
-      const videos: DiscoveryVideo[] = await videosResponse.json()
+      const videos: DiscoveryVideoWithBank[] = await response.json()
       setDiscoveryVideos(videos)
 
-      // Fetch bank videos to get focus area map
-      const bankResponse = await fetch('/api/videos')
+      // Build maps from the single response — no second API call needed
+      const newBankIdMap: Record<string, number> = {}
+      const newFocusAreaMap: Record<string, { id: number; name: string; color: string }[]> = {}
 
-      if (!bankResponse.ok) {
-        console.error('Failed to fetch bank videos')
-        setFocusAreaMap({})
-        setBankIdMap({})
-        return
-      }
-
-      const bankData: VideosAPIResponse = await bankResponse.json()
-
-      // Remap focusAreaMap from DB id to youtubeId
-      const youtubeIdMap: Record<string, { id: number; name: string; color: string }[]> = {}
-      const bankIdMap: Record<string, number> = {}
-      for (const video of bankData.videos) {
-        const areas = bankData.focusAreaMap[video.id]
-        if (areas && areas.length > 0 && video.youtubeId) {
-          youtubeIdMap[video.youtubeId] = areas.map(fa => ({
+      for (const video of videos) {
+        if (video.bankVideoId !== null && video.bankVideoId !== undefined) {
+          newBankIdMap[video.youtubeId] = video.bankVideoId
+        }
+        if (video.focusAreas && video.focusAreas.length > 0) {
+          newFocusAreaMap[video.youtubeId] = video.focusAreas.map((fa) => ({
             id: fa.id,
             name: fa.name,
             color: fa.color ?? '',
           }))
         }
-        if (video.youtubeId) {
-          bankIdMap[video.youtubeId] = video.id
-        }
       }
 
-      setFocusAreaMap(youtubeIdMap)
-      setBankIdMap(bankIdMap)
+      setBankIdMap(newBankIdMap)
+      setFocusAreaMap(newFocusAreaMap)
     } catch (err) {
       console.error('Failed to fetch videos:', err)
       setDiscoveryVideos([])

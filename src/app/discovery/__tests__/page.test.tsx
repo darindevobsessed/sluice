@@ -98,6 +98,8 @@ describe('Discovery Page', () => {
         publishedAt: new Date().toISOString(),
         description: 'Test description',
         inBank: false,
+        bankVideoId: null,
+        focusAreas: [],
       },
       {
         youtubeId: 'vid2',
@@ -107,20 +109,10 @@ describe('Discovery Page', () => {
         publishedAt: new Date(Date.now() - 86400000).toISOString(),
         description: 'Test description 2',
         inBank: true,
+        bankVideoId: 1,
+        focusAreas: [{ id: 1, name: 'TypeScript', color: '#3178c6' }],
       },
     ]
-
-    const mockBankVideos = [
-      {
-        id: 1,
-        youtubeId: 'vid2',
-        title: 'Test Video 2',
-      },
-    ]
-
-    const mockFocusAreaMap = {
-      1: [{ id: 1, name: 'TypeScript', color: '#3178c6' }],
-    }
 
     // Mock /api/channels
     ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
@@ -128,20 +120,10 @@ describe('Discovery Page', () => {
       json: async () => mockChannels,
     })
 
-    // Mock /api/channels/videos
+    // Mock /api/channels/videos — now includes bankVideoId and focusAreas
     ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
       ok: true,
       json: async () => mockDiscoveryVideos,
-    })
-
-    // Mock /api/videos
-    ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({
-        videos: mockBankVideos,
-        stats: {},
-        focusAreaMap: mockFocusAreaMap,
-      }),
     })
 
     render(<Discovery />)
@@ -217,7 +199,7 @@ describe('Discovery Page', () => {
       json: async () => ({ videoCount: 1, channelCount: 1, errors: [] }),
     })
 
-    // Mock /api/channels/videos GET (called by fetchVideos)
+    // Mock /api/channels/videos GET (called by fetchVideos) — includes new fields
     ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
       ok: true,
       json: async () => [{
@@ -228,17 +210,9 @@ describe('Discovery Page', () => {
         publishedAt: new Date().toISOString(),
         description: 'New video description',
         inBank: false,
+        bankVideoId: null,
+        focusAreas: [],
       }],
-    })
-
-    // Mock /api/videos fetch
-    ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({
-        videos: [],
-        stats: {},
-        focusAreaMap: {},
-      }),
     })
 
     // Submit follow
@@ -270,6 +244,8 @@ describe('Discovery Page', () => {
         publishedAt: new Date().toISOString(),
         description: 'Test',
         inBank: false,
+        bankVideoId: null,
+        focusAreas: [],
       },
     ]
 
@@ -279,20 +255,10 @@ describe('Discovery Page', () => {
       json: async () => mockChannels,
     })
 
-    // Mock videos fetch
+    // Mock videos fetch — single call now includes bank data
     ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
       ok: true,
       json: async () => mockVideos,
-    })
-
-    // Mock /api/videos fetch
-    ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({
-        videos: [],
-        stats: {},
-        focusAreaMap: {},
-      }),
     })
 
     render(<Discovery />)
@@ -316,20 +282,10 @@ describe('Discovery Page', () => {
       json: async () => [mockChannel],
     })
 
-    // Mock videos fetch
+    // Mock videos fetch — single call
     ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
       ok: true,
       json: async () => [],
-    })
-
-    // Mock /api/videos fetch
-    ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({
-        videos: [],
-        stats: {},
-        focusAreaMap: {},
-      }),
     })
 
     render(<Discovery />)
@@ -373,6 +329,8 @@ describe('Discovery Page', () => {
         publishedAt: new Date().toISOString(),
         description: 'Test',
         inBank: false,
+        bankVideoId: null,
+        focusAreas: [],
       },
     ]
 
@@ -382,20 +340,10 @@ describe('Discovery Page', () => {
       json: async () => [mockChannel],
     })
 
-    // Mock initial videos fetch
+    // Mock initial videos fetch — single call
     ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
       ok: true,
       json: async () => mockVideos,
-    })
-
-    // Mock /api/videos fetch
-    ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({
-        videos: [],
-        stats: {},
-        focusAreaMap: {},
-      }),
     })
 
     render(<Discovery />)
@@ -408,20 +356,16 @@ describe('Discovery Page', () => {
     // Clear previous fetch calls
     vi.clearAllMocks()
 
-    // Mock refresh videos fetch
+    // Mock refresh endpoint call (POST /api/channels/videos/refresh)
+    ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ videoCount: 1, channelCount: 1, errors: [] }),
+    })
+
+    // Mock /api/channels/videos refetch — single call with updated data
     ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
       ok: true,
       json: async () => mockVideos,
-    })
-
-    // Mock /api/videos refetch
-    ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({
-        videos: [],
-        stats: {},
-        focusAreaMap: {},
-      }),
     })
 
     // Click refresh button
@@ -463,6 +407,8 @@ describe('Discovery Page', () => {
           publishedAt: new Date().toISOString(),
           description: 'Test',
           inBank: false,
+          bankVideoId: null,
+          focusAreas: [],
         },
       ]
 
@@ -472,20 +418,10 @@ describe('Discovery Page', () => {
         json: async () => mockChannels,
       })
 
-      // Mock /api/channels/videos
+      // Mock /api/channels/videos — single call
       ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: true,
         json: async () => mockVideos,
-      })
-
-      // Mock /api/videos
-      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          videos: [],
-          stats: {},
-          focusAreaMap: {},
-        }),
       })
 
       render(<Discovery />)
@@ -532,6 +468,8 @@ describe('Discovery Page', () => {
           publishedAt: new Date().toISOString(),
           description: 'Test',
           inBank: false,
+          bankVideoId: null,
+          focusAreas: [],
         },
       ]
 
@@ -541,20 +479,10 @@ describe('Discovery Page', () => {
         json: async () => mockChannels,
       })
 
-      // Mock /api/channels/videos
+      // Mock /api/channels/videos — single call
       ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: true,
         json: async () => mockVideos,
-      })
-
-      // Mock /api/videos
-      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          videos: [],
-          stats: {},
-          focusAreaMap: {},
-        }),
       })
 
       render(<Discovery />)
@@ -606,6 +534,8 @@ describe('Discovery Page', () => {
           publishedAt: new Date().toISOString(),
           description: 'Test',
           inBank: false,
+          bankVideoId: null,
+          focusAreas: [],
         },
         {
           youtubeId: 'vid2',
@@ -615,6 +545,8 @@ describe('Discovery Page', () => {
           publishedAt: new Date().toISOString(),
           description: 'Test',
           inBank: false,
+          bankVideoId: null,
+          focusAreas: [],
         },
       ]
 
@@ -624,20 +556,10 @@ describe('Discovery Page', () => {
         json: async () => mockChannels,
       })
 
-      // Mock /api/channels/videos
+      // Mock /api/channels/videos — single call
       ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: true,
         json: async () => mockVideos,
-      })
-
-      // Mock /api/videos
-      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          videos: [],
-          stats: {},
-          focusAreaMap: {},
-        }),
       })
 
       render(<Discovery />)
@@ -670,6 +592,8 @@ describe('Discovery Page', () => {
           publishedAt: new Date().toISOString(),
           description: 'Test',
           inBank: false,
+          bankVideoId: null,
+          focusAreas: [],
         },
         {
           youtubeId: 'vid2',
@@ -679,6 +603,8 @@ describe('Discovery Page', () => {
           publishedAt: new Date().toISOString(),
           description: 'Test',
           inBank: true,
+          bankVideoId: 5,
+          focusAreas: [],
         },
       ]
 
@@ -688,20 +614,10 @@ describe('Discovery Page', () => {
         json: async () => mockChannels,
       })
 
-      // Mock /api/channels/videos
+      // Mock /api/channels/videos — single call
       ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: true,
         json: async () => mockVideos,
-      })
-
-      // Mock /api/videos
-      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          videos: [],
-          stats: {},
-          focusAreaMap: {},
-        }),
       })
 
       render(<Discovery />)
@@ -734,6 +650,8 @@ describe('Discovery Page', () => {
         publishedAt: new Date(Date.now() - i * 86400000).toISOString(),
         description: 'Test',
         inBank: false,
+        bankVideoId: null,
+        focusAreas: [],
       }))
 
       // Mock /api/channels
@@ -742,20 +660,10 @@ describe('Discovery Page', () => {
         json: async () => mockChannels,
       })
 
-      // Mock /api/channels/videos
+      // Mock /api/channels/videos — single call
       ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: true,
         json: async () => mockVideos,
-      })
-
-      // Mock /api/videos
-      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          videos: [],
-          stats: {},
-          focusAreaMap: {},
-        }),
       })
 
       render(<Discovery />)
@@ -790,6 +698,8 @@ describe('Discovery Page', () => {
           publishedAt: new Date().toISOString(),
           description: 'Test',
           inBank: false,
+          bankVideoId: null,
+          focusAreas: [],
         },
       ]
 
@@ -799,20 +709,10 @@ describe('Discovery Page', () => {
         json: async () => mockChannels,
       })
 
-      // Mock /api/channels/videos
+      // Mock /api/channels/videos — single call
       ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: true,
         json: async () => mockVideos,
-      })
-
-      // Mock /api/videos
-      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          videos: [],
-          stats: {},
-          focusAreaMap: {},
-        }),
       })
 
       render(<Discovery />)
@@ -854,6 +754,8 @@ describe('Discovery Page', () => {
           publishedAt: new Date().toISOString(),
           description: 'Test',
           inBank: false,
+          bankVideoId: null,
+          focusAreas: [],
         },
       ]
 
@@ -863,20 +765,10 @@ describe('Discovery Page', () => {
         json: async () => mockChannels,
       })
 
-      // Mock /api/channels/videos
+      // Mock /api/channels/videos — single call
       ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: true,
         json: async () => mockVideos,
-      })
-
-      // Mock /api/videos
-      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          videos: [],
-          stats: {},
-          focusAreaMap: {},
-        }),
       })
 
       render(<Discovery />)
@@ -921,6 +813,8 @@ describe('Discovery Page', () => {
         publishedAt: new Date(Date.now() - i * 86400000).toISOString(),
         description: 'Test',
         inBank: false,
+        bankVideoId: null,
+        focusAreas: [],
       }))
 
       // Mock /api/channels
@@ -929,20 +823,10 @@ describe('Discovery Page', () => {
         json: async () => mockChannels,
       })
 
-      // Mock /api/channels/videos
+      // Mock /api/channels/videos — single call
       ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: true,
         json: async () => mockVideos,
-      })
-
-      // Mock /api/videos
-      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          videos: [],
-          stats: {},
-          focusAreaMap: {},
-        }),
       })
 
       render(<Discovery />)
@@ -987,6 +871,8 @@ describe('Discovery Page', () => {
         publishedAt: new Date(Date.now() - i * 86400000).toISOString(),
         description: 'Test',
         inBank: false,
+        bankVideoId: null,
+        focusAreas: [],
       }))
 
       // Mock /api/channels
@@ -995,20 +881,10 @@ describe('Discovery Page', () => {
         json: async () => mockChannels,
       })
 
-      // Mock /api/channels/videos
+      // Mock /api/channels/videos — single call
       ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: true,
         json: async () => mockVideos,
-      })
-
-      // Mock /api/videos
-      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          videos: [],
-          stats: {},
-          focusAreaMap: {},
-        }),
       })
 
       render(<Discovery />)
@@ -1049,6 +925,8 @@ describe('Discovery Page', () => {
           publishedAt: new Date().toISOString(),
           description: 'Test',
           inBank: false,
+          bankVideoId: null,
+          focusAreas: [],
         },
         {
           youtubeId: 'vid2',
@@ -1058,6 +936,8 @@ describe('Discovery Page', () => {
           publishedAt: new Date().toISOString(),
           description: 'Test',
           inBank: true,
+          bankVideoId: 5,
+          focusAreas: [],
         },
       ]
 
@@ -1067,20 +947,10 @@ describe('Discovery Page', () => {
         json: async () => mockChannels,
       })
 
-      // Mock /api/channels/videos
+      // Mock /api/channels/videos — single call
       ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: true,
         json: async () => mockVideos,
-      })
-
-      // Mock /api/videos
-      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          videos: [],
-          stats: {},
-          focusAreaMap: {},
-        }),
       })
 
       render(<Discovery />)
@@ -1120,6 +990,8 @@ describe('Discovery Page', () => {
           publishedAt: new Date().toISOString(),
           description: 'Test',
           inBank: false,
+          bankVideoId: null,
+          focusAreas: [],
         },
       ]
 
@@ -1129,20 +1001,10 @@ describe('Discovery Page', () => {
         json: async () => mockChannels,
       })
 
-      // Mock /api/channels/videos
+      // Mock /api/channels/videos — single call
       ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: true,
         json: async () => mockVideos,
-      })
-
-      // Mock /api/videos
-      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          videos: [],
-          stats: {},
-          focusAreaMap: {},
-        }),
       })
 
       render(<Discovery />)
@@ -1176,6 +1038,8 @@ describe('Discovery Page', () => {
           publishedAt: new Date().toISOString(),
           description: 'Test',
           inBank: false,
+          bankVideoId: null,
+          focusAreas: [],
         },
         {
           youtubeId: 'vid2',
@@ -1185,6 +1049,8 @@ describe('Discovery Page', () => {
           publishedAt: new Date().toISOString(),
           description: 'Test',
           inBank: true,
+          bankVideoId: 3,
+          focusAreas: [],
         },
       ]
 
@@ -1194,20 +1060,10 @@ describe('Discovery Page', () => {
         json: async () => mockChannels,
       })
 
-      // Mock /api/channels/videos
+      // Mock /api/channels/videos — single call
       ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: true,
         json: async () => mockVideos,
-      })
-
-      // Mock /api/videos
-      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          videos: [],
-          stats: {},
-          focusAreaMap: {},
-        }),
       })
 
       render(<Discovery />)
@@ -1242,6 +1098,8 @@ describe('Discovery Page', () => {
         publishedAt: new Date(Date.now() - i * 86400000).toISOString(),
         description: 'Test',
         inBank: false,
+        bankVideoId: null,
+        focusAreas: [],
       }))
 
       // Mock /api/channels
@@ -1250,20 +1108,10 @@ describe('Discovery Page', () => {
         json: async () => mockChannels,
       })
 
-      // Mock /api/channels/videos
+      // Mock /api/channels/videos — single call
       ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: true,
         json: async () => mockVideos,
-      })
-
-      // Mock /api/videos
-      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          videos: [],
-          stats: {},
-          focusAreaMap: {},
-        }),
       })
 
       render(<Discovery />)
@@ -1295,6 +1143,8 @@ describe('Discovery Page', () => {
         publishedAt: new Date(Date.now() - i * 86400000).toISOString(),
         description: 'Test',
         inBank: false,
+        bankVideoId: null,
+        focusAreas: [],
       }))
 
       // Mock /api/channels
@@ -1303,20 +1153,10 @@ describe('Discovery Page', () => {
         json: async () => mockChannels,
       })
 
-      // Mock /api/channels/videos
+      // Mock /api/channels/videos — single call
       ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: true,
         json: async () => mockVideos,
-      })
-
-      // Mock /api/videos
-      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          videos: [],
-          stats: {},
-          focusAreaMap: {},
-        }),
       })
 
       render(<Discovery />)
@@ -1348,6 +1188,8 @@ describe('Discovery Page', () => {
         publishedAt: new Date(Date.now() - i * 86400000).toISOString(),
         description: 'Test',
         inBank: false,
+        bankVideoId: null,
+        focusAreas: [],
       }))
 
       // Mock /api/channels
@@ -1356,20 +1198,10 @@ describe('Discovery Page', () => {
         json: async () => mockChannels,
       })
 
-      // Mock /api/channels/videos
+      // Mock /api/channels/videos — single call
       ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: true,
         json: async () => mockVideos,
-      })
-
-      // Mock /api/videos
-      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          videos: [],
-          stats: {},
-          focusAreaMap: {},
-        }),
       })
 
       render(<Discovery />)
