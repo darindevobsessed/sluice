@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { render, screen, waitFor, renderHook, act } from '@testing-library/react'
+import type { FocusArea } from '@/lib/db/schema'
 import { SidebarDataProvider, useSidebarData } from '../SidebarDataProvider'
 
 // Mock fetch
@@ -24,7 +25,7 @@ describe('SidebarDataProvider', () => {
   })
 
   describe('initial state', () => {
-    it('starts with isLoading=true and empty channels', () => {
+    it('starts with isLoading=true, empty channels, and empty focusAreas', () => {
       // Never resolves — keep in loading state
       mockFetch.mockReturnValue(new Promise(() => {}))
 
@@ -34,6 +35,7 @@ describe('SidebarDataProvider', () => {
 
       expect(result.current.isLoading).toBe(true)
       expect(result.current.channels).toEqual([])
+      expect(result.current.focusAreas).toEqual([])
     })
 
     it('provides a refetch function', () => {
@@ -80,6 +82,41 @@ describe('SidebarDataProvider', () => {
 
       await waitFor(() => {
         expect(result.current.channels).toEqual(mockChannels)
+      })
+    })
+
+    it('populates focusAreas from API response', async () => {
+      const mockFocusAreas: FocusArea[] = [
+        { id: 1, name: 'React', color: '#61dafb', createdAt: new Date('2024-01-01') },
+        { id: 2, name: 'TypeScript', color: '#3178c6', createdAt: new Date('2024-01-01') },
+      ]
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ channels: [], focusAreas: mockFocusAreas }),
+      })
+
+      const { result } = renderHook(() => useSidebarData(), {
+        wrapper: SidebarDataProvider,
+      })
+
+      await waitFor(() => {
+        expect(result.current.focusAreas).toEqual(mockFocusAreas)
+      })
+    })
+
+    it('defaults focusAreas to empty array when missing from response', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ channels: [] }),
+      })
+
+      const { result } = renderHook(() => useSidebarData(), {
+        wrapper: SidebarDataProvider,
+      })
+
+      await waitFor(() => {
+        expect(result.current.focusAreas).toEqual([])
       })
     })
 
@@ -154,21 +191,28 @@ describe('SidebarDataProvider', () => {
   })
 
   describe('refetch', () => {
-    it('re-fetches channel data when refetch is called', async () => {
+    it('re-fetches channel and focusArea data when refetch is called', async () => {
       const firstChannels = [{ name: 'Fireship', videoCount: 12 }]
+      const firstFocusAreas: FocusArea[] = [
+        { id: 1, name: 'React', color: '#61dafb', createdAt: new Date('2024-01-01') },
+      ]
       const secondChannels = [
         { name: 'Fireship', videoCount: 13 },
         { name: 'Theo', videoCount: 8 },
+      ]
+      const secondFocusAreas: FocusArea[] = [
+        { id: 1, name: 'React', color: '#61dafb', createdAt: new Date('2024-01-01') },
+        { id: 2, name: 'TypeScript', color: '#3178c6', createdAt: new Date('2024-01-02') },
       ]
 
       mockFetch
         .mockResolvedValueOnce({
           ok: true,
-          json: async () => ({ channels: firstChannels }),
+          json: async () => ({ channels: firstChannels, focusAreas: firstFocusAreas }),
         })
         .mockResolvedValueOnce({
           ok: true,
-          json: async () => ({ channels: secondChannels }),
+          json: async () => ({ channels: secondChannels, focusAreas: secondFocusAreas }),
         })
 
       const { result } = renderHook(() => useSidebarData(), {
@@ -177,6 +221,7 @@ describe('SidebarDataProvider', () => {
 
       await waitFor(() => {
         expect(result.current.channels).toEqual(firstChannels)
+        expect(result.current.focusAreas).toEqual(firstFocusAreas)
       })
 
       await act(async () => {
@@ -184,6 +229,7 @@ describe('SidebarDataProvider', () => {
       })
 
       expect(result.current.channels).toEqual(secondChannels)
+      expect(result.current.focusAreas).toEqual(secondFocusAreas)
       expect(mockFetch).toHaveBeenCalledTimes(2)
     })
   })

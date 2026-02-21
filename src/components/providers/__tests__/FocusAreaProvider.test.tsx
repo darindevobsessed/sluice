@@ -2,8 +2,10 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import { act } from 'react'
 import { FocusAreaProvider, useFocusArea } from '../FocusAreaProvider'
+import { SidebarDataProvider } from '../SidebarDataProvider'
+import type { FocusArea } from '@/lib/db/schema'
 
-// Mock fetch
+// Mock fetch (SidebarDataProvider fetches /api/sidebar)
 const mockFetch = vi.fn()
 global.fetch = mockFetch
 
@@ -29,6 +31,25 @@ Object.defineProperty(window, 'localStorage', {
   value: localStorageMock,
 })
 
+// Helper: renders FocusAreaProvider inside SidebarDataProvider with a given focusAreas list
+function renderWithProviders(
+  children: React.ReactNode,
+  focusAreas: FocusArea[] = [],
+) {
+  mockFetch.mockResolvedValueOnce({
+    ok: true,
+    json: async () => ({ channels: [], focusAreas }),
+  })
+
+  return render(
+    <SidebarDataProvider>
+      <FocusAreaProvider>
+        {children}
+      </FocusAreaProvider>
+    </SidebarDataProvider>
+  )
+}
+
 // Test component that uses the context
 function TestComponent() {
   const { focusAreas, selectedFocusAreaId, setSelectedFocusAreaId, isLoading } = useFocusArea()
@@ -51,39 +72,36 @@ describe('FocusAreaProvider', () => {
     localStorageMock.clear()
   })
 
-  it('loads focus areas on mount', async () => {
-    const mockFocusAreas = [
-      { id: 1, name: 'React', color: '#61dafb', createdAt: new Date() },
-      { id: 2, name: 'TypeScript', color: '#3178c6', createdAt: new Date() },
+  it('reads focus areas from SidebarDataProvider (no separate fetch)', async () => {
+    const mockFocusAreas: FocusArea[] = [
+      { id: 1, name: 'React', color: '#61dafb', createdAt: new Date('2024-01-01') },
+      { id: 2, name: 'TypeScript', color: '#3178c6', createdAt: new Date('2024-01-01') },
     ]
 
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ focusAreas: mockFocusAreas }),
-    })
-
-    render(
-      <FocusAreaProvider>
-        <TestComponent />
-      </FocusAreaProvider>
-    )
+    renderWithProviders(<TestComponent />, mockFocusAreas)
 
     await waitFor(() => {
       expect(screen.getByTestId('focus-areas-count').textContent).toBe('2')
     })
+
+    // Should only fetch /api/sidebar once (no separate /api/focus-areas call)
+    expect(mockFetch).toHaveBeenCalledTimes(1)
+    expect(mockFetch).toHaveBeenCalledWith('/api/sidebar')
+  })
+
+  it('does NOT fetch /api/focus-areas', async () => {
+    renderWithProviders(<TestComponent />, [])
+
+    await waitFor(() => {
+      expect(screen.getByTestId('focus-areas-count').textContent).toBe('0')
+    })
+
+    const calls = mockFetch.mock.calls.map((c: unknown[]) => c[0])
+    expect(calls).not.toContain('/api/focus-areas')
   })
 
   it('defaults selectedFocusAreaId to null', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ focusAreas: [] }),
-    })
-
-    render(
-      <FocusAreaProvider>
-        <TestComponent />
-      </FocusAreaProvider>
-    )
+    renderWithProviders(<TestComponent />, [])
 
     await waitFor(() => {
       expect(screen.getByTestId('selected-id').textContent).toBe('null')
@@ -93,16 +111,7 @@ describe('FocusAreaProvider', () => {
   it('loads selectedFocusAreaId from localStorage', async () => {
     localStorageMock.setItem('gold-miner-focus-area', '5')
 
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ focusAreas: [] }),
-    })
-
-    render(
-      <FocusAreaProvider>
-        <TestComponent />
-      </FocusAreaProvider>
-    )
+    renderWithProviders(<TestComponent />, [])
 
     await waitFor(() => {
       expect(screen.getByTestId('selected-id').textContent).toBe('5')
@@ -110,16 +119,7 @@ describe('FocusAreaProvider', () => {
   })
 
   it('persists selectedFocusAreaId to localStorage when changed', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ focusAreas: [] }),
-    })
-
-    render(
-      <FocusAreaProvider>
-        <TestComponent />
-      </FocusAreaProvider>
-    )
+    renderWithProviders(<TestComponent />, [])
 
     await waitFor(() => {
       expect(screen.getByText('Select 1')).toBeInTheDocument()
@@ -137,16 +137,7 @@ describe('FocusAreaProvider', () => {
   it('removes from localStorage when set to null', async () => {
     localStorageMock.setItem('gold-miner-focus-area', '3')
 
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ focusAreas: [] }),
-    })
-
-    render(
-      <FocusAreaProvider>
-        <TestComponent />
-      </FocusAreaProvider>
-    )
+    renderWithProviders(<TestComponent />, [])
 
     await waitFor(() => {
       expect(screen.getByText('Select All')).toBeInTheDocument()
@@ -161,15 +152,74 @@ describe('FocusAreaProvider', () => {
     })
   })
 
+  it('reflects focusArea updates after sidebar refetch', async () => {
+    const initialFocusAreas: FocusArea[] = [
+      { id: 1, name: 'React', color: '#61dafb', createdAt: new Date('2024-01-01') },
+    ]
+
+    // First render: 1 focus area
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ channels: [], focusAreas: initialFocusAreas }),
+    })
+
+    function RefetchComponent() {
+      const { focusAreas, isLoading, refetch } = useFocusArea()
+
+      if (isLoading) return <div>Loading...</div>
+
+      return (
+        <div>
+          <div data-testid="focus-areas-count">{focusAreas.length}</div>
+          <button onClick={() => refetch()}>Refetch</button>
+        </div>
+      )
+    }
+
+    render(
+      <SidebarDataProvider>
+        <FocusAreaProvider>
+          <RefetchComponent />
+        </FocusAreaProvider>
+      </SidebarDataProvider>
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId('focus-areas-count').textContent).toBe('1')
+    })
+
+    // Queue updated sidebar response with 2 focus areas
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        channels: [],
+        focusAreas: [
+          { id: 1, name: 'React', color: '#61dafb', createdAt: new Date('2024-01-01') },
+          { id: 2, name: 'TypeScript', color: '#3178c6', createdAt: new Date('2024-01-02') },
+        ],
+      }),
+    })
+
+    act(() => {
+      screen.getByText('Refetch').click()
+    })
+
+    await waitFor(() => {
+      expect(screen.getByTestId('focus-areas-count').textContent).toBe('2')
+    })
+  })
+
   it('handles fetch errors gracefully', async () => {
     const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
 
     mockFetch.mockRejectedValueOnce(new Error('Network error'))
 
     render(
-      <FocusAreaProvider>
-        <TestComponent />
-      </FocusAreaProvider>
+      <SidebarDataProvider>
+        <FocusAreaProvider>
+          <TestComponent />
+        </FocusAreaProvider>
+      </SidebarDataProvider>
     )
 
     await waitFor(() => {

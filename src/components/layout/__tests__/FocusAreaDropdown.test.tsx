@@ -3,6 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { FocusAreaDropdown } from '../FocusAreaDropdown'
 import { FocusAreaProvider } from '@/components/providers/FocusAreaProvider'
+import { SidebarDataProvider } from '@/components/providers/SidebarDataProvider'
 
 // Mock fetch
 const mockFetch = vi.fn()
@@ -48,9 +49,9 @@ describe('FocusAreaDropdown', () => {
 
   it('renders pill-shaped trigger button', async () => {
     render(
-      <FocusAreaProvider>
+      <SidebarDataProvider><FocusAreaProvider>
         <FocusAreaDropdown />
-      </FocusAreaProvider>
+      </FocusAreaProvider></SidebarDataProvider>
     )
 
     await waitFor(() => {
@@ -62,9 +63,9 @@ describe('FocusAreaDropdown', () => {
 
   it('shows "All Areas" by default when no area is selected', async () => {
     render(
-      <FocusAreaProvider>
+      <SidebarDataProvider><FocusAreaProvider>
         <FocusAreaDropdown />
-      </FocusAreaProvider>
+      </FocusAreaProvider></SidebarDataProvider>
     )
 
     await waitFor(() => {
@@ -76,9 +77,9 @@ describe('FocusAreaDropdown', () => {
     localStorageMock.setItem('gold-miner-focus-area', '1')
 
     render(
-      <FocusAreaProvider>
+      <SidebarDataProvider><FocusAreaProvider>
         <FocusAreaDropdown />
-      </FocusAreaProvider>
+      </FocusAreaProvider></SidebarDataProvider>
     )
 
     await waitFor(() => {
@@ -90,9 +91,9 @@ describe('FocusAreaDropdown', () => {
     const user = userEvent.setup()
 
     render(
-      <FocusAreaProvider>
+      <SidebarDataProvider><FocusAreaProvider>
         <FocusAreaDropdown />
-      </FocusAreaProvider>
+      </FocusAreaProvider></SidebarDataProvider>
     )
 
     await waitFor(() => {
@@ -113,9 +114,9 @@ describe('FocusAreaDropdown', () => {
     const user = userEvent.setup()
 
     render(
-      <FocusAreaProvider>
+      <SidebarDataProvider><FocusAreaProvider>
         <FocusAreaDropdown />
-      </FocusAreaProvider>
+      </FocusAreaProvider></SidebarDataProvider>
     )
 
     await waitFor(() => {
@@ -134,9 +135,9 @@ describe('FocusAreaDropdown', () => {
     const user = userEvent.setup()
 
     render(
-      <FocusAreaProvider>
+      <SidebarDataProvider><FocusAreaProvider>
         <FocusAreaDropdown />
-      </FocusAreaProvider>
+      </FocusAreaProvider></SidebarDataProvider>
     )
 
     await waitFor(() => {
@@ -155,9 +156,9 @@ describe('FocusAreaDropdown', () => {
     const user = userEvent.setup()
 
     render(
-      <FocusAreaProvider>
+      <SidebarDataProvider><FocusAreaProvider>
         <FocusAreaDropdown />
-      </FocusAreaProvider>
+      </FocusAreaProvider></SidebarDataProvider>
     )
 
     await waitFor(() => {
@@ -177,9 +178,9 @@ describe('FocusAreaDropdown', () => {
     const user = userEvent.setup()
 
     render(
-      <FocusAreaProvider>
+      <SidebarDataProvider><FocusAreaProvider>
         <FocusAreaDropdown />
-      </FocusAreaProvider>
+      </FocusAreaProvider></SidebarDataProvider>
     )
 
     await waitFor(() => {
@@ -207,9 +208,9 @@ describe('FocusAreaDropdown', () => {
     localStorageMock.setItem('gold-miner-focus-area', '2')
 
     render(
-      <FocusAreaProvider>
+      <SidebarDataProvider><FocusAreaProvider>
         <FocusAreaDropdown />
-      </FocusAreaProvider>
+      </FocusAreaProvider></SidebarDataProvider>
     )
 
     await waitFor(() => {
@@ -237,9 +238,9 @@ describe('FocusAreaDropdown', () => {
     const mockOnManageClick = vi.fn()
 
     render(
-      <FocusAreaProvider>
+      <SidebarDataProvider><FocusAreaProvider>
         <FocusAreaDropdown onManageClick={mockOnManageClick} />
-      </FocusAreaProvider>
+      </FocusAreaProvider></SidebarDataProvider>
     )
 
     await waitFor(() => {
@@ -263,9 +264,9 @@ describe('FocusAreaDropdown', () => {
 
   it('applies muted background styling to trigger button', async () => {
     render(
-      <FocusAreaProvider>
+      <SidebarDataProvider><FocusAreaProvider>
         <FocusAreaDropdown />
-      </FocusAreaProvider>
+      </FocusAreaProvider></SidebarDataProvider>
     )
 
     await waitFor(() => {
@@ -282,9 +283,9 @@ describe('FocusAreaDropdown', () => {
     })
 
     render(
-      <FocusAreaProvider>
+      <SidebarDataProvider><FocusAreaProvider>
         <FocusAreaDropdown />
-      </FocusAreaProvider>
+      </FocusAreaProvider></SidebarDataProvider>
     )
 
     await waitFor(() => {

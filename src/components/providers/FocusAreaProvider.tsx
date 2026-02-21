@@ -1,7 +1,8 @@
 'use client'
 
-import { createContext, useContext, useEffect, useState, useCallback } from 'react'
+import { createContext, useContext, useState, useCallback } from 'react'
 import type { FocusArea } from '@/lib/db/schema'
+import { useSidebarData } from './SidebarDataProvider'
 
 interface FocusAreaContextValue {
   focusAreas: FocusArea[]
@@ -16,40 +17,16 @@ const FocusAreaContext = createContext<FocusAreaContextValue | undefined>(undefi
 const STORAGE_KEY = 'gold-miner-focus-area'
 
 export function FocusAreaProvider({ children }: { children: React.ReactNode }) {
-  const [focusAreas, setFocusAreas] = useState<FocusArea[]>([])
-  const [selectedFocusAreaId, setSelectedFocusAreaIdState] = useState<number | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-
-  // Load focus areas from API
-  const fetchFocusAreas = useCallback(async () => {
-    try {
-      const response = await fetch('/api/focus-areas')
-      if (response.ok) {
-        const data = await response.json()
-        setFocusAreas(data.focusAreas || [])
-      }
-    } catch (error) {
-      console.error('Failed to fetch focus areas:', error)
-    } finally {
-      setIsLoading(false)
-    }
-  }, [])
-
-  // Load selected focus area from localStorage on mount
-  useEffect(() => {
+  const { focusAreas, isLoading, refetch: refetchSidebar } = useSidebarData()
+  const [selectedFocusAreaId, setSelectedFocusAreaIdState] = useState<number | null>(() => {
+    if (typeof window === 'undefined') return null
     const storedId = localStorage.getItem(STORAGE_KEY)
     if (storedId) {
       const parsedId = parseInt(storedId, 10)
-      if (!isNaN(parsedId)) {
-        setSelectedFocusAreaIdState(parsedId)
-      }
+      if (!isNaN(parsedId)) return parsedId
     }
-  }, [])
-
-  // Fetch focus areas on mount
-  useEffect(() => {
-    fetchFocusAreas()
-  }, [fetchFocusAreas])
+    return null
+  })
 
   // Persist selected focus area to localStorage
   const setSelectedFocusAreaId = useCallback((id: number | null) => {
@@ -67,7 +44,7 @@ export function FocusAreaProvider({ children }: { children: React.ReactNode }) {
         focusAreas,
         selectedFocusAreaId,
         setSelectedFocusAreaId,
-        refetch: fetchFocusAreas,
+        refetch: refetchSidebar,
         isLoading,
       }}
     >

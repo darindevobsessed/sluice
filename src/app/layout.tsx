@@ -42,16 +42,16 @@ export default function RootLayout({
         <ThemeProvider>
           <AgentProvider>
             <ExtractionProvider>
-              <FocusAreaProvider>
-                <SidebarProvider>
-                  <SidebarDataProvider>
+              <SidebarProvider>
+                <SidebarDataProvider>
+                  <FocusAreaProvider>
                     <TooltipProvider>
                       <Sidebar />
                       <MainContent>{children}</MainContent>
                     </TooltipProvider>
-                  </SidebarDataProvider>
-                </SidebarProvider>
-              </FocusAreaProvider>
+                  </FocusAreaProvider>
+                </SidebarDataProvider>
+              </SidebarProvider>
             </ExtractionProvider>
           </AgentProvider>
         </ThemeProvider>

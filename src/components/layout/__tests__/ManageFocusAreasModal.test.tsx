@@ -3,6 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { ManageFocusAreasModal } from '../ManageFocusAreasModal'
 import { FocusAreaProvider } from '@/components/providers/FocusAreaProvider'
+import { SidebarDataProvider } from '@/components/providers/SidebarDataProvider'
 
 // Mock fetch
 const mockFetch = vi.fn()
@@ -51,9 +52,9 @@ describe('ManageFocusAreasModal', () => {
 
   it('renders modal title "Manage Focus Areas"', async () => {
     render(
-      <FocusAreaProvider>
+      <SidebarDataProvider><FocusAreaProvider>
         <ManageFocusAreasModal open={true} onOpenChange={() => {}} />
-      </FocusAreaProvider>
+      </FocusAreaProvider></SidebarDataProvider>
     )
 
     await waitFor(() => {
@@ -63,9 +64,9 @@ describe('ManageFocusAreasModal', () => {
 
   it('displays list of existing focus areas', async () => {
     render(
-      <FocusAreaProvider>
+      <SidebarDataProvider><FocusAreaProvider>
         <ManageFocusAreasModal open={true} onOpenChange={() => {}} />
-      </FocusAreaProvider>
+      </FocusAreaProvider></SidebarDataProvider>
     )
 
     await waitFor(() => {
@@ -82,9 +83,9 @@ describe('ManageFocusAreasModal', () => {
     })
 
     render(
-      <FocusAreaProvider>
+      <SidebarDataProvider><FocusAreaProvider>
         <ManageFocusAreasModal open={true} onOpenChange={() => {}} />
-      </FocusAreaProvider>
+      </FocusAreaProvider></SidebarDataProvider>
     )
 
     await waitFor(() => {
@@ -94,9 +95,9 @@ describe('ManageFocusAreasModal', () => {
 
   it('displays rename and delete buttons for each focus area', async () => {
     render(
-      <FocusAreaProvider>
+      <SidebarDataProvider><FocusAreaProvider>
         <ManageFocusAreasModal open={true} onOpenChange={() => {}} />
-      </FocusAreaProvider>
+      </FocusAreaProvider></SidebarDataProvider>
     )
 
     await waitFor(() => {
@@ -109,9 +110,9 @@ describe('ManageFocusAreasModal', () => {
 
   it('displays add focus area input and button', async () => {
     render(
-      <FocusAreaProvider>
+      <SidebarDataProvider><FocusAreaProvider>
         <ManageFocusAreasModal open={true} onOpenChange={() => {}} />
-      </FocusAreaProvider>
+      </FocusAreaProvider></SidebarDataProvider>
     )
 
     await waitFor(() => {
@@ -136,9 +137,9 @@ describe('ManageFocusAreasModal', () => {
     })
 
     render(
-      <FocusAreaProvider>
+      <SidebarDataProvider><FocusAreaProvider>
         <ManageFocusAreasModal open={true} onOpenChange={() => {}} />
-      </FocusAreaProvider>
+      </FocusAreaProvider></SidebarDataProvider>
     )
 
     await waitFor(() => {
@@ -178,9 +179,9 @@ describe('ManageFocusAreasModal', () => {
     })
 
     render(
-      <FocusAreaProvider>
+      <SidebarDataProvider><FocusAreaProvider>
         <ManageFocusAreasModal open={true} onOpenChange={() => {}} />
-      </FocusAreaProvider>
+      </FocusAreaProvider></SidebarDataProvider>
     )
 
     await waitFor(() => {
@@ -213,9 +214,9 @@ describe('ManageFocusAreasModal', () => {
     })
 
     render(
-      <FocusAreaProvider>
+      <SidebarDataProvider><FocusAreaProvider>
         <ManageFocusAreasModal open={true} onOpenChange={() => {}} />
-      </FocusAreaProvider>
+      </FocusAreaProvider></SidebarDataProvider>
     )
 
     await waitFor(() => {
@@ -242,9 +243,9 @@ describe('ManageFocusAreasModal', () => {
     const user = userEvent.setup()
 
     render(
-      <FocusAreaProvider>
+      <SidebarDataProvider><FocusAreaProvider>
         <ManageFocusAreasModal open={true} onOpenChange={() => {}} />
-      </FocusAreaProvider>
+      </FocusAreaProvider></SidebarDataProvider>
     )
 
     await waitFor(() => {
@@ -262,9 +263,9 @@ describe('ManageFocusAreasModal', () => {
     const user = userEvent.setup()
 
     render(
-      <FocusAreaProvider>
+      <SidebarDataProvider><FocusAreaProvider>
         <ManageFocusAreasModal open={true} onOpenChange={() => {}} />
-      </FocusAreaProvider>
+      </FocusAreaProvider></SidebarDataProvider>
     )
 
     await waitFor(() => {
@@ -295,9 +296,9 @@ describe('ManageFocusAreasModal', () => {
     })
 
     render(
-      <FocusAreaProvider>
+      <SidebarDataProvider><FocusAreaProvider>
         <ManageFocusAreasModal open={true} onOpenChange={() => {}} />
-      </FocusAreaProvider>
+      </FocusAreaProvider></SidebarDataProvider>
     )
 
     await waitFor(() => {
@@ -334,9 +335,9 @@ describe('ManageFocusAreasModal', () => {
     const user = userEvent.setup()
 
     render(
-      <FocusAreaProvider>
+      <SidebarDataProvider><FocusAreaProvider>
         <ManageFocusAreasModal open={true} onOpenChange={() => {}} />
-      </FocusAreaProvider>
+      </FocusAreaProvider></SidebarDataProvider>
     )
 
     await waitFor(() => {
@@ -365,9 +366,9 @@ describe('ManageFocusAreasModal', () => {
     mockConfirm.mockReturnValue(false)
 
     render(
-      <FocusAreaProvider>
+      <SidebarDataProvider><FocusAreaProvider>
         <ManageFocusAreasModal open={true} onOpenChange={() => {}} />
-      </FocusAreaProvider>
+      </FocusAreaProvider></SidebarDataProvider>
     )
 
     await waitFor(() => {
@@ -397,9 +398,9 @@ describe('ManageFocusAreasModal', () => {
     })
 
     render(
-      <FocusAreaProvider>
+      <SidebarDataProvider><FocusAreaProvider>
         <ManageFocusAreasModal open={true} onOpenChange={() => {}} />
-      </FocusAreaProvider>
+      </FocusAreaProvider></SidebarDataProvider>
     )
 
     await waitFor(() => {
@@ -425,9 +426,9 @@ describe('ManageFocusAreasModal', () => {
     mockConfirm.mockReturnValue(false)
 
     render(
-      <FocusAreaProvider>
+      <SidebarDataProvider><FocusAreaProvider>
         <ManageFocusAreasModal open={true} onOpenChange={() => {}} />
-      </FocusAreaProvider>
+      </FocusAreaProvider></SidebarDataProvider>
     )
 
     await waitFor(() => {
@@ -459,9 +460,9 @@ describe('ManageFocusAreasModal', () => {
     })
 
     render(
-      <FocusAreaProvider>
+      <SidebarDataProvider><FocusAreaProvider>
         <ManageFocusAreasModal open={true} onOpenChange={() => {}} />
-      </FocusAreaProvider>
+      </FocusAreaProvider></SidebarDataProvider>
     )
 
     await waitFor(() => {
@@ -480,9 +481,9 @@ describe('ManageFocusAreasModal', () => {
     const mockOnOpenChange = vi.fn()
 
     render(
-      <FocusAreaProvider>
+      <SidebarDataProvider><FocusAreaProvider>
         <ManageFocusAreasModal open={true} onOpenChange={mockOnOpenChange} />
-      </FocusAreaProvider>
+      </FocusAreaProvider></SidebarDataProvider>
     )
 
     await waitFor(() => {
@@ -510,9 +511,9 @@ describe('ManageFocusAreasModal', () => {
     }).mockReturnValueOnce(postPromise as Promise<Response>)
 
     render(
-      <FocusAreaProvider>
+      <SidebarDataProvider><FocusAreaProvider>
         <ManageFocusAreasModal open={true} onOpenChange={() => {}} />
-      </FocusAreaProvider>
+      </FocusAreaProvider></SidebarDataProvider>
     )
 
     await waitFor(() => {

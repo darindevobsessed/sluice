@@ -1,6 +1,7 @@
 'use client'
 
 import { createContext, useContext, useEffect, useState, useCallback } from 'react'
+import type { FocusArea } from '@/lib/db/schema'
 
 export interface SidebarChannel {
   name: string
@@ -9,6 +10,7 @@ export interface SidebarChannel {
 
 interface SidebarDataContextValue {
   channels: SidebarChannel[]
+  focusAreas: FocusArea[]
   isLoading: boolean
   refetch: () => Promise<void>
 }
@@ -17,6 +19,7 @@ const SidebarDataContext = createContext<SidebarDataContextValue | undefined>(un
 
 export function SidebarDataProvider({ children }: { children: React.ReactNode }) {
   const [channels, setChannels] = useState<SidebarChannel[]>([])
+  const [focusAreas, setFocusAreas] = useState<FocusArea[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   const fetchSidebarData = useCallback(async () => {
@@ -25,6 +28,7 @@ export function SidebarDataProvider({ children }: { children: React.ReactNode })
       if (response.ok) {
         const data = await response.json()
         setChannels(data.channels || [])
+        setFocusAreas(data.focusAreas || [])
       }
     } catch (error) {
       console.error('Failed to fetch sidebar data:', error)
@@ -38,7 +42,7 @@ export function SidebarDataProvider({ children }: { children: React.ReactNode })
   }, [fetchSidebarData])
 
   return (
-    <SidebarDataContext.Provider value={{ channels, isLoading, refetch: fetchSidebarData }}>
+    <SidebarDataContext.Provider value={{ channels, focusAreas, isLoading, refetch: fetchSidebarData }}>
       {children}
     </SidebarDataContext.Provider>
   )

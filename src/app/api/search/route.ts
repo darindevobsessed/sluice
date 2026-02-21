@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { sql, eq } from 'drizzle-orm';
-import { db, chunks, videoFocusAreas } from '@/lib/db';
+import { eq } from 'drizzle-orm';
+import { db, videoFocusAreas } from '@/lib/db';
 import { hybridSearch } from '@/lib/search/hybrid-search';
 import { aggregateByVideo, type VideoResult } from '@/lib/search/aggregate';
 import type { SearchResult } from '@/lib/search/types';
@@ -64,14 +64,8 @@ export async function GET(request: Request) {
 
   const timer = startApiTimer('/api/search', 'GET')
 
-  // Check if any embeddings exist
-  const embeddingCount = await db
-    .select({ count: sql<number>`count(*)` })
-    .from(chunks)
-    .where(sql`${chunks.embedding} IS NOT NULL`);
-  const hasEmbeddings = (embeddingCount[0]?.count ?? 0) > 0;
-
   // If no query, return empty results
+  // hasEmbeddings defaults to true for empty queries — no count query needed
   if (!query.trim()) {
     timer.end(200, { empty: true })
     const response: SearchResponse = {
@@ -80,7 +74,7 @@ export async function GET(request: Request) {
       query: '',
       mode,
       timing: 0,
-      hasEmbeddings,
+      hasEmbeddings: true,
     };
     return NextResponse.json(response, {
       headers: {
@@ -108,6 +102,11 @@ export async function GET(request: Request) {
   }
 
   const videoResults = aggregateByVideo(chunkResults);
+
+  // Derive hasEmbeddings from search results — avoids a separate count(*) query.
+  // Keyword mode never needs embeddings, so always report true.
+  // For vector/hybrid modes, results only come back when embeddings exist.
+  const hasEmbeddings = mode === 'keyword' ? true : chunkResults.length > 0
 
   const timing = timer.end(200, { mode, resultCount: videoResults.length, hasEmbeddings })
 
