@@ -98,6 +98,10 @@ In the Vercel dashboard, go to **Settings > Environment Variables** for your pro
 | `AI_GATEWAY_KEY` | `sk-ant-...` | AI gateway key for insights, personas, ensemble queries. Get at [console.anthropic.com](https://console.anthropic.com). |
 | `AGENT_AUTH_TOKEN` | Any secure random string (e.g., `openssl rand -hex 32`) | Authenticates SSE agent transport in production. When this is set, the `/api/agent/token` endpoint returns `transport: 'sse'` instead of `transport: 'websocket'`. |
 | `CRON_SECRET` | Any secure random string (e.g., `openssl rand -hex 32`) | Secures `/api/cron/*` endpoints. Vercel sends this as `Authorization: Bearer <token>` header. |
+| `BETTER_AUTH_SECRET` | `openssl rand -base64 32` | Signing key for auth sessions/tokens. Required for production security. |
+| `BETTER_AUTH_URL` | `https://your-domain.vercel.app` | Base URL for OAuth callback redirects. Must match your production domain exactly. |
+| `GOOGLE_CLIENT_ID` | `xxx.apps.googleusercontent.com` | Google OAuth client ID. Create at Google Cloud Console. Add callback URL: `https://your-domain.vercel.app/api/auth/callback/google` |
+| `GOOGLE_CLIENT_SECRET` | `GOCSPX-xxx` | Google OAuth client secret from the same credential. |
 
 ### Optional
 
@@ -106,6 +110,7 @@ In the Vercel dashboard, go to **Settings > Environment Variables** for your pro
 | `MCP_AUTH_ENABLED` | `true` | Enable MCP endpoint authentication. Default: `false` (open access). |
 | `MCP_AUTH_TOKEN` | Any secure random string | Required when `MCP_AUTH_ENABLED=true`. Clients send as `Authorization: Bearer <token>`. |
 | `NEXT_PUBLIC_AGENT_PORT` | `9334` | Only relevant for local dev (WebSocket agent). Not used in production (SSE transport). Can be omitted. |
+| `ALLOWED_EMAIL_DOMAIN` | `devobsessed.com` | Email domain restriction for sign-in. Default: `devobsessed.com`. |
 
 > **Note:** Do NOT set `PORT` or `AGENT_PORT` -- these are local dev settings. Vercel manages ports automatically.
 
@@ -305,8 +310,13 @@ Test MCP endpoints if you use Gold Miner with Claude Code.
 | `AI_GATEWAY_KEY` | Yes | AI gateway key for AI features |
 | `AGENT_AUTH_TOKEN` | Yes | SSE agent authentication |
 | `CRON_SECRET` | Yes | Cron endpoint security |
+| `BETTER_AUTH_SECRET` | Yes | Auth session/token signing key |
+| `BETTER_AUTH_URL` | Yes | Base URL for OAuth redirects |
+| `GOOGLE_CLIENT_ID` | Yes | Google OAuth client ID |
+| `GOOGLE_CLIENT_SECRET` | Yes | Google OAuth client secret |
 | `MCP_AUTH_ENABLED` | No | MCP endpoint auth toggle |
 | `MCP_AUTH_TOKEN` | No | MCP auth token (when enabled) |
+| `ALLOWED_EMAIL_DOMAIN` | No | Email domain restriction (default: `devobsessed.com`) |
 
 ### Key URLs
 
