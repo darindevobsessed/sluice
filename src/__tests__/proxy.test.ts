@@ -47,11 +47,13 @@ describe('proxy', () => {
     })
 
     describe('public routes', () => {
-      it('allows / without auth', () => {
+      it('redirects / to /sign-in without auth', () => {
+        mockGetSessionCookie.mockReturnValue(null)
         const response = proxy(createRequest('/'))
-        expect(response.status).toBe(200)
-        expect(response.headers.get('x-middleware-next')).toBe('1')
-        expect(mockGetSessionCookie).not.toHaveBeenCalled()
+        expect(response.status).toBe(307)
+        const location = new URL(response.headers.get('location')!)
+        expect(location.pathname).toBe('/sign-in')
+        expect(location.searchParams.get('callbackUrl')).toBe('/')
       })
 
       it('allows /sign-in without auth', () => {

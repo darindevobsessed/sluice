@@ -9,13 +9,13 @@ import { getSessionCookie } from 'better-auth/cookies'
  * In development, all requests pass through unchanged.
  *
  * Protected: all app pages and API routes not in the public list.
- * Public: /, /sign-in, /api/auth/*, /.well-known/*, /api/cron/*
+ * Public: /sign-in, /api/auth/*, /.well-known/*, /api/cron/*
  *
  * Page requests without a session redirect to /sign-in.
  * API requests without a session return 401 JSON.
  */
 
-const PUBLIC_PAGE_PATHS = ['/', '/sign-in']
+const PUBLIC_PAGE_PATHS = ['/sign-in']
 
 const PUBLIC_API_PREFIXES = ['/api/auth', '/.well-known', '/api/cron']
 
