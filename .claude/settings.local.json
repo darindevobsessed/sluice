@@ -54,7 +54,8 @@
       "mcp__plugin_craft_chrome-devtools__performance_analyze_insight",
       "mcp__plugin_craft_chrome-devtools__get_network_request",
       "mcp__gold-miner__chat_with_persona",
-      "Bash(node_modules/.bin/vitest run --reporter=dot)"
+      "Bash(node_modules/.bin/vitest run --reporter=dot)",
+      "mcp__gold-miner__get_list_of_creators"
     ]
   }
 }
