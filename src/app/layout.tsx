@@ -1,38 +1,30 @@
-import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
-import "./globals.css";
+import type { Metadata } from "next"
+import { Inter, JetBrains_Mono } from "next/font/google"
+import "./globals.css"
 import '@/lib/env'
-import { Sidebar } from "@/components/layout/Sidebar";
-import { MainContent } from "@/components/layout/MainContent";
-import { ThemeProvider } from "@/components/providers/ThemeProvider";
-import { AgentProvider } from "@/lib/agent/AgentProvider";
-import { ExtractionProvider } from "@/components/providers/ExtractionProvider";
-import { FocusAreaProvider } from "@/components/providers/FocusAreaProvider";
-import { SidebarProvider } from "@/components/providers/SidebarProvider";
-import { SidebarDataProvider } from "@/components/providers/SidebarDataProvider";
-import { TooltipProvider } from "@/components/ui/tooltip";
+import { ThemeProvider } from "@/components/providers/ThemeProvider"
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
-});
+})
 
 const jetbrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains-mono",
   subsets: ["latin"],
-});
+})
 
 export const metadata: Metadata = {
   title: "Gold Miner",
   description: "Extract knowledge from YouTube videos and generate Claude Code plugins",
-};
+}
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
@@ -40,24 +32,11 @@ export default function RootLayout({
         className={`${inter.variable} ${jetbrainsMono.variable} antialiased font-sans`}
       >
         <ThemeProvider>
-          <AgentProvider>
-            <ExtractionProvider>
-              <SidebarProvider>
-                <SidebarDataProvider>
-                  <FocusAreaProvider>
-                    <TooltipProvider>
-                      <Sidebar />
-                      <MainContent>{children}</MainContent>
-                    </TooltipProvider>
-                  </FocusAreaProvider>
-                </SidebarDataProvider>
-              </SidebarProvider>
-            </ExtractionProvider>
-          </AgentProvider>
+          {children}
         </ThemeProvider>
         <Analytics />
         <SpeedInsights />
       </body>
     </html>
-  );
+  )
 }
