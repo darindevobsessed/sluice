@@ -1,6 +1,6 @@
-# Contributing to Gold Miner
+# Contributing to Sluice
 
-Thank you for your interest in contributing to Gold Miner! This project transforms YouTube content into a searchable knowledge bank with AI-powered personas and Claude Code integration. Whether you're fixing bugs, adding features, or improving documentation, your contributions are welcome.
+Thank you for your interest in contributing to Sluice! This project transforms YouTube content into a searchable knowledge bank with AI-powered personas and Claude Code integration. Whether you're fixing bugs, adding features, or improving documentation, your contributions are welcome.
 
 For an overview of the project's purpose and features, see the [README](README.md).
 
@@ -19,7 +19,7 @@ Before you begin, ensure you have the following installed:
 
 ## Local Development Setup
 
-Follow these steps to get Gold Miner running on your machine:
+Follow these steps to get Sluice running on your machine:
 
 ### 1. Fork and Clone
 
@@ -108,7 +108,7 @@ Open [http://localhost:3001](http://localhost:3001) in your browser. You're read
 
 ## Code Style
 
-Gold Miner follows strict conventions to maintain consistency across the codebase. Please adhere to these guidelines:
+Sluice follows strict conventions to maintain consistency across the codebase. Please adhere to these guidelines:
 
 ### TypeScript & Formatting
 - **No semicolons** — Semicolons are omitted per project convention
@@ -142,7 +142,7 @@ For detailed architecture, API patterns, and conventions, see [CLAUDE.md](CLAUDE
 
 ## Testing
 
-Gold Miner uses [Vitest](https://vitest.dev/) with [React Testing Library](https://testing-library.com/react) for testing.
+Sluice uses [Vitest](https://vitest.dev/) with [React Testing Library](https://testing-library.com/react) for testing.
 
 ### Running Tests
 
@@ -193,7 +193,7 @@ describe('MyComponent', () => {
 
 ### 1. Fork the Repository
 
-Click the "Fork" button on the [Gold Miner GitHub page](https://github.com/yourusername/gold-miner) to create your own copy.
+Click the "Fork" button on the [Sluice GitHub page](https://github.com/yourusername/gold-miner) to create your own copy.
 
 ### 2. Create a Descriptive Branch
 
@@ -310,4 +310,4 @@ If you have questions about contributing, feel free to:
 - Ask in an issue or PR
 - Review [CLAUDE.md](CLAUDE.md) for technical architecture details
 
-Thank you for contributing to Gold Miner!
+Thank you for contributing to Sluice!

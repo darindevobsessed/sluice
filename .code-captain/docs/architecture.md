@@ -2,7 +2,7 @@
 
 ## Overview
 
-Gold Miner is a knowledge extraction platform that processes YouTube videos through AI analysis to generate actionable insights and Claude Code plugin suggestions.
+Sluice is a knowledge extraction platform that processes YouTube videos through AI analysis to generate actionable insights and Claude Code plugin suggestions.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐

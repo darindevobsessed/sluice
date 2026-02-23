@@ -1,12 +1,12 @@
 ---
-description: Ingest one or more YouTube videos into the Gold Miner knowledge base
+description: Ingest one or more YouTube videos into the Sluice knowledge base
 arguments:
   - name: urls
     description: One or more YouTube video URLs (space-separated)
     required: true
 ---
 
-Ingest the YouTube video(s) at `$ARGUMENTS.urls` into the Gold Miner knowledge base. The dev server must be running on localhost:3000.
+Ingest the YouTube video(s) at `$ARGUMENTS.urls` into the Sluice knowledge base. The dev server must be running on localhost:3001.
 
 Process each URL one at a time. For each video, follow these steps using bash (curl).
 
@@ -35,7 +35,7 @@ If this fails, report it and skip to the next URL.
 Call the project API:
 
 ```
-curl -s -X POST http://localhost:3000/api/youtube/transcript \
+curl -s -X POST http://localhost:3001/api/youtube/transcript \
   -H "Content-Type: application/json" \
   -d '{"videoId": "VIDEO_ID"}'
 ```
@@ -54,7 +54,7 @@ Based on the video title, channel name, and the first ~2000 characters of the tr
 Call the project API with all the data. IMPORTANT: The transcript can be very long — write the JSON payload to a temp file and use `curl --data @file` to avoid shell escaping issues.
 
 ```
-curl -s -X POST http://localhost:3000/api/videos \
+curl -s -X POST http://localhost:3001/api/videos \
   -H "Content-Type: application/json" \
   --data @/tmp/gm-ingest-payload.json
 ```

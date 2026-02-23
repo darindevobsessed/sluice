@@ -2,7 +2,7 @@
 
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability in Gold Miner, please report it responsibly.
+If you discover a security vulnerability in Sluice, please report it responsibly.
 
 **Do not open a public issue for security vulnerabilities.**
 
@@ -31,7 +31,7 @@ When reporting a vulnerability, please include:
 
 This security policy covers:
 
-- The Gold Miner application code
+- The Sluice application code
 - Dependencies used by the project
 - Deployment configurations provided in this repository
 
@@ -49,4 +49,4 @@ This security policy covers:
 - Social engineering attacks
 - Denial of service attacks
 
-Thank you for helping keep Gold Miner secure.
+Thank you for helping keep Sluice secure.

@@ -35,7 +35,7 @@
 ## Infrastructure
 
 ### Database
-- **SQLite** - Local file-based database (`./data/gold-miner.db`)
+- **SQLite** - Local file-based database (`./data/sluice.db`)
 - **Drizzle Kit** - Database migrations and schema management
 - Full-text search (FTS5) for transcript search
 
