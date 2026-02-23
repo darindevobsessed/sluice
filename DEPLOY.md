@@ -1,6 +1,6 @@
-# Gold Miner -- Production Deployment Guide
+# Sluice -- Production Deployment Guide
 
-A step-by-step checklist for deploying Gold Miner to Vercel with a Neon PostgreSQL database.
+A step-by-step checklist for deploying Sluice to Vercel with a Neon PostgreSQL database.
 
 ---
 
@@ -14,7 +14,7 @@ A step-by-step checklist for deploying Gold Miner to Vercel with a Neon PostgreS
 
 ### Why Vercel Pro?
 
-Gold Miner has 9 API routes that export `maxDuration = 60` for long-running operations:
+Sluice has 9 API routes that export `maxDuration = 60` for long-running operations:
 - `/api/search` -- hybrid RAG search with embedding generation
 - `/api/agent/stream` -- Claude insight streaming via SSE
 - `/api/cron/check-feeds` -- RSS feed checking across channels
@@ -33,9 +33,9 @@ Vercel Hobby plan limits functions to 10 seconds. These routes will timeout on H
 ## 1. Create Vercel Project
 
 - [ ] Go to [vercel.com/new](https://vercel.com/new)
-- [ ] Import the Gold Miner repository from GitHub
+- [ ] Import the Sluice repository from GitHub
 - [ ] Framework Preset: **Next.js** (auto-detected)
-- [ ] Root Directory: `.` (default -- Gold Miner is not in a monorepo subdirectory)
+- [ ] Root Directory: `.` (default -- Sluice is not in a monorepo subdirectory)
 - [ ] Build Command: `npm run build` (default)
 - [ ] Output Directory: `.next` (default)
 - [ ] Install Command: `npm install` (default)
@@ -48,7 +48,7 @@ Vercel Hobby plan limits functions to 10 seconds. These routes will timeout on H
 ### Create Database
 
 - [ ] Go to [console.neon.tech](https://console.neon.tech)
-- [ ] Create a new project (name: `gold-miner` or similar)
+- [ ] Create a new project (name: `sluice` or similar)
 - [ ] Region: choose closest to your Vercel deployment region (default: `us-east-1`)
 - [ ] Copy the connection string -- it looks like:
   ```
@@ -57,7 +57,7 @@ Vercel Hobby plan limits functions to 10 seconds. These routes will timeout on H
 
 ### Enable pgvector Extension
 
-Gold Miner uses pgvector for 384-dimensional vector embeddings (all-MiniLM-L6-v2 model).
+Sluice uses pgvector for 384-dimensional vector embeddings (all-MiniLM-L6-v2 model).
 
 - [ ] Open the Neon SQL Editor (or connect via `psql`)
 - [ ] Run:
@@ -82,7 +82,7 @@ Gold Miner uses pgvector for 384-dimensional vector embeddings (all-MiniLM-L6-v2
   SELECT tablename FROM pg_tables WHERE schemaname = 'public' ORDER BY tablename;
   ```
 
-> **Troubleshooting:** If `db:push` fails with SSL errors, ensure your connection string includes `?sslmode=require`. The Gold Miner DB module auto-detects Neon URLs (checks for `neon.tech` in the connection string) and configures SSL + reduced pool size (3 connections instead of 10).
+> **Troubleshooting:** If `db:push` fails with SSL errors, ensure your connection string includes `?sslmode=require`. The Sluice DB module auto-detects Neon URLs (checks for `neon.tech` in the connection string) and configures SSL + reduced pool size (3 connections instead of 10).
 
 ---
 
@@ -127,7 +127,7 @@ In the Vercel dashboard, go to **Settings > Environment Variables** for your pro
   - `npm install` completing without errors
   - `next build` completing successfully
   - No warnings about missing environment variables in build output
-- [ ] Verify the deployment URL works (e.g., `https://gold-miner-xxx.vercel.app`)
+- [ ] Verify the deployment URL works (e.g., `https://sluice-xxx.vercel.app`)
 - [ ] Check the Function logs (Vercel dashboard > Logs) for startup -- you should NOT see:
   - `Warning: AI_GATEWAY_KEY not set` (means env var is missing)
   - `Warning: CRON_SECRET not set` (means cron endpoints are unsecured)
@@ -157,7 +157,7 @@ Skip this section if the default `*.vercel.app` domain is sufficient.
 
 ## 6. Verify Cron Jobs
 
-Gold Miner uses two Vercel Cron Jobs defined in `vercel.json`:
+Sluice uses two Vercel Cron Jobs defined in `vercel.json`:
 
 | Cron Job | Schedule | Path | Purpose |
 |----------|----------|------|---------|
@@ -267,7 +267,7 @@ Requires multiple personas. Skip if fewer than 2 personas exist.
 
 ### 7.8 MCP Tools
 
-Test MCP endpoints if you use Gold Miner with Claude Code.
+Test MCP endpoints if you use Sluice with Claude Code.
 
 - [ ] Test search_rag tool:
   ```bash

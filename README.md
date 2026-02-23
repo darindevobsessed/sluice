@@ -1,6 +1,6 @@
 <div align="center">
 
-# Gold Miner
+# Sluice
 
 Transform YouTube content into a searchable knowledge bank with AI-powered personas and Claude Code integration
 
@@ -16,11 +16,11 @@ Transform YouTube content into a searchable knowledge bank with AI-powered perso
 
 ---
 
-## What is Gold Miner?
+## What is Sluice?
 
-Gold Miner transforms YouTube videos into a searchable, AI-augmented knowledge bank. Paste a YouTube URL, and it automatically fetches the transcript, generates vector embeddings, and makes the content discoverable through hybrid search. The result is a personal knowledge base where you can surface insights across hundreds of videos in seconds.
+Sluice transforms YouTube videos into a searchable, AI-augmented knowledge bank. Paste a YouTube URL, and it automatically fetches the transcript, generates vector embeddings, and makes the content discoverable through hybrid search. The result is a personal knowledge base where you can surface insights across hundreds of videos in seconds.
 
-What makes Gold Miner unique is its combination of advanced RAG techniques with creator-focused AI features. Hybrid search fuses vector similarity (pgvector) with keyword matching using Reciprocal Rank Fusion. AI-generated personas capture each creator's expertise and communication style, letting you query channels as if chatting with the creator themselves. Ensemble queries ("Ask the Panel") stream parallel responses from multiple personas, grounded in their respective content via RAG. And the entire knowledge bank is exposed to Claude Code via Model Context Protocol (MCP), turning your video library into a queryable context source for AI workflows.
+What makes Sluice unique is its combination of advanced RAG techniques with creator-focused AI features. Hybrid search fuses vector similarity (pgvector) with keyword matching using Reciprocal Rank Fusion. AI-generated personas capture each creator's expertise and communication style, letting you query channels as if chatting with the creator themselves. Ensemble queries ("Ask the Panel") stream parallel responses from multiple personas, grounded in their respective content via RAG. And the entire knowledge bank is exposed to Claude Code via Model Context Protocol (MCP), turning your video library into a queryable context source for AI workflows.
 
 <!-- TODO: Add screenshot of dashboard (docs/assets/dashboard-screenshot.png) -->
 
@@ -29,7 +29,7 @@ What makes Gold Miner unique is its combination of advanced RAG techniques with 
 ## Features
 
 ### YouTube Ingestion
-Paste any YouTube URL and Gold Miner automatically fetches the transcript using the YouTube Transcript API, pulling metadata via oEmbed. Alternatively, upload plain text transcripts for content without YouTube sources. All processing happens in a background job queue with automatic retry logic, so ingestion is reliable even for large batches.
+Paste any YouTube URL and Sluice automatically fetches the transcript using the YouTube Transcript API, pulling metadata via oEmbed. Alternatively, upload plain text transcripts for content without YouTube sources. All processing happens in a background job queue with automatic retry logic, so ingestion is reliable even for large batches.
 
 ### Hybrid RAG Search
 Search combines vector similarity (pgvector cosine distance on 384-dimensional FastEmbed embeddings) with keyword matching (PostgreSQL case-insensitive ILIKE), then fuses results using Reciprocal Rank Fusion (k=60) to balance semantic and lexical relevance. Optional temporal decay boosts recent content in rankings. Results are aggregated by video, showing the top matching chunk per video for clean, scannable output.
@@ -47,10 +47,10 @@ AI-generated personas capture each YouTube channel's expertise and communication
 Ask a question and get parallel streaming responses (Server-Sent Events) from the top 3 most relevant creator personas simultaneously. "Who's best?" routing uses cosine similarity between your query embedding and each persona's expertise centroid. Each persona's response is grounded in their own channel's content via RAG search, so answers cite specific videos. The result feels like consulting a panel of experts, each speaking from their domain.
 
 ### MCP Integration
-Expose your entire knowledge bank to Claude Code via 4 MCP tools. Search the knowledge base, list all creators, chat with a specific persona, or run ensemble queries—all accessible from your terminal. MCP turns Gold Miner into a queryable context source for Claude workflows, letting you pull insights from your video library directly into coding sessions, research, or planning.
+Expose your entire knowledge bank to Claude Code via 4 MCP tools. Search the knowledge base, list all creators, chat with a specific persona, or run ensemble queries—all accessible from your terminal. MCP turns Sluice into a queryable context source for Claude workflows, letting you pull insights from your video library directly into coding sessions, research, or planning.
 
 ### Channel Discovery
-Follow YouTube channels via RSS feeds with delta detection—Gold Miner automatically fetches new videos as they're published, no manual checking required. The Similar Creators feature uses average centroid similarity (cosine distance of 0.6 threshold) to recommend channels with related content. Discovery tiles show new channels and trending topics with horizontal scroll and CSS scroll-snap for quick scanning.
+Follow YouTube channels via RSS feeds with delta detection—Sluice automatically fetches new videos as they're published, no manual checking required. The Similar Creators feature uses average centroid similarity (cosine distance of 0.6 threshold) to recommend channels with related content. Discovery tiles show new channels and trending topics with horizontal scroll and CSS scroll-snap for quick scanning.
 
 ### Focus Areas
 User-defined categories let you organize videos by topic (e.g., "TypeScript", "Design Systems", "DevOps"). Assign optional colors for visual differentiation. Filter the entire knowledge bank or search results by focus area. Focus areas persist in localStorage and sync across sessions, giving you a personalized taxonomy without backend complexity.
@@ -80,7 +80,7 @@ The pipeline flows from YouTube URL ingestion through transcript fetching, then 
 
 ## MCP Tools
 
-Gold Miner's MCP integration is what makes it a true knowledge infrastructure tool for Claude Code workflows. Once connected, Claude can query your video library, consult creator personas, and pull context from your knowledge bank—all without leaving the terminal.
+Sluice's MCP integration is what makes it a true knowledge infrastructure tool for Claude Code workflows. Once connected, Claude can query your video library, consult creator personas, and pull context from your knowledge bank—all without leaving the terminal.
 
 | Tool | Description |
 |------|-------------|
@@ -91,12 +91,12 @@ Gold Miner's MCP integration is what makes it a true knowledge infrastructure to
 
 ### Connecting to Claude Code
 
-Add Gold Miner to your `mcp.json` configuration:
+Add Sluice to your `mcp.json` configuration:
 
 ```json
 {
   "mcpServers": {
-    "gold-miner": {
+    "sluice": {
       "type": "sse",
       "url": "http://localhost:3001/api/mcp/sse"
     }

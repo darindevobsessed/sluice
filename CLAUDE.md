@@ -1,4 +1,4 @@
-# Gold Miner
+# Sluice
 
 A knowledge extraction platform that transforms YouTube content into a searchable knowledge bank with hybrid RAG search, AI-generated insights, creator personas, and Model Context Protocol (MCP) integration for Claude Code workflows.
 
@@ -52,7 +52,7 @@ A knowledge extraction platform that transforms YouTube content into a searchabl
 ## Project Structure
 
 ```
-gold-miner/
+sluice/
 ├── src/
 │   ├── app/                      # Next.js App Router pages and API routes
 │   │   ├── page.tsx              # Knowledge Bank (main page)
@@ -199,7 +199,7 @@ Required environment variables (see `.env.example` for template):
 
 ## Database Schema
 
-Gold Miner uses **11 tables** in PostgreSQL with pgvector extension:
+Sluice uses **11 tables** in PostgreSQL with pgvector extension:
 
 ### Core Tables
 - **videos** - YouTube video metadata and transcripts (source_type, youtube_id, title, channel, thumbnail, duration, description, transcript, published_at)
@@ -227,7 +227,7 @@ All tables use auto-incrementing `serial` primary keys except `insights` (text I
 ## Core Architecture
 
 ### Hybrid RAG Search
-Gold Miner uses a **hybrid search** approach combining vector similarity and keyword search:
+Sluice uses a **hybrid search** approach combining vector similarity and keyword search:
 - **Vector search**: cosine similarity on 384-dim embeddings (pgvector)
 - **Keyword search**: PostgreSQL case-insensitive `ILIKE` matching
 - **Reciprocal Rank Fusion (RRF)**: combines both result sets (k=60)
@@ -257,7 +257,7 @@ AI-powered content extraction generates structured insights for each video:
 - **UI**: Appears above search results when personas exist
 
 ### MCP Tools (Model Context Protocol)
-Gold Miner exposes 4 MCP tools for Claude Code workflows:
+Sluice exposes 4 MCP tools for Claude Code workflows:
 1. `search_rag` - Hybrid search with vector + keyword + RRF
 2. `get_list_of_creators` - List all YouTube channels in knowledge bank
 3. `chat_with_persona` - Query a specific creator persona
@@ -274,7 +274,7 @@ Tools registered in `src/lib/mcp/tools.ts` with Zod schema validation. Authentic
 - **Auth**: secured with `CRON_SECRET` env var
 
 ### Dual Transport Agent
-Gold Miner supports two transport mechanisms for AI agent operations:
+Sluice supports two transport mechanisms for AI agent operations:
 - **WebSocket (local dev)**: Standalone agent server via `npm run agent` on port 9334
 - **SSE (production)**: Server-Sent Events via `/api/agent/stream` for serverless deployment (Vercel)
 - **Auto-detection**: Token endpoint `/api/agent/token` returns `transport: 'websocket'` (local) or `transport: 'sse'` (production)
@@ -300,7 +300,7 @@ Server-Sent Events (SSE) for real-time AI responses:
 ## Key Design Decisions
 
 ### Product Philosophy
-**"Keep it the base"** (Brad's principle): Gold Miner is a knowledge tool, not a chatbot. Personas augment search, don't replace it.
+**"Keep it the base"** (Brad's principle): Sluice is a knowledge tool, not a chatbot. Personas augment search, don't replace it.
 
 ### UI Design
 - **Global top bar**: 56px height (`h-14 bg-card border-b`), page title left, focus area dropdown right
@@ -326,7 +326,7 @@ Server-Sent Events (SSE) for real-time AI responses:
 
 ## Deployment
 
-Gold Miner deploys to **Vercel** with a **Neon PostgreSQL** database. See [`DEPLOY.md`](./DEPLOY.md) for the full step-by-step deployment checklist.
+Sluice deploys to **Vercel** with a **Neon PostgreSQL** database. See [`DEPLOY.md`](./DEPLOY.md) for the full step-by-step deployment checklist.
 
 **Key production details:**
 - Vercel Pro plan required (60s function timeout for 9 heavy API routes)
