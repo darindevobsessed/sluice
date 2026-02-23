@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { ThemeToggle } from "@/components/settings/ThemeToggle";
 
 export const metadata: Metadata = {
-  title: "Settings | Gold Miner",
+  title: "Settings | Sluice",
 };
 
 export default function Settings() {

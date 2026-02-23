@@ -17,7 +17,7 @@ const jetbrainsMono = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "Gold Miner",
+  title: "Sluice",
   description: "Extract knowledge from YouTube videos and generate Claude Code plugins",
 }
 

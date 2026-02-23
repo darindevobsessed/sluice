@@ -71,7 +71,7 @@ describe('Sidebar', () => {
 
     it('shows logo text when expanded', () => {
       render(<SidebarTestWrapper />)
-      const logoTexts = screen.getAllByText('Gold Miner')
+      const logoTexts = screen.getAllByText('Sluice')
       expect(logoTexts.length).toBeGreaterThan(0)
       expect(logoTexts[0]).toBeInTheDocument()
     })
@@ -90,7 +90,7 @@ describe('Sidebar', () => {
       render(<SidebarTestWrapper />)
       const toggleButtons = screen.getAllByRole('button', { name: /toggle sidebar/i })
       const desktopToggleButton = toggleButtons[0]!
-      const logoTexts = screen.getAllByText('Gold Miner')
+      const logoTexts = screen.getAllByText('Sluice')
       const desktopLogoText = logoTexts[0]!
 
       // Both should be in the same parent container (the header)
@@ -125,7 +125,7 @@ describe('Sidebar', () => {
       const sidebars = screen.getAllByRole('complementary')
       const desktopSidebar = sidebars[0]!
       const logoTexts = desktopSidebar.querySelectorAll('span')
-      const desktopLogoText = Array.from(logoTexts).find(span => span.textContent === 'Gold Miner')
+      const desktopLogoText = Array.from(logoTexts).find(span => span.textContent === 'Sluice')
 
       expect(
         desktopLogoText === undefined ||

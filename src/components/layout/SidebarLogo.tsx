@@ -14,7 +14,7 @@ export function SidebarLogo({ collapsed = false }: SidebarLogoProps) {
       <Pickaxe className="h-6 w-6 text-primary shrink-0" />
       {!collapsed && (
         <span className="text-lg font-semibold overflow-hidden whitespace-nowrap flex-1">
-          Gold Miner
+          Sluice
         </span>
       )}
       <Button

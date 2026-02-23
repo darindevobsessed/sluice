@@ -3,7 +3,7 @@ import { Suspense } from "react"
 import { AddVideoPage } from "@/components/add-video/AddVideoPage"
 
 export const metadata: Metadata = {
-  title: "Add Video | Gold Miner",
+  title: "Add Video | Sluice",
 }
 
 export default function AddVideo() {

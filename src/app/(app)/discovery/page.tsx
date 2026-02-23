@@ -3,7 +3,7 @@ import { Suspense } from 'react'
 import { DiscoveryContent } from '@/components/discovery/DiscoveryContent'
 
 export const metadata: Metadata = {
-  title: 'Discovery | Gold Miner',
+  title: 'Discovery | Sluice',
 }
 
 export default function Discovery() {

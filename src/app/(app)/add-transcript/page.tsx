@@ -3,7 +3,7 @@ import { Suspense } from 'react'
 import { AddTranscriptPage } from '@/components/add-transcript/AddTranscriptPage'
 
 export const metadata: Metadata = {
-  title: 'Add Transcript | Gold Miner',
+  title: 'Add Transcript | Sluice',
 }
 
 export default function AddTranscript() {

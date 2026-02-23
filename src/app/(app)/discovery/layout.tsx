@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Discovery | Gold Miner',
+  title: 'Discovery | Sluice',
 }
 
 export default function DiscoveryLayout({
