@@ -1,5 +1,6 @@
 import { Pool } from 'pg';
 import { drizzle } from 'drizzle-orm/node-postgres';
+import { sql } from 'drizzle-orm';
 import * as schema from '../schema';
 
 // Use test database (created by init-db.sql)
@@ -13,12 +14,13 @@ let testDb: ReturnType<typeof drizzle<typeof schema>> | null = null;
 
 export async function setupTestDb() {
   if (!pool) {
-    pool = new Pool({ connectionString: TEST_DATABASE_URL });
+    pool = new Pool({ connectionString: TEST_DATABASE_URL, max: 1 });
     testDb = drizzle(pool, { schema });
   }
 
-  // Clean tables before each test
-  await pool.query('TRUNCATE videos, insights, channels, settings, chunks, relationships, temporal_metadata, focus_areas, video_focus_areas, personas, jobs, "user", session, account, verification CASCADE');
+  // Clean tables before each test — use Drizzle's execute to ensure
+  // TRUNCATE goes through the same connection management as inserts
+  await testDb!.execute(sql`TRUNCATE videos, insights, channels, settings, chunks, relationships, temporal_metadata, focus_areas, video_focus_areas, personas, jobs, "user", session, account, verification CASCADE`);
 
   return testDb!;
 }

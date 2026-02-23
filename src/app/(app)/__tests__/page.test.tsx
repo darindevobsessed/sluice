@@ -254,11 +254,12 @@ describe('Home Page - Ensemble Trigger', () => {
 
     render(<KnowledgeBankContent />)
 
-    // Wait for persona status to load
+    // Wait for persona status to load — PersonaStatus defers its fetch by 2s,
+    // so we need a longer timeout than the default 1s
     await waitFor(() => {
       const hint = screen.queryByText(/End with \? to ask your personas/i)
       expect(hint).toBeInTheDocument()
-    })
+    }, { timeout: 5000 })
 
     // Should not show old hint text
     expect(screen.queryByText(/Ask a question \(3\+ words\) to hear from your personas/i)).not.toBeInTheDocument()

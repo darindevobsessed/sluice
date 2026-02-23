@@ -60,10 +60,14 @@ export function AgentProvider({ children }: AgentProviderProps) {
       }
     }
 
-    connect();
+    // Defer agent connection — not needed for initial page render.
+    // This avoids triggering /api/agent/token compilation during the
+    // initial API waterfall, letting page-critical routes compile first.
+    const timer = setTimeout(connect, 2000);
 
     return () => {
       cancelled = true;
+      clearTimeout(timer);
       connectionRef.current?.disconnect();
     };
   }, []);

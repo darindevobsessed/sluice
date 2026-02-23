@@ -93,7 +93,14 @@ export function PersonaStatus({ onActivePersonasChange }: PersonaStatusProps) {
         setIsLoading(false)
       }
     }
-    fetchStatus()
+    // Defer persona status fetch — not needed for initial page render.
+    // The skeleton loader displays during the delay, which is the same
+    // UX as waiting for the API response.
+    const timer = setTimeout(fetchStatus, 2000)
+
+    return () => {
+      clearTimeout(timer)
+    }
   }, [onActivePersonasChange])
 
   const handleCreate = useCallback(async (channelName: string) => {

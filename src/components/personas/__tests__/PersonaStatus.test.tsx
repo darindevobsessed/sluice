@@ -1,6 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { render, screen, act } from '@testing-library/react'
 import { PersonaStatus, PersonaStatusSkeleton } from '../PersonaStatus'
 
 // Mock fetch globally
@@ -9,14 +8,26 @@ global.fetch = vi.fn()
 describe('PersonaStatus', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.useFakeTimers()
   })
+
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  // Helper to advance the 2-second defer and drain all async microtasks
+  async function advanceDefer() {
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(2000)
+    })
+  }
 
   it('renders loading state on initial mount', () => {
     vi.mocked(fetch).mockImplementation(() => new Promise(() => {})) // Never resolves
 
     render(<PersonaStatus />)
 
-    // Should show skeleton with pill placeholders
+    // Should show skeleton with pill placeholders (fetch not yet fired — deferred)
     expect(screen.getByTestId('persona-status-skeleton')).toBeInTheDocument()
   })
 
@@ -28,11 +39,12 @@ describe('PersonaStatus', () => {
 
     const { container } = render(<PersonaStatus />)
 
-    await waitFor(() => {
-      expect(fetch).toHaveBeenCalledWith('/api/personas/status')
-    })
+    // Before defer: skeleton shows
+    expect(screen.getByTestId('persona-status-skeleton')).toBeInTheDocument()
 
-    // Component should not render at all
+    await advanceDefer()
+
+    // Component should not render at all (empty channels returns null)
     expect(container.firstChild).toBeNull()
   })
 
@@ -51,11 +63,10 @@ describe('PersonaStatus', () => {
 
     render(<PersonaStatus />)
 
-    await waitFor(() => {
-      expect(screen.getByText(/Personas/i)).toBeInTheDocument()
-    })
+    await advanceDefer()
 
     // Should show "2 active · 1 building"
+    expect(screen.getByText(/Personas/i)).toBeInTheDocument()
     expect(screen.getByText(/2 active/i)).toBeInTheDocument()
     expect(screen.getByText(/1 building/i)).toBeInTheDocument()
   })
@@ -73,10 +84,9 @@ describe('PersonaStatus', () => {
 
     render(<PersonaStatus />)
 
-    await waitFor(() => {
-      expect(screen.getByText('@Fireship')).toBeInTheDocument()
-    })
+    await advanceDefer()
 
+    expect(screen.getByText('@Fireship')).toBeInTheDocument()
     // Should show checkmark
     expect(screen.getByText('✓')).toBeInTheDocument()
   })
@@ -94,13 +104,11 @@ describe('PersonaStatus', () => {
 
     render(<PersonaStatus />)
 
-    await waitFor(() => {
-      expect(screen.getByText('@Theo')).toBeInTheDocument()
-    })
+    await advanceDefer()
 
+    expect(screen.getByText('@Theo')).toBeInTheDocument()
     // Should show transcript count
     expect(screen.getByText(/6 transcripts/i)).toBeInTheDocument()
-
     // Should show Create button
     expect(screen.getByRole('button', { name: /create/i })).toBeInTheDocument()
   })
@@ -118,16 +126,13 @@ describe('PersonaStatus', () => {
 
     render(<PersonaStatus />)
 
-    await waitFor(() => {
-      expect(screen.getByText('@Web Dev Simplified')).toBeInTheDocument()
-    })
+    await advanceDefer()
 
+    expect(screen.getByText('@Web Dev Simplified')).toBeInTheDocument()
     // Should show progress (2/5)
     expect(screen.getByText('2/5')).toBeInTheDocument()
-
     // Should show "3 more needed"
     expect(screen.getByText(/3 more needed/i)).toBeInTheDocument()
-
     // Should have a progress bar
     expect(screen.getByRole('progressbar')).toBeInTheDocument()
   })
@@ -147,11 +152,10 @@ describe('PersonaStatus', () => {
 
     render(<PersonaStatus />)
 
-    await waitFor(() => {
-      expect(screen.getByText('@Fireship')).toBeInTheDocument()
-    })
+    await advanceDefer()
 
     // Active persona with checkmark
+    expect(screen.getByText('@Fireship')).toBeInTheDocument()
     expect(screen.getByText('✓')).toBeInTheDocument()
 
     // Ready to create with Create button
@@ -164,8 +168,6 @@ describe('PersonaStatus', () => {
   })
 
   it('calls POST /api/personas when Create button is clicked', async () => {
-    const user = userEvent.setup()
-
     vi.mocked(fetch)
       .mockResolvedValueOnce({
         ok: true,
@@ -183,25 +185,23 @@ describe('PersonaStatus', () => {
 
     render(<PersonaStatus />)
 
-    await waitFor(() => {
-      expect(screen.getByRole('button', { name: /create/i })).toBeInTheDocument()
-    })
+    await advanceDefer()
 
     const createButton = screen.getByRole('button', { name: /create/i })
-    await user.click(createButton)
 
-    await waitFor(() => {
-      expect(fetch).toHaveBeenCalledWith('/api/personas', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ channelName: 'Theo' }),
-      })
+    // Click and drain all async microtasks
+    await act(async () => {
+      createButton.click()
+    })
+
+    expect(fetch).toHaveBeenCalledWith('/api/personas', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ channelName: 'Theo' }),
     })
   })
 
   it('updates card to active state after successful persona creation', async () => {
-    const user = userEvent.setup()
-
     vi.mocked(fetch)
       .mockResolvedValueOnce({
         ok: true,
@@ -219,25 +219,23 @@ describe('PersonaStatus', () => {
 
     render(<PersonaStatus />)
 
-    await waitFor(() => {
-      expect(screen.getByRole('button', { name: /create/i })).toBeInTheDocument()
-    })
+    await advanceDefer()
 
     const createButton = screen.getByRole('button', { name: /create/i })
-    await user.click(createButton)
+
+    // Click and drain all async microtasks
+    await act(async () => {
+      createButton.click()
+    })
 
     // After creation, card should update to active state (checkmark)
-    await waitFor(() => {
-      expect(screen.getByText('✓')).toBeInTheDocument()
-    })
+    expect(screen.getByText('✓')).toBeInTheDocument()
 
     // Create button should be gone
     expect(screen.queryByRole('button', { name: /create/i })).not.toBeInTheDocument()
   })
 
   it('shows loading state on Create button while creating', async () => {
-    const user = userEvent.setup()
-
     vi.mocked(fetch)
       .mockResolvedValueOnce({
         ok: true,
@@ -252,22 +250,20 @@ describe('PersonaStatus', () => {
 
     render(<PersonaStatus />)
 
-    await waitFor(() => {
-      expect(screen.getByRole('button', { name: /create/i })).toBeInTheDocument()
-    })
+    await advanceDefer()
 
     const createButton = screen.getByRole('button', { name: /create/i })
-    await user.click(createButton)
+
+    // Click — the second fetch never resolves, so loading state persists
+    await act(async () => {
+      createButton.click()
+    })
 
     // Button should show loading state
-    await waitFor(() => {
-      expect(screen.getByText(/creating/i)).toBeInTheDocument()
-    })
+    expect(screen.getByText(/creating/i)).toBeInTheDocument()
   })
 
   it('shows error message when persona creation fails', async () => {
-    const user = userEvent.setup()
-
     vi.mocked(fetch)
       .mockResolvedValueOnce({
         ok: true,
@@ -285,17 +281,17 @@ describe('PersonaStatus', () => {
 
     render(<PersonaStatus />)
 
-    await waitFor(() => {
-      expect(screen.getByRole('button', { name: /create/i })).toBeInTheDocument()
-    })
+    await advanceDefer()
 
     const createButton = screen.getByRole('button', { name: /create/i })
-    await user.click(createButton)
+
+    // Click and drain all async microtasks
+    await act(async () => {
+      createButton.click()
+    })
 
     // Error message should appear
-    await waitFor(() => {
-      expect(screen.getByText(/failed to create persona/i)).toBeInTheDocument()
-    })
+    expect(screen.getByText(/failed to create persona/i)).toBeInTheDocument()
   })
 
   it('passes hasActivePersonas prop to callback when personas exist', async () => {
@@ -313,9 +309,9 @@ describe('PersonaStatus', () => {
 
     render(<PersonaStatus onActivePersonasChange={onActivePersonasChange} />)
 
-    await waitFor(() => {
-      expect(onActivePersonasChange).toHaveBeenCalledWith(true)
-    })
+    await advanceDefer()
+
+    expect(onActivePersonasChange).toHaveBeenCalledWith(true)
   })
 
   it('calls callback with false when no active personas exist', async () => {
@@ -333,9 +329,9 @@ describe('PersonaStatus', () => {
 
     render(<PersonaStatus onActivePersonasChange={onActivePersonasChange} />)
 
-    await waitFor(() => {
-      expect(onActivePersonasChange).toHaveBeenCalledWith(false)
-    })
+    await advanceDefer()
+
+    expect(onActivePersonasChange).toHaveBeenCalledWith(false)
   })
 
   it('limits visible channels to 5 by default when more than 5 exist', async () => {
@@ -357,9 +353,7 @@ describe('PersonaStatus', () => {
 
     render(<PersonaStatus />)
 
-    await waitFor(() => {
-      expect(screen.getByText('@Channel1')).toBeInTheDocument()
-    })
+    await advanceDefer()
 
     // First 5 should be visible
     expect(screen.getByText('@Channel1')).toBeInTheDocument()
@@ -391,9 +385,9 @@ describe('PersonaStatus', () => {
 
     render(<PersonaStatus />)
 
-    await waitFor(() => {
-      expect(screen.getByText(/show all 6 channels/i)).toBeInTheDocument()
-    })
+    await advanceDefer()
+
+    expect(screen.getByText(/show all 6 channels/i)).toBeInTheDocument()
   })
 
   it('does not show toggle button when 5 or fewer channels exist', async () => {
@@ -411,17 +405,14 @@ describe('PersonaStatus', () => {
 
     render(<PersonaStatus />)
 
-    await waitFor(() => {
-      expect(screen.getByText('@Channel1')).toBeInTheDocument()
-    })
+    await advanceDefer()
 
+    expect(screen.getByText('@Channel1')).toBeInTheDocument()
     // Toggle button should not be present
     expect(screen.queryByText(/show all/i)).not.toBeInTheDocument()
   })
 
   it('expands to show all channels when toggle button is clicked', async () => {
-    const user = userEvent.setup()
-
     vi.mocked(fetch).mockResolvedValueOnce({
       ok: true,
       json: async () => ({
@@ -439,25 +430,22 @@ describe('PersonaStatus', () => {
 
     render(<PersonaStatus />)
 
-    await waitFor(() => {
-      expect(screen.getByText(/show all 6 channels/i)).toBeInTheDocument()
-    })
+    await advanceDefer()
+
+    expect(screen.getByText(/show all 6 channels/i)).toBeInTheDocument()
 
     const toggleButton = screen.getByRole('button', { name: /show all 6 channels/i })
-    await user.click(toggleButton)
-
-    // All channels should now be visible
-    await waitFor(() => {
-      expect(screen.getByText('@Channel6')).toBeInTheDocument()
+    await act(async () => {
+      toggleButton.click()
     })
 
+    // All channels should now be visible
+    expect(screen.getByText('@Channel6')).toBeInTheDocument()
     // Button text should change to "Show less"
     expect(screen.getByText(/show less/i)).toBeInTheDocument()
   })
 
   it('collapses back to 5 channels when "Show less" is clicked', async () => {
-    const user = userEvent.setup()
-
     vi.mocked(fetch).mockResolvedValueOnce({
       ok: true,
       json: async () => ({
@@ -475,24 +463,27 @@ describe('PersonaStatus', () => {
 
     render(<PersonaStatus />)
 
-    await waitFor(() => {
-      expect(screen.getByText(/show all 6 channels/i)).toBeInTheDocument()
-    })
+    await advanceDefer()
 
+    expect(screen.getByText(/show all 6 channels/i)).toBeInTheDocument()
+
+    // Expand
     const toggleButton = screen.getByRole('button', { name: /show all 6 channels/i })
-    await user.click(toggleButton)
-
-    await waitFor(() => {
-      expect(screen.getByText(/show less/i)).toBeInTheDocument()
+    await act(async () => {
+      toggleButton.click()
     })
 
+    expect(screen.getByText(/show less/i)).toBeInTheDocument()
+    expect(screen.getByText('@Channel6')).toBeInTheDocument()
+
+    // Collapse
     const collapseButton = screen.getByRole('button', { name: /show less/i })
-    await user.click(collapseButton)
+    await act(async () => {
+      collapseButton.click()
+    })
 
     // Last channel should be hidden again
-    await waitFor(() => {
-      expect(screen.queryByText('@Channel6')).not.toBeInTheDocument()
-    })
+    expect(screen.queryByText('@Channel6')).not.toBeInTheDocument()
 
     // Button should show "Show all" again
     expect(screen.getByText(/show all 6 channels/i)).toBeInTheDocument()
@@ -517,9 +508,9 @@ describe('PersonaStatus', () => {
 
     render(<PersonaStatus />)
 
-    await waitFor(() => {
-      expect(screen.getByText('@Active1')).toBeInTheDocument()
-    })
+    await advanceDefer()
+
+    expect(screen.getByText('@Active1')).toBeInTheDocument()
 
     const channels = screen.getAllByText(/@\w+/)
 
@@ -553,9 +544,7 @@ describe('PersonaStatus', () => {
 
     render(<PersonaStatus />)
 
-    await waitFor(() => {
-      expect(screen.getByText('@Active1')).toBeInTheDocument()
-    })
+    await advanceDefer()
 
     // All 6 active personas should be visible (even though default is 5)
     expect(screen.getByText('@Active1')).toBeInTheDocument()
@@ -616,9 +605,9 @@ describe('PersonaStatus', () => {
 
       const { container } = render(<PersonaStatus />)
 
-      await waitFor(() => {
-        expect(screen.getByText('@Fireship')).toBeInTheDocument()
-      })
+      await advanceDefer()
+
+      expect(screen.getByText('@Fireship')).toBeInTheDocument()
 
       // Find the pill container
       const pill = container.querySelector('.rounded-full.bg-green-500\\/10')
@@ -640,9 +629,9 @@ describe('PersonaStatus', () => {
 
       render(<PersonaStatus />)
 
-      await waitFor(() => {
-        expect(screen.getByText('@Theo')).toBeInTheDocument()
-      })
+      await advanceDefer()
+
+      expect(screen.getByText('@Theo')).toBeInTheDocument()
 
       // Find the ready pill container (has Create button)
       const pill = screen.getByRole('button', { name: /create/i }).closest('.rounded-lg')
@@ -664,9 +653,9 @@ describe('PersonaStatus', () => {
 
       render(<PersonaStatus />)
 
-      await waitFor(() => {
-        expect(screen.getByText('@Web Dev Simplified')).toBeInTheDocument()
-      })
+      await advanceDefer()
+
+      expect(screen.getByText('@Web Dev Simplified')).toBeInTheDocument()
 
       // Find the building pill container (has progress bar)
       const pill = screen.getByRole('progressbar').closest('.rounded-lg')
@@ -689,9 +678,9 @@ describe('PersonaStatus', () => {
 
       render(<PersonaStatus />)
 
-      await waitFor(() => {
-        expect(screen.getByText(`@${longChannelName}`)).toBeInTheDocument()
-      })
+      await advanceDefer()
+
+      expect(screen.getByText(`@${longChannelName}`)).toBeInTheDocument()
 
       // Find the channel name span
       const channelNameSpan = screen.getByText(`@${longChannelName}`)
@@ -713,9 +702,9 @@ describe('PersonaStatus', () => {
 
       const { container } = render(<PersonaStatus />)
 
-      await waitFor(() => {
-        expect(screen.getByText('@Channel1')).toBeInTheDocument()
-      })
+      await advanceDefer()
+
+      expect(screen.getByText('@Channel1')).toBeInTheDocument()
 
       // Find the pills container (flex flex-wrap gap-2)
       const pillsContainer = container.querySelector('.flex.flex-wrap.gap-2')
@@ -738,9 +727,9 @@ describe('PersonaStatus', () => {
 
       render(<PersonaStatus />)
 
-      await waitFor(() => {
-        expect(screen.getByText(`@${longChannelName}`)).toBeInTheDocument()
-      })
+      await advanceDefer()
+
+      expect(screen.getByText(`@${longChannelName}`)).toBeInTheDocument()
 
       const channelNameSpan = screen.getByText(`@${longChannelName}`)
       expect(channelNameSpan).toHaveClass('truncate')
@@ -761,9 +750,9 @@ describe('PersonaStatus', () => {
 
       render(<PersonaStatus />)
 
-      await waitFor(() => {
-        expect(screen.getByText(`@${longChannelName}`)).toBeInTheDocument()
-      })
+      await advanceDefer()
+
+      expect(screen.getByText(`@${longChannelName}`)).toBeInTheDocument()
 
       const channelNameSpan = screen.getByText(`@${longChannelName}`)
       expect(channelNameSpan).toHaveClass('truncate')

@@ -7,10 +7,6 @@ describe('computeChannelCentroid', () => {
     await setupTestDb()
   })
 
-  afterAll(async () => {
-    await teardownTestDb()
-  })
-
   it('computes average embedding vector for a channel', async () => {
     const db = getTestDb()
 
