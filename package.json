@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "npm run dev:cleanup && concurrently -n agent,next -c cyan,green \"npm run agent\" \"npm run next:dev\"",
+    "dev": "npm run dev:cleanup && concurrently -n agent,next,warmup -c cyan,green,yellow \"npm run agent\" \"npm run next:dev\" \"sleep 3 && npm run dev:warmup\"",
+    "dev:warmup": "tsx scripts/dev-warmup.ts",
     "next:dev": "exec next dev -p ${PORT:-3001}",
     "agent": "exec env AGENT_PORT=${AGENT_PORT:-9334} tsx src/agent/index.ts",
     "build": "next build",

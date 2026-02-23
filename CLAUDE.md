@@ -123,6 +123,7 @@ sluice/
 All commands use **npm** as the package manager:
 
 - `npm run dev` - Start development servers (Next.js on port 3001 + Agent WebSocket on port 9334)
+- `npm run dev:warmup` - Pre-compile critical routes (runs automatically with `npm run dev`)
 - `npm run next:dev` - Start Next.js dev server only
 - `npm run agent` - Start Agent WebSocket server only
 - `npm run build` - Production build
