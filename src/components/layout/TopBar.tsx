@@ -5,6 +5,7 @@ import { ArrowLeft, Menu } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { useSidebar } from '@/components/providers/SidebarProvider'
+import { UserMenu } from './UserMenu'
 
 interface TopBarProps {
   title?: string
@@ -52,8 +53,11 @@ export function TopBar({ title, backHref, backLabel, children, className }: TopB
         </h1>
       </div>
 
-      {/* Right side: slot for focus area dropdown or other content */}
-      {children && <div className="flex items-center">{children}</div>}
+      {/* Right side: focus area dropdown + user menu */}
+      <div className="flex items-center gap-3">
+        {children}
+        <UserMenu />
+      </div>
     </header>
   )
 }

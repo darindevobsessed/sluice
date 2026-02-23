@@ -12,6 +12,10 @@ vi.mock('next/link', () => ({
   ),
 }))
 
+vi.mock('../UserMenu', () => ({
+  UserMenu: () => null,
+}))
+
 function TopBarTestWrapper({ children, ...props }: React.ComponentProps<typeof TopBar>) {
   return (
     <SidebarProvider>
