@@ -149,6 +149,11 @@ All commands use **npm** as the package manager:
 - Agent WebSocket server: **9334** (configurable via `AGENT_PORT` env var)
 - **DO NOT** kill processes on ports **3000** or **9333** (reserved for other projects)
 
+**Bundler:**
+- Turbopack is the default bundler (Next.js 16 stable)
+- File-system cache persists in `.next/cache/` across restarts
+- To fall back to webpack (not recommended): `next dev --webpack`
+
 ## Code Style
 
 ### Formatting Conventions
