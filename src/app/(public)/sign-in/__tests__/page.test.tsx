@@ -48,9 +48,9 @@ describe('SignInPage', () => {
       mockUseSession.mockReturnValue({ data: null, isPending: false })
     })
 
-    it('renders Gold Miner branding and description', () => {
+    it('renders Sluice branding and description', () => {
       render(<SignInPage />)
-      expect(screen.getByText('Gold Miner')).toBeInTheDocument()
+      expect(screen.getByText('Sluice')).toBeInTheDocument()
       expect(screen.getByText(/extract knowledge from youtube/i)).toBeInTheDocument()
     })
 

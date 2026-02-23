@@ -177,7 +177,7 @@ describe('Sidebar', () => {
       const desktopToggleButton = toggleButtons[0]!
       await user.click(desktopToggleButton)
 
-      expect(localStorageMock.getItem('gold-miner-sidebar-collapsed')).toBe('true')
+      expect(localStorageMock.getItem('sluice-sidebar-collapsed')).toBe('true')
     })
   })
 

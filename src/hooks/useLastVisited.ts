@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 
-const STORAGE_KEY = 'gold-miner-last-visited'
+const STORAGE_KEY = 'sluice-last-visited'
 const AUTO_MARK_DELAY_MS = 100
 
 interface UseLastVisitedReturn {

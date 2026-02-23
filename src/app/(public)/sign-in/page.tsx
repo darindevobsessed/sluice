@@ -99,7 +99,7 @@ function SignInContent() {
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
           <Pickaxe className="h-8 w-8 text-primary" />
         </div>
-        <h1 className="text-3xl font-bold tracking-tight">Gold Miner</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Sluice</h1>
         <p className="text-muted-foreground text-lg">
           Extract knowledge from YouTube videos into a searchable knowledge bank.
         </p>

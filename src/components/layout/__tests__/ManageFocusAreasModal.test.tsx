@@ -446,7 +446,7 @@ describe('ManageFocusAreasModal', () => {
     const user = userEvent.setup()
     const mockConfirm = vi.mocked(global.confirm)
     mockConfirm.mockReturnValue(true)
-    localStorageMock.setItem('gold-miner-focus-area', '1')
+    localStorageMock.setItem('sluice-focus-area', '1')
 
     mockFetch.mockResolvedValueOnce({
       ok: true,
@@ -473,7 +473,7 @@ describe('ManageFocusAreasModal', () => {
     await user.click(deleteButtons[0]!)
 
     await waitFor(() => {
-      expect(localStorageMock.getItem('gold-miner-focus-area')).toBeNull()
+      expect(localStorageMock.getItem('sluice-focus-area')).toBeNull()
     })
   })
 

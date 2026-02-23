@@ -449,7 +449,7 @@ describe('SidebarFocusAreas', () => {
     })
 
     it('initializes as closed when localStorage has "false"', async () => {
-      localStorageMock.setItem('gold-miner-sidebar-focus-areas-open', 'false')
+      localStorageMock.setItem('sluice-sidebar-focus-areas-open', 'false')
 
       render(<SidebarFocusAreas />)
       // useEffect runs after mount, so we wait for the state update
@@ -467,11 +467,11 @@ describe('SidebarFocusAreas', () => {
       const collapsible = screen.getByTestId('collapsible')
       await user.click(collapsible)
 
-      expect(localStorageMock.getItem('gold-miner-sidebar-focus-areas-open')).toBe('false')
+      expect(localStorageMock.getItem('sluice-sidebar-focus-areas-open')).toBe('false')
     })
 
     it('persists re-opened state to localStorage', async () => {
-      localStorageMock.setItem('gold-miner-sidebar-focus-areas-open', 'false')
+      localStorageMock.setItem('sluice-sidebar-focus-areas-open', 'false')
       const user = userEvent.setup()
 
       render(<SidebarFocusAreas />)
@@ -484,7 +484,7 @@ describe('SidebarFocusAreas', () => {
       const collapsible = screen.getByTestId('collapsible')
       await user.click(collapsible)
 
-      expect(localStorageMock.getItem('gold-miner-sidebar-focus-areas-open')).toBe('true')
+      expect(localStorageMock.getItem('sluice-sidebar-focus-areas-open')).toBe('true')
     })
   })
 

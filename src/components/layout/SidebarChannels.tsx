@@ -12,7 +12,7 @@ import {
   CollapsibleContent,
 } from '@/components/ui/collapsible'
 
-const STORAGE_KEY = 'gold-miner-sidebar-channels-open'
+const STORAGE_KEY = 'sluice-sidebar-channels-open'
 
 export function SidebarChannels() {
   const { channels, isLoading } = useSidebarData()

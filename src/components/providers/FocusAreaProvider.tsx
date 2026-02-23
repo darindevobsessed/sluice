@@ -14,7 +14,7 @@ interface FocusAreaContextValue {
 
 const FocusAreaContext = createContext<FocusAreaContextValue | undefined>(undefined)
 
-const STORAGE_KEY = 'gold-miner-focus-area'
+const STORAGE_KEY = 'sluice-focus-area'
 
 export function FocusAreaProvider({ children }: { children: React.ReactNode }) {
   const { focusAreas, isLoading, refetch: refetchSidebar } = useSidebarData()

@@ -74,7 +74,7 @@ describe('FocusAreaDropdown', () => {
   })
 
   it('shows selected area name when an area is selected', async () => {
-    localStorageMock.setItem('gold-miner-focus-area', '1')
+    localStorageMock.setItem('sluice-focus-area', '1')
 
     render(
       <SidebarDataProvider><FocusAreaProvider>
@@ -198,14 +198,14 @@ describe('FocusAreaDropdown', () => {
     await user.click(screen.getByText('React'))
 
     await waitFor(() => {
-      expect(localStorageMock.getItem('gold-miner-focus-area')).toBe('1')
+      expect(localStorageMock.getItem('sluice-focus-area')).toBe('1')
       expect(screen.getByRole('button', { name: /React/i })).toBeInTheDocument()
     })
   })
 
   it('updates context and localStorage when selecting "All"', async () => {
     const user = userEvent.setup()
-    localStorageMock.setItem('gold-miner-focus-area', '2')
+    localStorageMock.setItem('sluice-focus-area', '2')
 
     render(
       <SidebarDataProvider><FocusAreaProvider>
@@ -228,7 +228,7 @@ describe('FocusAreaDropdown', () => {
     await user.click(screen.getByText('All'))
 
     await waitFor(() => {
-      expect(localStorageMock.getItem('gold-miner-focus-area')).toBeNull()
+      expect(localStorageMock.getItem('sluice-focus-area')).toBeNull()
       expect(screen.getByRole('button', { name: /All Areas/i })).toBeInTheDocument()
     })
   })

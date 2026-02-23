@@ -12,7 +12,7 @@ import {
   CollapsibleContent,
 } from '@/components/ui/collapsible'
 
-const STORAGE_KEY = 'gold-miner-sidebar-focus-areas-open'
+const STORAGE_KEY = 'sluice-sidebar-focus-areas-open'
 
 export function SidebarFocusAreas() {
   const { focusAreas, selectedFocusAreaId, setSelectedFocusAreaId, isLoading } = useFocusArea()

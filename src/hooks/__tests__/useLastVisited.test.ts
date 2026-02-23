@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
 import { useLastVisited } from '../useLastVisited'
 
-const STORAGE_KEY = 'gold-miner-last-visited'
+const STORAGE_KEY = 'sluice-last-visited'
 
 describe('useLastVisited', () => {
   beforeEach(() => {

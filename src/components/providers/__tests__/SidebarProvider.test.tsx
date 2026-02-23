@@ -40,7 +40,7 @@ describe('SidebarProvider', () => {
     })
 
     it('should toggle collapsed from true to false', async () => {
-      localStorage.setItem('gold-miner-sidebar-collapsed', 'true')
+      localStorage.setItem('sluice-sidebar-collapsed', 'true')
 
       const { result } = renderHook(() => useSidebar(), {
         wrapper: SidebarProvider,
@@ -67,11 +67,11 @@ describe('SidebarProvider', () => {
         result.current.toggleSidebar()
       })
 
-      expect(localStorage.getItem('gold-miner-sidebar-collapsed')).toBe('true')
+      expect(localStorage.getItem('sluice-sidebar-collapsed')).toBe('true')
     })
 
     it('should persist collapsed=false to localStorage', () => {
-      localStorage.setItem('gold-miner-sidebar-collapsed', 'true')
+      localStorage.setItem('sluice-sidebar-collapsed', 'true')
 
       const { result } = renderHook(() => useSidebar(), {
         wrapper: SidebarProvider,
@@ -81,13 +81,13 @@ describe('SidebarProvider', () => {
         result.current.toggleSidebar()
       })
 
-      expect(localStorage.getItem('gold-miner-sidebar-collapsed')).toBe('false')
+      expect(localStorage.getItem('sluice-sidebar-collapsed')).toBe('false')
     })
   })
 
   describe('localStorage persistence', () => {
     it('should load collapsed=true from localStorage after mount', async () => {
-      localStorage.setItem('gold-miner-sidebar-collapsed', 'true')
+      localStorage.setItem('sluice-sidebar-collapsed', 'true')
 
       const { result } = renderHook(() => useSidebar(), {
         wrapper: SidebarProvider,
@@ -100,7 +100,7 @@ describe('SidebarProvider', () => {
     })
 
     it('should load collapsed=false from localStorage after mount', async () => {
-      localStorage.setItem('gold-miner-sidebar-collapsed', 'false')
+      localStorage.setItem('sluice-sidebar-collapsed', 'false')
 
       const { result } = renderHook(() => useSidebar(), {
         wrapper: SidebarProvider,
@@ -125,7 +125,7 @@ describe('SidebarProvider', () => {
     })
 
     it('should handle invalid localStorage value gracefully', () => {
-      localStorage.setItem('gold-miner-sidebar-collapsed', 'invalid')
+      localStorage.setItem('sluice-sidebar-collapsed', 'invalid')
 
       const { result } = renderHook(() => useSidebar(), {
         wrapper: SidebarProvider,
@@ -225,7 +225,7 @@ describe('SidebarProvider', () => {
         result.current.toggleMobile()
       })
 
-      expect(localStorage.getItem('gold-miner-sidebar-mobile-open')).toBeNull()
+      expect(localStorage.getItem('sluice-sidebar-mobile-open')).toBeNull()
     })
 
     it('should be independent from collapsed state', () => {

@@ -12,7 +12,7 @@ interface SidebarContextValue {
 
 const SidebarContext = createContext<SidebarContextValue | undefined>(undefined)
 
-const STORAGE_KEY = 'gold-miner-sidebar-collapsed'
+const STORAGE_KEY = 'sluice-sidebar-collapsed'
 
 export function SidebarProvider({ children }: { children: React.ReactNode }) {
   // Initialize to false to avoid SSR hydration mismatch

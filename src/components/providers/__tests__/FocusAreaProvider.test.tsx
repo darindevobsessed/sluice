@@ -109,7 +109,7 @@ describe('FocusAreaProvider', () => {
   })
 
   it('loads selectedFocusAreaId from localStorage', async () => {
-    localStorageMock.setItem('gold-miner-focus-area', '5')
+    localStorageMock.setItem('sluice-focus-area', '5')
 
     renderWithProviders(<TestComponent />, [])
 
@@ -130,12 +130,12 @@ describe('FocusAreaProvider', () => {
     })
 
     await waitFor(() => {
-      expect(localStorageMock.getItem('gold-miner-focus-area')).toBe('1')
+      expect(localStorageMock.getItem('sluice-focus-area')).toBe('1')
     })
   })
 
   it('removes from localStorage when set to null', async () => {
-    localStorageMock.setItem('gold-miner-focus-area', '3')
+    localStorageMock.setItem('sluice-focus-area', '3')
 
     renderWithProviders(<TestComponent />, [])
 
@@ -148,7 +148,7 @@ describe('FocusAreaProvider', () => {
     })
 
     await waitFor(() => {
-      expect(localStorageMock.getItem('gold-miner-focus-area')).toBeNull()
+      expect(localStorageMock.getItem('sluice-focus-area')).toBeNull()
     })
   })
 
