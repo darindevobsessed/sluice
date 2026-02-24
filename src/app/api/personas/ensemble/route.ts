@@ -97,14 +97,11 @@ export async function POST(request: Request) {
     // Extract just the personas (sorted by best match)
     const topPersonas = bestMatches.map(m => m.persona)
 
-    // Create abort controller for cleanup
-    const abortController = new AbortController()
-
-    // Stream ensemble response
+    // Stream ensemble response — request.signal is aborted by Next.js on client disconnect
     const stream = await streamEnsembleResponse({
       question,
       personas: topPersonas,
-      signal: abortController.signal,
+      signal: request.signal,
     })
 
     // Return SSE stream

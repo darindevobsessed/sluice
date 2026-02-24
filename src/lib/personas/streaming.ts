@@ -89,7 +89,7 @@ export async function streamPersonaResponse(
   if (signal) {
     signal.addEventListener('abort', () => {
       abortController.abort()
-    })
+    }, { once: true })
   }
 
   // Start the Agent SDK query

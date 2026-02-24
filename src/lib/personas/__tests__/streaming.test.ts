@@ -282,6 +282,33 @@ describe('streamPersonaResponse', () => {
     expect(options?.abortController).toBeInstanceOf(AbortController)
   })
 
+  it('should use { once: true } on abort signal listener to prevent leaks', async () => {
+    const signal = new AbortController().signal
+    const addEventListenerSpy = vi.spyOn(signal, 'addEventListener')
+
+    mockQuery.mockReturnValue(
+      (async function* () {
+        yield {
+          type: 'assistant',
+          message: { content: [{ type: 'text', text: 'Response' }] },
+        }
+      })() as never
+    )
+
+    await streamPersonaResponse({
+      persona: mockPersona,
+      question: 'What is TypeScript?',
+      context: mockContext,
+      signal,
+    })
+
+    expect(addEventListenerSpy).toHaveBeenCalledWith(
+      'abort',
+      expect.any(Function),
+      { once: true },
+    )
+  })
+
   it('should limit context to avoid exceeding token budget', async () => {
     // Create a large context (more than 3K tokens worth)
     const largeContext: SearchResult[] = Array.from({ length: 20 }, (_, i) => ({
