@@ -50,3 +50,7 @@ next-env.d.ts
 
 # craft
 .craft/
+
+# stale artifacts
+*.db
+.code-captain/
