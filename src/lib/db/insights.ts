@@ -56,47 +56,31 @@ export async function upsertExtraction(
   updatedAt: Date
 }> {
   const now = new Date()
-  const existing = await getExtractionForVideo(videoId, dbInstance)
+  const id = crypto.randomUUID()
 
-  if (existing) {
-    // Update existing
-    await dbInstance
-      .update(insights)
-      .set({
+  const [result] = await dbInstance
+    .insert(insights)
+    .values({
+      id,
+      videoId,
+      contentType: extraction.contentType,
+      extraction: extraction as unknown as typeof insights.$inferInsert.extraction,
+      createdAt: now,
+      updatedAt: now,
+    })
+    .onConflictDoUpdate({
+      target: insights.videoId,
+      set: {
         contentType: extraction.contentType,
         extraction: extraction as unknown as typeof insights.$inferInsert.extraction,
         updatedAt: now,
-      })
-      .where(eq(insights.id, existing.id))
-
-    return {
-      ...existing,
-      contentType: extraction.contentType,
-      extraction,
-      updatedAt: now,
-    }
-  }
-
-  // Create new
-  const id = crypto.randomUUID()
-  const dbRecord = {
-    id,
-    videoId,
-    contentType: extraction.contentType,
-    extraction: extraction as unknown as typeof insights.$inferInsert.extraction,
-    createdAt: now,
-    updatedAt: now,
-  }
-
-  await dbInstance.insert(insights).values(dbRecord)
+      },
+    })
+    .returning()
 
   return {
-    id,
-    videoId,
-    contentType: extraction.contentType,
-    extraction,
-    createdAt: now,
-    updatedAt: now,
+    ...result!,
+    extraction: result!.extraction as ExtractionResult,
   }
 }
 
