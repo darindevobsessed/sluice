@@ -3,12 +3,13 @@ import { fetchChannelFeed, refreshDiscoveryVideos } from '@/lib/automation/rss'
 import { getChannelsForAutoFetch, updateChannelLastFetched } from '@/lib/automation/queries'
 import { findNewVideos, createVideoFromRSS } from '@/lib/automation/delta'
 import { enqueueJob } from '@/lib/automation/queue'
+import { verifyCronSecret } from '@/lib/auth-guards'
 
 export async function GET(request: Request) {
-  // Verify cron secret
-  const authHeader = request.headers.get('authorization')
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return new Response('Unauthorized', { status: 401 })
+  // Verify cron secret (timing-safe, rejects when env unset)
+  const authResult = verifyCronSecret(request)
+  if (!authResult.valid) {
+    return authResult.response
   }
 
   try {

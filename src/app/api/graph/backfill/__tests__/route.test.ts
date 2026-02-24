@@ -2,6 +2,11 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+// Mock auth-guards before route import
+vi.mock('@/lib/auth-guards', () => ({
+  verifyCronSecret: vi.fn(),
+}))
+
 // Mock modules
 vi.mock('@/lib/graph/compute-relationships', () => ({
   computeRelationships: vi.fn(),
@@ -21,12 +26,36 @@ vi.mock('@/lib/db', () => {
 
 // Import after mocking
 const { POST } = await import('../route')
+const { verifyCronSecret } = await import('@/lib/auth-guards')
 const { computeRelationships } = await import('@/lib/graph/compute-relationships')
 const { db } = await import('@/lib/db')
+
+function makeRequest() {
+  return new Request('http://localhost/api/graph/backfill', {
+    method: 'POST',
+    headers: { authorization: 'Bearer test-secret' },
+  })
+}
 
 describe('POST /api/graph/backfill', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.mocked(verifyCronSecret).mockReturnValue({ valid: true })
+  })
+
+  it('returns 401 when cron secret is invalid', async () => {
+    vi.mocked(verifyCronSecret).mockReturnValue({
+      valid: false,
+      response: new Response('Unauthorized', { status: 401 }),
+    })
+
+    const request = new Request('http://localhost/api/graph/backfill', {
+      method: 'POST',
+    })
+    const response = await POST(request)
+
+    expect(response.status).toBe(401)
+    expect(db.delete).not.toHaveBeenCalled()
   })
 
   it('deletes all relationships and recomputes for all videos', async () => {
@@ -47,7 +76,7 @@ describe('POST /api/graph/backfill', () => {
       .mockResolvedValueOnce({ created: 15, skipped: 2 })
       .mockResolvedValueOnce({ created: 8, skipped: 1 })
 
-    const response = await POST()
+    const response = await POST(makeRequest())
     const data = await response.json()
 
     expect(response.status).toBe(200)
@@ -72,7 +101,7 @@ describe('POST /api/graph/backfill', () => {
       rows: [],
     } as any)
 
-    const response = await POST()
+    const response = await POST(makeRequest())
     const data = await response.json()
 
     expect(response.status).toBe(200)
@@ -96,7 +125,7 @@ describe('POST /api/graph/backfill', () => {
 
     vi.mocked(computeRelationships).mockResolvedValue({ created: 5, skipped: 0 })
 
-    const response = await POST()
+    const response = await POST(makeRequest())
     const data = await response.json()
 
     expect(response.status).toBe(200)
@@ -125,7 +154,7 @@ describe('POST /api/graph/backfill', () => {
       .mockResolvedValueOnce({ created: 100, skipped: 20 })
       .mockResolvedValueOnce({ created: 50, skipped: 10 })
 
-    const response = await POST()
+    const response = await POST(makeRequest())
     const data = await response.json()
 
     expect(response.status).toBe(200)
@@ -140,7 +169,7 @@ describe('POST /api/graph/backfill', () => {
       throw new Error('Database connection failed')
     })
 
-    const response = await POST()
+    const response = await POST(makeRequest())
     const data = await response.json()
 
     expect(response.status).toBe(500)
@@ -154,7 +183,7 @@ describe('POST /api/graph/backfill', () => {
 
     vi.mocked(db.execute).mockRejectedValue(new Error('Query timeout'))
 
-    const response = await POST()
+    const response = await POST(makeRequest())
     const data = await response.json()
 
     expect(response.status).toBe(500)
@@ -172,7 +201,7 @@ describe('POST /api/graph/backfill', () => {
 
     vi.mocked(computeRelationships).mockRejectedValue(new Error('Embedding error'))
 
-    const response = await POST()
+    const response = await POST(makeRequest())
     const data = await response.json()
 
     expect(response.status).toBe(500)
@@ -195,7 +224,7 @@ describe('POST /api/graph/backfill', () => {
       .mockResolvedValueOnce({ created: 10, skipped: 0 })
       .mockResolvedValueOnce({ created: 0, skipped: 0 })
 
-    const response = await POST()
+    const response = await POST(makeRequest())
     const data = await response.json()
 
     expect(response.status).toBe(200)

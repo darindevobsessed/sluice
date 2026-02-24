@@ -1,12 +1,13 @@
 import { NextResponse } from 'next/server'
 import { claimNextJob, completeJob, failJob } from '@/lib/automation/queue'
 import { processJob } from '@/lib/automation/processor'
+import { verifyCronSecret } from '@/lib/auth-guards'
 
 export async function GET(request: Request) {
-  // Verify cron secret
-  const authHeader = request.headers.get('authorization')
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return new Response('Unauthorized', { status: 401 })
+  // Verify cron secret (timing-safe, rejects when env unset)
+  const authResult = verifyCronSecret(request)
+  if (!authResult.valid) {
+    return authResult.response
   }
 
   const results = { processed: 0, failed: 0 }

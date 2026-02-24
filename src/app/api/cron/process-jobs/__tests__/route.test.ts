@@ -62,6 +62,20 @@ describe('GET /api/cron/process-jobs', () => {
     expect(text).toBe('Unauthorized')
   })
 
+  it('returns 401 when CRON_SECRET is unset', async () => {
+    delete process.env.CRON_SECRET
+    const request = new Request('http://localhost/api/cron/process-jobs', {
+      headers: {
+        authorization: 'Bearer undefined',
+      },
+    })
+    const response = await GET(request)
+
+    expect(response.status).toBe(401)
+    const text = await response.text()
+    expect(text).toBe('Unauthorized')
+  })
+
   it('returns success with 0 processed when no pending jobs', async () => {
     const request = new Request('http://localhost/api/cron/process-jobs', {
       headers: {

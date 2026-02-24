@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { sql } from 'drizzle-orm'
 import { db, relationships, chunks } from '@/lib/db'
 import { computeRelationships } from '@/lib/graph/compute-relationships'
+import { verifyCronSecret } from '@/lib/auth-guards'
 
 /**
  * POST /api/graph/backfill
@@ -18,8 +19,14 @@ import { computeRelationships } from '@/lib/graph/compute-relationships'
  * Note: This is a long-running operation for large databases.
  * For the current 53 videos, acceptable for one-time backfill.
  */
-export async function POST(): Promise<NextResponse> {
+export async function POST(request: Request): Promise<NextResponse> {
   try {
+    // Verify cron secret (this is a destructive admin operation)
+    const authResult = verifyCronSecret(request)
+    if (!authResult.valid) {
+      return new NextResponse('Unauthorized', { status: 401 })
+    }
+
     // Step 1: Clear all existing relationships
     await db.delete(relationships).returning({ id: relationships.id })
 
