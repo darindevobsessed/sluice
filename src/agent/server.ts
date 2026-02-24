@@ -1,13 +1,13 @@
 /**
  * WebSocket server for local agent communication.
- * Accepts connections on port 9333, validates tokens, and routes messages.
+ * Accepts connections on port 9334, validates tokens, and routes messages.
  */
 import { WebSocketServer, type WebSocket } from 'ws'
 import { validateToken } from './auth.js'
 import { handleInsightRequest, cancelInsight } from './chat.js'
 import chalk from 'chalk'
 
-const PORT = parseInt(process.env.AGENT_PORT || '9333', 10)
+const PORT = parseInt(process.env.AGENT_PORT || '9334', 10)
 
 interface AgentMessage {
   type: string

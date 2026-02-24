@@ -43,7 +43,7 @@ const handler = createMcpHandler(
     sseEndpoint: '/api/mcp/sse',
     sseMessageEndpoint: '/api/mcp/message',
     maxDuration: 60,
-    verboseLogs: true,
+    verboseLogs: process.env.NODE_ENV !== 'production',
   }
 )
 

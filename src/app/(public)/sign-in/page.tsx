@@ -47,7 +47,7 @@ function SignInContent() {
       if (result.error) {
         const status = result.error.status
         if (status === 403) {
-          setError('Only @devobsessed.com accounts can sign in.')
+          setError(result.error.message ?? 'Access restricted. Check with your administrator.')
         } else {
           setError(result.error.message ?? 'Sign in failed')
         }

@@ -70,7 +70,7 @@ export class AgentConnection {
     this.setStatus('connecting')
 
     return new Promise((resolve, reject) => {
-      const agentPort = process.env.NEXT_PUBLIC_AGENT_PORT || '9333'
+      const agentPort = process.env.NEXT_PUBLIC_AGENT_PORT || '9334'
       const ws = new WebSocket(`ws://localhost:${agentPort}`)
       ws.onopen = () => {
         // Send authentication

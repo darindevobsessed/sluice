@@ -97,7 +97,19 @@ describe('SignInPage', () => {
       render(<SignInPage />)
       await user.click(screen.getByRole('button', { name: /sign in with google/i }))
       await waitFor(() => {
-        expect(screen.getByText('Only @devobsessed.com accounts can sign in.')).toBeInTheDocument()
+        expect(screen.getByText('Only @devobsessed.com accounts are allowed')).toBeInTheDocument()
+      })
+    })
+
+    it('shows fallback error on 403 without message', async () => {
+      mockSignIn.social.mockResolvedValue({
+        error: { status: 403 },
+      })
+      const user = userEvent.setup()
+      render(<SignInPage />)
+      await user.click(screen.getByRole('button', { name: /sign in with google/i }))
+      await waitFor(() => {
+        expect(screen.getByText('Access restricted. Check with your administrator.')).toBeInTheDocument()
       })
     })
 
