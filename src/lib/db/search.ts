@@ -46,8 +46,7 @@ export async function searchVideos(query: string, dbInstance = defaultDb): Promi
     .where(
       or(
         ilike(videos.title, pattern),
-        ilike(videos.channel, pattern),
-        ilike(videos.transcript, pattern)
+        ilike(videos.channel, pattern)
       )
     )
     .orderBy(desc(videos.createdAt))

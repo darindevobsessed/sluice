@@ -76,31 +76,6 @@ describe('searchVideos (Postgres)', () => {
     expect(results[0]?.title).toBe('TypeScript Deep Dive');
   });
 
-  it('finds videos by transcript content', async () => {
-    const db = getTestDb();
-
-    await db.insert(schema.videos).values([
-      {
-        youtubeId: 'ds-vid1',
-        title: 'Video One',
-        channel: 'Channel A',
-        transcript: 'This video discusses async/await patterns',
-        duration: 600,
-      },
-      {
-        youtubeId: 'ds-vid2',
-        title: 'Video Two',
-        channel: 'Channel B',
-        transcript: 'This video covers state management',
-        duration: 900,
-      },
-    ]);
-
-    const results = await searchVideos('async/await', db);
-    expect(results).toHaveLength(1);
-    expect(results[0]?.title).toBe('Video One');
-  });
-
   it('finds videos by channel name', async () => {
     const db = getTestDb();
 
@@ -172,25 +147,6 @@ describe('searchVideos (Postgres)', () => {
     expect('transcript' in results[0]!).toBe(false);
   });
 
-  it('still matches against transcript content even though transcript is excluded from results', async () => {
-    const db = getTestDb();
-
-    await db.insert(schema.videos).values([
-      {
-        youtubeId: 'ds-vid1',
-        title: 'Generic Title',
-        channel: 'Channel A',
-        transcript: 'This video discusses unique-search-term-xyz patterns',
-        duration: 600,
-      },
-    ]);
-
-    const results = await searchVideos('unique-search-term-xyz', db);
-    expect(results).toHaveLength(1);
-    expect(results[0]?.title).toBe('Generic Title');
-    // Found via transcript match, but transcript not in response
-    expect('transcript' in results[0]!).toBe(false);
-  });
 });
 
 describe('getVideoStats (Postgres)', () => {

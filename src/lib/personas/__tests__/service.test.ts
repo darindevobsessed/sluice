@@ -43,16 +43,14 @@ describe('generatePersonaSystemPrompt', () => {
   it('generates a system prompt from channel content', async () => {
     const channelName = 'Test Creator'
 
-    // Mock transcript samples
+    // Mock transcript samples (no innerJoin — query goes directly from videos)
     mockDb.select.mockReturnValue({
       from: vi.fn().mockReturnValue({
-        innerJoin: vi.fn().mockReturnValue({
-          where: vi.fn().mockReturnValue({
-            limit: vi.fn().mockResolvedValue([
-              { transcript: 'Sample transcript about React and TypeScript...' },
-              { transcript: 'Another video about testing and best practices...' },
-            ]),
-          }),
+        where: vi.fn().mockReturnValue({
+          limit: vi.fn().mockResolvedValue([
+            { transcript: 'Sample transcript about React and TypeScript...' },
+            { transcript: 'Another video about testing and best practices...' },
+          ]),
         }),
       }),
     } as never)
@@ -92,10 +90,8 @@ describe('generatePersonaSystemPrompt', () => {
 
     mockDb.select.mockReturnValue({
       from: vi.fn().mockReturnValue({
-        innerJoin: vi.fn().mockReturnValue({
-          where: vi.fn().mockReturnValue({
-            limit: vi.fn().mockResolvedValue([]),
-          }),
+        where: vi.fn().mockReturnValue({
+          limit: vi.fn().mockResolvedValue([]),
         }),
       }),
     } as never)
@@ -110,12 +106,10 @@ describe('generatePersonaSystemPrompt', () => {
 
     mockDb.select.mockReturnValue({
       from: vi.fn().mockReturnValue({
-        innerJoin: vi.fn().mockReturnValue({
-          where: vi.fn().mockReturnValue({
-            limit: vi.fn().mockResolvedValue([
-              { transcript: 'Sample transcript...' },
-            ]),
-          }),
+        where: vi.fn().mockReturnValue({
+          limit: vi.fn().mockResolvedValue([
+            { transcript: 'Sample transcript...' },
+          ]),
         }),
       }),
     } as never)
@@ -140,7 +134,7 @@ describe('extractExpertiseTopics', () => {
   it('extracts top topics from channel chunks', async () => {
     const channelName = 'Test Creator'
 
-    // Mock chunk content data
+    // Mock chunk content data (extractExpertiseTopics still uses innerJoin on chunks)
     mockDb.select.mockReturnValue({
       from: vi.fn().mockReturnValue({
         innerJoin: vi.fn().mockReturnValue({
@@ -233,15 +227,13 @@ describe('createPersona', () => {
       }),
     } as never)
 
-    // Mock transcript samples for system prompt
+    // Mock transcript samples for system prompt (no innerJoin)
     mockDb.select.mockReturnValueOnce({
       from: vi.fn().mockReturnValue({
-        innerJoin: vi.fn().mockReturnValue({
-          where: vi.fn().mockReturnValue({
-            limit: vi.fn().mockResolvedValue([
-              { transcript: 'Sample transcript...' },
-            ]),
-          }),
+        where: vi.fn().mockReturnValue({
+          limit: vi.fn().mockResolvedValue([
+            { transcript: 'Sample transcript...' },
+          ]),
         }),
       }),
     } as never)
@@ -265,7 +257,7 @@ describe('createPersona', () => {
       })() as never
     )
 
-    // Mock chunk content for topics
+    // Mock chunk content for topics (extractExpertiseTopics still uses innerJoin)
     mockDb.select.mockReturnValueOnce({
       from: vi.fn().mockReturnValue({
         innerJoin: vi.fn().mockReturnValue({
@@ -336,15 +328,13 @@ describe('createPersona', () => {
       }),
     } as never)
 
-    // Mock transcript samples
+    // Mock transcript samples (no innerJoin)
     mockDb.select.mockReturnValueOnce({
       from: vi.fn().mockReturnValue({
-        innerJoin: vi.fn().mockReturnValue({
-          where: vi.fn().mockReturnValue({
-            limit: vi.fn().mockResolvedValue([
-              { transcript: 'Sample...' },
-            ]),
-          }),
+        where: vi.fn().mockReturnValue({
+          limit: vi.fn().mockResolvedValue([
+            { transcript: 'Sample...' },
+          ]),
         }),
       }),
     } as never)
@@ -363,7 +353,7 @@ describe('createPersona', () => {
       })() as never
     )
 
-    // Mock topics
+    // Mock topics (extractExpertiseTopics still uses innerJoin)
     mockDb.select.mockReturnValueOnce({
       from: vi.fn().mockReturnValue({
         innerJoin: vi.fn().mockReturnValue({

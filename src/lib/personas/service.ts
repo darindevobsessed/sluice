@@ -30,7 +30,6 @@ export async function generatePersonaSystemPrompt(
       transcript: videos.transcript,
     })
     .from(videos)
-    .innerJoin(chunks, eq(chunks.videoId, videos.id))
     .where(
       sql`${videos.channel} = ${channelName} AND ${videos.transcript} IS NOT NULL`
     )
