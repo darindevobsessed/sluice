@@ -244,9 +244,10 @@ describe('POST /api/agent/stream', () => {
     }
 
     const fullResponse = chunks.join('')
-    expect(fullResponse).toContain('data: {"event":"text","content":"First chunk"}')
-    expect(fullResponse).toContain('data: {"event":"text","content":"Second chunk"}')
-    expect(fullResponse).toContain('data: {"event":"done","fullContent":"First chunkSecond chunk"}')
+    // Updated: Chunk 1 translates insight-handler's { event } to SSE client's { type }
+    expect(fullResponse).toContain('data: {"type":"text","content":"First chunk"}')
+    expect(fullResponse).toContain('data: {"type":"text","content":"Second chunk"}')
+    expect(fullResponse).toContain('data: {"type":"done","fullContent":"First chunkSecond chunk"}')
   })
 
   it('handles handler errors gracefully', async () => {
@@ -278,7 +279,8 @@ describe('POST /api/agent/stream', () => {
     }
 
     const fullResponse = chunks.join('')
-    expect(fullResponse).toContain('data: {"event":"error","error":"Something went wrong"}')
+    // Updated: Chunk 1 translates insight-handler's { event } to SSE client's { type }
+    expect(fullResponse).toContain('data: {"type":"error","error":"Something went wrong"}')
   })
 
   it('validates all fields are strings', async () => {

@@ -112,147 +112,157 @@ export function useEnsemble(question: string | null) {
         const reader = body.getReader()
         const decoder = new TextDecoder()
 
-        while (true) {
-          const { done, value } = await reader.read()
+        try {
+          while (true) {
+            const { done, value } = await reader.read()
 
-          if (done) break
+            if (done) break
 
-          // Decode chunk
-          const chunk = decoder.decode(value, { stream: true })
-          const lines = chunk.split('\n')
+            // Decode chunk
+            const chunk = decoder.decode(value, { stream: true })
+            const lines = chunk.split('\n')
 
-          for (const line of lines) {
-            if (line.startsWith('data:')) {
-              const dataStr = line.substring(5).trim()
+            for (const line of lines) {
+              if (line.startsWith('data:')) {
+                const dataStr = line.substring(5).trim()
 
-              if (!dataStr) continue
+                if (!dataStr) continue
 
-              try {
-                const event = JSON.parse(dataStr)
+                try {
+                  const event = JSON.parse(dataStr)
 
-                // Handle different event types
-                switch (event.type) {
-                  case 'persona_start': {
-                    const { personaId, personaName } = event
-                    setState((prev) => {
-                      const newPersonas = new Map(prev.personas)
-                      newPersonas.set(personaId, {
-                        personaId,
-                        personaName,
-                        text: '',
-                        sources: [],
-                        isDone: false,
-                        isError: false,
+                  // Handle different event types
+                  switch (event.type) {
+                    case 'persona_start': {
+                      const { personaId, personaName } = event
+                      setState((prev) => {
+                        const newPersonas = new Map(prev.personas)
+                        newPersonas.set(personaId, {
+                          personaId,
+                          personaName,
+                          text: '',
+                          sources: [],
+                          isDone: false,
+                          isError: false,
+                        })
+                        return { ...prev, personas: newPersonas }
                       })
-                      return { ...prev, personas: newPersonas }
-                    })
-                    break
-                  }
+                      break
+                    }
 
-                  case 'delta': {
-                    const { personaId, text } = event
-                    setState((prev) => {
-                      const newPersonas = new Map(prev.personas)
-                      const persona = newPersonas.get(personaId)
-                      if (persona) {
-                        newPersonas.set(personaId, {
-                          ...persona,
-                          text: persona.text + text,
-                        })
-                      }
-                      return { ...prev, personas: newPersonas }
-                    })
-                    break
-                  }
+                    case 'delta': {
+                      const { personaId, text } = event
+                      setState((prev) => {
+                        const newPersonas = new Map(prev.personas)
+                        const persona = newPersonas.get(personaId)
+                        if (persona) {
+                          newPersonas.set(personaId, {
+                            ...persona,
+                            text: persona.text + text,
+                          })
+                        }
+                        return { ...prev, personas: newPersonas }
+                      })
+                      break
+                    }
 
-                  case 'sources': {
-                    const { personaId, chunks } = event
-                    setState((prev) => {
-                      const newPersonas = new Map(prev.personas)
-                      const persona = newPersonas.get(personaId)
-                      if (persona) {
-                        newPersonas.set(personaId, {
-                          ...persona,
-                          sources: chunks.map((c: unknown) => {
-                            const chunk = c as {
-                              chunkId: number
-                              content: string
-                              videoTitle: string
-                            }
-                            return {
-                              chunkId: chunk.chunkId,
-                              content: chunk.content,
-                              videoTitle: chunk.videoTitle,
-                            }
-                          }),
-                        })
-                      }
-                      return { ...prev, personas: newPersonas }
-                    })
-                    break
-                  }
+                    case 'sources': {
+                      const { personaId, chunks } = event
+                      setState((prev) => {
+                        const newPersonas = new Map(prev.personas)
+                        const persona = newPersonas.get(personaId)
+                        if (persona) {
+                          newPersonas.set(personaId, {
+                            ...persona,
+                            sources: chunks.map((c: unknown) => {
+                              const chunk = c as {
+                                chunkId: number
+                                content: string
+                                videoTitle: string
+                              }
+                              return {
+                                chunkId: chunk.chunkId,
+                                content: chunk.content,
+                                videoTitle: chunk.videoTitle,
+                              }
+                            }),
+                          })
+                        }
+                        return { ...prev, personas: newPersonas }
+                      })
+                      break
+                    }
 
-                  case 'persona_done': {
-                    const { personaId } = event
-                    setState((prev) => {
-                      const newPersonas = new Map(prev.personas)
-                      const persona = newPersonas.get(personaId)
-                      if (persona) {
-                        newPersonas.set(personaId, {
-                          ...persona,
-                          isDone: true,
-                        })
-                      }
-                      return { ...prev, personas: newPersonas }
-                    })
-                    break
-                  }
+                    case 'persona_done': {
+                      const { personaId } = event
+                      setState((prev) => {
+                        const newPersonas = new Map(prev.personas)
+                        const persona = newPersonas.get(personaId)
+                        if (persona) {
+                          newPersonas.set(personaId, {
+                            ...persona,
+                            isDone: true,
+                          })
+                        }
+                        return { ...prev, personas: newPersonas }
+                      })
+                      break
+                    }
 
-                  case 'persona_error': {
-                    const { personaId, error: errorMsg } = event
-                    setState((prev) => {
-                      const newPersonas = new Map(prev.personas)
-                      const persona = newPersonas.get(personaId)
-                      if (persona) {
-                        newPersonas.set(personaId, {
-                          ...persona,
-                          isError: true,
-                          errorMessage: errorMsg,
-                        })
-                      }
-                      return { ...prev, personas: newPersonas }
-                    })
-                    break
-                  }
+                    case 'persona_error': {
+                      const { personaId, error: errorMsg } = event
+                      setState((prev) => {
+                        const newPersonas = new Map(prev.personas)
+                        const persona = newPersonas.get(personaId)
+                        if (persona) {
+                          newPersonas.set(personaId, {
+                            ...persona,
+                            isError: true,
+                            errorMessage: errorMsg,
+                          })
+                        }
+                        return { ...prev, personas: newPersonas }
+                      })
+                      break
+                    }
 
-                  case 'best_match': {
-                    const { personaId, personaName, score } = event
-                    setState((prev) => ({
-                      ...prev,
-                      bestMatch: { personaId, personaName, score },
-                    }))
-                    break
-                  }
+                    case 'best_match': {
+                      const { personaId, personaName, score } = event
+                      setState((prev) => ({
+                        ...prev,
+                        bestMatch: { personaId, personaName, score },
+                      }))
+                      break
+                    }
 
-                  case 'all_done': {
-                    setState((prev) => ({
-                      ...prev,
-                      isAllDone: true,
-                      isLoading: false,
-                    }))
-                    break
-                  }
+                    case 'all_done': {
+                      setState((prev) => ({
+                        ...prev,
+                        isAllDone: true,
+                        isLoading: false,
+                      }))
+                      break
+                    }
 
-                  default:
-                    // Unknown event type, skip
-                    break
+                    default:
+                      // Unknown event type, skip
+                      break
+                  }
+                } catch {
+                  // Skip malformed JSON
+                  continue
                 }
-              } catch {
-                // Skip malformed JSON
-                continue
               }
             }
           }
+        } finally {
+          reader.releaseLock()
+          setState((prev) => {
+            if (prev.isLoading) {
+              return { ...prev, isLoading: false }
+            }
+            return prev
+          })
         }
       } catch (error) {
         // Ignore abort errors

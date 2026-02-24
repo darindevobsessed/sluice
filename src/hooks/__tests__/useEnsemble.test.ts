@@ -364,6 +364,76 @@ describe('useEnsemble', () => {
     expect(true).toBe(true)
   })
 
+  it('clears isLoading when stream closes without all_done event', async () => {
+    const mockResponse = {
+      ok: true,
+      body: new ReadableStream({
+        start(controller) {
+          controller.enqueue(
+            new TextEncoder().encode(
+              'data: {"type":"persona_start","personaId":1,"personaName":"Fireship"}\n\n'
+            )
+          )
+          controller.enqueue(
+            new TextEncoder().encode('data: {"type":"delta","personaId":1,"text":"Hello"}\n\n')
+          )
+          // Close without all_done
+          controller.close()
+        },
+      }),
+    }
+
+    mockFetch.mockResolvedValue(mockResponse)
+
+    const { result } = renderHook(() => useEnsemble('What is TypeScript?'))
+
+    await waitFor(
+      () => {
+        expect(result.current.state.isLoading).toBe(false)
+      },
+      { timeout: 1000 }
+    )
+
+    expect(result.current.state.isAllDone).toBe(false)
+    expect(result.current.state.personas.get(1)?.text).toBe('Hello')
+  })
+
+  it('releases reader lock when stream ends normally', async () => {
+    let capturedReader: ReadableStreamDefaultReader<Uint8Array> | null = null
+
+    const mockResponse = {
+      ok: true,
+      body: new ReadableStream({
+        start(controller) {
+          controller.enqueue(new TextEncoder().encode('data: {"type":"all_done"}\n\n'))
+          controller.close()
+        },
+      }),
+    }
+
+    // Spy on getReader to capture the reader
+    const originalGetReader = mockResponse.body.getReader.bind(mockResponse.body)
+    vi.spyOn(mockResponse.body, 'getReader').mockImplementation(() => {
+      capturedReader = originalGetReader()
+      return capturedReader
+    })
+
+    mockFetch.mockResolvedValue(mockResponse)
+
+    const { result } = renderHook(() => useEnsemble('What is TypeScript?'))
+
+    await waitFor(
+      () => {
+        expect(result.current.state.isLoading).toBe(false)
+      },
+      { timeout: 1000 }
+    )
+
+    // After stream ends, we should be able to create a new reader
+    // (which would throw if the lock wasn't released)
+    expect(() => mockResponse.body.getReader()).not.toThrow()
+  })
+
   it('reset function clears all state', async () => {
     const mockResponse = {
       ok: true,

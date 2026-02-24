@@ -160,43 +160,47 @@ export async function streamEnsembleResponse(
             const reader = stream.getReader()
             const decoder = new TextDecoder()
 
-            while (true) {
-              const { done, value } = await reader.read()
+            try {
+              while (true) {
+                const { done, value } = await reader.read()
 
-              if (done) break
+                if (done) break
 
-              // Parse the SSE chunk from Claude API
-              const chunk = decoder.decode(value, { stream: true })
-              const lines = chunk.split('\n')
+                // Parse the SSE chunk from Claude API
+                const chunk = decoder.decode(value, { stream: true })
+                const lines = chunk.split('\n')
 
-              for (const line of lines) {
-                if (line.startsWith('data:')) {
-                  const dataStr = line.substring(5).trim()
+                for (const line of lines) {
+                  if (line.startsWith('data:')) {
+                    const dataStr = line.substring(5).trim()
 
-                  if (!dataStr) continue
+                    if (!dataStr) continue
 
-                  try {
-                    const data = JSON.parse(dataStr)
+                    try {
+                      const data = JSON.parse(dataStr)
 
-                    // Transform Claude events to persona-tagged events
-                    if (data.type === 'content_block_delta') {
-                      controller.enqueue(
-                        formatSSE({
-                          type: 'delta',
-                          personaId: persona.id,
-                          text: data.delta?.text || '',
-                        })
-                      )
-                    } else if (data.type === 'done') {
-                      // Skip Claude's done event, we'll emit our own
+                      // Transform Claude events to persona-tagged events
+                      if (data.type === 'content_block_delta') {
+                        controller.enqueue(
+                          formatSSE({
+                            type: 'delta',
+                            personaId: persona.id,
+                            text: data.delta?.text || '',
+                          })
+                        )
+                      } else if (data.type === 'done') {
+                        // Skip Claude's done event, we'll emit our own
+                        continue
+                      }
+                    } catch {
+                      // Skip malformed JSON
                       continue
                     }
-                  } catch {
-                    // Skip malformed JSON
-                    continue
                   }
                 }
               }
+            } finally {
+              reader.releaseLock()
             }
 
             // Emit sources
