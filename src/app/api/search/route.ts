@@ -83,6 +83,15 @@ export async function GET(request: Request) {
     });
   }
 
+  // Reject queries that are too long
+  if (query.length > 500) {
+    timer.end(400, { reason: 'query_too_long' })
+    return NextResponse.json(
+      { error: 'Search query must be 500 characters or fewer' },
+      { status: 400 }
+    )
+  }
+
   // Run search - fetch more chunks (limit * 3) for better video aggregation
   let chunkResults = await hybridSearch(query, {
     mode,

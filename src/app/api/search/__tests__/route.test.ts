@@ -523,6 +523,36 @@ describe('GET /api/search', () => {
     expect(data.timing).toBeGreaterThanOrEqual(0);
   });
 
+  describe('query length validation', () => {
+    it('rejects queries longer than 500 characters', async () => {
+      const longQuery = 'a'.repeat(501)
+      const request = new Request(`http://localhost:3000/api/search?q=${longQuery}`)
+
+      const response = await GET(request)
+      const data = await response.json()
+
+      expect(response.status).toBe(400)
+      expect(data.error).toBe('Search query must be 500 characters or fewer')
+    })
+
+    it('accepts queries of exactly 500 characters', async () => {
+      const exactQuery = 'a'.repeat(500)
+      const request = new Request(`http://localhost:3000/api/search?q=${exactQuery}`)
+
+      const response = await GET(request)
+
+      expect(response.status).toBe(200)
+    })
+
+    it('accepts normal length queries', async () => {
+      const request = new Request('http://localhost:3000/api/search?q=TypeScript')
+
+      const response = await GET(request)
+
+      expect(response.status).toBe(200)
+    })
+  })
+
   describe('temporal decay parameters', () => {
     it('does not apply decay by default', async () => {
       const db = testDb;

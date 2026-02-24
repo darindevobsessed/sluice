@@ -57,7 +57,11 @@
       "Bash(node_modules/.bin/vitest run --reporter=dot)",
       "mcp__gold-miner__get_list_of_creators",
       "Bash(bash:*)",
-      "mcp__plugin_craft_chrome-devtools__emulate"
+      "mcp__plugin_craft_chrome-devtools__emulate",
+      "mcp__plugin_craft_chrome-devtools__list_console_messages",
+      "mcp__plugin_craft_chrome-devtools__get_console_message",
+      "mcp__plugin_craft_chrome-devtools__close_page",
+      "mcp__plugin_craft_chrome-devtools__fill"
     ]
   }
 }
