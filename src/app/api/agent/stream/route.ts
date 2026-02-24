@@ -61,9 +61,12 @@ export async function POST(request: Request) {
       async start(controller) {
         const encoder = new TextEncoder()
 
-        // Send function to enqueue SSE events
-        const send = (event: object) => {
-          const data = `data: ${JSON.stringify(event)}\n\n`
+        // Translate insight-handler's { event: 'text', ... } format
+        // to SSE client's expected { type: 'text', ... } format.
+        const send = (eventObj: object) => {
+          const { event: eventType, ...rest } = eventObj as Record<string, unknown>
+          const payload = eventType ? { type: eventType, ...rest } : eventObj
+          const data = `data: ${JSON.stringify(payload)}\n\n`
           controller.enqueue(encoder.encode(data))
         }
 

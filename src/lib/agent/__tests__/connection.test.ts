@@ -541,6 +541,46 @@ describe('AgentConnection', () => {
         expect(id2).toBeTruthy()
         expect(id1).not.toBe(id2)
       })
+
+      it('ignores SSE events with event key instead of type key (pre-fix format)', async () => {
+        const mockFetch = vi.fn().mockResolvedValue({
+          ok: true,
+          body: {
+            getReader: () => ({
+              read: vi.fn()
+                .mockResolvedValueOnce({
+                  done: false,
+                  value: new TextEncoder().encode('data: {"event":"text","content":"Hello"}\n\n'),
+                })
+                .mockResolvedValueOnce({
+                  done: false,
+                  value: new TextEncoder().encode('data: {"event":"done","fullContent":"Hello"}\n\n'),
+                })
+                .mockResolvedValueOnce({ done: true }),
+            }),
+          },
+        })
+        global.fetch = mockFetch as any
+
+        const callbacks = {
+          onText: vi.fn(),
+          onDone: vi.fn(),
+        }
+
+        connection.generateInsight(
+          {
+            insightType: 'test',
+            prompt: 'test prompt',
+            systemPrompt: 'test system',
+          },
+          callbacks,
+        )
+
+        await new Promise(resolve => setTimeout(resolve, 20))
+
+        expect(callbacks.onText).not.toHaveBeenCalled()
+        expect(callbacks.onDone).not.toHaveBeenCalled()
+      })
     })
 
     describe('cancelInsight with SSE', () => {
