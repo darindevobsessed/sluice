@@ -4,13 +4,20 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { POST } from '../route'
 import { handleInsightRequest } from '@/lib/agent/insight-handler'
+import { safeCompare } from '@/lib/auth-guards'
 
 // Mock the insight handler
 vi.mock('@/lib/agent/insight-handler', () => ({
   handleInsightRequest: vi.fn(),
 }))
 
+// Mock auth-guards with safeCompare that preserves existing behavior
+vi.mock('@/lib/auth-guards', () => ({
+  safeCompare: vi.fn((a: string, b: string) => a === b),
+}))
+
 const mockHandleInsightRequest = vi.mocked(handleInsightRequest)
+const mockSafeCompare = vi.mocked(safeCompare)
 
 describe('POST /api/agent/stream', () => {
   const validPayload = {
@@ -58,6 +65,34 @@ describe('POST /api/agent/stream', () => {
     expect(response.status).toBe(401)
     const data = await response.json()
     expect(data.error).toContain('Invalid token')
+  })
+
+  it('uses safeCompare for timing-safe token validation', async () => {
+    const request = new Request('http://localhost/api/agent/stream', {
+      method: 'POST',
+      body: JSON.stringify(validPayload),
+    })
+
+    await POST(request)
+
+    expect(mockSafeCompare).toHaveBeenCalledWith(
+      validPayload.token,
+      process.env.AGENT_AUTH_TOKEN
+    )
+  })
+
+  it('uses safeCompare even when token is wrong', async () => {
+    const request = new Request('http://localhost/api/agent/stream', {
+      method: 'POST',
+      body: JSON.stringify({ ...validPayload, token: 'wrong-token' }),
+    })
+
+    await POST(request)
+
+    expect(mockSafeCompare).toHaveBeenCalledWith(
+      'wrong-token',
+      process.env.AGENT_AUTH_TOKEN
+    )
   })
 
   it('returns 400 if request body is missing required fields', async () => {

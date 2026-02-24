@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { handleInsightRequest } from '@/lib/agent/insight-handler'
+import { safeCompare } from '@/lib/auth-guards'
 
 const streamSchema = z.object({
   id: z.string().min(1, 'ID is required'),
@@ -50,8 +51,8 @@ export async function POST(request: Request) {
 
     const { id, prompt, systemPrompt, token } = validationResult.data
 
-    // Validate auth token
-    if (token !== authToken) {
+    // Validate auth token (timing-safe comparison)
+    if (!safeCompare(token, authToken)) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
     }
 
