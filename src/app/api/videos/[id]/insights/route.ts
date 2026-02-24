@@ -1,7 +1,71 @@
 import { NextResponse } from 'next/server'
+import { z } from 'zod'
 import { getExtractionForVideo, upsertExtraction } from '@/lib/db/insights'
-import type { ExtractionResult } from '@/lib/claude/prompts/types'
 import { startApiTimer } from '@/lib/api-timing'
+import { auth } from '@/lib/auth'
+import { headers } from 'next/headers'
+
+const extractionSchema = z.object({
+  extraction: z.object({
+    contentType: z.enum(['dev', 'meeting', 'educational', 'thought-leadership', 'general']),
+    summary: z.object({
+      tldr: z.string(),
+      overview: z.string(),
+      keyPoints: z.array(z.string()),
+    }),
+    insights: z.array(z.object({
+      title: z.string(),
+      timestamp: z.string(),
+      explanation: z.string(),
+      actionable: z.string(),
+    })),
+    actionItems: z.object({
+      immediate: z.array(z.string()),
+      shortTerm: z.array(z.string()),
+      longTerm: z.array(z.string()),
+      resources: z.array(z.object({
+        name: z.string(),
+        description: z.string(),
+      })),
+    }),
+    knowledgePrompt: z.string().optional(),
+    claudeCode: z.object({
+      applicable: z.boolean(),
+      skills: z.array(z.object({
+        name: z.string(),
+        description: z.string(),
+        allowedTools: z.array(z.string()),
+        instructions: z.string(),
+      })),
+      commands: z.array(z.object({
+        name: z.string(),
+        description: z.string(),
+        argumentHint: z.string(),
+        steps: z.string(),
+      })),
+      agents: z.array(z.object({
+        name: z.string(),
+        description: z.string(),
+        model: z.enum(['haiku', 'sonnet', 'opus']),
+        systemPrompt: z.string(),
+      })),
+      hooks: z.array(z.object({
+        name: z.string(),
+        event: z.enum(['PreToolUse', 'PostToolUse', 'Stop', 'Notification']),
+        matcher: z.string(),
+        command: z.string(),
+        purpose: z.string(),
+      })),
+      rules: z.array(z.object({
+        name: z.string(),
+        rule: z.string(),
+        rationale: z.string(),
+        goodExample: z.string(),
+        badExample: z.string(),
+      })),
+    }),
+  }),
+})
 
 /**
  * GET /api/videos/[id]/insights
@@ -12,37 +76,37 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params;
-  const videoId = parseInt(id, 10);
+  const { id } = await params
+  const videoId = parseInt(id, 10)
   const timer = startApiTimer(`/api/videos/${id}/insights`, 'GET')
   try {
     if (isNaN(videoId)) {
       timer.end(400)
-      return NextResponse.json({ error: 'Invalid video ID' }, { status: 400 });
+      return NextResponse.json({ error: 'Invalid video ID' }, { status: 400 })
     }
 
-    const result = await getExtractionForVideo(videoId);
+    const result = await getExtractionForVideo(videoId)
 
     if (!result) {
       timer.end(200, { found: false })
       return NextResponse.json({
         extraction: null,
         generatedAt: null,
-      });
+      })
     }
 
     timer.end(200, { found: true })
     return NextResponse.json({
       extraction: result.extraction,
       generatedAt: result.updatedAt.toISOString(),
-    });
+    })
   } catch (error) {
-    console.error('Error fetching insights:', error);
+    console.error('Error fetching insights:', error)
     timer.end(500)
     return NextResponse.json(
       { error: 'Failed to fetch insights' },
       { status: 500 }
-    );
+    )
   }
 }
 
@@ -55,49 +119,58 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params;
-  const videoId = parseInt(id, 10);
+  const { id } = await params
+  const videoId = parseInt(id, 10)
   const timer = startApiTimer(`/api/videos/${id}/insights`, 'POST')
   try {
     if (isNaN(videoId)) {
       timer.end(400)
-      return NextResponse.json({ error: 'Invalid video ID' }, { status: 400 });
+      return NextResponse.json({ error: 'Invalid video ID' }, { status: 400 })
     }
 
-    const body = (await request.json()) as { extraction?: ExtractionResult };
+    // Require authenticated session for POST
+    const session = await auth.api.getSession({ headers: await headers() })
+    if (!session) {
+      timer.end(401)
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
 
-    if (!body.extraction) {
+    let rawBody: unknown
+    try {
+      rawBody = await request.json()
+    } catch {
       timer.end(400)
       return NextResponse.json(
-        { error: 'Missing extraction in request body' },
+        { error: 'Invalid JSON in request body' },
         { status: 400 }
-      );
+      )
     }
 
-    const extraction = body.extraction;
-
-    // Validate extraction has required fields
-    if (!extraction.contentType || !extraction.summary) {
+    const parseResult = extractionSchema.safeParse(rawBody)
+    if (!parseResult.success) {
+      const firstError = parseResult.error.issues[0]
       timer.end(400)
       return NextResponse.json(
-        { error: 'Invalid extraction format' },
+        { error: firstError?.message ?? 'Invalid extraction format' },
         { status: 400 }
-      );
+      )
     }
 
-    const result = await upsertExtraction(videoId, extraction);
+    const { extraction } = parseResult.data
+
+    const result = await upsertExtraction(videoId, extraction)
 
     timer.end(200)
     return NextResponse.json({
       extraction: result.extraction,
       generatedAt: result.updatedAt.toISOString(),
-    });
+    })
   } catch (error) {
-    console.error('Error saving insights:', error);
+    console.error('Error saving insights:', error)
     timer.end(500)
     return NextResponse.json(
       { error: 'Failed to save insights' },
       { status: 500 }
-    );
+    )
   }
 }

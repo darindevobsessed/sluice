@@ -1,34 +1,52 @@
-import { describe, it, expect, beforeEach, afterAll, vi } from 'vitest';
-import { setupTestDb, teardownTestDb, getTestDb, schema } from '@/lib/db/__tests__/setup';
-import type { ExtractionResult } from '@/lib/claude/prompts/types';
+import { describe, it, expect, beforeEach, afterAll, vi } from 'vitest'
+import { setupTestDb, teardownTestDb, getTestDb, schema } from '@/lib/db/__tests__/setup'
+import type { ExtractionResult } from '@/lib/claude/prompts/types'
+
+// Mock auth module
+const mockGetSession = vi.fn()
+vi.mock('@/lib/auth', () => ({
+  auth: {
+    api: {
+      getSession: (...args: unknown[]) => mockGetSession(...args),
+    },
+  },
+}))
+
+// Mock next/headers
+const mockHeaders = vi.fn()
+vi.mock('next/headers', () => ({
+  headers: () => mockHeaders(),
+}))
 
 // Mock the insights module to use test database
 vi.mock('@/lib/db/insights', async () => {
-  const actual = await vi.importActual<typeof import('@/lib/db/insights')>('@/lib/db/insights');
-  const setup = await import('@/lib/db/__tests__/setup');
+  const actual = await vi.importActual<typeof import('@/lib/db/insights')>('@/lib/db/insights')
+  const setup = await import('@/lib/db/__tests__/setup')
   return {
     ...actual,
     getExtractionForVideo: (videoId: number) => actual.getExtractionForVideo(videoId, setup.getTestDb()),
     upsertExtraction: (videoId: number, extraction: ExtractionResult) =>
       actual.upsertExtraction(videoId, extraction, setup.getTestDb()),
     deleteExtraction: (videoId: number) => actual.deleteExtraction(videoId, setup.getTestDb()),
-  };
-});
+  }
+})
 
 // Import after mocking
-const { GET, POST } = await import('../route');
+const { GET, POST } = await import('../route')
 
 describe('GET /api/videos/[id]/insights (Postgres)', () => {
   beforeEach(async () => {
-    await setupTestDb();
-  });
+    await setupTestDb()
+    mockGetSession.mockResolvedValue({ user: { id: '1', email: 'test@devobsessed.com' } })
+    mockHeaders.mockResolvedValue(new Headers())
+  })
 
   afterAll(async () => {
-    await teardownTestDb();
-  });
+    await teardownTestDb()
+  })
 
   it('returns null for video without extraction', async () => {
-    const db = getTestDb();
+    const db = getTestDb()
 
     // Create video without extraction
     const [video] = await db
@@ -40,23 +58,23 @@ describe('GET /api/videos/[id]/insights (Postgres)', () => {
         transcript: 'Test transcript',
         duration: 600,
       })
-      .returning();
+      .returning()
 
-    const request = new Request('http://localhost:3000/api/videos/1/insights');
-    const params = Promise.resolve({ id: String(video!.id) });
+    const request = new Request('http://localhost:3000/api/videos/1/insights')
+    const params = Promise.resolve({ id: String(video!.id) })
 
-    const response = await GET(request, { params });
-    const data = await response.json();
+    const response = await GET(request, { params })
+    const data = await response.json()
 
-    expect(response.status).toBe(200);
+    expect(response.status).toBe(200)
     expect(data).toEqual({
       extraction: null,
       generatedAt: null,
-    });
-  });
+    })
+  })
 
   it('returns extraction when it exists', async () => {
-    const db = getTestDb();
+    const db = getTestDb()
 
     // Create video
     const [video] = await db
@@ -68,7 +86,7 @@ describe('GET /api/videos/[id]/insights (Postgres)', () => {
         transcript: 'Test transcript',
         duration: 600,
       })
-      .returning();
+      .returning()
 
     // Create extraction
     const extraction: ExtractionResult = {
@@ -93,54 +111,73 @@ describe('GET /api/videos/[id]/insights (Postgres)', () => {
         hooks: [],
         rules: [],
       },
-    };
+    }
 
     await db.insert(schema.insights).values({
       id: 'test-id',
       videoId: video!.id,
       contentType: 'dev',
       extraction: extraction as unknown as typeof schema.insights.$inferInsert.extraction,
-    });
+    })
 
-    const request = new Request('http://localhost:3000/api/videos/1/insights');
-    const params = Promise.resolve({ id: String(video!.id) });
+    const request = new Request('http://localhost:3000/api/videos/1/insights')
+    const params = Promise.resolve({ id: String(video!.id) })
 
-    const response = await GET(request, { params });
-    const data = await response.json();
+    const response = await GET(request, { params })
+    const data = await response.json()
 
-    expect(response.status).toBe(200);
-    expect(data.extraction).toBeDefined();
-    expect(data.extraction.contentType).toBe('dev');
-    expect(data.extraction.summary.tldr).toBe('Test TLDR');
-    expect(data.generatedAt).toBeDefined();
-  });
+    expect(response.status).toBe(200)
+    expect(data.extraction).toBeDefined()
+    expect(data.extraction.contentType).toBe('dev')
+    expect(data.extraction.summary.tldr).toBe('Test TLDR')
+    expect(data.generatedAt).toBeDefined()
+  })
 
   it('returns null for non-existent video ID', async () => {
-    const request = new Request('http://localhost:3000/api/videos/999/insights');
-    const params = Promise.resolve({ id: '999' });
+    const request = new Request('http://localhost:3000/api/videos/999/insights')
+    const params = Promise.resolve({ id: '999' })
 
-    const response = await GET(request, { params });
-    const data = await response.json();
+    const response = await GET(request, { params })
+    const data = await response.json()
 
-    expect(response.status).toBe(200);
+    expect(response.status).toBe(200)
     expect(data).toEqual({
       extraction: null,
       generatedAt: null,
-    });
-  });
-});
+    })
+  })
+})
 
 describe('POST /api/videos/[id]/insights (Postgres)', () => {
   beforeEach(async () => {
-    await setupTestDb();
-  });
+    await setupTestDb()
+    mockGetSession.mockResolvedValue({ user: { id: '1', email: 'test@devobsessed.com' } })
+    mockHeaders.mockResolvedValue(new Headers())
+  })
 
   afterAll(async () => {
-    await teardownTestDb();
-  });
+    await teardownTestDb()
+  })
+
+  it('returns 401 when no session exists', async () => {
+    mockGetSession.mockResolvedValue(null)
+
+    const request = new Request('http://localhost:3000/api/videos/1/insights', {
+      method: 'POST',
+      body: JSON.stringify({ extraction: {} }),
+      headers: { 'Content-Type': 'application/json' },
+    })
+    const params = Promise.resolve({ id: '1' })
+
+    const response = await POST(request, { params })
+    const data = await response.json()
+
+    expect(response.status).toBe(401)
+    expect(data.error).toBe('Unauthorized')
+  })
 
   it('creates new extraction', async () => {
-    const db = getTestDb();
+    const db = getTestDb()
 
     // Create video
     const [video] = await db
@@ -152,7 +189,7 @@ describe('POST /api/videos/[id]/insights (Postgres)', () => {
         transcript: 'Test transcript',
         duration: 600,
       })
-      .returning();
+      .returning()
 
     const extraction: ExtractionResult = {
       contentType: 'educational',
@@ -176,26 +213,26 @@ describe('POST /api/videos/[id]/insights (Postgres)', () => {
         hooks: [],
         rules: [],
       },
-    };
+    }
 
     const request = new Request('http://localhost:3000/api/videos/1/insights', {
       method: 'POST',
       body: JSON.stringify({ extraction }),
       headers: { 'Content-Type': 'application/json' },
-    });
-    const params = Promise.resolve({ id: String(video!.id) });
+    })
+    const params = Promise.resolve({ id: String(video!.id) })
 
-    const response = await POST(request, { params });
-    const data = await response.json();
+    const response = await POST(request, { params })
+    const data = await response.json()
 
-    expect(response.status).toBe(200);
-    expect(data.extraction.contentType).toBe('educational');
-    expect(data.extraction.summary.tldr).toBe('New TLDR');
-    expect(data.generatedAt).toBeDefined();
-  });
+    expect(response.status).toBe(200)
+    expect(data.extraction.contentType).toBe('educational')
+    expect(data.extraction.summary.tldr).toBe('New TLDR')
+    expect(data.generatedAt).toBeDefined()
+  })
 
   it('updates existing extraction', async () => {
-    const db = getTestDb();
+    const db = getTestDb()
 
     // Create video
     const [video] = await db
@@ -207,7 +244,7 @@ describe('POST /api/videos/[id]/insights (Postgres)', () => {
         transcript: 'Test transcript',
         duration: 600,
       })
-      .returning();
+      .returning()
 
     // Create initial extraction
     const initialExtraction: ExtractionResult = {
@@ -232,14 +269,14 @@ describe('POST /api/videos/[id]/insights (Postgres)', () => {
         hooks: [],
         rules: [],
       },
-    };
+    }
 
     await db.insert(schema.insights).values({
       id: 'test-id',
       videoId: video!.id,
       contentType: 'dev',
       extraction: initialExtraction as unknown as typeof schema.insights.$inferInsert.extraction,
-    });
+    })
 
     // Update with new extraction
     const updatedExtraction: ExtractionResult = {
@@ -264,25 +301,25 @@ describe('POST /api/videos/[id]/insights (Postgres)', () => {
         hooks: [],
         rules: [],
       },
-    };
+    }
 
     const request = new Request('http://localhost:3000/api/videos/1/insights', {
       method: 'POST',
       body: JSON.stringify({ extraction: updatedExtraction }),
       headers: { 'Content-Type': 'application/json' },
-    });
-    const params = Promise.resolve({ id: String(video!.id) });
+    })
+    const params = Promise.resolve({ id: String(video!.id) })
 
-    const response = await POST(request, { params });
-    const data = await response.json();
+    const response = await POST(request, { params })
+    const data = await response.json()
 
-    expect(response.status).toBe(200);
-    expect(data.extraction.contentType).toBe('meeting');
-    expect(data.extraction.summary.tldr).toBe('Updated TLDR');
-  });
+    expect(response.status).toBe(200)
+    expect(data.extraction.contentType).toBe('meeting')
+    expect(data.extraction.summary.tldr).toBe('Updated TLDR')
+  })
 
-  it('returns 400 for invalid extraction format', async () => {
-    const db = getTestDb();
+  it('returns 400 for invalid extraction format (Zod validation)', async () => {
+    const db = getTestDb()
 
     // Create video
     const [video] = await db
@@ -294,30 +331,32 @@ describe('POST /api/videos/[id]/insights (Postgres)', () => {
         transcript: 'Test transcript',
         duration: 600,
       })
-      .returning();
+      .returning()
 
-    // Missing required fields
+    // Missing required fields (summary missing)
     const invalidExtraction = {
       contentType: 'dev',
-      // Missing summary
-    };
+      // Missing summary, insights, actionItems, claudeCode
+    }
 
     const request = new Request('http://localhost:3000/api/videos/1/insights', {
       method: 'POST',
       body: JSON.stringify({ extraction: invalidExtraction }),
       headers: { 'Content-Type': 'application/json' },
-    });
-    const params = Promise.resolve({ id: String(video!.id) });
+    })
+    const params = Promise.resolve({ id: String(video!.id) })
 
-    const response = await POST(request, { params });
-    const data = await response.json();
+    const response = await POST(request, { params })
+    const data = await response.json()
 
-    expect(response.status).toBe(400);
-    expect(data.error).toBe('Invalid extraction format');
-  });
+    expect(response.status).toBe(400)
+    // Zod provides specific field-level error messages, not the old generic message
+    expect(data.error).toBeTruthy()
+    expect(typeof data.error).toBe('string')
+  })
 
-  it('returns 400 for missing extraction in body', async () => {
-    const db = getTestDb();
+  it('returns 400 for missing extraction in body (Zod validation)', async () => {
+    const db = getTestDb()
 
     // Create video
     const [video] = await db
@@ -329,24 +368,26 @@ describe('POST /api/videos/[id]/insights (Postgres)', () => {
         transcript: 'Test transcript',
         duration: 600,
       })
-      .returning();
+      .returning()
 
     const request = new Request('http://localhost:3000/api/videos/1/insights', {
       method: 'POST',
       body: JSON.stringify({}), // No extraction field
       headers: { 'Content-Type': 'application/json' },
-    });
-    const params = Promise.resolve({ id: String(video!.id) });
+    })
+    const params = Promise.resolve({ id: String(video!.id) })
 
-    const response = await POST(request, { params });
-    const data = await response.json();
+    const response = await POST(request, { params })
+    const data = await response.json()
 
-    expect(response.status).toBe(400);
-    expect(data.error).toBe('Missing extraction in request body');
-  });
+    expect(response.status).toBe(400)
+    // Zod provides specific field-level error messages
+    expect(data.error).toBeTruthy()
+    expect(typeof data.error).toBe('string')
+  })
 
-  it('handles malformed JSON', async () => {
-    const db = getTestDb();
+  it('handles malformed JSON with 400 (not 500)', async () => {
+    const db = getTestDb()
 
     // Create video
     const [video] = await db
@@ -358,34 +399,36 @@ describe('POST /api/videos/[id]/insights (Postgres)', () => {
         transcript: 'Test transcript',
         duration: 600,
       })
-      .returning();
+      .returning()
 
     const request = new Request('http://localhost:3000/api/videos/1/insights', {
       method: 'POST',
       body: 'not valid json{',
       headers: { 'Content-Type': 'application/json' },
-    });
-    const params = Promise.resolve({ id: String(video!.id) });
+    })
+    const params = Promise.resolve({ id: String(video!.id) })
 
-    // Should return 500 error (try/catch handles malformed JSON)
-    const response = await POST(request, { params });
-    expect(response.status).toBe(500);
-    const data = await response.json();
-    expect(data.error).toBe('Failed to save insights');
-  });
-});
+    const response = await POST(request, { params })
+    const data = await response.json()
+
+    expect(response.status).toBe(400)
+    expect(data.error).toBe('Invalid JSON in request body')
+  })
+})
 
 describe('edge cases (Postgres)', () => {
   beforeEach(async () => {
-    await setupTestDb();
-  });
+    await setupTestDb()
+    mockGetSession.mockResolvedValue({ user: { id: '1', email: 'test@devobsessed.com' } })
+    mockHeaders.mockResolvedValue(new Headers())
+  })
 
   afterAll(async () => {
-    await teardownTestDb();
-  });
+    await teardownTestDb()
+  })
 
   it('handles large extraction data', async () => {
-    const db = getTestDb();
+    const db = getTestDb()
 
     // Create video
     const [video] = await db
@@ -397,7 +440,7 @@ describe('edge cases (Postgres)', () => {
         transcript: 'Test transcript',
         duration: 600,
       })
-      .returning();
+      .returning()
 
     // Create large extraction
     const insights = Array.from({ length: 100 }, (_, i) => ({
@@ -405,7 +448,7 @@ describe('edge cases (Postgres)', () => {
       timestamp: '00:05:30',
       explanation: `Explanation ${i} `.repeat(50),
       actionable: `Action ${i}`,
-    }));
+    }))
 
     const extraction: ExtractionResult = {
       contentType: 'dev',
@@ -432,24 +475,24 @@ describe('edge cases (Postgres)', () => {
         hooks: [],
         rules: [],
       },
-    };
+    }
 
     const request = new Request('http://localhost:3000/api/videos/1/insights', {
       method: 'POST',
       body: JSON.stringify({ extraction }),
       headers: { 'Content-Type': 'application/json' },
-    });
-    const params = Promise.resolve({ id: String(video!.id) });
+    })
+    const params = Promise.resolve({ id: String(video!.id) })
 
-    const response = await POST(request, { params });
-    const data = await response.json();
+    const response = await POST(request, { params })
+    const data = await response.json()
 
-    expect(response.status).toBe(200);
-    expect(data.extraction.insights).toHaveLength(100);
-  });
+    expect(response.status).toBe(200)
+    expect(data.extraction.insights).toHaveLength(100)
+  })
 
   it('handles empty arrays in extraction', async () => {
-    const db = getTestDb();
+    const db = getTestDb()
 
     // Create video
     const [video] = await db
@@ -461,7 +504,7 @@ describe('edge cases (Postgres)', () => {
         transcript: 'Test transcript',
         duration: 600,
       })
-      .returning();
+      .returning()
 
     const extraction: ExtractionResult = {
       contentType: 'general',
@@ -485,20 +528,20 @@ describe('edge cases (Postgres)', () => {
         hooks: [],
         rules: [],
       },
-    };
+    }
 
     const request = new Request('http://localhost:3000/api/videos/1/insights', {
       method: 'POST',
       body: JSON.stringify({ extraction }),
       headers: { 'Content-Type': 'application/json' },
-    });
-    const params = Promise.resolve({ id: String(video!.id) });
+    })
+    const params = Promise.resolve({ id: String(video!.id) })
 
-    const response = await POST(request, { params });
-    const data = await response.json();
+    const response = await POST(request, { params })
+    const data = await response.json()
 
-    expect(response.status).toBe(200);
-    expect(data.extraction.insights).toEqual([]);
-    expect(data.extraction.summary.keyPoints).toEqual([]);
-  });
-});
+    expect(response.status).toBe(200)
+    expect(data.extraction.insights).toEqual([])
+    expect(data.extraction.summary.keyPoints).toEqual([])
+  })
+})

@@ -6,6 +6,22 @@ import { GET } from '../route'
 import fs from 'fs'
 import path from 'path'
 
+// Mock auth module
+const mockGetSession = vi.fn()
+vi.mock('@/lib/auth', () => ({
+  auth: {
+    api: {
+      getSession: (...args: unknown[]) => mockGetSession(...args),
+    },
+  },
+}))
+
+// Mock next/headers
+const mockHeaders = vi.fn()
+vi.mock('next/headers', () => ({
+  headers: () => mockHeaders(),
+}))
+
 // Mock fs module
 vi.mock('fs', () => ({
   default: {
@@ -24,6 +40,8 @@ describe('GET /api/agent/token', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     delete process.env.AGENT_AUTH_TOKEN
+    mockGetSession.mockResolvedValue({ user: { id: '1', email: 'test@devobsessed.com' } })
+    mockHeaders.mockResolvedValue(new Headers())
   })
 
   afterEach(() => {
@@ -33,6 +51,16 @@ describe('GET /api/agent/token', () => {
     } else {
       delete process.env.AGENT_AUTH_TOKEN
     }
+  })
+
+  it('returns 401 when no session exists', async () => {
+    mockGetSession.mockResolvedValue(null)
+
+    const response = await GET()
+    const data = await response.json()
+
+    expect(response.status).toBe(401)
+    expect(data.error).toBe('Unauthorized')
   })
 
   it('returns token with websocket transport when file exists and is valid', async () => {

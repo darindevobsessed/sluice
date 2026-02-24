@@ -1,14 +1,23 @@
 /**
  * API route to retrieve the agent token.
  * Returns the token from .agent-token file (websocket) or AGENT_AUTH_TOKEN env var (SSE).
+ * Requires an authenticated session to prevent token exposure to anonymous callers.
  */
 import { NextResponse } from 'next/server'
 import fs from 'fs'
 import path from 'path'
+import { auth } from '@/lib/auth'
+import { headers } from 'next/headers'
 
 const TOKEN_FILE = '.agent-token'
 
 export async function GET() {
+  // Require authenticated session
+  const session = await auth.api.getSession({ headers: await headers() })
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   const tokenPath = path.join(process.cwd(), TOKEN_FILE)
 
   // Try filesystem first (local dev with WebSocket)

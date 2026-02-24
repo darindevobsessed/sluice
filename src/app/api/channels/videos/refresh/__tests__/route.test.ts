@@ -1,5 +1,21 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
+// Mock auth module
+const mockGetSession = vi.fn()
+vi.mock('@/lib/auth', () => ({
+  auth: {
+    api: {
+      getSession: (...args: unknown[]) => mockGetSession(...args),
+    },
+  },
+}))
+
+// Mock next/headers
+const mockHeaders = vi.fn()
+vi.mock('next/headers', () => ({
+  headers: () => mockHeaders(),
+}))
+
 const mockRefreshDiscoveryVideos = vi.fn()
 
 vi.mock('@/lib/automation/rss', () => ({
@@ -12,6 +28,22 @@ const { POST } = await import('../route')
 describe('POST /api/channels/videos/refresh', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockGetSession.mockResolvedValue({ user: { id: '1', email: 'test@devobsessed.com' } })
+    mockHeaders.mockResolvedValue(new Headers())
+  })
+
+  it('returns 401 when no session exists', async () => {
+    mockGetSession.mockResolvedValue(null)
+
+    const request = new Request('http://localhost/api/channels/videos/refresh', {
+      method: 'POST',
+    })
+    const response = await POST(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(401)
+    expect(data.error).toBe('Unauthorized')
+    expect(mockRefreshDiscoveryVideos).not.toHaveBeenCalled()
   })
 
   it('calls refreshDiscoveryVideos and returns result', async () => {
