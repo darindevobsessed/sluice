@@ -90,9 +90,9 @@ async function fetchTranscriptInnerTube(videoId: string, lang = 'en'): Promise<I
 
   return results
     .map((result) => ({
-      text: decodeHtmlEntities(result[3]),
-      duration: parseFloat(result[2]),
-      offset: parseFloat(result[1]),
+      text: decodeHtmlEntities(result[3] ?? ''),
+      duration: parseFloat(result[2] ?? '0'),
+      offset: parseFloat(result[1] ?? '0'),
       lang: track.languageCode,
     }))
     .filter((item) => item.text.trim() !== '')
