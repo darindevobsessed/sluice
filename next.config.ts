@@ -18,10 +18,14 @@ const nextConfig: NextConfig = {
     }
     return config
   },
-  // Exclude onnxruntime-node binaries from Vercel Lambda (208MB of native
-  // binaries we don't use — onnxruntime-web WASM is used instead).
+  // Exclude onnxruntime-node native binaries (208MB) — not used on Vercel.
   outputFileTracingExcludes: {
     '*': ['node_modules/onnxruntime-node/**/*'],
+  },
+  // Include onnxruntime-web WASM runtime files that the file tracer misses
+  // (loaded via dynamic import() with constructed paths at runtime).
+  outputFileTracingIncludes: {
+    '*': ['node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded*'],
   },
   images: {
     remotePatterns: [
