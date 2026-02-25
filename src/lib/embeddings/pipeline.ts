@@ -89,8 +89,11 @@ export class EmbeddingPipeline {
     env.allowLocalModels = false
     env.allowRemoteModels = true
 
+    // On Vercel, onnxruntime-node is aliased to onnxruntime-web which only
+    // supports 'wasm' (not 'cpu'). Locally, onnxruntime-node uses 'cpu'.
+    const device = process.env.VERCEL ? 'wasm' : undefined
     // Start initialization - cast to our simplified type
-    const pipelinePromise = pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2', { dtype: 'fp32' })
+    const pipelinePromise = pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2', { dtype: 'fp32', device })
     this.initPromise = pipelinePromise as unknown as Promise<EmbeddingPipelineType>
 
     try {
