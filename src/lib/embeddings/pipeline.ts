@@ -14,20 +14,6 @@ interface EmbeddingPipelineFunction {
 
 type EmbeddingPipelineType = EmbeddingPipelineFunction
 
-/**
- * On Vercel serverless, onnxruntime-node's native .so can't load.
- * Inject onnxruntime-web via the global symbol that @huggingface/transformers
- * checks BEFORE trying onnxruntime-node (see backends/onnx.js line 59-61).
- */
-async function ensureOnnxRuntime() {
-  const ORT_SYMBOL = Symbol.for('onnxruntime')
-  if (!(ORT_SYMBOL in globalThis) && process.env.VERCEL) {
-    // @ts-expect-error — onnxruntime-web types don't resolve via package.json exports
-    const ortWeb = await import('onnxruntime-web')
-    ;(globalThis as Record<symbol, unknown>)[ORT_SYMBOL] = ortWeb.default ?? ortWeb
-  }
-}
-
 /** Lazily loaded transformers module */
 let transformersModule: {
   pipeline: typeof import('@huggingface/transformers').pipeline
@@ -36,7 +22,6 @@ let transformersModule: {
 
 async function getTransformers() {
   if (!transformersModule) {
-    await ensureOnnxRuntime()
     const mod = await import('@huggingface/transformers')
     transformersModule = { pipeline: mod.pipeline, env: mod.env }
   }
@@ -89,11 +74,13 @@ export class EmbeddingPipeline {
     env.allowLocalModels = false
     env.allowRemoteModels = true
 
-    // On Vercel, onnxruntime-node is aliased to onnxruntime-web which only
-    // supports 'wasm' (not 'cpu'). Locally, onnxruntime-node uses 'cpu'.
-    const device = process.env.VERCEL ? 'wasm' : undefined
-    // Start initialization - cast to our simplified type
-    const pipelinePromise = pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2', { dtype: 'fp32', device })
+    // No explicit device — let transformers.js detect based on runtime:
+    // - Locally: IS_NODE_ENV path → onnxruntime-node → 'cpu' (native)
+    // - Vercel: IS_NODE_ENV path → onnxruntime-node aliased to onnxruntime-web
+    //   via webpack → 'cpu' maps to WASM-based CPU execution
+    // DO NOT inject via globalThis[Symbol.for('onnxruntime')] — that bypasses
+    // the IS_NODE_ENV branch which populates supportedDevices.
+    const pipelinePromise = pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2', { dtype: 'fp32' })
     this.initPromise = pipelinePromise as unknown as Promise<EmbeddingPipelineType>
 
     try {
