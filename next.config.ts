@@ -9,9 +9,9 @@ const nextConfig: NextConfig = {
   webpack: (config) => {
     config.resolve.alias = {
       ...config.resolve.alias,
-      // Disable onnxruntime-node so @huggingface/transformers falls through
-      // to onnxruntime-web (WASM). The native .so doesn't load in Lambda.
-      'onnxruntime-node$': false,
+      // Redirect onnxruntime-node to onnxruntime-web (WASM).
+      // Native .so doesn't load in Lambda; WASM files load from CDN.
+      'onnxruntime-node': 'onnxruntime-web',
     }
     return config
   },
