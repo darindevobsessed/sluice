@@ -14,6 +14,30 @@ interface EmbeddingPipelineFunction {
 
 type EmbeddingPipelineType = EmbeddingPipelineFunction
 
+/**
+ * On Vercel, onnxruntime-node is webpack-aliased to onnxruntime-web.
+ * onnxruntime-web tries to load its WASM binary via import('https://cdn...')
+ * which Node.js rejects (ERR_UNSUPPORTED_ESM_URL_SCHEME).
+ * Fix: configure wasmPaths to load from local node_modules before any
+ * ONNX session is created.
+ *
+ * DO NOT inject via globalThis[Symbol.for('onnxruntime')] — that causes
+ * transformers.js to skip the IS_NODE_ENV branch, leaving supportedDevices empty.
+ */
+async function configureWasmForVercel() {
+  if (!process.env.VERCEL) return
+
+  // Import onnxruntime-web directly to configure its WASM paths.
+  // Webpack alias ensures this is the same module transformers.js loads.
+  // @ts-expect-error — onnxruntime-web types don't resolve via package.json exports
+  const ort = await import('onnxruntime-web')
+  const ortModule = ort.default ?? ort
+  ortModule.env.wasm.numThreads = 1
+  ortModule.env.wasm.proxy = false
+  // Load WASM files from local filesystem, not CDN
+  ortModule.env.wasm.wasmPaths = '/var/task/node_modules/onnxruntime-web/dist/'
+}
+
 /** Lazily loaded transformers module */
 let transformersModule: {
   pipeline: typeof import('@huggingface/transformers').pipeline
@@ -22,6 +46,7 @@ let transformersModule: {
 
 async function getTransformers() {
   if (!transformersModule) {
+    await configureWasmForVercel()
     const mod = await import('@huggingface/transformers')
     transformersModule = { pipeline: mod.pipeline, env: mod.env }
   }
