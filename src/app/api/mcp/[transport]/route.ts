@@ -87,4 +87,4 @@ export { wrappedHandler as GET, wrappedHandler as POST }
  * Configure route segment for Vercel
  * maxDuration allows longer-running MCP operations
  */
-export const maxDuration = 60
+export const maxDuration = 300

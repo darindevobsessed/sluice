@@ -4,6 +4,9 @@ const nextConfig: NextConfig = {
   serverExternalPackages: [
     '@anthropic-ai/claude-agent-sdk',
   ],
+  // Force webpack to bundle (not externalize) these packages so
+  // resolve.alias can redirect onnxruntime-node → onnxruntime-web.
+  transpilePackages: ['@huggingface/transformers', 'onnxruntime-node'],
   // Webpack config applies only during `next build --webpack` (Vercel).
   // Local dev uses Turbopack which ignores this.
   webpack: (config) => {
