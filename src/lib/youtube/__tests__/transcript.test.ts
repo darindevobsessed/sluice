@@ -77,46 +77,63 @@ describe('fetchTranscript', () => {
     expect(result.error).toBe('No transcript available for this video');
   });
 
-  it('handles disabled transcripts', async () => {
+  it('handles disabled transcripts via InnerTube fallback', async () => {
     mockFetchTranscript.mockRejectedValueOnce(
       new Error('Transcript is disabled on this video')
+    );
+    // InnerTube fallback also fails — no captions in response
+    const mockFetch = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(
+      new Response(JSON.stringify({ captions: null }), { status: 200 })
     );
 
     const result = await fetchTranscript('disabled-video');
 
     expect(result.success).toBe(false);
     expect(result.transcript).toBeNull();
-    expect(result.error).toBe('Transcripts are disabled for this video');
+    expect(result.error).toBe('No transcript available for this video');
+    mockFetch.mockRestore();
   });
 
-  it('handles private/unavailable videos', async () => {
+  it('handles private/unavailable videos via InnerTube fallback', async () => {
     mockFetchTranscript.mockRejectedValueOnce(new Error('Video is private'));
+    const mockFetch = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(
+      new Response(JSON.stringify({ captions: null }), { status: 200 })
+    );
 
     const result = await fetchTranscript('private-video');
 
     expect(result.success).toBe(false);
-    expect(result.error).toBe('Video is private or unavailable');
+    expect(result.error).toBe('No transcript available for this video');
+    mockFetch.mockRestore();
   });
 
   it('handles not found errors', async () => {
     mockFetchTranscript.mockRejectedValueOnce(
       new Error('Could not find video: not found')
     );
+    const mockFetch = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(
+      new Response(JSON.stringify({ captions: null }), { status: 200 })
+    );
 
     const result = await fetchTranscript('not-found-video');
 
     expect(result.success).toBe(false);
     expect(result.error).toBe('No transcript available for this video');
+    mockFetch.mockRestore();
   });
 
   it('handles unknown errors gracefully', async () => {
     mockFetchTranscript.mockRejectedValueOnce(new Error('Network timeout'));
+    const mockFetch = vi.spyOn(globalThis, 'fetch').mockRejectedValueOnce(
+      new Error('Network timeout')
+    );
 
     const result = await fetchTranscript('error-video');
 
     expect(result.success).toBe(false);
     expect(result.error).toContain('Failed to fetch transcript');
     expect(result.error).toContain('Network timeout');
+    mockFetch.mockRestore();
   });
 
   it('caches successful results', async () => {

@@ -15,9 +15,98 @@ interface CachedResult {
   expiresAt: number;
 }
 
+interface InnerTubeTranscriptItem {
+  text: string;
+  duration: number;
+  offset: number;
+  lang: string;
+}
+
 // In-memory cache to avoid re-fetching
 const transcriptCache = new Map<string, CachedResult>();
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+const RE_XML_TRANSCRIPT = /<text start="([^"]*)" dur="([^"]*)">([^<]*)<\/text>/g
+
+/**
+ * Fetch transcript via YouTube InnerTube API (bypasses HTML scraping).
+ * Works from datacenter IPs where YouTube serves consent walls instead of video pages.
+ */
+async function fetchTranscriptInnerTube(videoId: string, lang = 'en'): Promise<InnerTubeTranscriptItem[]> {
+  // Step 1: Get caption track URLs via InnerTube player API
+  const playerResponse = await fetch('https://www.youtube.com/youtubei/v1/player', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'User-Agent': 'com.google.android.youtube/19.09.37 (Linux; Android 13)',
+    },
+    body: JSON.stringify({
+      context: {
+        client: {
+          clientName: 'ANDROID',
+          clientVersion: '19.09.37',
+          androidSdkVersion: 33,
+          hl: lang,
+          gl: 'US',
+        },
+      },
+      videoId,
+    }),
+  })
+
+  const data = await playerResponse.json()
+  const captions = data?.captions?.playerCaptionsTracklistRenderer
+
+  if (!captions || !captions.captionTracks?.length) {
+    throw new Error('No transcripts available')
+  }
+
+  // Find the matching language track (prefer exact, then prefix, then ASR, then first)
+  const tracks = captions.captionTracks
+  const track =
+    tracks.find((t: { languageCode: string }) => t.languageCode === lang) ||
+    tracks.find((t: { languageCode: string }) => t.languageCode.startsWith(lang + '-')) ||
+    tracks.find((t: { kind: string }) => t.kind === 'asr') ||
+    tracks[0]
+
+  // Step 2: Fetch the actual transcript XML
+  const transcriptResponse = await fetch(track.baseUrl, {
+    headers: {
+      'User-Agent': 'com.google.android.youtube/19.09.37 (Linux; Android 13)',
+      ...(lang && { 'Accept-Language': lang }),
+    },
+  })
+
+  if (!transcriptResponse.ok) {
+    throw new Error('Failed to fetch transcript file')
+  }
+
+  const xml = await transcriptResponse.text()
+  const results = [...xml.matchAll(RE_XML_TRANSCRIPT)]
+
+  if (!results.length) {
+    throw new Error('Empty transcript response')
+  }
+
+  return results
+    .map((result) => ({
+      text: decodeHtmlEntities(result[3]),
+      duration: parseFloat(result[2]),
+      offset: parseFloat(result[1]),
+      lang: track.languageCode,
+    }))
+    .filter((item) => item.text.trim() !== '')
+}
+
+function decodeHtmlEntities(text: string): string {
+  return text
+    .replace(/&quot;/g, '"')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&#39;/g, "'")
+    .replace(/&#x27;/g, "'")
+}
 
 /**
  * Fetch transcript for a YouTube video
@@ -35,10 +124,15 @@ export async function fetchTranscript(
   }
 
   try {
-    // Fetch transcript (defaults to English, falls back to auto-generated)
-    const items = await YoutubeTranscript.fetchTranscript(videoId, {
-      lang: 'en',
-    });
+    // Try library first, fall back to InnerTube API for datacenter environments
+    let items;
+    try {
+      items = await YoutubeTranscript.fetchTranscript(videoId, { lang: 'en' });
+    } catch (libraryError) {
+      // Library fails on Vercel/datacenter IPs due to YouTube consent walls.
+      // Fall back to InnerTube API which bypasses HTML scraping.
+      items = await fetchTranscriptInnerTube(videoId, 'en');
+    }
 
     if (!items || items.length === 0) {
       const result: TranscriptFetchResult = {
