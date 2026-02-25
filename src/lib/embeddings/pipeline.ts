@@ -1,4 +1,3 @@
-import { pipeline, env } from '@huggingface/transformers'
 import { rm } from 'fs/promises'
 
 /**
@@ -16,6 +15,35 @@ interface EmbeddingPipelineFunction {
 type EmbeddingPipelineType = EmbeddingPipelineFunction
 
 /**
+ * On Vercel serverless, onnxruntime-node's native .so can't load.
+ * Inject onnxruntime-web via the global symbol that @huggingface/transformers
+ * checks BEFORE trying onnxruntime-node (see backends/onnx.js line 59-61).
+ */
+async function ensureOnnxRuntime() {
+  const ORT_SYMBOL = Symbol.for('onnxruntime')
+  if (!(ORT_SYMBOL in globalThis) && process.env.VERCEL) {
+    // @ts-expect-error — onnxruntime-web types don't resolve via package.json exports
+    const ortWeb = await import('onnxruntime-web')
+    ;(globalThis as Record<symbol, unknown>)[ORT_SYMBOL] = ortWeb.default ?? ortWeb
+  }
+}
+
+/** Lazily loaded transformers module */
+let transformersModule: {
+  pipeline: typeof import('@huggingface/transformers').pipeline
+  env: typeof import('@huggingface/transformers').env
+} | null = null
+
+async function getTransformers() {
+  if (!transformersModule) {
+    await ensureOnnxRuntime()
+    const mod = await import('@huggingface/transformers')
+    transformersModule = { pipeline: mod.pipeline, env: mod.env }
+  }
+  return transformersModule
+}
+
+/**
  * Singleton class for managing the embedding pipeline.
  * Preserves the pipeline instance across requests to avoid re-downloading the model.
  */
@@ -25,12 +53,7 @@ export class EmbeddingPipeline {
   private initPromise: Promise<EmbeddingPipelineType> | null = null
   private hasRetried = false
 
-  private constructor() {
-    // Configure Transformers.js for Vercel compatibility
-    env.cacheDir = '/tmp/.cache'
-    env.allowLocalModels = false
-    env.allowRemoteModels = true
-  }
+  private constructor() {}
 
   /**
    * Get the singleton instance of the embedding pipeline.
@@ -58,6 +81,13 @@ export class EmbeddingPipeline {
     if (this.initPromise) {
       return this.initPromise
     }
+
+    const { pipeline, env } = await getTransformers()
+
+    // Configure Transformers.js for Vercel compatibility
+    env.cacheDir = '/tmp/.cache'
+    env.allowLocalModels = false
+    env.allowRemoteModels = true
 
     // Start initialization - cast to our simplified type
     const pipelinePromise = pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2', { dtype: 'fp32' })
