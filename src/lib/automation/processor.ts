@@ -4,7 +4,7 @@ import { eq } from 'drizzle-orm'
 import { fetchTranscript } from '@/lib/youtube/transcript'
 import { parseTranscript } from '@/lib/transcript/parse'
 import { chunkTranscript } from '@/lib/embeddings/chunker'
-import { embedChunks } from '@/lib/embeddings/service'
+// Dynamic import used at call site to avoid ONNX native library crash on module load
 import { enqueueJob } from './queue'
 import type { Job } from '@/lib/db/schema'
 import type { TranscriptSegment } from '@/lib/embeddings/types'
@@ -89,6 +89,7 @@ async function processGenerateEmbeddings(payload: unknown): Promise<void> {
     throw new Error('No chunks generated from transcript')
   }
 
-  // Generate embeddings using existing service
+  // Dynamic import to avoid ONNX native library crash on module load
+  const { embedChunks } = await import('@/lib/embeddings/service')
   await embedChunks(chunkedSegments, undefined, videoId)
 }

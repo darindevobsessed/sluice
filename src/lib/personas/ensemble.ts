@@ -1,5 +1,5 @@
 import type { Persona } from '@/lib/db/schema'
-import { generateEmbedding } from '@/lib/embeddings/pipeline'
+// Dynamic import used at call site to avoid ONNX native library crash on module load
 import { cosineSimilarity } from '@/lib/graph/compute-relationships'
 import { getPersonaContext } from './context'
 import { streamPersonaResponse } from './streaming'
@@ -40,6 +40,7 @@ export async function findBestPersonas(
   }
 
   // Generate embedding for the question
+  const { generateEmbedding } = await import('@/lib/embeddings/pipeline')
   const questionEmbedding = await generateEmbedding(question)
   const questionVector = Array.from(questionEmbedding)
 

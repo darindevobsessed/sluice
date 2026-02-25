@@ -4,7 +4,7 @@ import { db as defaultDb, chunks, videos } from '@/lib/db';
 import type * as schema from '@/lib/db/schema';
 import type { SearchResult } from './types';
 import { vectorSearch } from './vector-search';
-import { generateEmbedding } from '@/lib/embeddings/pipeline';
+// Dynamic import used at call sites to avoid ONNX native library crash on module load
 import { calculateTemporalDecay } from '@/lib/temporal/decay';
 
 /**
@@ -162,12 +162,14 @@ export async function hybridSearch(
   }
   // Pure vector mode
   else if (mode === 'vector') {
+    const { generateEmbedding } = await import('@/lib/embeddings/pipeline')
     const queryEmbedding = await generateEmbedding(query);
     const embeddingArray = Array.from(queryEmbedding);
     results = await vectorSearch(embeddingArray, limit, 0.3, db);
   }
   // Hybrid mode: combine both with RRF
   else {
+    const { generateEmbedding } = await import('@/lib/embeddings/pipeline')
     const queryEmbedding = await generateEmbedding(query);
     const embeddingArray = Array.from(queryEmbedding);
 

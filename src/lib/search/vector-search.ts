@@ -3,7 +3,7 @@ import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { db as defaultDb, chunks, videos } from '@/lib/db';
 import type * as schema from '@/lib/db/schema';
 import type { SearchResult } from './types';
-import { generateEmbedding } from '@/lib/embeddings/pipeline';
+// Dynamic import used at call sites to avoid ONNX native library crash on module load
 
 /**
  * Performs vector similarity search on chunk embeddings.
@@ -87,6 +87,7 @@ export async function searchByQuery(
   }
 
   // Generate embedding for the query
+  const { generateEmbedding } = await import('@/lib/embeddings/pipeline')
   const embedding = await generateEmbedding(query);
 
   // Convert Float32Array to regular array for database query
