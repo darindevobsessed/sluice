@@ -324,7 +324,7 @@ export function AddVideoPage() {
         )}
 
         {metadata && !loading && (
-          <VideoPreviewCard metadata={metadata} />
+          <VideoPreviewCard metadata={metadata} videoId={parseYouTubeUrl(url)?.videoId} />
         )}
 
         {showManualFallback && !loading && (
