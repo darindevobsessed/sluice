@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  serverExternalPackages: ['onnxruntime-node'],
+  serverExternalPackages: ['onnxruntime-node', '@anthropic-ai/claude-agent-sdk'],
   images: {
     remotePatterns: [
       {

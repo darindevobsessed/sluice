@@ -1,4 +1,5 @@
 import type { TranscriptSegment } from '@/lib/transcript/types'
+import { fetchTranscriptSupadata } from './transcript-supadata'
 
 export interface TranscriptFetchResult {
   success: boolean;
@@ -209,7 +210,18 @@ export async function fetchTranscript(
   }
 
   try {
-    const items = await fetchTranscriptInnerTube(videoId, 'en')
+    let items: RawTranscriptItem[]
+
+    if (process.env.SUPADATA_API_KEY) {
+      try {
+        items = await fetchTranscriptSupadata(videoId, 'en')
+      } catch (supadataError) {
+        console.warn(`[transcript] Supadata failed for ${videoId}, falling back to InnerTube:`, supadataError instanceof Error ? supadataError.message : supadataError)
+        items = await fetchTranscriptInnerTube(videoId, 'en')
+      }
+    } else {
+      items = await fetchTranscriptInnerTube(videoId, 'en')
+    }
 
     if (!items.length) {
       const result: TranscriptFetchResult = {

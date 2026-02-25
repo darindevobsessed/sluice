@@ -40,7 +40,7 @@ describe('MCP Route Handler', () => {
   })
 
   it('exports maxDuration config', () => {
-    expect(routeModule.maxDuration).toBe(60)
+    expect(routeModule.maxDuration).toBe(300)
   })
 
   it('returns a Response for POST requests', async () => {

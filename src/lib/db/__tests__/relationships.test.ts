@@ -13,9 +13,9 @@ const createMockDb = () => {
     where: vi.fn().mockResolvedValue([]),
   }
   return {
-    select: vi.fn(() => mockSelectChain),
-    insert: vi.fn(() => mockInsertChain),
-    delete: vi.fn(() => mockDeleteChain),
+    select: vi.fn((_table?: unknown) => mockSelectChain),
+    insert: vi.fn((_table?: unknown) => mockInsertChain),
+    delete: vi.fn((_table?: unknown) => mockDeleteChain),
     _selectChain: mockSelectChain,
     _insertChain: mockInsertChain,
     _deleteChain: mockDeleteChain,
