@@ -1,12 +1,15 @@
 /**
  * Environment variable validation module.
  * Side-effect: importing this module runs validation.
- * Throws error if required env vars are missing.
+ * Throws error if required env vars are missing (skipped during build).
  * Warns if optional env vars are missing.
  */
 
+// Skip validation during Next.js build phase (static page generation)
+const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build'
+
 // Required environment variables
-if (!process.env.DATABASE_URL) {
+if (!process.env.DATABASE_URL && !isBuildPhase) {
   throw new Error('DATABASE_URL environment variable is required')
 }
 
