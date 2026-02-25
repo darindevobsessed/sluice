@@ -4,7 +4,6 @@ import { NextResponse, after } from "next/server";
 import { z } from "zod";
 import { parseTranscript } from '@/lib/transcript/parse'
 import { chunkTranscript } from '@/lib/embeddings/chunker'
-import { embedChunks } from '@/lib/embeddings/service'
 import type { TranscriptSegment } from '@/lib/embeddings/types'
 import { fetchVideoPageMetadata } from '@/lib/youtube/metadata'
 import { startApiTimer } from '@/lib/api-timing'
@@ -249,7 +248,8 @@ export async function POST(request: Request) {
             return
           }
 
-          // Generate embeddings
+          // Dynamic import to avoid ONNX native library crash on module load
+          const { embedChunks } = await import('@/lib/embeddings/service')
           const result = await embedChunks(chunks, undefined, createdVideo.id)
           console.log(`[auto-embed] Generated ${result.successCount} embeddings for video ${createdVideo.id}`)
         } catch (error) {

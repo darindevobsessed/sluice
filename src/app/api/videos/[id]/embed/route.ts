@@ -3,7 +3,6 @@ import { db, videos } from '@/lib/db';
 import { eq } from 'drizzle-orm';
 import { parseTranscript } from '@/lib/transcript/parse';
 import { chunkTranscript } from '@/lib/embeddings/chunker';
-import { embedChunks } from '@/lib/embeddings/service';
 import type { TranscriptSegment } from '@/lib/embeddings/types';
 import { startApiTimer } from '@/lib/api-timing';
 
@@ -103,7 +102,8 @@ export async function POST(
       );
     }
 
-    // Generate embeddings and store to database
+    // Dynamic import to avoid ONNX native library crash on module load
+    const { embedChunks } = await import('@/lib/embeddings/service')
     const embeddingResult = await embedChunks(chunkedSegments, undefined, videoId);
 
     if (embeddingResult.errorCount > 0) {
