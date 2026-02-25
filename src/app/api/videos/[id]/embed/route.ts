@@ -107,11 +107,12 @@ export async function POST(
     const embeddingResult = await embedChunks(chunkedSegments, undefined, videoId);
 
     if (embeddingResult.errorCount > 0) {
+      const firstError = embeddingResult.chunks.find(c => c.error)?.error
       timer.end(500, { chunkCount: embeddingResult.successCount })
       return NextResponse.json(
         {
           success: false,
-          error: `Failed to generate embeddings for ${embeddingResult.errorCount} chunks`,
+          error: `Failed to generate embeddings for ${embeddingResult.errorCount} chunks: ${firstError}`,
           chunkCount: embeddingResult.successCount,
         },
         { status: 500 }
