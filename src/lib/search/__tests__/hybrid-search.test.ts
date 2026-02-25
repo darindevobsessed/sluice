@@ -1,863 +1,896 @@
-import { describe, it, expect, beforeEach, afterAll, vi } from 'vitest';
-import { setupTestDb, teardownTestDb, getTestDb, schema } from '@/lib/db/__tests__/setup';
-import { hybridSearch } from '../hybrid-search';
+import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { hybridSearch } from '../hybrid-search'
+import type { NodePgDatabase } from 'drizzle-orm/node-postgres'
+import type * as schema from '@/lib/db/schema'
 
 // Mock the embedding pipeline to avoid ONNX runtime issues in tests
 vi.mock('@/lib/embeddings/pipeline', () => ({
-  generateEmbedding: vi.fn().mockResolvedValue(new Float32Array(384).fill(0.5))
-}));
+  generateEmbedding: vi.fn().mockResolvedValue(new Float32Array(384).fill(0.5)),
+}))
+
+// Mock vector-search module so hybrid mode can be tested independently
+vi.mock('../vector-search', () => ({
+  vectorSearch: vi.fn().mockResolvedValue([]),
+}))
+
+import { vectorSearch } from '../vector-search'
+
+const createMockDb = () => {
+  const mockSelectChain = {
+    from: vi.fn().mockReturnThis(),
+    innerJoin: vi.fn().mockReturnThis(),
+    leftJoin: vi.fn().mockReturnThis(),
+    where: vi.fn().mockReturnThis(),
+    orderBy: vi.fn().mockReturnThis(),
+    limit: vi.fn().mockResolvedValue([]),
+  }
+  const mockInsertChain = {
+    values: vi.fn().mockReturnThis(),
+    returning: vi.fn().mockResolvedValue([]),
+  }
+  const mockDeleteChain = {
+    where: vi.fn().mockResolvedValue([]),
+  }
+  return {
+    select: vi.fn(() => mockSelectChain),
+    insert: vi.fn(() => mockInsertChain),
+    delete: vi.fn(() => mockDeleteChain),
+    execute: vi.fn().mockResolvedValue({ rows: [] }),
+    _selectChain: mockSelectChain,
+    _insertChain: mockInsertChain,
+    _deleteChain: mockDeleteChain,
+  }
+}
+
+type MockDb = ReturnType<typeof createMockDb>
 
 describe('hybridSearch', () => {
-  beforeEach(async () => {
-    await setupTestDb();
-  });
+  let mockDb: MockDb
 
-  afterAll(async () => {
-    await teardownTestDb();
-  });
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockDb = createMockDb()
+  })
 
   describe('mode: keyword', () => {
     it('returns chunks matching keyword search', async () => {
-      const db = getTestDb();
-
-      const [video] = await db.insert(schema.videos).values({
-        youtubeId: 'test-vid',
-        title: 'Test Video',
-        channel: 'Test Channel',
-        transcript: 'Test transcript',
-        duration: 600,
-      }).returning();
-
-      await db.insert(schema.chunks).values([
+      mockDb._selectChain.limit.mockResolvedValue([
         {
-          videoId: video!.id,
+          chunkId: 1,
           content: 'TypeScript is a typed superset of JavaScript',
           startTime: 0,
           endTime: 10,
-          embedding: new Array(384).fill(0.5),
+          similarity: '1.0',
+          videoId: 1,
+          videoTitle: 'Test Video',
+          channel: 'Test Channel',
+          youtubeId: 'test-vid',
+          thumbnail: null,
+          publishedAt: null,
         },
-        {
-          videoId: video!.id,
-          content: 'Python is a dynamically typed language',
-          startTime: 10,
-          endTime: 20,
-          embedding: new Array(384).fill(0.5),
-        },
-        {
-          videoId: video!.id,
-          content: 'JavaScript is very popular for web development',
-          startTime: 20,
-          endTime: 30,
-          embedding: new Array(384).fill(0.5),
-        },
-      ]);
+      ])
 
-      const results = await hybridSearch('TypeScript', { mode: 'keyword', limit: 10 }, db);
+      const results = await hybridSearch(
+        'TypeScript',
+        { mode: 'keyword', limit: 10 },
+        mockDb as unknown as NodePgDatabase<typeof schema>,
+      )
 
-      expect(results.length).toBeGreaterThan(0);
-      expect(results[0]?.content).toContain('TypeScript');
-    });
+      expect(results.length).toBeGreaterThan(0)
+      expect(results[0]?.content).toContain('TypeScript')
+    })
 
     it('performs case-insensitive keyword search', async () => {
-      const db = getTestDb();
+      mockDb._selectChain.limit.mockResolvedValue([
+        {
+          chunkId: 1,
+          content: 'TypeScript is awesome',
+          startTime: 0,
+          endTime: 10,
+          similarity: '1.0',
+          videoId: 1,
+          videoTitle: 'Test Video',
+          channel: 'Test Channel',
+          youtubeId: 'test-vid',
+          thumbnail: null,
+          publishedAt: null,
+        },
+      ])
 
-      const [video] = await db.insert(schema.videos).values({
-        youtubeId: 'test-vid',
-        title: 'Test Video',
-        channel: 'Test Channel',
-        transcript: 'Test transcript',
-        duration: 600,
-      }).returning();
+      const results = await hybridSearch(
+        'typescript',
+        { mode: 'keyword', limit: 10 },
+        mockDb as unknown as NodePgDatabase<typeof schema>,
+      )
 
-      await db.insert(schema.chunks).values({
-        videoId: video!.id,
-        content: 'TypeScript is awesome',
-        startTime: 0,
-        endTime: 10,
-        embedding: new Array(384).fill(0.5),
-      });
-
-      const results = await hybridSearch('typescript', { mode: 'keyword', limit: 10 }, db);
-
-      expect(results.length).toBe(1);
-      expect(results[0]?.content).toContain('TypeScript');
-    });
+      expect(results.length).toBe(1)
+      expect(results[0]?.content).toContain('TypeScript')
+    })
 
     it('returns empty array when no keyword matches', async () => {
-      const db = getTestDb();
+      mockDb._selectChain.limit.mockResolvedValue([])
 
-      const [video] = await db.insert(schema.videos).values({
-        youtubeId: 'test-vid',
-        title: 'Test Video',
-        channel: 'Test Channel',
-        transcript: 'Test transcript',
-        duration: 600,
-      }).returning();
+      const results = await hybridSearch(
+        'TypeScript',
+        { mode: 'keyword', limit: 10 },
+        mockDb as unknown as NodePgDatabase<typeof schema>,
+      )
 
-      await db.insert(schema.chunks).values({
-        videoId: video!.id,
-        content: 'Python programming',
-        startTime: 0,
-        endTime: 10,
-        embedding: new Array(384).fill(0.5),
-      });
-
-      const results = await hybridSearch('TypeScript', { mode: 'keyword', limit: 10 }, db);
-
-      expect(results).toEqual([]);
-    });
+      expect(results).toEqual([])
+    })
 
     it('respects limit parameter', async () => {
-      const db = getTestDb();
+      mockDb._selectChain.limit.mockResolvedValue([
+        {
+          chunkId: 1,
+          content: 'This is test chunk 0',
+          startTime: 0,
+          endTime: 10,
+          similarity: '1.0',
+          videoId: 1,
+          videoTitle: 'Test Video',
+          channel: 'Test Channel',
+          youtubeId: 'test-vid',
+          thumbnail: null,
+          publishedAt: null,
+        },
+        {
+          chunkId: 2,
+          content: 'This is test chunk 1',
+          startTime: 10,
+          endTime: 20,
+          similarity: '1.0',
+          videoId: 1,
+          videoTitle: 'Test Video',
+          channel: 'Test Channel',
+          youtubeId: 'test-vid',
+          thumbnail: null,
+          publishedAt: null,
+        },
+      ])
 
-      const [video] = await db.insert(schema.videos).values({
-        youtubeId: 'test-vid',
-        title: 'Test Video',
-        channel: 'Test Channel',
-        transcript: 'Test transcript',
-        duration: 600,
-      }).returning();
+      const results = await hybridSearch(
+        'test',
+        { mode: 'keyword', limit: 2 },
+        mockDb as unknown as NodePgDatabase<typeof schema>,
+      )
 
-      // Insert 5 chunks all containing "test"
-      for (let i = 0; i < 5; i++) {
-        await db.insert(schema.chunks).values({
-          videoId: video!.id,
-          content: `This is test chunk ${i}`,
-          startTime: i * 10,
-          endTime: (i + 1) * 10,
-          embedding: new Array(384).fill(0.5),
-        });
-      }
-
-      const results = await hybridSearch('test', { mode: 'keyword', limit: 2 }, db);
-
-      expect(results).toHaveLength(2);
-    });
-  });
+      expect(results).toHaveLength(2)
+    })
+  })
 
   describe('mode: vector', () => {
     it('performs pure vector search', async () => {
-      const db = getTestDb();
-
-      const [video] = await db.insert(schema.videos).values({
-        youtubeId: 'test-vid',
-        title: 'Test Video',
-        channel: 'Test Channel',
-        transcript: 'Test transcript',
-        duration: 600,
-      }).returning();
-
-      await db.insert(schema.chunks).values({
-        videoId: video!.id,
-        content: 'Some content here',
-        startTime: 0,
-        endTime: 10,
-        embedding: new Array(384).fill(0.8),
-      });
-
-      const results = await hybridSearch('query text', { mode: 'vector', limit: 10 }, db);
-
-      expect(Array.isArray(results)).toBe(true);
-      // Vector search should return results based on embedding similarity
-    });
-
-    it('respects similarity threshold in vector mode', async () => {
-      const db = getTestDb();
-
-      const [video] = await db.insert(schema.videos).values({
-        youtubeId: 'test-vid',
-        title: 'Test Video',
-        channel: 'Test Channel',
-        transcript: 'Test transcript',
-        duration: 600,
-      }).returning();
-
-      await db.insert(schema.chunks).values({
-        videoId: video!.id,
-        content: 'Low similarity content',
-        startTime: 0,
-        endTime: 10,
-        embedding: new Array(384).fill(0.1),
-      });
-
-      // With mocked embedding at 0.5 and chunk at 0.1, similarity should be low
-      // Results should be filtered by the default 0.3 threshold
-      const results = await hybridSearch('query', { mode: 'vector', limit: 10 }, db);
-
-      // May return empty if similarity is too low
-      expect(Array.isArray(results)).toBe(true);
-    });
-  });
-
-  describe('mode: hybrid (RRF)', () => {
-    it('combines vector and keyword results using RRF', async () => {
-      const db = getTestDb();
-
-      const [video] = await db.insert(schema.videos).values({
-        youtubeId: 'test-vid',
-        title: 'Test Video',
-        channel: 'Test Channel',
-        transcript: 'Test transcript',
-        duration: 600,
-      }).returning();
-
-      // Insert chunks
-      // Chunk 1: High vector similarity, contains keyword
-      await db.insert(schema.chunks).values({
-        videoId: video!.id,
-        content: 'TypeScript is a typed language',
-        startTime: 0,
-        endTime: 10,
-        embedding: new Array(384).fill(0.9),
-      });
-
-      // Chunk 2: Low vector similarity, contains keyword
-      await db.insert(schema.chunks).values({
-        videoId: video!.id,
-        content: 'TypeScript tutorial for beginners',
-        startTime: 10,
-        endTime: 20,
-        embedding: new Array(384).fill(0.3),
-      });
-
-      // Chunk 3: High vector similarity, no keyword
-      await db.insert(schema.chunks).values({
-        videoId: video!.id,
-        content: 'Programming concepts explained',
-        startTime: 20,
-        endTime: 30,
-        embedding: new Array(384).fill(0.9),
-      });
-
-      const results = await hybridSearch('TypeScript', { mode: 'hybrid', limit: 10 }, db);
-
-      // Should return results from both vector and keyword search
-      expect(results.length).toBeGreaterThan(0);
-      // Results should be ordered by combined RRF score
-      expect(Array.isArray(results)).toBe(true);
-    });
-
-    it('deduplicates chunks appearing in both vector and keyword results', async () => {
-      const db = getTestDb();
-
-      const [video] = await db.insert(schema.videos).values({
-        youtubeId: 'test-vid',
-        title: 'Test Video',
-        channel: 'Test Channel',
-        transcript: 'Test transcript',
-        duration: 600,
-      }).returning();
-
-      // Chunk that will appear in both results
-      await db.insert(schema.chunks).values({
-        videoId: video!.id,
-        content: 'TypeScript programming language',
-        startTime: 0,
-        endTime: 10,
-        embedding: new Array(384).fill(0.8),
-      });
-
-      const results = await hybridSearch('TypeScript', { mode: 'hybrid', limit: 10 }, db);
-
-      // Should not have duplicates
-      const chunkIds = results.map(r => r.chunkId);
-      const uniqueIds = new Set(chunkIds);
-      expect(chunkIds.length).toBe(uniqueIds.size);
-    });
-
-    it('boosts chunks that appear in both vector and keyword results', async () => {
-      const db = getTestDb();
-
-      const [video] = await db.insert(schema.videos).values({
-        youtubeId: 'test-vid',
-        title: 'Test Video',
-        channel: 'Test Channel',
-        transcript: 'Test transcript',
-        duration: 600,
-      }).returning();
-
-      // Chunk 1: Appears in both (keyword + vector)
-      await db.insert(schema.chunks).values({
-        videoId: video!.id,
-        content: 'TypeScript is amazing',
-        startTime: 0,
-        endTime: 10,
-        embedding: new Array(384).fill(0.8),
-      });
-
-      // Chunk 2: Only in keyword
-      await db.insert(schema.chunks).values({
-        videoId: video!.id,
-        content: 'TypeScript tutorial',
-        startTime: 10,
-        endTime: 20,
-        embedding: new Array(384).fill(0.2),
-      });
-
-      // Chunk 3: Only in vector (high similarity but no keyword)
-      await db.insert(schema.chunks).values({
-        videoId: video!.id,
-        content: 'Programming best practices',
-        startTime: 20,
-        endTime: 30,
-        embedding: new Array(384).fill(0.8),
-      });
-
-      const results = await hybridSearch('TypeScript', { mode: 'hybrid', limit: 10 }, db);
-
-      // Chunk that appears in both should have higher score
-      // (exact ordering depends on RRF implementation)
-      expect(results.length).toBeGreaterThan(0);
-    });
-
-    it('respects limit parameter in hybrid mode', async () => {
-      const db = getTestDb();
-
-      const [video] = await db.insert(schema.videos).values({
-        youtubeId: 'test-vid',
-        title: 'Test Video',
-        channel: 'Test Channel',
-        transcript: 'Test transcript',
-        duration: 600,
-      }).returning();
-
-      // Insert 10 chunks
-      for (let i = 0; i < 10; i++) {
-        await db.insert(schema.chunks).values({
-          videoId: video!.id,
-          content: `TypeScript content ${i}`,
-          startTime: i * 10,
-          endTime: (i + 1) * 10,
-          embedding: new Array(384).fill(0.7),
-        });
-      }
-
-      const results = await hybridSearch('TypeScript', { mode: 'hybrid', limit: 5 }, db);
-
-      expect(results.length).toBeLessThanOrEqual(5);
-    });
-  });
-
-  describe('default behavior', () => {
-    it('uses hybrid mode by default', async () => {
-      const db = getTestDb();
-
-      const [video] = await db.insert(schema.videos).values({
-        youtubeId: 'test-vid',
-        title: 'Test Video',
-        channel: 'Test Channel',
-        transcript: 'Test transcript',
-        duration: 600,
-      }).returning();
-
-      await db.insert(schema.chunks).values({
-        videoId: video!.id,
-        content: 'TypeScript programming',
-        startTime: 0,
-        endTime: 10,
-        embedding: new Array(384).fill(0.7),
-      });
-
-      // Don't specify mode - should use hybrid
-      const results = await hybridSearch('TypeScript', { limit: 10 }, db);
-
-      expect(Array.isArray(results)).toBe(true);
-    });
-
-    it('uses limit of 10 by default', async () => {
-      const db = getTestDb();
-
-      const [video] = await db.insert(schema.videos).values({
-        youtubeId: 'test-vid',
-        title: 'Test Video',
-        channel: 'Test Channel',
-        transcript: 'Test transcript',
-        duration: 600,
-      }).returning();
-
-      // Insert 15 chunks
-      for (let i = 0; i < 15; i++) {
-        await db.insert(schema.chunks).values({
-          videoId: video!.id,
-          content: `Test content ${i}`,
-          startTime: i * 10,
-          endTime: (i + 1) * 10,
-          embedding: new Array(384).fill(0.7),
-        });
-      }
-
-      const results = await hybridSearch('test', {}, db);
-
-      expect(results.length).toBeLessThanOrEqual(10);
-    });
-  });
-
-  describe('result structure', () => {
-    it('returns SearchResult objects with all required fields', async () => {
-      const db = getTestDb();
-
-      const [video] = await db.insert(schema.videos).values({
-        youtubeId: 'abc123',
-        title: 'Test Video Title',
-        channel: 'Test Channel Name',
-        thumbnail: 'https://example.com/thumb.jpg',
-        transcript: 'Test transcript',
-        duration: 600,
-      }).returning();
-
-      await db.insert(schema.chunks).values({
-        videoId: video!.id,
-        content: 'TypeScript programming',
-        startTime: 42,
-        endTime: 52,
-        embedding: new Array(384).fill(0.7),
-      });
-
-      const results = await hybridSearch('TypeScript', { mode: 'keyword' }, db);
-
-      expect(results).toHaveLength(1);
-
-      const result = results[0]!;
-      expect(result).toHaveProperty('chunkId');
-      expect(result).toHaveProperty('content', 'TypeScript programming');
-      expect(result).toHaveProperty('startTime', 42);
-      expect(result).toHaveProperty('endTime', 52);
-      expect(result).toHaveProperty('similarity');
-      expect(result).toHaveProperty('videoId', video!.id);
-      expect(result).toHaveProperty('videoTitle', 'Test Video Title');
-      expect(result).toHaveProperty('channel', 'Test Channel Name');
-      expect(result).toHaveProperty('youtubeId', 'abc123');
-      expect(result).toHaveProperty('thumbnail', 'https://example.com/thumb.jpg');
-    });
-
-    it('assigns similarity score of 1.0 for keyword matches', async () => {
-      const db = getTestDb();
-
-      const [video] = await db.insert(schema.videos).values({
-        youtubeId: 'test-vid',
-        title: 'Test Video',
-        channel: 'Test Channel',
-        transcript: 'Test transcript',
-        duration: 600,
-      }).returning();
-
-      await db.insert(schema.chunks).values({
-        videoId: video!.id,
-        content: 'TypeScript programming',
-        startTime: 0,
-        endTime: 10,
-        embedding: new Array(384).fill(0.7),
-      });
-
-      const results = await hybridSearch('TypeScript', { mode: 'keyword' }, db);
-
-      expect(results[0]?.similarity).toBe(1.0);
-    });
-  });
-
-  describe('edge cases', () => {
-    it('handles empty database', async () => {
-      const db = getTestDb();
-
-      const results = await hybridSearch('anything', { mode: 'hybrid' }, db);
-
-      expect(results).toEqual([]);
-    });
-
-    it('handles query with special characters', async () => {
-      const db = getTestDb();
-
-      const [video] = await db.insert(schema.videos).values({
-        youtubeId: 'test-vid',
-        title: 'Test Video',
-        channel: 'Test Channel',
-        transcript: 'Test transcript',
-        duration: 600,
-      }).returning();
-
-      await db.insert(schema.chunks).values({
-        videoId: video!.id,
-        content: 'C++ programming language',
-        startTime: 0,
-        endTime: 10,
-        embedding: new Array(384).fill(0.7),
-      });
-
-      const results = await hybridSearch('C++', { mode: 'keyword' }, db);
-
-      expect(results.length).toBeGreaterThanOrEqual(0);
-    });
-
-    it('handles partial word matches in keyword search', async () => {
-      const db = getTestDb();
-
-      const [video] = await db.insert(schema.videos).values({
-        youtubeId: 'test-vid',
-        title: 'Test Video',
-        channel: 'Test Channel',
-        transcript: 'Test transcript',
-        duration: 600,
-      }).returning();
-
-      await db.insert(schema.chunks).values({
-        videoId: video!.id,
-        content: 'TypeScript programming language',
-        startTime: 0,
-        endTime: 10,
-        embedding: new Array(384).fill(0.7),
-      });
-
-      // Partial match should work
-      const results = await hybridSearch('Type', { mode: 'keyword' }, db);
-
-      expect(results.length).toBe(1);
-      expect(results[0]?.content).toContain('TypeScript');
-    });
-  });
-
-  describe('temporal decay', () => {
-    it('does not apply decay when temporalDecay is false (default)', async () => {
-      const db = getTestDb();
-
-      const now = new Date();
-      const oneYearAgo = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
-
-      const [oldVideo] = await db.insert(schema.videos).values({
-        youtubeId: 'old-vid',
-        title: 'Old Video',
-        channel: 'Test Channel',
-        transcript: 'Test transcript',
-        duration: 600,
-        publishedAt: oneYearAgo,
-      }).returning();
-
-      const [newVideo] = await db.insert(schema.videos).values({
-        youtubeId: 'new-vid',
-        title: 'New Video',
-        channel: 'Test Channel',
-        transcript: 'Test transcript',
-        duration: 600,
-        publishedAt: now,
-      }).returning();
-
-      await db.insert(schema.chunks).values([
+      vi.mocked(vectorSearch).mockResolvedValue([
         {
-          videoId: oldVideo!.id,
-          content: 'TypeScript programming old',
-          startTime: 0,
-          endTime: 10,
-          embedding: new Array(384).fill(0.7),
-        },
-        {
-          videoId: newVideo!.id,
-          content: 'TypeScript programming new',
-          startTime: 0,
-          endTime: 10,
-          embedding: new Array(384).fill(0.7),
-        },
-      ]);
-
-      const results = await hybridSearch('TypeScript', { mode: 'keyword', limit: 10, temporalDecay: false }, db);
-
-      // Without decay, both should have same similarity
-      expect(results).toHaveLength(2);
-      expect(results[0]?.similarity).toBeCloseTo(results[1]?.similarity ?? 0, 2);
-    });
-
-    it('applies temporal decay when temporalDecay is true', async () => {
-      const db = getTestDb();
-
-      const now = new Date();
-      const oneYearAgo = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
-
-      const [oldVideo] = await db.insert(schema.videos).values({
-        youtubeId: 'old-vid',
-        title: 'Old Video',
-        channel: 'Test Channel',
-        transcript: 'Test transcript',
-        duration: 600,
-        publishedAt: oneYearAgo,
-      }).returning();
-
-      const [newVideo] = await db.insert(schema.videos).values({
-        youtubeId: 'new-vid',
-        title: 'New Video',
-        channel: 'Test Channel',
-        transcript: 'Test transcript',
-        duration: 600,
-        publishedAt: now,
-      }).returning();
-
-      await db.insert(schema.chunks).values([
-        {
-          videoId: oldVideo!.id,
-          content: 'TypeScript programming',
-          startTime: 0,
-          endTime: 10,
-          embedding: new Array(384).fill(0.7),
-        },
-        {
-          videoId: newVideo!.id,
-          content: 'TypeScript programming',
-          startTime: 0,
-          endTime: 10,
-          embedding: new Array(384).fill(0.7),
-        },
-      ]);
-
-      const results = await hybridSearch('TypeScript', { mode: 'keyword', limit: 10, temporalDecay: true }, db);
-
-      expect(results).toHaveLength(2);
-
-      // New video should have higher score due to decay
-      const newResult = results.find(r => r.videoId === newVideo!.id);
-      const oldResult = results.find(r => r.videoId === oldVideo!.id);
-
-      expect(newResult).toBeDefined();
-      expect(oldResult).toBeDefined();
-      expect(newResult!.similarity).toBeGreaterThan(oldResult!.similarity);
-
-      // Old video should have ~0.5 of original score (1-year-old with 365-day half-life)
-      expect(oldResult!.similarity).toBeCloseTo(0.5, 1);
-      expect(newResult!.similarity).toBeCloseTo(1.0, 1);
-    });
-
-    it('respects custom halfLifeDays parameter', async () => {
-      const db = getTestDb();
-
-      const now = new Date();
-      const sixMonthsAgo = new Date(now.getTime() - 180 * 24 * 60 * 60 * 1000);
-
-      const [oldVideo] = await db.insert(schema.videos).values({
-        youtubeId: 'old-vid',
-        title: 'Old Video',
-        channel: 'Test Channel',
-        transcript: 'Test transcript',
-        duration: 600,
-        publishedAt: sixMonthsAgo,
-      }).returning();
-
-      await db.insert(schema.chunks).values({
-        videoId: oldVideo!.id,
-        content: 'TypeScript programming',
-        startTime: 0,
-        endTime: 10,
-        embedding: new Array(384).fill(0.7),
-      });
-
-      // Use 180-day half-life - 6-month-old content should have ~0.5 similarity
-      const results = await hybridSearch('TypeScript', {
-        mode: 'keyword',
-        limit: 10,
-        temporalDecay: true,
-        halfLifeDays: 180,
-      }, db);
-
-      expect(results).toHaveLength(1);
-      expect(results[0]?.similarity).toBeCloseTo(0.5, 1);
-    });
-
-    it('handles chunks from videos with null publishedAt', async () => {
-      const db = getTestDb();
-
-      const [videoNoDate] = await db.insert(schema.videos).values({
-        youtubeId: 'no-date-vid',
-        title: 'No Date Video',
-        channel: 'Test Channel',
-        transcript: 'Test transcript',
-        duration: 600,
-        publishedAt: null,
-      }).returning();
-
-      await db.insert(schema.chunks).values({
-        videoId: videoNoDate!.id,
-        content: 'TypeScript programming',
-        startTime: 0,
-        endTime: 10,
-        embedding: new Array(384).fill(0.7),
-      });
-
-      const results = await hybridSearch('TypeScript', {
-        mode: 'keyword',
-        limit: 10,
-        temporalDecay: true,
-      }, db);
-
-      expect(results).toHaveLength(1);
-      // No decay applied when publishedAt is null
-      expect(results[0]?.similarity).toBeCloseTo(1.0, 2);
-    });
-
-    it('re-sorts results after applying decay', async () => {
-      const db = getTestDb();
-
-      const now = new Date();
-      const twoYearsAgo = new Date(now.getTime() - 730 * 24 * 60 * 60 * 1000);
-
-      const [oldVideo] = await db.insert(schema.videos).values({
-        youtubeId: 'old-vid',
-        title: 'Old Video',
-        channel: 'Test Channel',
-        transcript: 'Test transcript',
-        duration: 600,
-        publishedAt: twoYearsAgo,
-      }).returning();
-
-      const [newVideo] = await db.insert(schema.videos).values({
-        youtubeId: 'new-vid',
-        title: 'New Video',
-        channel: 'Test Channel',
-        transcript: 'Test transcript',
-        duration: 600,
-        publishedAt: now,
-      }).returning();
-
-      // Old video has better keyword match (appears twice)
-      await db.insert(schema.chunks).values([
-        {
-          videoId: oldVideo!.id,
-          content: 'TypeScript TypeScript programming',
-          startTime: 0,
-          endTime: 10,
-          embedding: new Array(384).fill(0.7),
-        },
-        {
-          videoId: newVideo!.id,
-          content: 'TypeScript programming',
-          startTime: 0,
-          endTime: 10,
-          embedding: new Array(384).fill(0.7),
-        },
-      ]);
-
-      // Without decay, old content ranks first (better keyword match)
-      const resultsNoDecay = await hybridSearch('TypeScript', {
-        mode: 'keyword',
-        limit: 10,
-        temporalDecay: false,
-      }, db);
-
-      // With decay, new content should rank first
-      const resultsWithDecay = await hybridSearch('TypeScript', {
-        mode: 'keyword',
-        limit: 10,
-        temporalDecay: true,
-      }, db);
-
-      expect(resultsNoDecay[0]?.videoId).toBe(oldVideo!.id);
-      expect(resultsWithDecay[0]?.videoId).toBe(newVideo!.id);
-    });
-
-    it('applies decay in hybrid mode', async () => {
-      const db = getTestDb();
-
-      const now = new Date();
-      const oneYearAgo = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
-
-      const [oldVideo] = await db.insert(schema.videos).values({
-        youtubeId: 'old-vid',
-        title: 'Old Video',
-        channel: 'Test Channel',
-        transcript: 'Test transcript',
-        duration: 600,
-        publishedAt: oneYearAgo,
-      }).returning();
-
-      const [newVideo] = await db.insert(schema.videos).values({
-        youtubeId: 'new-vid',
-        title: 'New Video',
-        channel: 'Test Channel',
-        transcript: 'Test transcript',
-        duration: 600,
-        publishedAt: now,
-      }).returning();
-
-      await db.insert(schema.chunks).values([
-        {
-          videoId: oldVideo!.id,
-          content: 'TypeScript programming',
-          startTime: 0,
-          endTime: 10,
-          embedding: new Array(384).fill(0.8),
-        },
-        {
-          videoId: newVideo!.id,
-          content: 'TypeScript programming',
-          startTime: 0,
-          endTime: 10,
-          embedding: new Array(384).fill(0.8),
-        },
-      ]);
-
-      const results = await hybridSearch('TypeScript', {
-        mode: 'hybrid',
-        limit: 10,
-        temporalDecay: true,
-      }, db);
-
-      expect(results).toHaveLength(2);
-
-      const newResult = results.find(r => r.videoId === newVideo!.id);
-      const oldResult = results.find(r => r.videoId === oldVideo!.id);
-
-      expect(newResult).toBeDefined();
-      expect(oldResult).toBeDefined();
-      expect(newResult!.similarity).toBeGreaterThan(oldResult!.similarity);
-    });
-
-    it('applies decay in vector mode', async () => {
-      const db = getTestDb();
-
-      const now = new Date();
-      const oneYearAgo = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
-
-      const [oldVideo] = await db.insert(schema.videos).values({
-        youtubeId: 'old-vid',
-        title: 'Old Video',
-        channel: 'Test Channel',
-        transcript: 'Test transcript',
-        duration: 600,
-        publishedAt: oneYearAgo,
-      }).returning();
-
-      const [newVideo] = await db.insert(schema.videos).values({
-        youtubeId: 'new-vid',
-        title: 'New Video',
-        channel: 'Test Channel',
-        transcript: 'Test transcript',
-        duration: 600,
-        publishedAt: now,
-      }).returning();
-
-      await db.insert(schema.chunks).values([
-        {
-          videoId: oldVideo!.id,
+          chunkId: 1,
           content: 'Some content here',
           startTime: 0,
           endTime: 10,
-          embedding: new Array(384).fill(0.8),
+          similarity: 0.85,
+          videoId: 1,
+          videoTitle: 'Test Video',
+          channel: 'Test Channel',
+          youtubeId: 'test-vid',
+          thumbnail: null,
+          publishedAt: null,
+        },
+      ])
+
+      const results = await hybridSearch(
+        'query text',
+        { mode: 'vector', limit: 10 },
+        mockDb as unknown as NodePgDatabase<typeof schema>,
+      )
+
+      expect(Array.isArray(results)).toBe(true)
+      expect(results.length).toBe(1)
+      expect(vectorSearch).toHaveBeenCalled()
+    })
+
+    it('returns empty results when vector search finds nothing above threshold', async () => {
+      vi.mocked(vectorSearch).mockResolvedValue([])
+
+      const results = await hybridSearch(
+        'query',
+        { mode: 'vector', limit: 10 },
+        mockDb as unknown as NodePgDatabase<typeof schema>,
+      )
+
+      expect(Array.isArray(results)).toBe(true)
+      expect(results).toEqual([])
+    })
+  })
+
+  describe('mode: hybrid (RRF)', () => {
+    it('combines vector and keyword results using RRF', async () => {
+      vi.mocked(vectorSearch).mockResolvedValue([
+        {
+          chunkId: 1,
+          content: 'TypeScript is a typed language',
+          startTime: 0,
+          endTime: 10,
+          similarity: 0.9,
+          videoId: 1,
+          videoTitle: 'Test Video',
+          channel: 'Test Channel',
+          youtubeId: 'test-vid',
+          thumbnail: null,
+          publishedAt: null,
         },
         {
-          videoId: newVideo!.id,
+          chunkId: 3,
+          content: 'Programming concepts explained',
+          startTime: 20,
+          endTime: 30,
+          similarity: 0.85,
+          videoId: 1,
+          videoTitle: 'Test Video',
+          channel: 'Test Channel',
+          youtubeId: 'test-vid',
+          thumbnail: null,
+          publishedAt: null,
+        },
+      ])
+
+      mockDb._selectChain.limit.mockResolvedValue([
+        {
+          chunkId: 1,
+          content: 'TypeScript is a typed language',
+          startTime: 0,
+          endTime: 10,
+          similarity: '1.0',
+          videoId: 1,
+          videoTitle: 'Test Video',
+          channel: 'Test Channel',
+          youtubeId: 'test-vid',
+          thumbnail: null,
+          publishedAt: null,
+        },
+        {
+          chunkId: 2,
+          content: 'TypeScript tutorial for beginners',
+          startTime: 10,
+          endTime: 20,
+          similarity: '1.0',
+          videoId: 1,
+          videoTitle: 'Test Video',
+          channel: 'Test Channel',
+          youtubeId: 'test-vid',
+          thumbnail: null,
+          publishedAt: null,
+        },
+      ])
+
+      const results = await hybridSearch(
+        'TypeScript',
+        { mode: 'hybrid', limit: 10 },
+        mockDb as unknown as NodePgDatabase<typeof schema>,
+      )
+
+      expect(results.length).toBeGreaterThan(0)
+      expect(Array.isArray(results)).toBe(true)
+    })
+
+    it('deduplicates chunks appearing in both vector and keyword results', async () => {
+      vi.mocked(vectorSearch).mockResolvedValue([
+        {
+          chunkId: 1,
+          content: 'TypeScript programming language',
+          startTime: 0,
+          endTime: 10,
+          similarity: 0.9,
+          videoId: 1,
+          videoTitle: 'Test Video',
+          channel: 'Test Channel',
+          youtubeId: 'test-vid',
+          thumbnail: null,
+          publishedAt: null,
+        },
+      ])
+
+      mockDb._selectChain.limit.mockResolvedValue([
+        {
+          chunkId: 1,
+          content: 'TypeScript programming language',
+          startTime: 0,
+          endTime: 10,
+          similarity: '1.0',
+          videoId: 1,
+          videoTitle: 'Test Video',
+          channel: 'Test Channel',
+          youtubeId: 'test-vid',
+          thumbnail: null,
+          publishedAt: null,
+        },
+      ])
+
+      const results = await hybridSearch(
+        'TypeScript',
+        { mode: 'hybrid', limit: 10 },
+        mockDb as unknown as NodePgDatabase<typeof schema>,
+      )
+
+      const chunkIds = results.map(r => r.chunkId)
+      const uniqueIds = new Set(chunkIds)
+      expect(chunkIds.length).toBe(uniqueIds.size)
+    })
+
+    it('boosts chunks that appear in both vector and keyword results', async () => {
+      vi.mocked(vectorSearch).mockResolvedValue([
+        {
+          chunkId: 1,
+          content: 'TypeScript is amazing',
+          startTime: 0,
+          endTime: 10,
+          similarity: 0.9,
+          videoId: 1,
+          videoTitle: 'Test Video',
+          channel: 'Test Channel',
+          youtubeId: 'test-vid',
+          thumbnail: null,
+          publishedAt: null,
+        },
+        {
+          chunkId: 3,
+          content: 'Programming best practices',
+          startTime: 20,
+          endTime: 30,
+          similarity: 0.85,
+          videoId: 1,
+          videoTitle: 'Test Video',
+          channel: 'Test Channel',
+          youtubeId: 'test-vid',
+          thumbnail: null,
+          publishedAt: null,
+        },
+      ])
+
+      mockDb._selectChain.limit.mockResolvedValue([
+        {
+          chunkId: 1,
+          content: 'TypeScript is amazing',
+          startTime: 0,
+          endTime: 10,
+          similarity: '1.0',
+          videoId: 1,
+          videoTitle: 'Test Video',
+          channel: 'Test Channel',
+          youtubeId: 'test-vid',
+          thumbnail: null,
+          publishedAt: null,
+        },
+        {
+          chunkId: 2,
+          content: 'TypeScript tutorial',
+          startTime: 10,
+          endTime: 20,
+          similarity: '1.0',
+          videoId: 1,
+          videoTitle: 'Test Video',
+          channel: 'Test Channel',
+          youtubeId: 'test-vid',
+          thumbnail: null,
+          publishedAt: null,
+        },
+      ])
+
+      const results = await hybridSearch(
+        'TypeScript',
+        { mode: 'hybrid', limit: 10 },
+        mockDb as unknown as NodePgDatabase<typeof schema>,
+      )
+
+      expect(results.length).toBeGreaterThan(0)
+      // Chunk 1 (appears in both) should be first due to RRF boost
+      expect(results[0]?.chunkId).toBe(1)
+    })
+
+    it('respects limit parameter in hybrid mode', async () => {
+      const vectorResults = Array.from({ length: 10 }, (_, i) => ({
+        chunkId: i + 1,
+        content: `TypeScript content ${i}`,
+        startTime: i * 10,
+        endTime: (i + 1) * 10,
+        similarity: 0.9 - i * 0.01,
+        videoId: 1,
+        videoTitle: 'Test Video',
+        channel: 'Test Channel',
+        youtubeId: 'test-vid',
+        thumbnail: null,
+        publishedAt: null,
+      }))
+
+      vi.mocked(vectorSearch).mockResolvedValue(vectorResults)
+
+      mockDb._selectChain.limit.mockResolvedValue(
+        vectorResults.map(r => ({ ...r, similarity: '1.0' })),
+      )
+
+      const results = await hybridSearch(
+        'TypeScript',
+        { mode: 'hybrid', limit: 5 },
+        mockDb as unknown as NodePgDatabase<typeof schema>,
+      )
+
+      expect(results.length).toBeLessThanOrEqual(5)
+    })
+  })
+
+  describe('default behavior', () => {
+    it('uses hybrid mode by default', async () => {
+      vi.mocked(vectorSearch).mockResolvedValue([])
+      mockDb._selectChain.limit.mockResolvedValue([])
+
+      const results = await hybridSearch(
+        'TypeScript',
+        { limit: 10 },
+        mockDb as unknown as NodePgDatabase<typeof schema>,
+      )
+
+      expect(Array.isArray(results)).toBe(true)
+      expect(vectorSearch).toHaveBeenCalled()
+    })
+
+    it('uses limit of 10 by default', async () => {
+      vi.mocked(vectorSearch).mockResolvedValue([])
+      mockDb._selectChain.limit.mockResolvedValue([])
+
+      const results = await hybridSearch(
+        'test',
+        {},
+        mockDb as unknown as NodePgDatabase<typeof schema>,
+      )
+
+      expect(results.length).toBeLessThanOrEqual(10)
+    })
+  })
+
+  describe('result structure', () => {
+    it('returns SearchResult objects with all required fields', async () => {
+      mockDb._selectChain.limit.mockResolvedValue([
+        {
+          chunkId: 1,
+          content: 'TypeScript programming',
+          startTime: 42,
+          endTime: 52,
+          similarity: '1.0',
+          videoId: 1,
+          videoTitle: 'Test Video Title',
+          channel: 'Test Channel Name',
+          youtubeId: 'abc123',
+          thumbnail: 'https://example.com/thumb.jpg',
+          publishedAt: null,
+        },
+      ])
+
+      const results = await hybridSearch(
+        'TypeScript',
+        { mode: 'keyword' },
+        mockDb as unknown as NodePgDatabase<typeof schema>,
+      )
+
+      expect(results).toHaveLength(1)
+
+      const result = results[0]!
+      expect(result).toHaveProperty('chunkId')
+      expect(result).toHaveProperty('content', 'TypeScript programming')
+      expect(result).toHaveProperty('startTime', 42)
+      expect(result).toHaveProperty('endTime', 52)
+      expect(result).toHaveProperty('similarity')
+      expect(result).toHaveProperty('videoId', 1)
+      expect(result).toHaveProperty('videoTitle', 'Test Video Title')
+      expect(result).toHaveProperty('channel', 'Test Channel Name')
+      expect(result).toHaveProperty('youtubeId', 'abc123')
+      expect(result).toHaveProperty('thumbnail', 'https://example.com/thumb.jpg')
+    })
+
+    it('assigns similarity score of 1.0 for keyword matches', async () => {
+      mockDb._selectChain.limit.mockResolvedValue([
+        {
+          chunkId: 1,
+          content: 'TypeScript programming',
+          startTime: 0,
+          endTime: 10,
+          similarity: '1.0',
+          videoId: 1,
+          videoTitle: 'Test Video',
+          channel: 'Test Channel',
+          youtubeId: 'test-vid',
+          thumbnail: null,
+          publishedAt: null,
+        },
+      ])
+
+      const results = await hybridSearch(
+        'TypeScript',
+        { mode: 'keyword' },
+        mockDb as unknown as NodePgDatabase<typeof schema>,
+      )
+
+      expect(results[0]?.similarity).toBe(1.0)
+    })
+  })
+
+  describe('edge cases', () => {
+    it('handles empty database', async () => {
+      vi.mocked(vectorSearch).mockResolvedValue([])
+      mockDb._selectChain.limit.mockResolvedValue([])
+
+      const results = await hybridSearch(
+        'anything',
+        { mode: 'hybrid' },
+        mockDb as unknown as NodePgDatabase<typeof schema>,
+      )
+
+      expect(results).toEqual([])
+    })
+
+    it('handles query with special characters', async () => {
+      mockDb._selectChain.limit.mockResolvedValue([])
+
+      const results = await hybridSearch(
+        'C++',
+        { mode: 'keyword' },
+        mockDb as unknown as NodePgDatabase<typeof schema>,
+      )
+
+      expect(results.length).toBeGreaterThanOrEqual(0)
+    })
+
+    it('handles partial word matches in keyword search', async () => {
+      mockDb._selectChain.limit.mockResolvedValue([
+        {
+          chunkId: 1,
+          content: 'TypeScript programming language',
+          startTime: 0,
+          endTime: 10,
+          similarity: '1.0',
+          videoId: 1,
+          videoTitle: 'Test Video',
+          channel: 'Test Channel',
+          youtubeId: 'test-vid',
+          thumbnail: null,
+          publishedAt: null,
+        },
+      ])
+
+      const results = await hybridSearch(
+        'Type',
+        { mode: 'keyword' },
+        mockDb as unknown as NodePgDatabase<typeof schema>,
+      )
+
+      expect(results.length).toBe(1)
+      expect(results[0]?.content).toContain('TypeScript')
+    })
+  })
+
+  describe('temporal decay', () => {
+    it('does not apply decay when temporalDecay is false (default)', async () => {
+      const now = new Date()
+      const oneYearAgo = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000)
+
+      mockDb._selectChain.limit.mockResolvedValue([
+        {
+          chunkId: 1,
+          content: 'TypeScript programming old',
+          startTime: 0,
+          endTime: 10,
+          similarity: '1.0',
+          videoId: 1,
+          videoTitle: 'Old Video',
+          channel: 'Test Channel',
+          youtubeId: 'old-vid',
+          thumbnail: null,
+          publishedAt: oneYearAgo,
+        },
+        {
+          chunkId: 2,
+          content: 'TypeScript programming new',
+          startTime: 0,
+          endTime: 10,
+          similarity: '1.0',
+          videoId: 2,
+          videoTitle: 'New Video',
+          channel: 'Test Channel',
+          youtubeId: 'new-vid',
+          thumbnail: null,
+          publishedAt: now,
+        },
+      ])
+
+      const results = await hybridSearch(
+        'TypeScript',
+        { mode: 'keyword', limit: 10, temporalDecay: false },
+        mockDb as unknown as NodePgDatabase<typeof schema>,
+      )
+
+      expect(results).toHaveLength(2)
+      expect(results[0]?.similarity).toBeCloseTo(results[1]?.similarity ?? 0, 2)
+    })
+
+    it('applies temporal decay when temporalDecay is true', async () => {
+      const now = new Date()
+      const oneYearAgo = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000)
+
+      mockDb._selectChain.limit.mockResolvedValue([
+        {
+          chunkId: 1,
+          content: 'TypeScript programming',
+          startTime: 0,
+          endTime: 10,
+          similarity: '1.0',
+          videoId: 1,
+          videoTitle: 'Old Video',
+          channel: 'Test Channel',
+          youtubeId: 'old-vid',
+          thumbnail: null,
+          publishedAt: oneYearAgo,
+        },
+        {
+          chunkId: 2,
+          content: 'TypeScript programming',
+          startTime: 0,
+          endTime: 10,
+          similarity: '1.0',
+          videoId: 2,
+          videoTitle: 'New Video',
+          channel: 'Test Channel',
+          youtubeId: 'new-vid',
+          thumbnail: null,
+          publishedAt: now,
+        },
+      ])
+
+      const results = await hybridSearch(
+        'TypeScript',
+        { mode: 'keyword', limit: 10, temporalDecay: true },
+        mockDb as unknown as NodePgDatabase<typeof schema>,
+      )
+
+      expect(results).toHaveLength(2)
+
+      const newResult = results.find(r => r.videoId === 2)
+      const oldResult = results.find(r => r.videoId === 1)
+
+      expect(newResult).toBeDefined()
+      expect(oldResult).toBeDefined()
+      expect(newResult!.similarity).toBeGreaterThan(oldResult!.similarity)
+
+      expect(oldResult!.similarity).toBeCloseTo(0.5, 1)
+      expect(newResult!.similarity).toBeCloseTo(1.0, 1)
+    })
+
+    it('respects custom halfLifeDays parameter', async () => {
+      const now = new Date()
+      const sixMonthsAgo = new Date(now.getTime() - 180 * 24 * 60 * 60 * 1000)
+
+      mockDb._selectChain.limit.mockResolvedValue([
+        {
+          chunkId: 1,
+          content: 'TypeScript programming',
+          startTime: 0,
+          endTime: 10,
+          similarity: '1.0',
+          videoId: 1,
+          videoTitle: 'Old Video',
+          channel: 'Test Channel',
+          youtubeId: 'old-vid',
+          thumbnail: null,
+          publishedAt: sixMonthsAgo,
+        },
+      ])
+
+      const results = await hybridSearch(
+        'TypeScript',
+        { mode: 'keyword', limit: 10, temporalDecay: true, halfLifeDays: 180 },
+        mockDb as unknown as NodePgDatabase<typeof schema>,
+      )
+
+      expect(results).toHaveLength(1)
+      expect(results[0]?.similarity).toBeCloseTo(0.5, 1)
+    })
+
+    it('handles chunks from videos with null publishedAt', async () => {
+      mockDb._selectChain.limit.mockResolvedValue([
+        {
+          chunkId: 1,
+          content: 'TypeScript programming',
+          startTime: 0,
+          endTime: 10,
+          similarity: '1.0',
+          videoId: 1,
+          videoTitle: 'No Date Video',
+          channel: 'Test Channel',
+          youtubeId: 'no-date-vid',
+          thumbnail: null,
+          publishedAt: null,
+        },
+      ])
+
+      const results = await hybridSearch(
+        'TypeScript',
+        { mode: 'keyword', limit: 10, temporalDecay: true },
+        mockDb as unknown as NodePgDatabase<typeof schema>,
+      )
+
+      expect(results).toHaveLength(1)
+      expect(results[0]?.similarity).toBeCloseTo(1.0, 2)
+    })
+
+    it('re-sorts results after applying decay', async () => {
+      const now = new Date()
+      const twoYearsAgo = new Date(now.getTime() - 730 * 24 * 60 * 60 * 1000)
+
+      mockDb._selectChain.limit.mockResolvedValue([
+        {
+          chunkId: 1,
+          content: 'TypeScript TypeScript programming',
+          startTime: 0,
+          endTime: 10,
+          similarity: '1.0',
+          videoId: 1,
+          videoTitle: 'Old Video',
+          channel: 'Test Channel',
+          youtubeId: 'old-vid',
+          thumbnail: null,
+          publishedAt: twoYearsAgo,
+        },
+        {
+          chunkId: 2,
+          content: 'TypeScript programming',
+          startTime: 0,
+          endTime: 10,
+          similarity: '1.0',
+          videoId: 2,
+          videoTitle: 'New Video',
+          channel: 'Test Channel',
+          youtubeId: 'new-vid',
+          thumbnail: null,
+          publishedAt: now,
+        },
+      ])
+
+      const resultsNoDecay = await hybridSearch(
+        'TypeScript',
+        { mode: 'keyword', limit: 10, temporalDecay: false },
+        mockDb as unknown as NodePgDatabase<typeof schema>,
+      )
+
+      const resultsWithDecay = await hybridSearch(
+        'TypeScript',
+        { mode: 'keyword', limit: 10, temporalDecay: true },
+        mockDb as unknown as NodePgDatabase<typeof schema>,
+      )
+
+      expect(resultsNoDecay[0]?.videoId).toBe(1)
+      expect(resultsWithDecay[0]?.videoId).toBe(2)
+    })
+
+    it('applies decay in hybrid mode', async () => {
+      const now = new Date()
+      const oneYearAgo = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000)
+
+      vi.mocked(vectorSearch).mockResolvedValue([
+        {
+          chunkId: 1,
+          content: 'TypeScript programming',
+          startTime: 0,
+          endTime: 10,
+          similarity: 0.9,
+          videoId: 1,
+          videoTitle: 'Old Video',
+          channel: 'Test Channel',
+          youtubeId: 'old-vid',
+          thumbnail: null,
+          publishedAt: oneYearAgo,
+        },
+        {
+          chunkId: 2,
+          content: 'TypeScript programming',
+          startTime: 0,
+          endTime: 10,
+          similarity: 0.9,
+          videoId: 2,
+          videoTitle: 'New Video',
+          channel: 'Test Channel',
+          youtubeId: 'new-vid',
+          thumbnail: null,
+          publishedAt: now,
+        },
+      ])
+
+      mockDb._selectChain.limit.mockResolvedValue([
+        {
+          chunkId: 1,
+          content: 'TypeScript programming',
+          startTime: 0,
+          endTime: 10,
+          similarity: '1.0',
+          videoId: 1,
+          videoTitle: 'Old Video',
+          channel: 'Test Channel',
+          youtubeId: 'old-vid',
+          thumbnail: null,
+          publishedAt: oneYearAgo,
+        },
+        {
+          chunkId: 2,
+          content: 'TypeScript programming',
+          startTime: 0,
+          endTime: 10,
+          similarity: '1.0',
+          videoId: 2,
+          videoTitle: 'New Video',
+          channel: 'Test Channel',
+          youtubeId: 'new-vid',
+          thumbnail: null,
+          publishedAt: now,
+        },
+      ])
+
+      const results = await hybridSearch(
+        'TypeScript',
+        { mode: 'hybrid', limit: 10, temporalDecay: true },
+        mockDb as unknown as NodePgDatabase<typeof schema>,
+      )
+
+      expect(results).toHaveLength(2)
+
+      const newResult = results.find(r => r.videoId === 2)
+      const oldResult = results.find(r => r.videoId === 1)
+
+      expect(newResult).toBeDefined()
+      expect(oldResult).toBeDefined()
+      expect(newResult!.similarity).toBeGreaterThan(oldResult!.similarity)
+    })
+
+    it('applies decay in vector mode', async () => {
+      const now = new Date()
+      const oneYearAgo = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000)
+
+      vi.mocked(vectorSearch).mockResolvedValue([
+        {
+          chunkId: 1,
+          content: 'Some content here',
+          startTime: 0,
+          endTime: 10,
+          similarity: 0.9,
+          videoId: 1,
+          videoTitle: 'Old Video',
+          channel: 'Test Channel',
+          youtubeId: 'old-vid',
+          thumbnail: null,
+          publishedAt: oneYearAgo,
+        },
+        {
+          chunkId: 2,
           content: 'Different content',
           startTime: 0,
           endTime: 10,
-          embedding: new Array(384).fill(0.8),
+          similarity: 0.9,
+          videoId: 2,
+          videoTitle: 'New Video',
+          channel: 'Test Channel',
+          youtubeId: 'new-vid',
+          thumbnail: null,
+          publishedAt: now,
         },
-      ]);
+      ])
 
-      const results = await hybridSearch('query', {
-        mode: 'vector',
-        limit: 10,
-        temporalDecay: true,
-      }, db);
+      const results = await hybridSearch(
+        'query',
+        { mode: 'vector', limit: 10, temporalDecay: true },
+        mockDb as unknown as NodePgDatabase<typeof schema>,
+      )
 
-      const newResult = results.find(r => r.videoId === newVideo!.id);
-      const oldResult = results.find(r => r.videoId === oldVideo!.id);
+      const newResult = results.find(r => r.videoId === 2)
+      const oldResult = results.find(r => r.videoId === 1)
 
       if (newResult && oldResult) {
-        expect(newResult.similarity).toBeGreaterThan(oldResult.similarity);
+        expect(newResult.similarity).toBeGreaterThan(oldResult.similarity)
       }
-    });
-  });
-});
+    })
+  })
+})

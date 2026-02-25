@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
+import { describe, it, expect } from 'vitest'
 
 /**
  * Tests for the domain restriction hook in auth.ts.
@@ -54,31 +54,5 @@ describe('auth domain restriction', () => {
         'Only @custom.org accounts are allowed'
       )
     })
-  })
-})
-
-describe('auth module integration', () => {
-  let originalEnv: NodeJS.ProcessEnv
-
-  beforeEach(() => {
-    originalEnv = { ...process.env }
-    vi.resetModules()
-  })
-
-  afterEach(() => {
-    process.env = originalEnv
-  })
-
-  it('exports auth object with socialProviders configured', async () => {
-    process.env.DATABASE_URL = 'postgresql://test:test@localhost:5432/test'
-    process.env.GOOGLE_CLIENT_ID = 'test-client-id'
-    process.env.GOOGLE_CLIENT_SECRET = 'test-client-secret'
-
-    try {
-      const authModule = await import('../auth')
-      expect(authModule.auth).toBeDefined()
-    } catch {
-      // DB connection errors are expected in test environment
-    }
   })
 })

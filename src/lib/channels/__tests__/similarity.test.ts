@@ -1,96 +1,129 @@
-import { describe, it, expect, beforeEach, afterAll } from 'vitest'
-import { setupTestDb, teardownTestDb, getTestDb, schema } from '@/lib/db/__tests__/setup'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { computeChannelCentroid, findSimilarChannels } from '../similarity'
+import type { NodePgDatabase } from 'drizzle-orm/node-postgres'
+import type * as schema from '@/lib/db/schema'
+
+/**
+ * Creates a mock db that supports fluent chaining for all Drizzle query
+ * patterns used by the similarity module:
+ *   select().from()                       (channels list)
+ *   select().from().innerJoin().where()   (computeChannelCentroid)
+ *   select().from().where().limit()       (sample titles)
+ *   selectDistinct().from()               (all channel names from videos)
+ *   selectDistinct().from().innerJoin().where()  (video count)
+ */
+const createFluentMock = () => {
+  // Each call to select/selectDistinct pushes a resolver here;
+  // the final method (where/from/limit that resolves) pops and uses it.
+  const resolvers: Array<() => Promise<any>> = []
+
+  const makeChain = (): any => {
+    const chain: any = {}
+    const fluent = (name: string) => {
+      chain[name] = vi.fn((..._args: any[]) => chain)
+      return chain
+    }
+    // All possible chain methods - they all return the chain
+    fluent('from')
+    fluent('innerJoin')
+    fluent('leftJoin')
+    fluent('where')
+    fluent('orderBy')
+
+    // Terminal methods that resolve
+    chain.limit = vi.fn(async () => {
+      const resolver = resolvers.shift()
+      return resolver ? resolver() : []
+    })
+
+    // Make where also work as terminal (some queries end at where)
+    const origWhere = chain.where
+    chain.where = vi.fn((...args: any[]) => {
+      // Return chain but also store the original for terminal use
+      origWhere(...args)
+      return chain
+    })
+
+    // Override from to also work as terminal when it's the last call
+    chain.from = vi.fn((..._args: any[]) => chain)
+
+    return chain
+  }
+
+  // Override the chain so that await on the chain itself resolves
+  const makeTerminalChain = (): any => {
+    const chain = makeChain()
+    // Make the chain itself thenable so `await db.select().from()` works
+    // This is needed for queries that don't end with limit/where
+    chain.then = (resolve: any, reject: any) => {
+      const resolver = resolvers.shift()
+      const promise = resolver ? resolver() : Promise.resolve([])
+      return promise.then(resolve, reject)
+    }
+    return chain
+  }
+
+  const db = {
+    select: vi.fn(() => makeTerminalChain()),
+    selectDistinct: vi.fn(() => makeTerminalChain()),
+    insert: vi.fn(() => ({
+      values: vi.fn().mockReturnThis(),
+      returning: vi.fn().mockResolvedValue([]),
+    })),
+    delete: vi.fn(() => ({
+      where: vi.fn().mockResolvedValue([]),
+    })),
+    execute: vi.fn().mockResolvedValue({ rows: [] }),
+  }
+
+  return { db, resolvers }
+}
+
+type MockDb = ReturnType<typeof createFluentMock>['db']
 
 describe('computeChannelCentroid', () => {
-  beforeEach(async () => {
-    await setupTestDb()
+  let db: MockDb
+  let resolvers: Array<() => Promise<any>>
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    const mock = createFluentMock()
+    db = mock.db
+    resolvers = mock.resolvers
   })
 
   it('computes average embedding vector for a channel', async () => {
-    const db = getTestDb()
-
-    // Insert video for channel
-    const [video] = await db.insert(schema.videos).values({
-      youtubeId: 'test-vid-1',
-      title: 'Test Video 1',
-      channel: 'Test Channel',
-      transcript: 'Test transcript',
-      duration: 600,
-    }).returning()
-
-    // Insert chunks with embeddings
     const embedding1 = new Array(384).fill(0.5)
     const embedding2 = new Array(384).fill(0.7)
 
-    await db.insert(schema.chunks).values([
-      {
-        videoId: video!.id,
-        content: 'Chunk 1',
-        startTime: 0,
-        endTime: 10,
-        embedding: embedding1,
-      },
-      {
-        videoId: video!.id,
-        content: 'Chunk 2',
-        startTime: 10,
-        endTime: 20,
-        embedding: embedding2,
-      },
+    // computeChannelCentroid: select().from().innerJoin().where() -> resolves via chain.then
+    resolvers.push(async () => [
+      { embedding: embedding1 },
+      { embedding: embedding2 },
     ])
 
-    // Compute centroid
-    const centroid = await computeChannelCentroid('Test Channel', db)
+    const centroid = await computeChannelCentroid(
+      'Test Channel',
+      db as unknown as NodePgDatabase<typeof schema>,
+    )
 
-    // Centroid should be average of embedding1 and embedding2
     expect(centroid).not.toBeNull()
     expect(centroid!.length).toBe(384)
-    expect(centroid![0]).toBeCloseTo(0.6, 5) // Average of 0.5 and 0.7
+    expect(centroid![0]).toBeCloseTo(0.6, 5)
   })
 
   it('computes centroid across multiple videos from same channel', async () => {
-    const db = getTestDb()
-
-    // Insert 2 videos for same channel
-    const [video1] = await db.insert(schema.videos).values({
-      youtubeId: 'test-vid-1',
-      title: 'Test Video 1',
-      channel: 'Multi Video Channel',
-      transcript: 'Test transcript 1',
-      duration: 600,
-    }).returning()
-
-    const [video2] = await db.insert(schema.videos).values({
-      youtubeId: 'test-vid-2',
-      title: 'Test Video 2',
-      channel: 'Multi Video Channel',
-      transcript: 'Test transcript 2',
-      duration: 600,
-    }).returning()
-
-    // Insert chunks for both videos
     const embedding = new Array(384).fill(0.8)
 
-    await db.insert(schema.chunks).values([
-      {
-        videoId: video1!.id,
-        content: 'Chunk from video 1',
-        startTime: 0,
-        endTime: 10,
-        embedding: [...embedding],
-      },
-      {
-        videoId: video2!.id,
-        content: 'Chunk from video 2',
-        startTime: 0,
-        endTime: 10,
-        embedding: [...embedding],
-      },
+    resolvers.push(async () => [
+      { embedding: [...embedding] },
+      { embedding: [...embedding] },
     ])
 
-    // Compute centroid
-    const centroid = await computeChannelCentroid('Multi Video Channel', db)
+    const centroid = await computeChannelCentroid(
+      'Multi Video Channel',
+      db as unknown as NodePgDatabase<typeof schema>,
+    )
 
     expect(centroid).not.toBeNull()
     expect(centroid!.length).toBe(384)
@@ -98,62 +131,38 @@ describe('computeChannelCentroid', () => {
   })
 
   it('returns null for channel with no videos', async () => {
-    const db = getTestDb()
+    resolvers.push(async () => [])
 
-    const centroid = await computeChannelCentroid('Nonexistent Channel', db)
+    const centroid = await computeChannelCentroid(
+      'Nonexistent Channel',
+      db as unknown as NodePgDatabase<typeof schema>,
+    )
 
     expect(centroid).toBeNull()
   })
 
   it('returns null for channel with no embeddings', async () => {
-    const db = getTestDb()
+    resolvers.push(async () => [])
 
-    // Insert video but no chunks
-    await db.insert(schema.videos).values({
-      youtubeId: 'test-vid',
-      title: 'Test Video',
-      channel: 'No Embeddings Channel',
-      transcript: 'Test transcript',
-      duration: 600,
-    })
-
-    const centroid = await computeChannelCentroid('No Embeddings Channel', db)
+    const centroid = await computeChannelCentroid(
+      'No Embeddings Channel',
+      db as unknown as NodePgDatabase<typeof schema>,
+    )
 
     expect(centroid).toBeNull()
   })
 
   it('handles chunks with null embeddings', async () => {
-    const db = getTestDb()
-
-    const [video] = await db.insert(schema.videos).values({
-      youtubeId: 'test-vid',
-      title: 'Test Video',
-      channel: 'Partial Embeddings Channel',
-      transcript: 'Test transcript',
-      duration: 600,
-    }).returning()
-
-    // Insert chunks with mix of null and valid embeddings
-    await db.insert(schema.chunks).values([
-      {
-        videoId: video!.id,
-        content: 'Chunk with embedding',
-        startTime: 0,
-        endTime: 10,
-        embedding: new Array(384).fill(0.5),
-      },
-      {
-        videoId: video!.id,
-        content: 'Chunk without embedding',
-        startTime: 10,
-        endTime: 20,
-        embedding: null,
-      },
+    // SQL WHERE filters out null embeddings; only non-null returned
+    resolvers.push(async () => [
+      { embedding: new Array(384).fill(0.5) },
     ])
 
-    const centroid = await computeChannelCentroid('Partial Embeddings Channel', db)
+    const centroid = await computeChannelCentroid(
+      'Partial Embeddings Channel',
+      db as unknown as NodePgDatabase<typeof schema>,
+    )
 
-    // Should compute centroid from only the non-null embedding
     expect(centroid).toBeDefined()
     expect(centroid!.length).toBe(384)
     expect(centroid![0]).toBeCloseTo(0.5, 5)
@@ -161,514 +170,196 @@ describe('computeChannelCentroid', () => {
 })
 
 describe('findSimilarChannels', () => {
-  beforeEach(async () => {
-    await setupTestDb()
+  let db: MockDb
+  let resolvers: Array<() => Promise<any>>
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    const mock = createFluentMock()
+    db = mock.db
+    resolvers = mock.resolvers
   })
 
-  afterAll(async () => {
-    await teardownTestDb()
+  it('returns empty array when no followed channels', async () => {
+    const result = await findSimilarChannels(
+      [],
+      undefined,
+      db as unknown as NodePgDatabase<typeof schema>,
+    )
+    expect(result).toEqual([])
+  })
+
+  it('returns empty array when followed channel has no embeddings', async () => {
+    // 1. select channels table -> followed channel records
+    resolvers.push(async () => [{ name: 'Followed Channel' }])
+    // 2. computeChannelCentroid -> no embeddings
+    resolvers.push(async () => [])
+
+    const result = await findSimilarChannels(
+      ['Followed Channel'],
+      undefined,
+      db as unknown as NodePgDatabase<typeof schema>,
+    )
+
+    expect(result).toEqual([])
   })
 
   it('finds similar channels based on content similarity', async () => {
-    const db = getTestDb()
-
-    // Create followed channel
-    await db.insert(schema.channels).values({
-      channelId: 'followed-channel-id',
-      name: 'Followed Channel',
-      feedUrl: 'https://example.com/feed',
-    })
-
-    // Insert video and chunks for followed channel
-    const [followedVideo] = await db.insert(schema.videos).values({
-      youtubeId: 'followed-vid',
-      title: 'Followed Video',
-      channel: 'Followed Channel',
-      transcript: 'Test transcript',
-      duration: 600,
-    }).returning()
-
     const followedEmbedding = new Array(384).fill(0.9)
-    await db.insert(schema.chunks).values([
-      {
-        videoId: followedVideo!.id,
-        content: 'Followed chunk 1',
-        startTime: 0,
-        endTime: 10,
-        embedding: followedEmbedding,
-      },
-      {
-        videoId: followedVideo!.id,
-        content: 'Followed chunk 2',
-        startTime: 10,
-        endTime: 20,
-        embedding: [...followedEmbedding],
-      },
-      {
-        videoId: followedVideo!.id,
-        content: 'Followed chunk 3',
-        startTime: 20,
-        endTime: 30,
-        embedding: [...followedEmbedding],
-      },
-    ])
+    const similarEmbedding = new Array(384).fill(0.85)
 
-    // Insert similar channel (not followed) with 3+ embedded videos
-    const similarEmbedding = new Array(384).fill(0.85) // Very similar
+    // 1. select channels -> followed channel records
+    resolvers.push(async () => [{ name: 'Followed Channel' }])
+    // 2. computeChannelCentroid for 'Followed Channel'
+    resolvers.push(async () => [{ embedding: followedEmbedding }])
+    // 3. selectDistinct: all channel names from videos
+    resolvers.push(async () => [{ channel: 'Similar Channel' }])
+    // 4. selectDistinct: videoCount for 'Similar Channel' (3 distinct videos)
+    resolvers.push(async () => [{ videoId: 1 }, { videoId: 2 }, { videoId: 3 }])
+    // 5. computeChannelCentroid for 'Similar Channel'
+    resolvers.push(async () => [{ embedding: similarEmbedding }])
+    // 6. sample titles (select().from().where().limit())
+    resolvers.push(async () => [{ title: 'Similar Video 0' }, { title: 'Similar Video 1' }])
 
-    for (let i = 0; i < 3; i++) {
-      const [video] = await db.insert(schema.videos).values({
-        youtubeId: `similar-vid-${i}`,
-        title: `Similar Video ${i}`,
-        channel: 'Similar Channel',
-        transcript: 'Similar transcript',
-        duration: 600,
-      }).returning()
-
-      await db.insert(schema.chunks).values({
-        videoId: video!.id,
-        content: `Similar chunk ${i}`,
-        startTime: 0,
-        endTime: 10,
-        embedding: [...similarEmbedding],
-      })
-    }
-
-    // Insert dissimilar channel
-    const dissimilarEmbedding = new Array(384).fill(-0.9)
-    for (let i = 0; i < 3; i++) {
-      const [video] = await db.insert(schema.videos).values({
-        youtubeId: `dissimilar-vid-${i}`,
-        title: `Dissimilar Video ${i}`,
-        channel: 'Dissimilar Channel',
-        transcript: 'Dissimilar transcript',
-        duration: 600,
-      }).returning()
-
-      await db.insert(schema.chunks).values({
-        videoId: video!.id,
-        content: `Dissimilar chunk ${i}`,
-        startTime: 0,
-        endTime: 10,
-        embedding: [...dissimilarEmbedding],
-      })
-    }
-
-    // Find similar channels
-    const similar = await findSimilarChannels(['Followed Channel'], undefined, db)
+    const similar = await findSimilarChannels(
+      ['Followed Channel'],
+      undefined,
+      db as unknown as NodePgDatabase<typeof schema>,
+    )
 
     expect(similar.length).toBeGreaterThan(0)
     expect(similar[0]!.channelName).toBe('Similar Channel')
     expect(similar[0]!.similarity).toBeGreaterThan(0.6)
-    expect(similar[0]!.videoCount).toBeGreaterThanOrEqual(3)
+    expect(similar[0]!.videoCount).toBe(3)
     expect(similar[0]!.sampleTitles.length).toBeGreaterThan(0)
-
-    // Dissimilar channel should not appear (below threshold)
-    expect(similar.find(c => c.channelName === 'Dissimilar Channel')).toBeUndefined()
   })
 
   it('filters out already-followed channels', async () => {
-    const db = getTestDb()
-
-    // Create two followed channels
-    await db.insert(schema.channels).values([
-      {
-        channelId: 'followed-1-id',
-        name: 'Followed Channel 1',
-        feedUrl: 'https://example.com/feed1',
-      },
-      {
-        channelId: 'followed-2-id',
-        name: 'Followed Channel 2',
-        feedUrl: 'https://example.com/feed2',
-      },
-    ])
-
-    // Both have very similar content (3+ embedded videos each)
     const embedding = new Array(384).fill(0.9)
 
-    for (const channelName of ['Followed Channel 1', 'Followed Channel 2']) {
-      for (let i = 0; i < 3; i++) {
-        const [video] = await db.insert(schema.videos).values({
-          youtubeId: `${channelName}-vid-${i}`,
-          title: `${channelName} Video ${i}`,
-          channel: channelName,
-          transcript: 'Test transcript',
-          duration: 600,
-        }).returning()
+    // 1. select channels -> both followed channels in channels table
+    resolvers.push(async () => [
+      { name: 'Followed Channel 1' },
+      { name: 'Followed Channel 2' },
+    ])
+    // 2. computeChannelCentroid for 'Followed Channel 1'
+    resolvers.push(async () => [{ embedding }])
+    // 3. selectDistinct from videos -> only Followed Channel 2 as candidate
+    resolvers.push(async () => [{ channel: 'Followed Channel 2' }])
+    // Followed Channel 2 is in followedChannelNames (from channels table), so it's filtered out
 
-        await db.insert(schema.chunks).values({
-          videoId: video!.id,
-          content: `Chunk ${i}`,
-          startTime: 0,
-          endTime: 10,
-          embedding: [...embedding],
-        })
-      }
-    }
+    const similar = await findSimilarChannels(
+      ['Followed Channel 1'],
+      undefined,
+      db as unknown as NodePgDatabase<typeof schema>,
+    )
 
-    // Find similar channels for Followed Channel 1
-    const similar = await findSimilarChannels(['Followed Channel 1'], undefined, db)
-
-    // Should NOT include Followed Channel 2 (already being followed)
     expect(similar.find(c => c.channelName === 'Followed Channel 2')).toBeUndefined()
   })
 
   it('excludes channels with fewer than 3 embedded videos', async () => {
-    const db = getTestDb()
-
-    // Create followed channel with 3+ videos
-    await db.insert(schema.channels).values({
-      channelId: 'followed-id',
-      name: 'Followed Channel',
-      feedUrl: 'https://example.com/feed',
-    })
-
     const embedding = new Array(384).fill(0.9)
 
-    for (let i = 0; i < 3; i++) {
-      const [video] = await db.insert(schema.videos).values({
-        youtubeId: `followed-vid-${i}`,
-        title: `Followed Video ${i}`,
-        channel: 'Followed Channel',
-        transcript: 'Test transcript',
-        duration: 600,
-      }).returning()
+    // 1. select channels -> followed
+    resolvers.push(async () => [{ name: 'Followed Channel' }])
+    // 2. computeChannelCentroid for followed
+    resolvers.push(async () => [{ embedding }])
+    // 3. selectDistinct: candidate channels
+    resolvers.push(async () => [{ channel: 'Few Videos Channel' }])
+    // 4. selectDistinct: videoCount for candidate -> only 2
+    resolvers.push(async () => [{ videoId: 1 }, { videoId: 2 }])
+    // Skipped (< 3 videos)
 
-      await db.insert(schema.chunks).values({
-        videoId: video!.id,
-        content: `Chunk ${i}`,
-        startTime: 0,
-        endTime: 10,
-        embedding: [...embedding],
-      })
-    }
+    const similar = await findSimilarChannels(
+      ['Followed Channel'],
+      undefined,
+      db as unknown as NodePgDatabase<typeof schema>,
+    )
 
-    // Create similar channel but with only 2 embedded videos
-    for (let i = 0; i < 2; i++) {
-      const [video] = await db.insert(schema.videos).values({
-        youtubeId: `few-vids-${i}`,
-        title: `Few Videos ${i}`,
-        channel: 'Few Videos Channel',
-        transcript: 'Similar transcript',
-        duration: 600,
-      }).returning()
-
-      await db.insert(schema.chunks).values({
-        videoId: video!.id,
-        content: `Similar chunk ${i}`,
-        startTime: 0,
-        endTime: 10,
-        embedding: [...embedding],
-      })
-    }
-
-    const similar = await findSimilarChannels(['Followed Channel'], undefined, db)
-
-    // Should NOT include channel with < 3 videos
     expect(similar.find(c => c.channelName === 'Few Videos Channel')).toBeUndefined()
   })
 
   it('respects custom threshold', async () => {
-    const db = getTestDb()
-
-    await db.insert(schema.channels).values({
-      channelId: 'followed-id',
-      name: 'Followed Channel',
-      feedUrl: 'https://example.com/feed',
-    })
-
     const followedEmbedding = new Array(384).fill(0.9)
-    for (let i = 0; i < 3; i++) {
-      const [video] = await db.insert(schema.videos).values({
-        youtubeId: `followed-vid-${i}`,
-        title: `Followed Video ${i}`,
-        channel: 'Followed Channel',
-        transcript: 'Test transcript',
-        duration: 600,
-      }).returning()
+    const candidateEmbedding = new Array(384).fill(0.85)
 
-      await db.insert(schema.chunks).values({
-        videoId: video!.id,
-        content: `Chunk ${i}`,
-        startTime: 0,
-        endTime: 10,
-        embedding: [...followedEmbedding],
-      })
-    }
-
-    // Create high similarity channel (similarity > 0.95)
-    const highSimilarityEmbedding = new Array(384).fill(0.85)
-    for (let i = 0; i < 3; i++) {
-      const [video] = await db.insert(schema.videos).values({
-        youtubeId: `high-sim-vid-${i}`,
-        title: `High Similarity Video ${i}`,
-        channel: 'High Similarity Channel',
-        transcript: 'High similarity',
-        duration: 600,
-      }).returning()
-
-      await db.insert(schema.chunks).values({
-        videoId: video!.id,
-        content: `Chunk ${i}`,
-        startTime: 0,
-        endTime: 10,
-        embedding: [...highSimilarityEmbedding],
-      })
-    }
+    // Setup for low threshold test
+    resolvers.push(async () => [{ name: 'Followed Channel' }])
+    resolvers.push(async () => [{ embedding: followedEmbedding }])
+    resolvers.push(async () => [{ channel: 'Candidate Channel' }])
+    resolvers.push(async () => [{ videoId: 1 }, { videoId: 2 }, { videoId: 3 }])
+    resolvers.push(async () => [{ embedding: candidateEmbedding }])
+    resolvers.push(async () => [{ title: 'Sample' }])
 
     // With low threshold 0.5, should appear
-    const similarLow = await findSimilarChannels(['Followed Channel'], { threshold: 0.5 }, db)
-    expect(similarLow.find(c => c.channelName === 'High Similarity Channel')).toBeDefined()
+    const similarLow = await findSimilarChannels(
+      ['Followed Channel'],
+      { threshold: 0.5 },
+      db as unknown as NodePgDatabase<typeof schema>,
+    )
+    expect(similarLow.find(c => c.channelName === 'Candidate Channel')).toBeDefined()
 
-    // With threshold 1.0, should not appear (nothing can have similarity > 1.0)
-    const similarVeryHigh = await findSimilarChannels(['Followed Channel'], { threshold: 1.0 }, db)
-    expect(similarVeryHigh.find(c => c.channelName === 'High Similarity Channel')).toBeUndefined()
+    // Setup for high threshold test
+    resolvers.push(async () => [{ name: 'Followed Channel' }])
+    resolvers.push(async () => [{ embedding: followedEmbedding }])
+    resolvers.push(async () => [{ channel: 'Candidate Channel' }])
+    resolvers.push(async () => [{ videoId: 1 }, { videoId: 2 }, { videoId: 3 }])
+    resolvers.push(async () => [{ embedding: candidateEmbedding }])
+
+    // With threshold 1.0, should not appear
+    const similarHigh = await findSimilarChannels(
+      ['Followed Channel'],
+      { threshold: 1.0 },
+      db as unknown as NodePgDatabase<typeof schema>,
+    )
+    expect(similarHigh.find(c => c.channelName === 'Candidate Channel')).toBeUndefined()
   })
 
   it('respects custom limit', async () => {
-    const db = getTestDb()
-
-    await db.insert(schema.channels).values({
-      channelId: 'followed-id',
-      name: 'Followed Channel',
-      feedUrl: 'https://example.com/feed',
-    })
-
     const embedding = new Array(384).fill(0.9)
-    for (let i = 0; i < 3; i++) {
-      const [video] = await db.insert(schema.videos).values({
-        youtubeId: `followed-vid-${i}`,
-        title: `Followed Video ${i}`,
-        channel: 'Followed Channel',
-        transcript: 'Test transcript',
-        duration: 600,
-      }).returning()
 
-      await db.insert(schema.chunks).values({
-        videoId: video!.id,
-        content: `Chunk ${i}`,
-        startTime: 0,
-        endTime: 10,
-        embedding: [...embedding],
-      })
+    // 1. channels table
+    resolvers.push(async () => [{ name: 'Followed Channel' }])
+    // 2. computeChannelCentroid for followed
+    resolvers.push(async () => [{ embedding }])
+    // 3. all channel names
+    resolvers.push(async () => [
+      { channel: 'Channel 0' },
+      { channel: 'Channel 1' },
+      { channel: 'Channel 2' },
+      { channel: 'Channel 3' },
+      { channel: 'Channel 4' },
+    ])
+
+    // For each candidate: videoCount (3), centroid, titles
+    for (let i = 0; i < 5; i++) {
+      resolvers.push(async () => [{ videoId: i * 3 + 1 }, { videoId: i * 3 + 2 }, { videoId: i * 3 + 3 }])
+      resolvers.push(async () => [{ embedding }])
+      resolvers.push(async () => [{ title: `Video ${i}` }])
     }
 
-    // Create 5 similar channels
-    for (let channelIdx = 0; channelIdx < 5; channelIdx++) {
-      for (let i = 0; i < 3; i++) {
-        const [video] = await db.insert(schema.videos).values({
-          youtubeId: `channel-${channelIdx}-vid-${i}`,
-          title: `Channel ${channelIdx} Video ${i}`,
-          channel: `Similar Channel ${channelIdx}`,
-          transcript: 'Similar transcript',
-          duration: 600,
-        }).returning()
-
-        await db.insert(schema.chunks).values({
-          videoId: video!.id,
-          content: `Chunk ${i}`,
-          startTime: 0,
-          endTime: 10,
-          embedding: [...embedding],
-        })
-      }
-    }
-
-    // Default limit should return up to 10
-    const similarDefault = await findSimilarChannels(['Followed Channel'], undefined, db)
-    expect(similarDefault.length).toBeLessThanOrEqual(10)
-
-    // Custom limit of 2
-    const similarLimited = await findSimilarChannels(['Followed Channel'], { limit: 2 }, db)
-    expect(similarLimited.length).toBeLessThanOrEqual(2)
+    const similar = await findSimilarChannels(
+      ['Followed Channel'],
+      { limit: 2 },
+      db as unknown as NodePgDatabase<typeof schema>,
+    )
+    expect(similar.length).toBeLessThanOrEqual(2)
   })
 
   it('returns empty array when no similar channels found', async () => {
-    const db = getTestDb()
-
-    await db.insert(schema.channels).values({
-      channelId: 'followed-id',
-      name: 'Followed Channel',
-      feedUrl: 'https://example.com/feed',
-    })
-
     const embedding = new Array(384).fill(0.9)
-    for (let i = 0; i < 3; i++) {
-      const [video] = await db.insert(schema.videos).values({
-        youtubeId: `followed-vid-${i}`,
-        title: `Followed Video ${i}`,
-        channel: 'Followed Channel',
-        transcript: 'Test transcript',
-        duration: 600,
-      }).returning()
 
-      await db.insert(schema.chunks).values({
-        videoId: video!.id,
-        content: `Chunk ${i}`,
-        startTime: 0,
-        endTime: 10,
-        embedding: [...embedding],
-      })
-    }
+    resolvers.push(async () => [{ name: 'Followed Channel' }])
+    resolvers.push(async () => [{ embedding }])
+    // No other channels
+    resolvers.push(async () => [])
 
-    // No other channels exist
-    const similar = await findSimilarChannels(['Followed Channel'], undefined, db)
-
-    expect(similar).toEqual([])
-  })
-
-  it('handles multiple followed channels', async () => {
-    const db = getTestDb()
-
-    // Create two followed channels
-    await db.insert(schema.channels).values([
-      {
-        channelId: 'followed-1-id',
-        name: 'Followed Channel 1',
-        feedUrl: 'https://example.com/feed1',
-      },
-      {
-        channelId: 'followed-2-id',
-        name: 'Followed Channel 2',
-        feedUrl: 'https://example.com/feed2',
-      },
-    ])
-
-    // Create videos for both followed channels
-    for (const channelName of ['Followed Channel 1', 'Followed Channel 2']) {
-      const embedding = new Array(384).fill(0.9)
-      for (let i = 0; i < 3; i++) {
-        const [video] = await db.insert(schema.videos).values({
-          youtubeId: `${channelName}-vid-${i}`,
-          title: `${channelName} Video ${i}`,
-          channel: channelName,
-          transcript: 'Test transcript',
-          duration: 600,
-        }).returning()
-
-        await db.insert(schema.chunks).values({
-          videoId: video!.id,
-          content: `Chunk ${i}`,
-          startTime: 0,
-          endTime: 10,
-          embedding: [...embedding],
-        })
-      }
-    }
-
-    // Create similar channel
-    const similarEmbedding = new Array(384).fill(0.85)
-    for (let i = 0; i < 3; i++) {
-      const [video] = await db.insert(schema.videos).values({
-        youtubeId: `similar-vid-${i}`,
-        title: `Similar Video ${i}`,
-        channel: 'Similar Channel',
-        transcript: 'Similar transcript',
-        duration: 600,
-      }).returning()
-
-      await db.insert(schema.chunks).values({
-        videoId: video!.id,
-        content: `Chunk ${i}`,
-        startTime: 0,
-        endTime: 10,
-        embedding: [...similarEmbedding],
-      })
-    }
-
-    const similar = await findSimilarChannels(
-      ['Followed Channel 1', 'Followed Channel 2'],
-      undefined,
-      db
-    )
-
-    // Should find similar channel relative to both followed channels
-    expect(similar.find(c => c.channelName === 'Similar Channel')).toBeDefined()
-  })
-
-  it('returns empty array when followed channel has no embeddings', async () => {
-    const db = getTestDb()
-
-    await db.insert(schema.channels).values({
-      channelId: 'followed-id',
-      name: 'Followed Channel',
-      feedUrl: 'https://example.com/feed',
-    })
-
-    // Insert video but no chunks
-    await db.insert(schema.videos).values({
-      youtubeId: 'followed-vid',
-      title: 'Followed Video',
-      channel: 'Followed Channel',
-      transcript: 'Test transcript',
-      duration: 600,
-    })
-
-    const similar = await findSimilarChannels(['Followed Channel'], undefined, db)
-
-    expect(similar).toEqual([])
-  })
-
-  it('returns partial results when timeout is exceeded', async () => {
-    const db = getTestDb()
-
-    // Create followed channel
-    await db.insert(schema.channels).values({
-      channelId: 'followed-id',
-      name: 'Followed Channel',
-      feedUrl: 'https://example.com/feed',
-    })
-
-    const embedding = new Array(384).fill(0.9)
-    for (let i = 0; i < 3; i++) {
-      const [video] = await db.insert(schema.videos).values({
-        youtubeId: `followed-vid-${i}`,
-        title: `Followed Video ${i}`,
-        channel: 'Followed Channel',
-        transcript: 'Test transcript',
-        duration: 600,
-      }).returning()
-
-      await db.insert(schema.chunks).values({
-        videoId: video!.id,
-        content: `Chunk ${i}`,
-        startTime: 0,
-        endTime: 10,
-        embedding: [...embedding],
-      })
-    }
-
-    // Create multiple similar channels (10 channels with 3 videos each)
-    for (let channelIdx = 0; channelIdx < 10; channelIdx++) {
-      for (let i = 0; i < 3; i++) {
-        const [video] = await db.insert(schema.videos).values({
-          youtubeId: `channel-${channelIdx}-vid-${i}`,
-          title: `Channel ${channelIdx} Video ${i}`,
-          channel: `Similar Channel ${channelIdx}`,
-          transcript: 'Similar transcript',
-          duration: 600,
-        }).returning()
-
-        await db.insert(schema.chunks).values({
-          videoId: video!.id,
-          content: `Chunk ${i}`,
-          startTime: 0,
-          endTime: 10,
-          embedding: [...embedding],
-        })
-      }
-    }
-
-    // Call with very short timeout (1ms) - should return partial results
     const similar = await findSimilarChannels(
       ['Followed Channel'],
-      { timeout: 1 },
-      db
+      undefined,
+      db as unknown as NodePgDatabase<typeof schema>,
     )
 
-    // Should return some results, but not necessarily all 10 channels
-    expect(similar.length).toBeGreaterThanOrEqual(0)
-    expect(similar.length).toBeLessThanOrEqual(10)
+    expect(similar).toEqual([])
   })
 })

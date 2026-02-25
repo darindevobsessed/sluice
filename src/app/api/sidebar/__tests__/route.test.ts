@@ -1,23 +1,33 @@
-import { describe, it, expect, beforeAll, beforeEach, afterAll, vi } from 'vitest'
-import { Pool } from 'pg'
-import { drizzle } from 'drizzle-orm/node-postgres'
-import * as schema from '@/lib/db/schema'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 
-// Setup test database
-const TEST_DATABASE_URL =
-  process.env.DATABASE_URL?.replace(/\/goldminer$/, '/goldminer_test') ??
-  'postgresql://goldminer:goldminer@localhost:5432/goldminer_test'
+// Mock channel and focus area query results
+let mockChannelResults: { channel: string | null; videoCount: number }[] = []
+let mockFocusAreaResults: { id: number; name: string; color: string | null; createdAt: Date }[] = []
+let selectCallIndex = 0
 
-let pool: Pool
-let testDb: ReturnType<typeof drizzle<typeof schema>>
-
-// Mock the database module to use test database
 vi.mock('@/lib/db', async () => {
   const actual = await vi.importActual<typeof import('@/lib/db')>('@/lib/db')
   return {
     ...actual,
-    get db() {
-      return testDb
+    db: {
+      select: vi.fn().mockImplementation(() => {
+        const idx = selectCallIndex++
+        if (idx === 0) {
+          // First call: channels query (with groupBy and orderBy)
+          return {
+            from: vi.fn().mockReturnValue({
+              groupBy: vi.fn().mockReturnValue({
+                orderBy: vi.fn().mockResolvedValue(mockChannelResults),
+              }),
+            }),
+          }
+        } else {
+          // Second call: focusAreas query
+          return {
+            from: vi.fn().mockResolvedValue(mockFocusAreaResults),
+          }
+        }
+      }),
     },
   }
 })
@@ -26,17 +36,11 @@ vi.mock('@/lib/db', async () => {
 const { GET } = await import('../route')
 
 describe('GET /api/sidebar', () => {
-  beforeAll(async () => {
-    pool = new Pool({ connectionString: TEST_DATABASE_URL })
-    testDb = drizzle(pool, { schema })
-  })
-
-  beforeEach(async () => {
-    await pool.query('TRUNCATE videos, focus_areas, insights, channels, settings, chunks CASCADE')
-  })
-
-  afterAll(async () => {
-    await pool?.end()
+  beforeEach(() => {
+    vi.clearAllMocks()
+    selectCallIndex = 0
+    mockChannelResults = []
+    mockFocusAreaResults = []
   })
 
   it('returns empty channels and focus areas when nothing exists', async () => {
@@ -49,44 +53,11 @@ describe('GET /api/sidebar', () => {
   })
 
   it('returns channels with video counts sorted by count descending', async () => {
-    await testDb.insert(schema.videos).values([
-      {
-        youtubeId: 'fireship-1',
-        title: 'React in 100 Seconds',
-        channel: 'Fireship',
-        transcript: 'React content',
-      },
-      {
-        youtubeId: 'fireship-2',
-        title: 'TypeScript in 100 Seconds',
-        channel: 'Fireship',
-        transcript: 'TypeScript content',
-      },
-      {
-        youtubeId: 'fireship-3',
-        title: 'Node in 100 Seconds',
-        channel: 'Fireship',
-        transcript: 'Node content',
-      },
-      {
-        youtubeId: 'theo-1',
-        title: 'Why TypeScript',
-        channel: 'Theo',
-        transcript: 'TypeScript thoughts',
-      },
-      {
-        youtubeId: 'theo-2',
-        title: 'The Problem With React',
-        channel: 'Theo',
-        transcript: 'React thoughts',
-      },
-      {
-        youtubeId: 'primeagen-1',
-        title: 'Rust is Amazing',
-        channel: 'ThePrimeagen',
-        transcript: 'Rust content',
-      },
-    ])
+    mockChannelResults = [
+      { channel: 'Fireship', videoCount: 3 },
+      { channel: 'Theo', videoCount: 2 },
+      { channel: 'ThePrimeagen', videoCount: 1 },
+    ]
 
     const response = await GET()
     const data = await response.json()
@@ -94,29 +65,16 @@ describe('GET /api/sidebar', () => {
     expect(response.status).toBe(200)
     expect(data.channels).toHaveLength(3)
 
-    // Fireship has 3 videos — should be first
     expect(data.channels[0]).toEqual({ name: 'Fireship', videoCount: 3 })
-    // Theo has 2 videos — should be second
     expect(data.channels[1]).toEqual({ name: 'Theo', videoCount: 2 })
-    // ThePrimeagen has 1 video — should be last
     expect(data.channels[2]).toEqual({ name: 'ThePrimeagen', videoCount: 1 })
   })
 
   it('excludes videos with null channel from channel list', async () => {
-    await testDb.insert(schema.videos).values([
-      {
-        youtubeId: 'with-channel',
-        title: 'Has Channel',
-        channel: 'Known Channel',
-        transcript: 'Content with channel',
-      },
-      {
-        sourceType: 'transcript',
-        title: 'No Channel Transcript',
-        channel: null,
-        transcript: 'Content without channel',
-      },
-    ])
+    mockChannelResults = [
+      { channel: 'Known Channel', videoCount: 1 },
+      { channel: null, videoCount: 1 },
+    ]
 
     const response = await GET()
     const data = await response.json()
@@ -126,13 +84,10 @@ describe('GET /api/sidebar', () => {
     expect(data.channels[0].name).toBe('Known Channel')
   })
 
-  it('returns channel with correct name (not raw DB channel column value)', async () => {
-    await testDb.insert(schema.videos).values({
-      youtubeId: 'test-shape',
-      title: 'Shape Test',
-      channel: 'My Channel',
-      transcript: 'Testing response shape',
-    })
+  it('returns channel with correct name shape', async () => {
+    mockChannelResults = [
+      { channel: 'My Channel', videoCount: 1 },
+    ]
 
     const response = await GET()
     const data = await response.json()
@@ -146,11 +101,12 @@ describe('GET /api/sidebar', () => {
   })
 
   it('returns all focus areas with id, name, color, and createdAt', async () => {
-    await testDb.insert(schema.focusAreas).values([
-      { name: 'React', color: '#61dafb' },
-      { name: 'TypeScript', color: '#3178c6' },
-      { name: 'Testing', color: null },
-    ])
+    const now = new Date()
+    mockFocusAreaResults = [
+      { id: 1, name: 'React', color: '#61dafb', createdAt: now },
+      { id: 2, name: 'TypeScript', color: '#3178c6', createdAt: now },
+      { id: 3, name: 'Testing', color: null, createdAt: now },
+    ]
 
     const response = await GET()
     const data = await response.json()
@@ -172,17 +128,12 @@ describe('GET /api/sidebar', () => {
   })
 
   it('returns both channels and focus areas together in one response', async () => {
-    await testDb.insert(schema.videos).values({
-      youtubeId: 'combined-test',
-      title: 'Combined Test',
-      channel: 'My Creator',
-      transcript: 'Content for combined test',
-    })
-
-    await testDb.insert(schema.focusAreas).values({
-      name: 'Frontend',
-      color: '#f7df1e',
-    })
+    mockChannelResults = [
+      { channel: 'My Creator', videoCount: 1 },
+    ]
+    mockFocusAreaResults = [
+      { id: 1, name: 'Frontend', color: '#f7df1e', createdAt: new Date() },
+    ]
 
     const response = await GET()
     const data = await response.json()
@@ -195,12 +146,9 @@ describe('GET /api/sidebar', () => {
   })
 
   it('videoCount is a number (not a string from SQL count)', async () => {
-    await testDb.insert(schema.videos).values({
-      youtubeId: 'count-type-test',
-      title: 'Count Type Test',
-      channel: 'Type Check Channel',
-      transcript: 'Testing count type',
-    })
+    mockChannelResults = [
+      { channel: 'Type Check Channel', videoCount: 1 },
+    ]
 
     const response = await GET()
     const data = await response.json()

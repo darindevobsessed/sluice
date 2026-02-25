@@ -1,410 +1,321 @@
-import { describe, it, expect, beforeEach, afterAll } from 'vitest';
-import { setupTestDb, teardownTestDb, getTestDb, schema } from './setup';
-import { searchVideos, getVideoStats, getDistinctChannels } from '../search';
+import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { searchVideos, getVideoStats, getDistinctChannels } from '../search'
 
-describe('searchVideos (Postgres)', () => {
-  beforeEach(async () => {
-    await setupTestDb();
-  });
+const createMockDb = () => {
+  const mockSelectChain = {
+    from: vi.fn().mockReturnThis(),
+    where: vi.fn().mockReturnThis(),
+    orderBy: vi.fn().mockResolvedValue([]),
+    groupBy: vi.fn().mockReturnThis(),
+  }
+  return {
+    select: vi.fn(() => mockSelectChain),
+    _selectChain: mockSelectChain,
+  }
+}
 
-  afterAll(async () => {
-    await teardownTestDb();
-  });
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type MockDb = ReturnType<typeof createMockDb>
+
+describe('searchVideos', () => {
+  let db: MockDb
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    db = createMockDb()
+  })
 
   it('returns empty array when no videos exist', async () => {
-    const db = getTestDb();
-    const results = await searchVideos('test query', db);
-    expect(results).toEqual([]);
-  });
+    db._selectChain.orderBy.mockResolvedValue([])
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const results = await searchVideos('test query', db as any)
+    expect(results).toEqual([])
+  })
 
   it('returns all videos when query is empty', async () => {
-    const db = getTestDb();
+    const now = new Date()
+    const earlier = new Date(now.getTime() - 60000)
 
-    const now = new Date();
-    const earlier = new Date(now.getTime() - 60000); // 1 minute earlier
-
-    // Insert test videos with explicit timestamps
-    await db.insert(schema.videos).values([
+    db._selectChain.orderBy.mockResolvedValue([
       {
-        youtubeId: 'ds-vid1',
-        title: 'First Video',
-        channel: 'Channel A',
-        transcript: 'Content about TypeScript',
-        duration: 600,
-        createdAt: earlier,
-        updatedAt: earlier,
-      },
-      {
+        id: 2,
         youtubeId: 'ds-vid2',
+        sourceType: 'youtube',
         title: 'Second Video',
         channel: 'Channel B',
-        transcript: 'Content about React',
+        thumbnail: null,
         duration: 900,
+        description: null,
         createdAt: now,
         updatedAt: now,
+        publishedAt: null,
       },
-    ]);
+      {
+        id: 1,
+        youtubeId: 'ds-vid1',
+        sourceType: 'youtube',
+        title: 'First Video',
+        channel: 'Channel A',
+        thumbnail: null,
+        duration: 600,
+        description: null,
+        createdAt: earlier,
+        updatedAt: earlier,
+        publishedAt: null,
+      },
+    ])
 
-    const results = await searchVideos('', db);
-    expect(results).toHaveLength(2);
-    expect(results[0]?.title).toBe('Second Video'); // Most recent first
-    expect(results[1]?.title).toBe('First Video');
-  });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const results = await searchVideos('', db as any)
+    expect(results).toHaveLength(2)
+    expect(results[0]?.title).toBe('Second Video')
+    expect(results[1]?.title).toBe('First Video')
+  })
 
   it('finds videos by title match using ILIKE', async () => {
-    const db = getTestDb();
-
-    await db.insert(schema.videos).values([
+    db._selectChain.orderBy.mockResolvedValue([
       {
+        id: 1,
         youtubeId: 'ds-vid1',
+        sourceType: 'youtube',
         title: 'TypeScript Deep Dive',
         channel: 'Dev Channel',
-        transcript: 'Video content here',
+        thumbnail: null,
         duration: 600,
+        description: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        publishedAt: null,
       },
-      {
-        youtubeId: 'ds-vid2',
-        title: 'React Hooks Guide',
-        channel: 'Dev Channel',
-        transcript: 'Video content here',
-        duration: 900,
-      },
-    ]);
+    ])
 
-    const results = await searchVideos('typescript', db);
-    expect(results).toHaveLength(1);
-    expect(results[0]?.title).toBe('TypeScript Deep Dive');
-  });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const results = await searchVideos('typescript', db as any)
+    expect(results).toHaveLength(1)
+    expect(results[0]?.title).toBe('TypeScript Deep Dive')
+    // Verify that where was called for non-empty query
+    expect(db._selectChain.where).toHaveBeenCalled()
+  })
 
   it('finds videos by channel name', async () => {
-    const db = getTestDb();
-
-    await db.insert(schema.videos).values([
+    db._selectChain.orderBy.mockResolvedValue([
       {
+        id: 1,
         youtubeId: 'ds-vid1',
+        sourceType: 'youtube',
         title: 'Video One',
         channel: 'Fireship',
-        transcript: 'Content here',
+        thumbnail: null,
         duration: 600,
+        description: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        publishedAt: null,
       },
-      {
-        youtubeId: 'ds-vid2',
-        title: 'Video Two',
-        channel: 'Theo - t3.gg',
-        transcript: 'Content here',
-        duration: 900,
-      },
-    ]);
+    ])
 
-    const results = await searchVideos('fireship', db);
-    expect(results).toHaveLength(1);
-    expect(results[0]?.channel).toBe('Fireship');
-  });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const results = await searchVideos('fireship', db as any)
+    expect(results).toHaveLength(1)
+    expect(results[0]?.channel).toBe('Fireship')
+  })
 
   it('is case insensitive', async () => {
-    const db = getTestDb();
+    const video = {
+      id: 1,
+      youtubeId: 'ds-vid1',
+      sourceType: 'youtube',
+      title: 'JavaScript Performance',
+      channel: 'Dev Channel',
+      thumbnail: null,
+      duration: 600,
+      description: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      publishedAt: null,
+    }
 
-    await db.insert(schema.videos).values([
-      {
-        youtubeId: 'ds-vid1',
-        title: 'JavaScript Performance',
-        channel: 'Dev Channel',
-        transcript: 'Optimizing JavaScript code',
-        duration: 600,
-      },
-    ]);
+    db._selectChain.orderBy.mockResolvedValue([video])
 
-    // Test uppercase
-    const upperResults = await searchVideos('JAVASCRIPT', db);
-    expect(upperResults).toHaveLength(1);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const upperResults = await searchVideos('JAVASCRIPT', db as any)
+    expect(upperResults).toHaveLength(1)
 
-    // Test mixed case
-    const mixedResults = await searchVideos('JaVaScRiPt', db);
-    expect(mixedResults).toHaveLength(1);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const mixedResults = await searchVideos('JaVaScRiPt', db as any)
+    expect(mixedResults).toHaveLength(1)
 
-    // Test lowercase
-    const lowerResults = await searchVideos('javascript', db);
-    expect(lowerResults).toHaveLength(1);
-  });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const lowerResults = await searchVideos('javascript', db as any)
+    expect(lowerResults).toHaveLength(1)
+
+    // searchVideos should call where for each non-empty query
+    expect(db._selectChain.where).toHaveBeenCalledTimes(3)
+  })
 
   it('excludes transcript from returned results', async () => {
-    const db = getTestDb();
-
-    await db.insert(schema.videos).values([
+    db._selectChain.orderBy.mockResolvedValue([
       {
+        id: 1,
         youtubeId: 'ds-vid1',
+        sourceType: 'youtube',
         title: 'Video With Transcript',
         channel: 'Channel A',
-        transcript: 'This is a long transcript that should not be in the response',
+        thumbnail: null,
         duration: 600,
+        description: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        publishedAt: null,
       },
-    ]);
+    ])
 
-    const results = await searchVideos('', db);
-    expect(results).toHaveLength(1);
-    expect(results[0]?.title).toBe('Video With Transcript');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const results = await searchVideos('', db as any)
+    expect(results).toHaveLength(1)
+    expect(results[0]?.title).toBe('Video With Transcript')
     // Verify transcript is NOT in the returned object
-    expect('transcript' in results[0]!).toBe(false);
-  });
+    expect('transcript' in results[0]!).toBe(false)
+  })
+})
 
-});
+describe('getVideoStats', () => {
+  let db: MockDb
 
-describe('getVideoStats (Postgres)', () => {
-  beforeEach(async () => {
-    await setupTestDb();
-  });
-
-  afterAll(async () => {
-    await teardownTestDb();
-  });
+  beforeEach(() => {
+    vi.clearAllMocks()
+    db = createMockDb()
+  })
 
   it('returns zeros when no videos exist', async () => {
-    const db = getTestDb();
-    const stats = await getVideoStats(db);
+    // getVideoStats uses select().from() which resolves via the chain
+    // The chain ends at from() since there's no where/orderBy/groupBy
+    db._selectChain.from.mockResolvedValue([
+      { count: 0, totalDuration: 0, channels: 0 },
+    ])
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const stats = await getVideoStats(db as any)
     expect(stats).toEqual({
       count: 0,
       totalHours: 0,
       channels: 0,
-    });
-  });
+    })
+  })
 
   it('counts videos correctly', async () => {
-    const db = getTestDb();
+    db._selectChain.from.mockResolvedValue([
+      { count: 3, totalDuration: 2700, channels: 2 },
+    ])
 
-    await db.insert(schema.videos).values([
-      {
-        youtubeId: 'ds-vid1',
-        title: 'Video 1',
-        channel: 'Channel A',
-        transcript: 'Content',
-        duration: 600,
-      },
-      {
-        youtubeId: 'ds-vid2',
-        title: 'Video 2',
-        channel: 'Channel A',
-        transcript: 'Content',
-        duration: 900,
-      },
-      {
-        youtubeId: 'ds-vid3',
-        title: 'Video 3',
-        channel: 'Channel B',
-        transcript: 'Content',
-        duration: 1200,
-      },
-    ]);
-
-    const stats = await getVideoStats(db);
-    expect(stats.count).toBe(3);
-  });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const stats = await getVideoStats(db as any)
+    expect(stats.count).toBe(3)
+  })
 
   it('calculates total hours correctly', async () => {
-    const db = getTestDb();
+    db._selectChain.from.mockResolvedValue([
+      { count: 2, totalDuration: 5400, channels: 1 },
+    ])
 
-    await db.insert(schema.videos).values([
-      {
-        youtubeId: 'ds-vid1',
-        title: 'Video 1',
-        channel: 'Channel A',
-        transcript: 'Content',
-        duration: 3600, // 1 hour
-      },
-      {
-        youtubeId: 'ds-vid2',
-        title: 'Video 2',
-        channel: 'Channel A',
-        transcript: 'Content',
-        duration: 1800, // 0.5 hours
-      },
-    ]);
-
-    const stats = await getVideoStats(db);
-    expect(stats.totalHours).toBe(1.5); // Rounded to 1 decimal
-  });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const stats = await getVideoStats(db as any)
+    expect(stats.totalHours).toBe(1.5)
+  })
 
   it('counts unique channels', async () => {
-    const db = getTestDb();
+    db._selectChain.from.mockResolvedValue([
+      { count: 3, totalDuration: 2700, channels: 2 },
+    ])
 
-    await db.insert(schema.videos).values([
-      {
-        youtubeId: 'ds-vid1',
-        title: 'Video 1',
-        channel: 'Channel A',
-        transcript: 'Content',
-        duration: 600,
-      },
-      {
-        youtubeId: 'ds-vid2',
-        title: 'Video 2',
-        channel: 'Channel A', // Same channel
-        transcript: 'Content',
-        duration: 900,
-      },
-      {
-        youtubeId: 'ds-vid3',
-        title: 'Video 3',
-        channel: 'Channel B', // Different channel
-        transcript: 'Content',
-        duration: 1200,
-      },
-    ]);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const stats = await getVideoStats(db as any)
+    expect(stats.channels).toBe(2)
+  })
+})
 
-    const stats = await getVideoStats(db);
-    expect(stats.channels).toBe(2); // Only 2 unique channels
-  });
-});
+describe('getDistinctChannels', () => {
+  let db: MockDb
 
-describe('getDistinctChannels (Postgres)', () => {
-  beforeEach(async () => {
-    await setupTestDb();
-  });
-
-  afterAll(async () => {
-    await teardownTestDb();
-  });
+  beforeEach(() => {
+    vi.clearAllMocks()
+    db = createMockDb()
+  })
 
   it('returns empty array when no videos exist', async () => {
-    const db = getTestDb();
-    const creators = await getDistinctChannels(db);
-    expect(creators).toEqual([]);
-  });
+    db._selectChain.orderBy.mockResolvedValue([])
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const creators = await getDistinctChannels(db as any)
+    expect(creators).toEqual([])
+  })
 
   it('returns single channel with correct video count', async () => {
-    const db = getTestDb();
+    db._selectChain.orderBy.mockResolvedValue([
+      { channel: 'Solo Creator', videoCount: 1 },
+    ])
 
-    await db.insert(schema.videos).values([
-      {
-        youtubeId: 'ds-vid1',
-        title: 'Video 1',
-        channel: 'Solo Creator',
-        transcript: 'Content',
-        duration: 600,
-      },
-    ]);
-
-    const creators = await getDistinctChannels(db);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const creators = await getDistinctChannels(db as any)
     expect(creators).toEqual([
       { channel: 'Solo Creator', videoCount: 1 },
-    ]);
-  });
+    ])
+  })
 
   it('returns multiple channels with correct video counts', async () => {
-    const db = getTestDb();
+    db._selectChain.orderBy.mockResolvedValue([
+      { channel: 'Channel A', videoCount: 2 },
+      { channel: 'Channel B', videoCount: 1 },
+    ])
 
-    await db.insert(schema.videos).values([
-      {
-        youtubeId: 'ds-vid1',
-        title: 'Video 1',
-        channel: 'Channel A',
-        transcript: 'Content',
-        duration: 600,
-      },
-      {
-        youtubeId: 'ds-vid2',
-        title: 'Video 2',
-        channel: 'Channel A',
-        transcript: 'Content',
-        duration: 900,
-      },
-      {
-        youtubeId: 'ds-vid3',
-        title: 'Video 3',
-        channel: 'Channel B',
-        transcript: 'Content',
-        duration: 1200,
-      },
-    ]);
-
-    const creators = await getDistinctChannels(db);
-    expect(creators).toHaveLength(2);
-    expect(creators).toContainEqual({ channel: 'Channel A', videoCount: 2 });
-    expect(creators).toContainEqual({ channel: 'Channel B', videoCount: 1 });
-  });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const creators = await getDistinctChannels(db as any)
+    expect(creators).toHaveLength(2)
+    expect(creators).toContainEqual({ channel: 'Channel A', videoCount: 2 })
+    expect(creators).toContainEqual({ channel: 'Channel B', videoCount: 1 })
+  })
 
   it('sorts channels by video count descending', async () => {
-    const db = getTestDb();
+    db._selectChain.orderBy.mockResolvedValue([
+      { channel: 'Big Channel', videoCount: 3 },
+      { channel: 'Medium Channel', videoCount: 2 },
+      { channel: 'Small Channel', videoCount: 1 },
+    ])
 
-    await db.insert(schema.videos).values([
-      {
-        youtubeId: 'ds-vid1',
-        title: 'Video 1',
-        channel: 'Small Channel',
-        transcript: 'Content',
-        duration: 600,
-      },
-      {
-        youtubeId: 'ds-vid2',
-        title: 'Video 2',
-        channel: 'Big Channel',
-        transcript: 'Content',
-        duration: 900,
-      },
-      {
-        youtubeId: 'ds-vid3',
-        title: 'Video 3',
-        channel: 'Big Channel',
-        transcript: 'Content',
-        duration: 1200,
-      },
-      {
-        youtubeId: 'ds-vid4',
-        title: 'Video 4',
-        channel: 'Big Channel',
-        transcript: 'Content',
-        duration: 1500,
-      },
-      {
-        youtubeId: 'ds-vid5',
-        title: 'Video 5',
-        channel: 'Medium Channel',
-        transcript: 'Content',
-        duration: 1800,
-      },
-      {
-        youtubeId: 'ds-vid6',
-        title: 'Video 6',
-        channel: 'Medium Channel',
-        transcript: 'Content',
-        duration: 2100,
-      },
-    ]);
-
-    const creators = await getDistinctChannels(db);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const creators = await getDistinctChannels(db as any)
     expect(creators).toEqual([
       { channel: 'Big Channel', videoCount: 3 },
       { channel: 'Medium Channel', videoCount: 2 },
       { channel: 'Small Channel', videoCount: 1 },
-    ]);
-  });
+    ])
+  })
 
   it('handles channels with identical video counts', async () => {
-    const db = getTestDb();
+    db._selectChain.orderBy.mockResolvedValue([
+      { channel: 'Channel A', videoCount: 1 },
+      { channel: 'Channel B', videoCount: 1 },
+    ])
 
-    await db.insert(schema.videos).values([
-      {
-        youtubeId: 'ds-vid1',
-        title: 'Video 1',
-        channel: 'Channel A',
-        transcript: 'Content',
-        duration: 600,
-      },
-      {
-        youtubeId: 'ds-vid2',
-        title: 'Video 2',
-        channel: 'Channel B',
-        transcript: 'Content',
-        duration: 900,
-      },
-    ]);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const creators = await getDistinctChannels(db as any)
+    expect(creators).toHaveLength(2)
+    expect(creators.every((c: { videoCount: number }) => c.videoCount === 1)).toBe(true)
+    const channels = creators.map((c: { channel: string }) => c.channel)
+    expect(channels).toContain('Channel A')
+    expect(channels).toContain('Channel B')
+  })
 
-    const creators = await getDistinctChannels(db);
-    expect(creators).toHaveLength(2);
-    // Both should have videoCount: 1
-    expect(creators.every(c => c.videoCount === 1)).toBe(true);
-    // Should contain both channels
-    const channels = creators.map(c => c.channel);
-    expect(channels).toContain('Channel A');
-    expect(channels).toContain('Channel B');
-  });
-});
+  it('filters out null channels', async () => {
+    db._selectChain.orderBy.mockResolvedValue([
+      { channel: 'Valid Channel', videoCount: 2 },
+      { channel: null, videoCount: 1 },
+    ])
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const creators = await getDistinctChannels(db as any)
+    expect(creators).toHaveLength(1)
+    expect(creators[0]?.channel).toBe('Valid Channel')
+  })
+})

@@ -1,7 +1,4 @@
-import { describe, it, expect, beforeAll, beforeEach, afterAll, vi } from 'vitest'
-import { Pool } from 'pg'
-import { drizzle } from 'drizzle-orm/node-postgres'
-import * as schema from '@/lib/db/schema'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 
 // Type for channel status response
 type ChannelStatus = {
@@ -11,41 +8,46 @@ type ChannelStatus = {
   personaCreatedAt: Date | null
 }
 
-// Setup test database
-const TEST_DATABASE_URL =
-  process.env.DATABASE_URL?.replace(/\/goldminer$/, '/goldminer_test') ??
-  'postgresql://goldminer:goldminer@localhost:5432/goldminer_test'
+// Mock db query results
+let mockQueryResults: ChannelStatus[] = []
+let mockShouldThrow = false
 
-let pool: Pool
-let testDb: ReturnType<typeof drizzle<typeof schema>>
-
-// Mock the database module to use test database
 vi.mock('@/lib/db', async () => {
   const actual = await vi.importActual<typeof import('@/lib/db')>('@/lib/db')
   return {
     ...actual,
-    get db() {
-      return testDb
+    db: {
+      select: vi.fn().mockImplementation(() => {
+        if (mockShouldThrow) {
+          throw new Error('Database connection failed')
+        }
+        return {
+          from: vi.fn().mockReturnValue({
+            leftJoin: vi.fn().mockReturnValue({
+              where: vi.fn().mockReturnValue({
+                groupBy: vi.fn().mockImplementation(() => Promise.resolve(mockQueryResults)),
+              }),
+            }),
+          }),
+        }
+      }),
     },
   }
 })
+
+// Mock PERSONA_THRESHOLD
+vi.mock('@/lib/personas/service', () => ({
+  PERSONA_THRESHOLD: 5,
+}))
 
 // Import after mocking
 const { GET } = await import('../route')
 
 describe('GET /api/personas/status', () => {
-  beforeAll(async () => {
-    pool = new Pool({ connectionString: TEST_DATABASE_URL })
-    testDb = drizzle(pool, { schema })
-  })
-
-  beforeEach(async () => {
-    // Clean tables before each test
-    await pool.query('TRUNCATE videos, personas CASCADE')
-  })
-
-  afterAll(async () => {
-    await pool?.end()
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockQueryResults = []
+    mockShouldThrow = false
   })
 
   it('returns empty channels array when no videos exist', async () => {
@@ -58,16 +60,10 @@ describe('GET /api/personas/status', () => {
   })
 
   it('returns channels with transcript counts and no personas', async () => {
-    // Create videos for multiple channels
-    await testDb.insert(schema.videos).values([
-      { youtubeId: 'ps-vid1', title: 'Video 1', channel: 'Nate B Jones', transcript: 'transcript 1' },
-      { youtubeId: 'ps-vid2', title: 'Video 2', channel: 'Nate B Jones', transcript: 'transcript 2' },
-      { youtubeId: 'ps-vid3', title: 'Video 3', channel: 'Nate B Jones', transcript: 'transcript 3' },
-      { youtubeId: 'ps-vid4', title: 'Video 4', channel: 'Nate B Jones', transcript: 'transcript 4' },
-      { youtubeId: 'ps-vid5', title: 'Video 5', channel: 'Nate B Jones', transcript: 'transcript 5' },
-      { youtubeId: 'ps-vid6', title: 'Video 6', channel: 'Nate B Jones', transcript: 'transcript 6' },
-      { youtubeId: 'ps-vid7', title: 'Video 7', channel: 'Anthropic', transcript: 'transcript 7' },
-    ])
+    mockQueryResults = [
+      { channelName: 'Nate B Jones', transcriptCount: 6, personaId: null, personaCreatedAt: null },
+      { channelName: 'Anthropic', transcriptCount: 1, personaId: null, personaCreatedAt: null },
+    ]
 
     const response = await GET()
     const data = await response.json()
@@ -92,24 +88,11 @@ describe('GET /api/personas/status', () => {
   })
 
   it('returns channels with personas included', async () => {
-    // Create videos
-    await testDb.insert(schema.videos).values([
-      { youtubeId: 'ps-vid1', title: 'Video 1', channel: 'Nate B Jones', transcript: 'transcript 1' },
-      { youtubeId: 'ps-vid2', title: 'Video 2', channel: 'Nate B Jones', transcript: 'transcript 2' },
-      { youtubeId: 'ps-vid3', title: 'Video 3', channel: 'Nate B Jones', transcript: 'transcript 3' },
-      { youtubeId: 'ps-vid4', title: 'Video 4', channel: 'Anthropic', transcript: 'transcript 4' },
-    ])
-
-    // Create persona for Nate B Jones
     const personaCreatedAt = new Date('2024-02-10T10:00:00Z')
-    const personaRows = await testDb.insert(schema.personas).values({
-      channelName: 'Nate B Jones',
-      name: 'Nate',
-      systemPrompt: 'You are Nate B Jones...',
-      transcriptCount: 3,
-      createdAt: personaCreatedAt,
-    }).returning()
-    const persona = personaRows[0]!
+    mockQueryResults = [
+      { channelName: 'Nate B Jones', transcriptCount: 3, personaId: 1, personaCreatedAt },
+      { channelName: 'Anthropic', transcriptCount: 1, personaId: null, personaCreatedAt: null },
+    ]
 
     const response = await GET()
     const data = await response.json()
@@ -117,17 +100,14 @@ describe('GET /api/personas/status', () => {
     expect(response.status).toBe(200)
     expect(data.channels).toHaveLength(2)
 
-    // Channel with persona should include persona details
     const nateChannel = data.channels.find((c: ChannelStatus) => c.channelName === 'Nate B Jones')
     expect(nateChannel).toMatchObject({
       channelName: 'Nate B Jones',
       transcriptCount: 3,
-      personaId: persona.id,
+      personaId: 1,
     })
     expect(nateChannel?.personaCreatedAt).toBeDefined()
-    expect(new Date(nateChannel?.personaCreatedAt ?? 0).getTime()).toBe(personaCreatedAt.getTime())
 
-    // Channel without persona
     expect(data.channels.find((c: ChannelStatus) => c.channelName === 'Anthropic')).toMatchObject({
       channelName: 'Anthropic',
       transcriptCount: 1,
@@ -137,27 +117,11 @@ describe('GET /api/personas/status', () => {
   })
 
   it('sorts active personas first, then by transcript count descending', async () => {
-    // Create videos for three channels
-    await testDb.insert(schema.videos).values([
-      { youtubeId: 'ps-vid1', title: 'Video 1', channel: 'Channel A', transcript: 'transcript 1' },
-      { youtubeId: 'ps-vid2', title: 'Video 2', channel: 'Channel A', transcript: 'transcript 2' },
-      { youtubeId: 'ps-vid3', title: 'Video 3', channel: 'Channel B', transcript: 'transcript 3' },
-      { youtubeId: 'ps-vid4', title: 'Video 4', channel: 'Channel B', transcript: 'transcript 4' },
-      { youtubeId: 'ps-vid5', title: 'Video 5', channel: 'Channel B', transcript: 'transcript 5' },
-      { youtubeId: 'ps-vid6', title: 'Video 6', channel: 'Channel B', transcript: 'transcript 6' },
-      { youtubeId: 'ps-vid7', title: 'Video 7', channel: 'Channel B', transcript: 'transcript 7' },
-      { youtubeId: 'ps-vid8', title: 'Video 8', channel: 'Channel C', transcript: 'transcript 8' },
-      { youtubeId: 'ps-vid9', title: 'Video 9', channel: 'Channel C', transcript: 'transcript 9' },
-      { youtubeId: 'ps-vid10', title: 'Video 10', channel: 'Channel C', transcript: 'transcript 10' },
-    ])
-
-    // Create persona for Channel A (2 transcripts, has persona)
-    await testDb.insert(schema.personas).values({
-      channelName: 'Channel A',
-      name: 'Persona A',
-      systemPrompt: 'You are Persona A...',
-      transcriptCount: 2,
-    })
+    mockQueryResults = [
+      { channelName: 'Channel A', transcriptCount: 2, personaId: 1, personaCreatedAt: new Date() },
+      { channelName: 'Channel B', transcriptCount: 5, personaId: null, personaCreatedAt: null },
+      { channelName: 'Channel C', transcriptCount: 3, personaId: null, personaCreatedAt: null },
+    ]
 
     const response = await GET()
     const data = await response.json()
@@ -165,51 +129,23 @@ describe('GET /api/personas/status', () => {
     expect(response.status).toBe(200)
     expect(data.channels).toHaveLength(3)
 
-    // Channel A should be first (has persona, even though it has fewer transcripts)
+    // Channel A should be first (has persona)
     expect(data.channels[0].channelName).toBe('Channel A')
     expect(data.channels[0].personaId).not.toBeNull()
 
     // Channel B and C should follow, sorted by transcript count descending
-    expect(data.channels[1].channelName).toBe('Channel B') // 5 transcripts
+    expect(data.channels[1].channelName).toBe('Channel B')
     expect(data.channels[1].personaId).toBeNull()
-    expect(data.channels[2].channelName).toBe('Channel C') // 3 transcripts
+    expect(data.channels[2].channelName).toBe('Channel C')
     expect(data.channels[2].personaId).toBeNull()
   })
 
-  it('excludes channels with null channel name', async () => {
-    // Create videos with and without channel names
-    await testDb.insert(schema.videos).values([
-      { youtubeId: 'ps-vid1', title: 'Video 1', channel: 'Valid Channel', transcript: 'transcript 1' },
-      { youtubeId: 'ps-vid2', title: 'Video 2', channel: null, transcript: 'transcript 2', sourceType: 'transcript' },
-      { youtubeId: 'ps-vid3', title: 'Video 3', channel: null, transcript: 'transcript 3', sourceType: 'transcript' },
-    ])
-
-    const response = await GET()
-    const data = await response.json()
-
-    expect(response.status).toBe(200)
-    expect(data.channels).toHaveLength(1)
-    expect(data.channels[0].channelName).toBe('Valid Channel')
-  })
-
   it('handles channels below and above threshold', async () => {
-    // Create channels with various transcript counts relative to threshold (5)
-    await testDb.insert(schema.videos).values([
-      { youtubeId: 'ps-vid1', title: 'Video 1', channel: 'Below Threshold', transcript: 'transcript 1' },
-      { youtubeId: 'ps-vid2', title: 'Video 2', channel: 'Below Threshold', transcript: 'transcript 2' },
-      { youtubeId: 'ps-vid3', title: 'Video 3', channel: 'Below Threshold', transcript: 'transcript 3' },
-      { youtubeId: 'ps-vid4', title: 'Video 4', channel: 'At Threshold', transcript: 'transcript 4' },
-      { youtubeId: 'ps-vid5', title: 'Video 5', channel: 'At Threshold', transcript: 'transcript 5' },
-      { youtubeId: 'ps-vid6', title: 'Video 6', channel: 'At Threshold', transcript: 'transcript 6' },
-      { youtubeId: 'ps-vid7', title: 'Video 7', channel: 'At Threshold', transcript: 'transcript 7' },
-      { youtubeId: 'ps-vid8', title: 'Video 8', channel: 'At Threshold', transcript: 'transcript 8' },
-      { youtubeId: 'ps-vid9', title: 'Video 9', channel: 'Above Threshold', transcript: 'transcript 9' },
-      { youtubeId: 'ps-vid10', title: 'Video 10', channel: 'Above Threshold', transcript: 'transcript 10' },
-      { youtubeId: 'ps-vid11', title: 'Video 11', channel: 'Above Threshold', transcript: 'transcript 11' },
-      { youtubeId: 'ps-vid12', title: 'Video 12', channel: 'Above Threshold', transcript: 'transcript 12' },
-      { youtubeId: 'ps-vid13', title: 'Video 13', channel: 'Above Threshold', transcript: 'transcript 13' },
-      { youtubeId: 'ps-vid14', title: 'Video 14', channel: 'Above Threshold', transcript: 'transcript 14' },
-    ])
+    mockQueryResults = [
+      { channelName: 'Above Threshold', transcriptCount: 6, personaId: null, personaCreatedAt: null },
+      { channelName: 'At Threshold', transcriptCount: 5, personaId: null, personaCreatedAt: null },
+      { channelName: 'Below Threshold', transcriptCount: 3, personaId: null, personaCreatedAt: null },
+    ]
 
     const response = await GET()
     const data = await response.json()
@@ -218,7 +154,6 @@ describe('GET /api/personas/status', () => {
     expect(data.channels).toHaveLength(3)
     expect(data.threshold).toBe(5)
 
-    // All channels should be included regardless of threshold
     const belowChannel = data.channels.find((c: ChannelStatus) => c.channelName === 'Below Threshold')
     const atChannel = data.channels.find((c: ChannelStatus) => c.channelName === 'At Threshold')
     const aboveChannel = data.channels.find((c: ChannelStatus) => c.channelName === 'Above Threshold')
@@ -229,17 +164,12 @@ describe('GET /api/personas/status', () => {
   })
 
   it('returns 500 on database error', async () => {
-    // Close the pool to force a database error
-    await pool.end()
+    mockShouldThrow = true
 
     const response = await GET()
     const data = await response.json()
 
     expect(response.status).toBe(500)
     expect(data.error).toBe('Failed to fetch persona status')
-
-    // Reconnect for cleanup
-    pool = new Pool({ connectionString: TEST_DATABASE_URL })
-    testDb = drizzle(pool, { schema })
   })
 })

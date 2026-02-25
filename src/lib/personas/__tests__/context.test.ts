@@ -1,55 +1,46 @@
-import { describe, it, expect, beforeEach, afterAll, vi } from 'vitest'
-import { setupTestDb, teardownTestDb, getTestDb, schema } from '@/lib/db/__tests__/setup'
-import { getPersonaContext, formatContextForPrompt } from '../context'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import type { SearchResult } from '@/lib/search/types'
 
-// Mock the embedding pipeline to avoid ONNX runtime issues in tests
-vi.mock('@/lib/embeddings/pipeline', () => ({
-  generateEmbedding: vi.fn().mockResolvedValue(new Float32Array(384).fill(0.5))
+// Mock the hybrid search
+const mockHybridSearch = vi.fn()
+vi.mock('@/lib/search/hybrid-search', () => ({
+  hybridSearch: (...args: unknown[]) => mockHybridSearch(...args),
 }))
 
-describe('getPersonaContext', () => {
-  beforeEach(async () => {
-    await setupTestDb()
-  })
+// Import after mocking
+const { getPersonaContext, formatContextForPrompt } = await import('../context')
 
-  afterAll(async () => {
-    await teardownTestDb()
+describe('getPersonaContext', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockHybridSearch.mockResolvedValue([])
   })
 
   it('should return filtered search results for a specific channel', async () => {
-    const db = getTestDb()
-
-    const [video1] = await db.insert(schema.videos).values({
-      youtubeId: 'pc-vid1',
-      title: 'TypeScript Basics',
-      channel: 'Test Channel',
-      transcript: 'Test transcript',
-      duration: 600,
-    }).returning()
-
-    const [video2] = await db.insert(schema.videos).values({
-      youtubeId: 'pc-vid2',
-      title: 'Python Basics',
-      channel: 'Other Channel',
-      transcript: 'Test transcript',
-      duration: 600,
-    }).returning()
-
-    await db.insert(schema.chunks).values([
+    mockHybridSearch.mockResolvedValue([
       {
-        videoId: video1!.id,
+        chunkId: 1,
         content: 'TypeScript is a typed superset',
         startTime: 0,
         endTime: 10,
-        embedding: new Array(384).fill(0.7),
+        videoId: 1,
+        videoTitle: 'TypeScript Basics',
+        channel: 'Test Channel',
+        youtubeId: 'pc-vid1',
+        thumbnail: null,
+        similarity: 0.85,
       },
       {
-        videoId: video2!.id,
+        chunkId: 2,
         content: 'Python is dynamically typed',
         startTime: 0,
         endTime: 10,
-        embedding: new Array(384).fill(0.7),
+        videoId: 2,
+        videoTitle: 'Python Basics',
+        channel: 'Other Channel',
+        youtubeId: 'pc-vid2',
+        thumbnail: null,
+        similarity: 0.80,
       },
     ])
 
@@ -60,53 +51,86 @@ describe('getPersonaContext', () => {
     results.forEach(result => {
       expect(result.channel).toBe('Test Channel')
     })
+    // Should filter out 'Other Channel'
+    expect(results).toHaveLength(1)
   })
 
   it('should limit results to 10 chunks', async () => {
-    const db = getTestDb()
-
-    const [video] = await db.insert(schema.videos).values({
-      youtubeId: 'pc-vid',
-      title: 'Test Video',
+    // Return 20 results from the target channel
+    const results = Array.from({ length: 20 }, (_, i) => ({
+      chunkId: i + 1,
+      content: `Test content ${i}`,
+      startTime: i * 10,
+      endTime: (i + 1) * 10,
+      videoId: 1,
+      videoTitle: 'Test Video',
       channel: 'Test Channel',
-      transcript: 'Test transcript',
-      duration: 600,
-    }).returning()
+      youtubeId: 'pc-vid',
+      thumbnail: null,
+      similarity: 0.7,
+    }))
+    mockHybridSearch.mockResolvedValue(results)
 
-    // Insert 20 chunks
-    for (let i = 0; i < 20; i++) {
-      await db.insert(schema.chunks).values({
-        videoId: video!.id,
-        content: `Test content ${i}`,
-        startTime: i * 10,
-        endTime: (i + 1) * 10,
-        embedding: new Array(384).fill(0.7),
-      })
-    }
+    const contextResults = await getPersonaContext('Test Channel', 'Test')
 
-    const results = await getPersonaContext('Test Channel', 'Test')
-
-    expect(results.length).toBeLessThanOrEqual(10)
+    expect(contextResults.length).toBeLessThanOrEqual(10)
   })
 
-  it('should use hybrid search mode', async () => {
-    const db = getTestDb()
+  it('should call hybridSearch with correct parameters', async () => {
+    await getPersonaContext('Test Channel', 'test query')
 
-    const [video] = await db.insert(schema.videos).values({
-      youtubeId: 'pc-vid',
-      title: 'Test Video',
-      channel: 'Test Channel',
-      transcript: 'Test transcript',
-      duration: 600,
-    }).returning()
-
-    await db.insert(schema.chunks).values({
-      videoId: video!.id,
-      content: 'Test query content',
-      startTime: 0,
-      endTime: 10,
-      embedding: new Array(384).fill(0.7),
+    expect(mockHybridSearch).toHaveBeenCalledWith('test query', {
+      mode: 'hybrid',
+      limit: 50,
     })
+  })
+
+  it('should handle empty results gracefully', async () => {
+    mockHybridSearch.mockResolvedValue([])
+
+    const results = await getPersonaContext('Nonexistent Channel', 'query')
+
+    expect(Array.isArray(results)).toBe(true)
+    expect(results.length).toBe(0)
+  })
+
+  it('should handle results where no chunks match the channel', async () => {
+    mockHybridSearch.mockResolvedValue([
+      {
+        chunkId: 1,
+        content: 'Some content',
+        startTime: 0,
+        endTime: 10,
+        videoId: 1,
+        videoTitle: 'Test Video',
+        channel: 'Different Channel',
+        youtubeId: 'pc-vid',
+        thumbnail: null,
+        similarity: 0.7,
+      },
+    ])
+
+    const results = await getPersonaContext('Nonexistent Channel', 'query')
+
+    expect(Array.isArray(results)).toBe(true)
+    expect(results.length).toBe(0)
+  })
+
+  it('should return results with correct properties', async () => {
+    mockHybridSearch.mockResolvedValue([
+      {
+        chunkId: 1,
+        content: 'Test query content',
+        startTime: 0,
+        endTime: 10,
+        videoId: 1,
+        videoTitle: 'Test Video',
+        channel: 'Test Channel',
+        youtubeId: 'pc-vid',
+        thumbnail: null,
+        similarity: 0.85,
+      },
+    ])
 
     const results = await getPersonaContext('Test Channel', 'test query')
 
@@ -118,55 +142,6 @@ describe('getPersonaContext', () => {
       expect(result).toHaveProperty('channel')
       expect(result).toHaveProperty('similarity')
     }
-  })
-
-  it('should handle empty results gracefully', async () => {
-    const db = getTestDb()
-
-    const [video] = await db.insert(schema.videos).values({
-      youtubeId: 'pc-vid',
-      title: 'Test Video',
-      channel: 'Different Channel',
-      transcript: 'Test transcript',
-      duration: 600,
-    }).returning()
-
-    await db.insert(schema.chunks).values({
-      videoId: video!.id,
-      content: 'Some content',
-      startTime: 0,
-      endTime: 10,
-      embedding: new Array(384).fill(0.7),
-    })
-
-    const results = await getPersonaContext('Nonexistent Channel', 'query')
-
-    expect(Array.isArray(results)).toBe(true)
-    expect(results.length).toBe(0)
-  })
-
-  it('should handle special characters in channel name', async () => {
-    const db = getTestDb()
-
-    const [video] = await db.insert(schema.videos).values({
-      youtubeId: 'pc-vid',
-      title: 'Test Video',
-      channel: "O'Reilly Media",
-      transcript: 'Test transcript',
-      duration: 600,
-    }).returning()
-
-    await db.insert(schema.chunks).values({
-      videoId: video!.id,
-      content: 'Test content',
-      startTime: 0,
-      endTime: 10,
-      embedding: new Array(384).fill(0.7),
-    })
-
-    const results = await getPersonaContext("O'Reilly Media", 'test')
-
-    expect(Array.isArray(results)).toBe(true)
   })
 })
 

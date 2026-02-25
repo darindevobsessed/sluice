@@ -10,8 +10,6 @@ export default defineConfig({
     include: ['**/*.test.{ts,tsx}'],
     exclude: ['node_modules', '.next'],
     setupFiles: ['dotenv/config', './vitest.setup.ts'],
-    // Run database tests sequentially to avoid conflicts
-    fileParallelism: false,
   },
   resolve: {
     alias: {
