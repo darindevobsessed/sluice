@@ -48,12 +48,19 @@ function mockInnerTubeASRSuccess(segments: Array<{ text: string; t: number; d: n
 }
 
 function mockInnerTubeNoCaptions() {
+  // ANDROID client returns no captions
   mockFetch.mockResolvedValueOnce({
-    json: async () => ({ captions: null }),
+    json: async () => ({ playabilityStatus: { status: 'OK' }, captions: null }),
+  })
+  // WEB client also returns no captions
+  mockFetch.mockResolvedValueOnce({
+    json: async () => ({ playabilityStatus: { status: 'OK' }, captions: null }),
   })
 }
 
 function mockInnerTubeFetchError() {
+  // Both clients fail with network error
+  mockFetch.mockRejectedValueOnce(new Error('Network timeout'))
   mockFetch.mockRejectedValueOnce(new Error('Network timeout'))
 }
 
@@ -181,12 +188,12 @@ describe('fetchTranscript', () => {
 
     const result1 = await fetchTranscript('failed-video')
     expect(result1.success).toBe(false)
-    expect(mockFetch).toHaveBeenCalledTimes(1)
+    expect(mockFetch).toHaveBeenCalledTimes(2) // Both clients tried
 
     const result2 = await fetchTranscript('failed-video')
     expect(result2.success).toBe(false)
     expect(result2.fromCache).toBe(true)
-    expect(mockFetch).toHaveBeenCalledTimes(1)
+    expect(mockFetch).toHaveBeenCalledTimes(2) // Not called again
   })
 
   it('cache expires after TTL', async () => {

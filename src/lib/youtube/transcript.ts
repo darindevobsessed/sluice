@@ -29,24 +29,71 @@ const RE_XML_STANDARD = /<text start="([^"]*)" dur="([^"]*)">([^<]*)<\/text>/g
 const RE_XML_ASR = /<p t="(\d+)" d="(\d+)"[^>]*>([\s\S]*?)<\/p>/g
 const RE_XML_ASR_SEGMENT = /<s[^>]*>([^<]*)<\/s>/g
 
-/**
- * Fetch transcript via YouTube InnerTube API.
- * Uses Android client which works from both local and datacenter IPs.
- * Handles both standard and ASR transcript XML formats.
- */
-async function fetchTranscriptInnerTube(videoId: string, lang = 'en'): Promise<RawTranscriptItem[]> {
-  const playerResponse = await fetch('https://www.youtube.com/youtubei/v1/player', {
-    method: 'POST',
+// InnerTube client configurations to try in order
+const INNERTUBE_CLIENTS = [
+  {
+    name: 'ANDROID',
     headers: {
       'Content-Type': 'application/json',
       'User-Agent': 'com.google.android.youtube/19.09.37 (Linux; Android 13)',
     },
+    context: {
+      client: {
+        clientName: 'ANDROID',
+        clientVersion: '19.09.37',
+        androidSdkVersion: 33,
+      },
+    },
+  },
+  {
+    name: 'WEB',
+    headers: {
+      'Content-Type': 'application/json',
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      'Cookie': 'CONSENT=PENDING+987; SOCS=CAESEwgDEgk0ODE3Nzk3MjQaAmVuIAEaBgiA_LyaBg',
+    },
+    context: {
+      client: {
+        clientName: 'WEB',
+        clientVersion: '2.20240101.00.00',
+      },
+    },
+  },
+] as const
+
+/**
+ * Fetch transcript via YouTube InnerTube API.
+ * Tries ANDROID client first, then WEB client with consent cookie.
+ * Handles both standard and ASR transcript XML formats.
+ */
+async function fetchTranscriptInnerTube(videoId: string, lang = 'en'): Promise<RawTranscriptItem[]> {
+  let lastError: Error | null = null
+
+  for (const client of INNERTUBE_CLIENTS) {
+    try {
+      const result = await tryInnerTubeClient(videoId, lang, client)
+      if (result.length > 0) return result
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error))
+      console.warn(`[transcript] ${client.name} client failed for ${videoId}:`, lastError.message)
+    }
+  }
+
+  throw lastError ?? new Error('All InnerTube clients failed')
+}
+
+async function tryInnerTubeClient(
+  videoId: string,
+  lang: string,
+  client: typeof INNERTUBE_CLIENTS[number],
+): Promise<RawTranscriptItem[]> {
+  const playerResponse = await fetch('https://www.youtube.com/youtubei/v1/player', {
+    method: 'POST',
+    headers: client.headers,
     body: JSON.stringify({
       context: {
         client: {
-          clientName: 'ANDROID',
-          clientVersion: '19.09.37',
-          androidSdkVersion: 33,
+          ...client.context.client,
           hl: lang,
           gl: 'US',
         },
@@ -56,10 +103,14 @@ async function fetchTranscriptInnerTube(videoId: string, lang = 'en'): Promise<R
   })
 
   const data = await playerResponse.json()
+  const playabilityStatus = data?.playabilityStatus?.status
   const captions = data?.captions?.playerCaptionsTracklistRenderer
 
+  // Log for production debugging
+  console.info(`[transcript] ${client.name} response for ${videoId}: playability=${playabilityStatus}, tracks=${captions?.captionTracks?.length ?? 0}`)
+
   if (!captions?.captionTracks?.length) {
-    throw new Error('Transcript is disabled on this video')
+    throw new Error(`Transcript is disabled on this video (${client.name}: ${playabilityStatus ?? 'no status'})`)
   }
 
   const tracks = captions.captionTracks as Array<{
@@ -77,7 +128,7 @@ async function fetchTranscriptInnerTube(videoId: string, lang = 'en'): Promise<R
 
   const transcriptResponse = await fetch(track.baseUrl, {
     headers: {
-      'User-Agent': 'com.google.android.youtube/19.09.37 (Linux; Android 13)',
+      ...client.headers,
       'Accept-Language': lang,
     },
   })
