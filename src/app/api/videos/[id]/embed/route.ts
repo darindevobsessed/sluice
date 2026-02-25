@@ -132,7 +132,7 @@ export async function POST(
     return NextResponse.json(
       {
         success: false,
-        error: 'Internal server error',
+        error: error instanceof Error ? error.message : 'Internal server error',
         chunkCount: 0,
       },
       { status: 500 }
