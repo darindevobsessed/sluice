@@ -15,6 +15,11 @@ const nextConfig: NextConfig = {
     }
     return config
   },
+  // Exclude onnxruntime-node binaries from Vercel Lambda (208MB of native
+  // binaries we don't use — onnxruntime-web WASM is used instead).
+  outputFileTracingExcludes: {
+    '*': ['node_modules/onnxruntime-node/**/*'],
+  },
   images: {
     remotePatterns: [
       {
