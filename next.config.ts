@@ -1,7 +1,13 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  serverExternalPackages: ['onnxruntime-node', '@anthropic-ai/claude-agent-sdk'],
+  serverExternalPackages: [
+    'onnxruntime-node',
+    'onnxruntime-common',
+    'onnxruntime-web',
+    '@huggingface/transformers',
+    '@anthropic-ai/claude-agent-sdk',
+  ],
   images: {
     remotePatterns: [
       {
