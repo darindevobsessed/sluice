@@ -1,8 +1,20 @@
 import { db as defaultDb } from '@/lib/db'
 import { jobs } from '@/lib/db/schema'
 import type { Job } from '@/lib/db/schema'
-import { eq, and, asc } from 'drizzle-orm'
+import { eq, and, asc, lt } from 'drizzle-orm'
 import type { JobType } from './types'
+
+/**
+ * Compute exponential backoff delay for a given attempt count.
+ * Base: 5 minutes, multiplier: 2x per retry, cap: 1 hour.
+ * Returns 0 for attempts <= 0 (no delay on first run).
+ */
+export function getBackoffMs(attempts: number): number {
+  const BASE_MS = 5 * 60 * 1000 // 5 minutes
+  const CAP_MS = 60 * 60 * 1000 // 1 hour
+  if (attempts <= 0) return 0
+  return Math.min(BASE_MS * Math.pow(2, attempts - 1), CAP_MS)
+}
 
 /**
  * Enqueue a new job
@@ -24,7 +36,9 @@ export async function enqueueJob(
 
 /**
  * Claim the next pending job for processing (atomically)
- * Uses SELECT FOR UPDATE SKIP LOCKED in a transaction to prevent race conditions
+ * Uses SELECT FOR UPDATE SKIP LOCKED in a transaction to prevent race conditions.
+ * For generate_embeddings jobs with prior attempts, respects exponential backoff
+ * using the startedAt timestamp from the last attempt.
  * @param type - Optional job type filter
  * @param dbInstance - Database instance (for testing)
  * @returns Job or null if none available
@@ -47,6 +61,18 @@ export async function claimNextJob(
       .for('update', { skipLocked: true })
 
     if (!nextJob) return null
+
+    // Apply backoff for generate_embeddings jobs on retry attempts
+    if (
+      nextJob.type === 'generate_embeddings' &&
+      nextJob.attempts > 0 &&
+      nextJob.startedAt
+    ) {
+      const backoffMs = getBackoffMs(nextJob.attempts)
+      if (nextJob.startedAt.getTime() + backoffMs > Date.now()) {
+        return null
+      }
+    }
 
     // UPDATE the claimed job
     const [claimed] = await tx.update(jobs)
@@ -97,6 +123,29 @@ export async function failJob(jobId: number, error: string, dbInstance = default
 }
 
 /**
+ * Fail an embedding job and reset to pending for retry-forever semantics.
+ * Unlike failJob, this never permanently fails — ONNX is free local infrastructure
+ * so embedding jobs always get retried. Updates startedAt so backoff is calculated
+ * from this failure timestamp.
+ * @param jobId - Job ID
+ * @param error - Error message
+ * @param dbInstance - Database instance (for testing)
+ */
+export async function failEmbeddingJob(
+  jobId: number,
+  error: string,
+  dbInstance = defaultDb
+): Promise<void> {
+  await dbInstance.update(jobs)
+    .set({
+      status: 'pending',
+      error,
+      startedAt: new Date(),
+    })
+    .where(eq(jobs.id, jobId))
+}
+
+/**
  * Get all jobs with a specific status
  * @param status - Job status to filter by
  * @param dbInstance - Database instance (for testing)
@@ -110,4 +159,28 @@ export async function getJobsByStatus(
     .from(jobs)
     .where(eq(jobs.status, status))
     .orderBy(asc(jobs.createdAt))
+}
+
+const STALE_JOB_TIMEOUT_MS = 10 * 60 * 1000 // 10 minutes
+
+/**
+ * Recover jobs stuck in processing state beyond the stale timeout.
+ * A job is considered stale if it has been processing for more than 10 minutes
+ * (indicates a crashed worker or unhandled error). Resets them to pending so
+ * they can be claimed again.
+ * @param dbInstance - Database instance (for testing)
+ * @returns Number of jobs recovered
+ */
+export async function recoverStaleJobs(dbInstance = defaultDb): Promise<number> {
+  const cutoff = new Date(Date.now() - STALE_JOB_TIMEOUT_MS)
+  const result = await dbInstance.update(jobs)
+    .set({ status: 'pending', error: 'Recovered: job exceeded 10 minute processing timeout' })
+    .where(
+      and(
+        eq(jobs.status, 'processing'),
+        lt(jobs.startedAt, cutoff)
+      )
+    )
+    .returning()
+  return result.length
 }
