@@ -1,5 +1,5 @@
 import { db as defaultDb } from '@/lib/db'
-import { jobs, videos, chunks } from '@/lib/db/schema'
+import { jobs } from '@/lib/db/schema'
 import type { Job } from '@/lib/db/schema'
 import { eq, and, asc, lt, sql } from 'drizzle-orm'
 import type { JobType } from './types'

@@ -1,21 +1,29 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { GET } from '../route'
 
-// Mock all dependencies
 vi.mock('@/lib/automation/queue', () => ({
   claimNextJob: vi.fn(),
   completeJob: vi.fn(),
   failJob: vi.fn(),
+  recoverStaleJobs: vi.fn(),
+  detectOrphanVideos: vi.fn(),
+  failEmbeddingJob: vi.fn(),
 }))
 
 vi.mock('@/lib/automation/processor', () => ({
   processJob: vi.fn(),
 }))
 
-import { claimNextJob, completeJob, failJob } from '@/lib/automation/queue'
+import { claimNextJob, completeJob, failJob, recoverStaleJobs, detectOrphanVideos, failEmbeddingJob } from '@/lib/automation/queue'
 import { processJob } from '@/lib/automation/processor'
 
-function mockJob(overrides: { id: number, type: string, payload: unknown }) {
+function authedRequest() {
+  return new Request('http://localhost/api/cron/process-jobs', {
+    headers: { authorization: 'Bearer test-secret' },
+  })
+}
+
+function mockJob(overrides: { id: number; type: string; payload: unknown }) {
   return {
     ...overrides,
     status: 'processing' as const,
@@ -34,6 +42,13 @@ describe('GET /api/cron/process-jobs', () => {
   beforeEach(() => {
     process.env = { ...originalEnv, CRON_SECRET: 'test-secret' }
     vi.clearAllMocks()
+    vi.mocked(recoverStaleJobs).mockResolvedValue(0)
+    vi.mocked(detectOrphanVideos).mockResolvedValue(0)
+    vi.mocked(claimNextJob).mockResolvedValue(null)
+    vi.mocked(completeJob).mockResolvedValue(undefined)
+    vi.mocked(failJob).mockResolvedValue(undefined)
+    vi.mocked(failEmbeddingJob).mockResolvedValue(undefined)
+    vi.mocked(processJob).mockResolvedValue(undefined)
   })
 
   afterEach(() => {
@@ -51,9 +66,7 @@ describe('GET /api/cron/process-jobs', () => {
 
   it('returns 401 when wrong auth', async () => {
     const request = new Request('http://localhost/api/cron/process-jobs', {
-      headers: {
-        authorization: 'Bearer wrong-secret',
-      },
+      headers: { authorization: 'Bearer wrong-secret' },
     })
     const response = await GET(request)
 
@@ -65,9 +78,7 @@ describe('GET /api/cron/process-jobs', () => {
   it('returns 401 when CRON_SECRET is unset', async () => {
     delete process.env.CRON_SECRET
     const request = new Request('http://localhost/api/cron/process-jobs', {
-      headers: {
-        authorization: 'Bearer undefined',
-      },
+      headers: { authorization: 'Bearer undefined' },
     })
     const response = await GET(request)
 
@@ -76,189 +87,194 @@ describe('GET /api/cron/process-jobs', () => {
     expect(text).toBe('Unauthorized')
   })
 
-  it('returns success with 0 processed when no pending jobs', async () => {
-    const request = new Request('http://localhost/api/cron/process-jobs', {
-      headers: {
-        authorization: 'Bearer test-secret',
-      },
-    })
-
-    vi.mocked(claimNextJob).mockResolvedValue(null)
-
-    const response = await GET(request)
+  it('runs all three phases with no work to do and returns all zeros', async () => {
+    const response = await GET(authedRequest())
 
     expect(response.status).toBe(200)
     const data = await response.json()
-    expect(data).toEqual({ processed: 0, failed: 0 })
-  })
-
-  it('processes multiple jobs successfully', async () => {
-    const request = new Request('http://localhost/api/cron/process-jobs', {
-      headers: {
-        authorization: 'Bearer test-secret',
-      },
+    expect(data).toEqual({
+      recovered: 0,
+      orphansEnqueued: 0,
+      embeddingsProcessed: 0,
+      embeddingsFailed: 0,
+      otherProcessed: 0,
+      otherFailed: 0,
     })
 
-    const job1 = mockJob({ id: 1, type: 'fetch_transcript', payload: { videoId: 123, youtubeId: 'abc123' } })
-    const job2 = mockJob({ id: 2, type: 'generate_embeddings', payload: { videoId: 456 } })
+    expect(recoverStaleJobs).toHaveBeenCalledTimes(1)
+    expect(detectOrphanVideos).toHaveBeenCalledTimes(1)
+    expect(claimNextJob).toHaveBeenCalledWith('generate_embeddings')
+    expect(claimNextJob).toHaveBeenCalledWith('fetch_transcript')
+  })
 
-    // Mock claiming two jobs, then no more jobs
+  it('reports stale recovery and orphan counts in response', async () => {
+    vi.mocked(recoverStaleJobs).mockResolvedValue(3)
+    vi.mocked(detectOrphanVideos).mockResolvedValue(2)
+
+    const response = await GET(authedRequest())
+
+    expect(response.status).toBe(200)
+    const data = await response.json()
+    expect(data.recovered).toBe(3)
+    expect(data.orphansEnqueued).toBe(2)
+  })
+
+  it('processes one embedding job per invocation', async () => {
+    const embeddingJob = mockJob({ id: 1, type: 'generate_embeddings', payload: { videoId: 42 } })
+
     vi.mocked(claimNextJob)
-      .mockResolvedValueOnce(job1)
-      .mockResolvedValueOnce(job2)
-      .mockResolvedValueOnce(null)
+      .mockImplementation(async (type) => {
+        if (type === 'generate_embeddings') return embeddingJob
+        return null
+      })
 
-    vi.mocked(processJob).mockResolvedValue(undefined)
-    vi.mocked(completeJob).mockResolvedValue(undefined)
-
-    const response = await GET(request)
+    const response = await GET(authedRequest())
 
     expect(response.status).toBe(200)
     const data = await response.json()
-    expect(data).toEqual({ processed: 2, failed: 0 })
+    expect(data.embeddingsProcessed).toBe(1)
+    expect(data.embeddingsFailed).toBe(0)
 
-    expect(claimNextJob).toHaveBeenCalledTimes(3)
-    expect(processJob).toHaveBeenCalledTimes(2)
-    expect(processJob).toHaveBeenCalledWith(job1)
-    expect(processJob).toHaveBeenCalledWith(job2)
-    expect(completeJob).toHaveBeenCalledTimes(2)
-    expect(completeJob).toHaveBeenCalledWith(1)
-    expect(completeJob).toHaveBeenCalledWith(2)
+    expect(processJob).toHaveBeenCalledWith(embeddingJob)
+    expect(completeJob).toHaveBeenCalledWith(embeddingJob.id)
+    // claimNextJob for embeddings called exactly once
+    expect(claimNextJob).toHaveBeenCalledWith('generate_embeddings')
   })
 
-  it('handles job failure and calls failJob', async () => {
-    const request = new Request('http://localhost/api/cron/process-jobs', {
-      headers: {
-        authorization: 'Bearer test-secret',
-      },
-    })
+  it('uses failEmbeddingJob for embedding failures, not failJob', async () => {
+    const embeddingJob = mockJob({ id: 7, type: 'generate_embeddings', payload: { videoId: 99 } })
 
-    const job = mockJob({ id: 1, type: 'fetch_transcript', payload: { videoId: 123, youtubeId: 'abc123' } })
+    vi.mocked(claimNextJob)
+      .mockImplementation(async (type) => {
+        if (type === 'generate_embeddings') return embeddingJob
+        return null
+      })
+    vi.mocked(processJob).mockRejectedValueOnce(new Error('ONNX crash'))
 
-    vi.mocked(claimNextJob).mockResolvedValueOnce(job).mockResolvedValueOnce(null)
-
-    vi.mocked(processJob).mockRejectedValueOnce(new Error('Transcript fetch failed'))
-    vi.mocked(failJob).mockResolvedValue(undefined)
-
-    const response = await GET(request)
+    const response = await GET(authedRequest())
 
     expect(response.status).toBe(200)
     const data = await response.json()
-    expect(data).toEqual({ processed: 0, failed: 1 })
+    expect(data.embeddingsFailed).toBe(1)
+    expect(data.embeddingsProcessed).toBe(0)
 
-    expect(processJob).toHaveBeenCalledWith(job)
-    expect(failJob).toHaveBeenCalledWith(1, 'Transcript fetch failed')
-    expect(completeJob).not.toHaveBeenCalled()
+    expect(failEmbeddingJob).toHaveBeenCalledWith(7, 'ONNX crash')
+    expect(failJob).not.toHaveBeenCalled()
   })
 
-  it('stops processing after maxJobs', async () => {
-    const request = new Request('http://localhost/api/cron/process-jobs', {
-      headers: {
-        authorization: 'Bearer test-secret',
-      },
-    })
+  it('uses regular failJob for fetch_transcript failures', async () => {
+    const transcriptJob = mockJob({ id: 5, type: 'fetch_transcript', payload: { videoId: 10, youtubeId: 'abc' } })
 
-    // Create 6 jobs (more than maxJobs of 5)
-    const jobs = Array.from({ length: 6 }, (_, i) =>
-      mockJob({ id: i + 1, type: 'fetch_transcript', payload: { videoId: i + 1, youtubeId: `video${i + 1}` } })
+    // Return the job once, then null so the loop stops after one job
+    vi.mocked(claimNextJob)
+      .mockImplementation(async (type) => {
+        if (type === 'generate_embeddings') return null
+        return null
+      })
+    vi.mocked(claimNextJob)
+      .mockResolvedValueOnce(null)         // generate_embeddings call
+      .mockResolvedValueOnce(transcriptJob) // first fetch_transcript call
+      .mockResolvedValue(null)              // subsequent fetch_transcript calls
+
+    vi.mocked(processJob).mockRejectedValueOnce(new Error('Network timeout'))
+
+    const response = await GET(authedRequest())
+
+    expect(response.status).toBe(200)
+    const data = await response.json()
+    expect(data.otherFailed).toBe(1)
+    expect(data.otherProcessed).toBe(0)
+
+    expect(failJob).toHaveBeenCalledWith(5, 'Network timeout')
+    expect(failEmbeddingJob).not.toHaveBeenCalled()
+  })
+
+  it('processes embedding and transcript jobs in same invocation', async () => {
+    const embeddingJob = mockJob({ id: 1, type: 'generate_embeddings', payload: { videoId: 42 } })
+    const transcriptJob = mockJob({ id: 2, type: 'fetch_transcript', payload: { videoId: 10, youtubeId: 'abc' } })
+
+    vi.mocked(claimNextJob)
+      .mockImplementation(async (type) => {
+        if (type === 'generate_embeddings') return embeddingJob
+        if (type === 'fetch_transcript') return transcriptJob
+        return null
+      })
+
+    // Second call for fetch_transcript returns null (only one transcript job)
+    let transcriptCallCount = 0
+    vi.mocked(claimNextJob)
+      .mockImplementation(async (type) => {
+        if (type === 'generate_embeddings') return embeddingJob
+        if (type === 'fetch_transcript') {
+          transcriptCallCount++
+          return transcriptCallCount === 1 ? transcriptJob : null
+        }
+        return null
+      })
+
+    const response = await GET(authedRequest())
+
+    expect(response.status).toBe(200)
+    const data = await response.json()
+    expect(data.embeddingsProcessed).toBe(1)
+    expect(data.otherProcessed).toBe(1)
+    expect(completeJob).toHaveBeenCalledWith(embeddingJob.id)
+    expect(completeJob).toHaveBeenCalledWith(transcriptJob.id)
+  })
+
+  it('processes up to 5 fetch_transcript jobs per invocation', async () => {
+    const transcriptJobs = Array.from({ length: 6 }, (_, i) =>
+      mockJob({ id: i + 1, type: 'fetch_transcript', payload: { videoId: i + 1, youtubeId: `vid${i + 1}` } })
     )
 
-    // Mock claiming jobs - all 6 available
-    vi.mocked(claimNextJob).mockImplementation(async () => {
-      const job = jobs.shift()
-      return job ?? null
-    })
+    let callCount = 0
+    vi.mocked(claimNextJob)
+      .mockImplementation(async (type) => {
+        if (type === 'generate_embeddings') return null
+        if (type === 'fetch_transcript') {
+          return transcriptJobs[callCount++] ?? null
+        }
+        return null
+      })
 
-    vi.mocked(processJob).mockResolvedValue(undefined)
-    vi.mocked(completeJob).mockResolvedValue(undefined)
-
-    const response = await GET(request)
+    const response = await GET(authedRequest())
 
     expect(response.status).toBe(200)
     const data = await response.json()
-    // Should only process 5, not 6
-    expect(data).toEqual({ processed: 5, failed: 0 })
-
-    expect(claimNextJob).toHaveBeenCalledTimes(5)
+    expect(data.otherProcessed).toBe(5)
+    expect(data.otherFailed).toBe(0)
     expect(processJob).toHaveBeenCalledTimes(5)
   })
 
   it('returns 500 on critical error', async () => {
-    const request = new Request('http://localhost/api/cron/process-jobs', {
-      headers: {
-        authorization: 'Bearer test-secret',
-      },
-    })
+    vi.mocked(recoverStaleJobs).mockRejectedValue(new Error('Database connection failed'))
 
-    // Mock a critical error at the top level
-    vi.mocked(claimNextJob).mockRejectedValue(new Error('Database connection failed'))
-
-    const response = await GET(request)
+    const response = await GET(authedRequest())
 
     expect(response.status).toBe(500)
     const data = await response.json()
     expect(data).toEqual({ error: 'Failed to process jobs' })
   })
 
-  it('handles mixed success and failure', async () => {
-    const request = new Request('http://localhost/api/cron/process-jobs', {
-      headers: {
-        authorization: 'Bearer test-secret',
-      },
-    })
-
-    const job1 = mockJob({ id: 1, type: 'fetch_transcript', payload: { videoId: 123, youtubeId: 'abc123' } })
-    const job2 = mockJob({ id: 2, type: 'generate_embeddings', payload: { videoId: 456 } })
-    const job3 = mockJob({ id: 3, type: 'fetch_transcript', payload: { videoId: 789, youtubeId: 'xyz789' } })
-
-    vi.mocked(claimNextJob)
-      .mockResolvedValueOnce(job1)
-      .mockResolvedValueOnce(job2)
-      .mockResolvedValueOnce(job3)
-      .mockResolvedValueOnce(null)
-
-    // job1 succeeds, job2 fails, job3 succeeds
-    vi.mocked(processJob)
-      .mockResolvedValueOnce(undefined)
-      .mockRejectedValueOnce(new Error('Embedding failed'))
-      .mockResolvedValueOnce(undefined)
-
-    vi.mocked(completeJob).mockResolvedValue(undefined)
-    vi.mocked(failJob).mockResolvedValue(undefined)
-
-    const response = await GET(request)
-
-    expect(response.status).toBe(200)
-    const data = await response.json()
-    expect(data).toEqual({ processed: 2, failed: 1 })
-
-    expect(completeJob).toHaveBeenCalledTimes(2)
-    expect(completeJob).toHaveBeenCalledWith(1)
-    expect(completeJob).toHaveBeenCalledWith(3)
-    expect(failJob).toHaveBeenCalledTimes(1)
-    expect(failJob).toHaveBeenCalledWith(2, 'Embedding failed')
-  })
-
   it('handles non-Error thrown values', async () => {
-    const request = new Request('http://localhost/api/cron/process-jobs', {
-      headers: {
-        authorization: 'Bearer test-secret',
-      },
-    })
+    const transcriptJob = mockJob({ id: 1, type: 'fetch_transcript', payload: { videoId: 1, youtubeId: 'abc' } })
 
-    const job = mockJob({ id: 1, type: 'fetch_transcript', payload: { videoId: 123, youtubeId: 'abc123' } })
-
-    vi.mocked(claimNextJob).mockResolvedValueOnce(job).mockResolvedValueOnce(null)
-
-    // Throw a non-Error value
+    let callCount = 0
+    vi.mocked(claimNextJob)
+      .mockImplementation(async (type) => {
+        if (type === 'fetch_transcript') {
+          callCount++
+          return callCount === 1 ? transcriptJob : null
+        }
+        return null
+      })
     vi.mocked(processJob).mockRejectedValueOnce('String error')
-    vi.mocked(failJob).mockResolvedValue(undefined)
 
-    const response = await GET(request)
+    const response = await GET(authedRequest())
 
     expect(response.status).toBe(200)
     const data = await response.json()
-    expect(data).toEqual({ processed: 0, failed: 1 })
+    expect(data.otherFailed).toBe(1)
 
     expect(failJob).toHaveBeenCalledWith(1, 'Unknown error')
   })

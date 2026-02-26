@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { getRelatedChunks } from '../traverse'
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres'

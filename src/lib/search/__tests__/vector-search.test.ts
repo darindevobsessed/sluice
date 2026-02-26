@@ -419,7 +419,7 @@ describe('vectorSearch', () => {
     it('throws TypeError for non-array embedding', async () => {
       await expect(
         vectorSearch(
-          'not an array' as any,
+          'not an array' as unknown as number[],
           10,
           0.3,
           mockDb as unknown as NodePgDatabase<typeof schema>,
