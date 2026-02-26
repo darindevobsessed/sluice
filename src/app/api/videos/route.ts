@@ -7,6 +7,7 @@ import { chunkTranscript } from '@/lib/embeddings/chunker'
 import type { TranscriptSegment } from '@/lib/embeddings/types'
 import { fetchVideoPageMetadata } from '@/lib/youtube/metadata'
 import { startApiTimer } from '@/lib/api-timing'
+import { enqueueJob } from '@/lib/automation/queue'
 
 const videoSchema = z.object({
   youtubeId: z.string().min(1).optional(),
@@ -229,33 +230,28 @@ export async function POST(request: Request) {
 
     const createdVideo = result[0];
 
-    // Trigger auto-embed if video has transcript
+    // Auto-embed: local = inline after(), production = job queue (avoids OOM)
     if (createdVideo && transcript && transcript.trim().length > 0) {
-      after(async () => {
-        try {
-          // Parse transcript and convert to embedding format
-          const parsedSegments = parseTranscript(transcript)
-          const segments: TranscriptSegment[] = parsedSegments.map(seg => ({
-            text: seg.text,
-            offset: seg.seconds * 1000, // Convert seconds to milliseconds
-          }))
-
-          // Chunk transcript
-          const chunks = chunkTranscript(segments)
-
-          if (chunks.length === 0) {
-            console.error(`[auto-embed] No chunks generated for video ${createdVideo.id}`)
-            return
+      if (process.env.VERCEL) {
+        await enqueueJob('generate_embeddings', { videoId: createdVideo.id })
+      } else {
+        after(async () => {
+          try {
+            const parsedSegments = parseTranscript(transcript)
+            const segments: TranscriptSegment[] = parsedSegments.map(seg => ({
+              text: seg.text,
+              offset: seg.seconds * 1000,
+            }))
+            const chunks = chunkTranscript(segments)
+            if (chunks.length === 0) return
+            const { embedChunks } = await import('@/lib/embeddings/service')
+            const result = await embedChunks(chunks, undefined, createdVideo.id)
+            console.log(`[auto-embed] Generated ${result.successCount} embeddings for video ${createdVideo.id}`)
+          } catch (error) {
+            console.error(`[auto-embed] Failed for video ${createdVideo.id}:`, error)
           }
-
-          // Dynamic import to avoid ONNX native library crash on module load
-          const { embedChunks } = await import('@/lib/embeddings/service')
-          const result = await embedChunks(chunks, undefined, createdVideo.id)
-          console.log(`[auto-embed] Generated ${result.successCount} embeddings for video ${createdVideo.id}`)
-        } catch (error) {
-          console.error(`[auto-embed] Failed for video ${createdVideo.id}:`, error)
-        }
-      })
+        })
+      }
     }
 
     if (!createdVideo) {

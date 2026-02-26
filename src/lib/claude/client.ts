@@ -1,7 +1,10 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { EventEmitter } from 'events'
 
-const MODEL = 'claude-sonnet-4-20250514'
+// Gateway requires 'anthropic/' prefix; direct SDK uses the raw model ID
+const MODEL = process.env.AI_GATEWAY_KEY
+  ? 'anthropic/claude-sonnet-4-20250514'
+  : 'claude-sonnet-4-20250514'
 const MAX_TOKENS = 4096
 
 /**
@@ -28,7 +31,11 @@ let _client: Anthropic | null = null
 function getClient(): Anthropic {
   if (!_client) {
     const apiKey = (process.env.ANTHROPIC_API_KEY || process.env.AI_GATEWAY_KEY || '').trim()
-    _client = new Anthropic({ apiKey })
+    _client = new Anthropic({
+      apiKey,
+      // Route through Vercel AI Gateway when AI_GATEWAY_KEY is set (production)
+      ...(process.env.AI_GATEWAY_KEY ? { baseURL: 'https://ai-gateway.vercel.sh' } : {}),
+    })
   }
   return _client
 }

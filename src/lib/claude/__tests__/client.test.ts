@@ -54,11 +54,15 @@ describe('client API key trimming', () => {
     const { generateText } = await import('../client')
     await generateText('test prompt')
 
-    expect(constructorSpy).toHaveBeenCalledWith({ apiKey: 'sk-ant-gateway-key' })
+    expect(constructorSpy).toHaveBeenCalledWith({
+      apiKey: 'sk-ant-gateway-key',
+      baseURL: 'https://ai-gateway.vercel.sh',
+    })
   })
 
-  it('passes clean key through unchanged', async () => {
+  it('passes clean key through unchanged (no gateway)', async () => {
     process.env.ANTHROPIC_API_KEY = 'sk-ant-clean-key'
+    delete process.env.AI_GATEWAY_KEY
 
     const { generateText } = await import('../client')
     await generateText('test prompt')
