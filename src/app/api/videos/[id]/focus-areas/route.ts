@@ -3,12 +3,15 @@ import { eq, and } from 'drizzle-orm'
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { startApiTimer } from '@/lib/api-timing'
+import { requireSession } from '@/lib/auth-guards'
 
 const assignFocusAreaSchema = z.object({
   focusAreaId: z.number().int().positive('Focus area ID is required'),
 })
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const denied = await requireSession()
+  if (denied) return denied
   const timer = startApiTimer('/api/videos/[id]/focus-areas', 'GET')
   try {
     const { id: idParam } = await params
@@ -52,6 +55,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 }
 
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const denied = await requireSession()
+  if (denied) return denied
   const timer = startApiTimer('/api/videos/[id]/focus-areas', 'POST')
   try {
     const { id: idParam } = await params
@@ -136,6 +141,8 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 }
 
 export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const denied = await requireSession()
+  if (denied) return denied
   const timer = startApiTimer('/api/videos/[id]/focus-areas', 'DELETE')
   try {
     const { id: idParam } = await params

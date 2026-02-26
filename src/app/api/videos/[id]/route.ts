@@ -2,11 +2,14 @@ import { db, videos } from "@/lib/db";
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { startApiTimer } from '@/lib/api-timing'
+import { requireSession } from '@/lib/auth-guards'
 
 export async function GET(
   _request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const denied = await requireSession()
+  if (denied) return denied
   const timer = startApiTimer('/api/videos/[id]', 'GET')
   try {
     const { id } = await params;

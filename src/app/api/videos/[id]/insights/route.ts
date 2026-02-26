@@ -2,8 +2,7 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { getExtractionForVideo, upsertExtraction } from '@/lib/db/insights'
 import { startApiTimer } from '@/lib/api-timing'
-import { auth } from '@/lib/auth'
-import { headers } from 'next/headers'
+import { requireSession } from '@/lib/auth-guards'
 
 const extractionSchema = z.object({
   extraction: z.object({
@@ -76,6 +75,8 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const denied = await requireSession()
+  if (denied) return denied
   const { id } = await params
   const videoId = parseInt(id, 10)
   const timer = startApiTimer(`/api/videos/${id}/insights`, 'GET')
@@ -119,6 +120,8 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const denied = await requireSession()
+  if (denied) return denied
   const { id } = await params
   const videoId = parseInt(id, 10)
   const timer = startApiTimer(`/api/videos/${id}/insights`, 'POST')
@@ -126,15 +129,6 @@ export async function POST(
     if (isNaN(videoId)) {
       timer.end(400)
       return NextResponse.json({ error: 'Invalid video ID' }, { status: 400 })
-    }
-
-    // Require authenticated session for POST (skip in dev — no login locally)
-    if (process.env.NODE_ENV !== 'development') {
-      const session = await auth.api.getSession({ headers: await headers() })
-      if (!session) {
-        timer.end(401)
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-      }
     }
 
     let rawBody: unknown

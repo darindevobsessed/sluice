@@ -8,6 +8,7 @@ import type { TranscriptSegment } from '@/lib/embeddings/types'
 import { fetchVideoPageMetadata } from '@/lib/youtube/metadata'
 import { startApiTimer } from '@/lib/api-timing'
 import { enqueueJob } from '@/lib/automation/queue'
+import { requireSession } from '@/lib/auth-guards'
 
 const videoSchema = z.object({
   youtubeId: z.string().min(1).optional(),
@@ -33,6 +34,8 @@ const videoSchema = z.object({
 });
 
 export async function GET(request: Request) {
+  const denied = await requireSession()
+  if (denied) return denied
   const timer = startApiTimer('/api/videos', 'GET')
   try {
     const { searchParams } = new URL(request.url);
@@ -139,6 +142,8 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const denied = await requireSession()
+  if (denied) return denied
   const timer = startApiTimer('/api/videos', 'POST')
   try {
     const body = await request.json();

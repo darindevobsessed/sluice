@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { db, chunks } from '@/lib/db';
 import { eq, isNotNull, count, and } from 'drizzle-orm';
 import { startApiTimer } from '@/lib/api-timing'
+import { requireSession } from '@/lib/auth-guards'
 
 interface StatusResponse {
   hasEmbeddings: boolean;
@@ -22,6 +23,8 @@ export async function GET(
   request: Request,
   context: RouteContext
 ): Promise<NextResponse<StatusResponse>> {
+  const denied = await requireSession()
+  if (denied) return denied as NextResponse<StatusResponse>
   const timer = startApiTimer('/api/videos/[id]/embed/status', 'GET')
   try {
     const { id } = await context.params;

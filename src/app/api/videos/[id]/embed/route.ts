@@ -5,6 +5,7 @@ import { parseTranscript } from '@/lib/transcript/parse';
 import { chunkTranscript } from '@/lib/embeddings/chunker';
 import type { TranscriptSegment } from '@/lib/embeddings/types';
 import { startApiTimer } from '@/lib/api-timing';
+import { requireSession } from '@/lib/auth-guards';
 
 interface EmbedResponse {
   success: boolean;
@@ -29,6 +30,8 @@ export async function POST(
   request: Request,
   context: RouteContext
 ): Promise<NextResponse<EmbedResponse>> {
+  const denied = await requireSession()
+  if (denied) return denied as NextResponse<EmbedResponse>
   const { id } = await context.params;
   const videoId = parseInt(id, 10);
   const timer = startApiTimer(`/api/videos/${id}/embed`, 'POST')

@@ -1,6 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import type { RelatedChunk } from '@/lib/graph/types'
 
+vi.mock('@/lib/auth-guards', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/auth-guards')>()
+  return {
+    ...actual,
+    requireSession: vi.fn().mockResolvedValue(null),
+  }
+})
+
 // Mock the traverse module
 vi.mock('@/lib/graph/traverse', () => ({
   getRelatedChunks: vi.fn(),

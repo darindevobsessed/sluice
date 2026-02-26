@@ -1,7 +1,8 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import type { ExtractionResult } from '@/lib/claude/prompts/types'
+import type { NextResponse } from 'next/server'
 
-// Mock auth module
+// Mock auth module (kept for test infrastructure compatibility)
 const mockGetSession = vi.fn()
 vi.mock('@/lib/auth', () => ({
   auth: {
@@ -11,11 +12,19 @@ vi.mock('@/lib/auth', () => ({
   },
 }))
 
-// Mock next/headers
+// Mock next/headers (kept for test infrastructure compatibility)
 const mockHeaders = vi.fn()
 vi.mock('next/headers', () => ({
   headers: () => mockHeaders(),
 }))
+
+vi.mock('@/lib/auth-guards', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/auth-guards')>()
+  return {
+    ...actual,
+    requireSession: vi.fn().mockResolvedValue(null),
+  }
+})
 
 // Mock the insights module
 const mockGetExtractionForVideo = vi.fn()
@@ -125,7 +134,10 @@ describe('POST /api/videos/[id]/insights', () => {
   })
 
   it('returns 401 when no session exists', async () => {
-    mockGetSession.mockResolvedValue(null)
+    const { requireSession } = await import('@/lib/auth-guards')
+    vi.mocked(requireSession).mockResolvedValueOnce(
+      new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 }) as unknown as NextResponse
+    )
 
     const request = new Request('http://localhost:3000/api/videos/1/insights', {
       method: 'POST',

@@ -6,6 +6,14 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { POST } from '../route';
 import * as transcriptLib from '@/lib/youtube/transcript';
 
+vi.mock('@/lib/auth-guards', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/auth-guards')>()
+  return {
+    ...actual,
+    requireSession: vi.fn().mockResolvedValue(null),
+  }
+})
+
 // Mock dependencies
 vi.mock('@/lib/youtube/transcript', () => ({
   fetchTranscript: vi.fn(),

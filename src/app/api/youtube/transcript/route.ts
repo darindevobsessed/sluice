@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { fetchTranscript, clearTranscriptCache } from '@/lib/youtube/transcript';
 import { z } from 'zod';
+import { requireSession } from '@/lib/auth-guards';
 
 const requestSchema = z.object({
   videoId: z.string().min(1).max(20),
@@ -8,6 +9,8 @@ const requestSchema = z.object({
 });
 
 export async function POST(request: Request) {
+  const denied = await requireSession()
+  if (denied) return denied
   try {
     const body = await request.json();
     const { videoId, forceRefresh } = requestSchema.parse(body);

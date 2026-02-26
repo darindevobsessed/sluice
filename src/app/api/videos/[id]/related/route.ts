@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getRelatedChunks } from '@/lib/graph/traverse'
 import { startApiTimer } from '@/lib/api-timing'
+import { requireSession } from '@/lib/auth-guards'
 
 interface RouteContext {
   params: Promise<{ id: string }>
@@ -10,6 +11,8 @@ export async function GET(
   request: Request,
   context: RouteContext
 ): Promise<NextResponse> {
+  const denied = await requireSession()
+  if (denied) return denied
   const timer = startApiTimer('/api/videos/[id]/related', 'GET')
   const { id } = await context.params
   const videoId = parseInt(id, 10)
