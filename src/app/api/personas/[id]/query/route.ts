@@ -5,6 +5,7 @@ import { eq } from 'drizzle-orm'
 import { getPersonaContext } from '@/lib/personas/context'
 import { streamPersonaResponse } from '@/lib/personas/streaming'
 import { startApiTimer } from '@/lib/api-timing'
+import { requireSession } from '@/lib/auth-guards'
 
 const querySchema = z.object({
   question: z.string().min(1, 'Question is required'),
@@ -22,6 +23,8 @@ const querySchema = z.object({
  * Response: text/event-stream with SSE events
  */
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const denied = await requireSession()
+  if (denied) return denied
   const { id } = await params
   const timer = startApiTimer(`/api/personas/${id}/query`, 'POST')
   try {

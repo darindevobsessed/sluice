@@ -3,6 +3,14 @@ import { Pool } from 'pg'
 import { drizzle } from 'drizzle-orm/node-postgres'
 import * as schema from '@/lib/db/schema'
 
+vi.mock('@/lib/auth-guards', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/auth-guards')>()
+  return {
+    ...actual,
+    requireSession: vi.fn().mockResolvedValue(null),
+  }
+})
+
 // Setup test database
 const TEST_DATABASE_URL =
   process.env.DATABASE_URL?.replace(/\/goldminer$/, '/goldminer_test') ??

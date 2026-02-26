@@ -3,6 +3,7 @@ import { eq } from 'drizzle-orm'
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { startApiTimer } from '@/lib/api-timing'
+import { requireSession } from '@/lib/auth-guards'
 
 const updateFocusAreaSchema = z.object({
   name: z
@@ -17,6 +18,8 @@ export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const denied = await requireSession()
+  if (denied) return denied
   const timer = startApiTimer('/api/focus-areas/[id]', 'PATCH')
   try {
     const { id: idParam } = await params
@@ -98,6 +101,8 @@ export async function DELETE(
   _request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const denied = await requireSession()
+  if (denied) return denied
   const timer = startApiTimer('/api/focus-areas/[id]', 'DELETE')
   try {
     const { id: idParam } = await params

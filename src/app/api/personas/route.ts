@@ -3,12 +3,15 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createPersona } from '@/lib/personas/service'
 import { startApiTimer } from '@/lib/api-timing'
+import { requireSession } from '@/lib/auth-guards'
 
 const createPersonaSchema = z.object({
   channelName: z.string().min(1, 'Channel name is required'),
 })
 
 export async function GET() {
+  const denied = await requireSession()
+  if (denied) return denied
   const timer = startApiTimer('/api/personas', 'GET')
   try {
     const allPersonas = await db.select().from(personas)
@@ -22,6 +25,8 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const denied = await requireSession()
+  if (denied) return denied
   const timer = startApiTimer('/api/personas', 'POST')
   try {
     // Parse and validate request body

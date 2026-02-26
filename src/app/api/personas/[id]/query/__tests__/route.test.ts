@@ -5,6 +5,14 @@ import { getPersonaContext } from '@/lib/personas/context'
 import { streamPersonaResponse } from '@/lib/personas/streaming'
 import type { Persona } from '@/lib/db/schema'
 
+vi.mock('@/lib/auth-guards', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/auth-guards')>()
+  return {
+    ...actual,
+    requireSession: vi.fn().mockResolvedValue(null),
+  }
+})
+
 // Mock dependencies
 vi.mock('@/lib/db', async () => {
   const actual = await vi.importActual('@/lib/db')

@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { db, personas } from '@/lib/db'
 import { inArray } from 'drizzle-orm'
 import { findBestPersonas, streamEnsembleResponse } from '@/lib/personas/ensemble'
+import { requireSession } from '@/lib/auth-guards'
 
 const EnsembleQuerySchema = z.object({
   question: z.string().min(1, 'Question cannot be empty'),
@@ -28,6 +29,8 @@ const EnsembleQuerySchema = z.object({
  * - 500: Server error
  */
 export async function POST(request: Request) {
+  const denied = await requireSession()
+  if (denied) return denied
   try {
     // Parse and validate request body
     let body: unknown

@@ -2,11 +2,14 @@ import { db, personas } from '@/lib/db'
 import { NextResponse } from 'next/server'
 import { eq } from 'drizzle-orm'
 import { startApiTimer } from '@/lib/api-timing'
+import { requireSession } from '@/lib/auth-guards'
 
 export async function DELETE(
   request: Request,
   context: { params: Promise<{ id: string }> }
 ) {
+  const denied = await requireSession()
+  if (denied) return denied
   const timer = startApiTimer('/api/personas/[id]', 'DELETE')
   try {
     const { id } = await context.params

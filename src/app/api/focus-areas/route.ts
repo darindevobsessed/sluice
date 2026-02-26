@@ -3,6 +3,7 @@ import { eq } from 'drizzle-orm'
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { startApiTimer } from '@/lib/api-timing'
+import { requireSession } from '@/lib/auth-guards'
 
 const createFocusAreaSchema = z.object({
   name: z.string().min(1, 'Name is required').transform((val) => val.trim()),
@@ -10,6 +11,8 @@ const createFocusAreaSchema = z.object({
 })
 
 export async function GET() {
+  const denied = await requireSession()
+  if (denied) return denied
   const timer = startApiTimer('/api/focus-areas', 'GET')
   try {
     const allFocusAreas = await db.select().from(focusAreas)
@@ -27,6 +30,8 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const denied = await requireSession()
+  if (denied) return denied
   const timer = startApiTimer('/api/focus-areas', 'POST')
   try {
     const body = await request.json()

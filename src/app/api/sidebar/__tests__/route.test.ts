@@ -1,5 +1,13 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
+vi.mock('@/lib/auth-guards', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/auth-guards')>()
+  return {
+    ...actual,
+    requireSession: vi.fn().mockResolvedValue(null),
+  }
+})
+
 // Mock channel and focus area query results
 let mockChannelResults: { channel: string | null; videoCount: number }[] = []
 let mockFocusAreaResults: { id: number; name: string; color: string | null; createdAt: Date }[] = []

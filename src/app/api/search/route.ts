@@ -5,6 +5,7 @@ import { hybridSearch } from '@/lib/search/hybrid-search';
 import { aggregateByVideo, type VideoResult } from '@/lib/search/aggregate';
 import type { SearchResult } from '@/lib/search/types';
 import { startApiTimer } from '@/lib/api-timing';
+import { requireSession } from '@/lib/auth-guards';
 
 /**
  * Search mode: vector, keyword, or hybrid (RRF)
@@ -39,6 +40,8 @@ interface SearchResponse {
  * Returns empty results if query is empty/missing.
  */
 export async function GET(request: Request) {
+  const denied = await requireSession()
+  if (denied) return denied
   const { searchParams } = new URL(request.url);
   const query = searchParams.get('q') || '';
   const limit = parseInt(searchParams.get('limit') || '10', 10);

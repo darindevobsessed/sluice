@@ -3,6 +3,14 @@ import { GET, POST } from '../route'
 import { db } from '@/lib/db'
 import { createPersona } from '@/lib/personas/service'
 
+vi.mock('@/lib/auth-guards', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/auth-guards')>()
+  return {
+    ...actual,
+    requireSession: vi.fn().mockResolvedValue(null),
+  }
+})
+
 // Mock dependencies
 vi.mock('@/lib/db', async () => {
   const actual = await vi.importActual('@/lib/db')

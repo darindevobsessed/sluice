@@ -2,6 +2,14 @@ import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
 import { DELETE } from '../route'
 import { db } from '@/lib/db'
 
+vi.mock('@/lib/auth-guards', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/auth-guards')>()
+  return {
+    ...actual,
+    requireSession: vi.fn().mockResolvedValue(null),
+  }
+})
+
 // Mock dependencies
 vi.mock('@/lib/db', async () => {
   const actual = await vi.importActual('@/lib/db')

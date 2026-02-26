@@ -2,6 +2,7 @@ import { db, videos, focusAreas } from '@/lib/db'
 import { sql } from 'drizzle-orm'
 import { NextResponse } from 'next/server'
 import { startApiTimer } from '@/lib/api-timing'
+import { requireSession } from '@/lib/auth-guards'
 
 /**
  * GET /api/sidebar
@@ -14,6 +15,8 @@ import { startApiTimer } from '@/lib/api-timing'
  * "creators in the knowledge bank" — any video with a non-null channel field.
  */
 export async function GET() {
+  const denied = await requireSession()
+  if (denied) return denied
   const timer = startApiTimer('/api/sidebar', 'GET')
   try {
     // Get distinct channels with video counts, sorted by count descending

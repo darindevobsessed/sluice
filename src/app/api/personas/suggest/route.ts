@@ -4,8 +4,11 @@ import { sql } from 'drizzle-orm'
 
 import { PERSONA_THRESHOLD } from '@/lib/personas/service'
 import { startApiTimer } from '@/lib/api-timing'
+import { requireSession } from '@/lib/auth-guards'
 
 export async function GET() {
+  const denied = await requireSession()
+  if (denied) return denied
   const timer = startApiTimer('/api/personas/suggest', 'GET')
   try {
     // Get existing persona channel names
