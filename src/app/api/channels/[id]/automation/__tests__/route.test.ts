@@ -1,5 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
+vi.mock('@/lib/auth-guards', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/auth-guards')>()
+  return {
+    ...actual,
+    requireSession: vi.fn().mockResolvedValue(null),
+  }
+})
+
 // Mock database and query modules
 const mockDb = {
   select: vi.fn(),

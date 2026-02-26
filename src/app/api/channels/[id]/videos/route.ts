@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { fetchChannelFeed } from '@/lib/automation/rss'
 import { startApiTimer } from '@/lib/api-timing'
+import { requireSession } from '@/lib/auth-guards'
 
 const channelIdSchema = z.string().regex(/^[1-9]\d*$/, 'Channel ID must be a positive integer')
 
@@ -11,6 +12,8 @@ export async function GET(
   _request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const denied = await requireSession()
+  if (denied) return denied
   const timer = startApiTimer('/api/channels/[id]/videos', 'GET')
   try {
     const { id } = await params

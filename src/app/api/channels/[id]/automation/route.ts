@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { updateChannelAutomation } from '@/lib/automation/queries'
 import { startApiTimer } from '@/lib/api-timing'
+import { requireSession } from '@/lib/auth-guards'
 
 const automationSchema = z.object({
   autoFetch: z.boolean().optional(),
@@ -17,6 +18,8 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const denied = await requireSession()
+  if (denied) return denied
   const timer = startApiTimer('/api/channels/[id]/automation', 'GET')
   try {
     const { id } = await params
@@ -72,6 +75,8 @@ export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const denied = await requireSession()
+  if (denied) return denied
   const timer = startApiTimer('/api/channels/[id]/automation', 'PATCH')
   try {
     const { id } = await params

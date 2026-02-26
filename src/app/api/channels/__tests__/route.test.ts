@@ -1,4 +1,13 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
+
+vi.mock('@/lib/auth-guards', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/auth-guards')>()
+  return {
+    ...actual,
+    requireSession: vi.fn().mockResolvedValue(null),
+  }
+})
+
 import { GET, POST } from '../route'
 import { db } from '@/lib/db'
 import { fetchChannelFeed } from '@/lib/automation/rss'

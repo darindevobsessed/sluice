@@ -4,12 +4,15 @@ import { z } from 'zod'
 import { parseChannelUrl } from '@/lib/youtube/channel-parser'
 import { fetchChannelFeed, getFeedUrl } from '@/lib/automation/rss'
 import { startApiTimer } from '@/lib/api-timing'
+import { requireSession } from '@/lib/auth-guards'
 
 const followChannelSchema = z.object({
   url: z.string().min(1, 'URL is required'),
 })
 
 export async function GET() {
+  const denied = await requireSession()
+  if (denied) return denied
   const timer = startApiTimer('/api/channels', 'GET')
   try {
     const allChannels = await db.select().from(channels)
@@ -23,6 +26,8 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const denied = await requireSession()
+  if (denied) return denied
   const timer = startApiTimer('/api/channels', 'POST')
   try {
     // Parse and validate request body

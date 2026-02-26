@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { db, channels, videos } from '@/lib/db'
 import { eq } from 'drizzle-orm'
 import { startApiTimer } from '@/lib/api-timing'
+import { requireSession } from '@/lib/auth-guards'
 
 const followChannelSchema = z.object({
   channelName: z.string().min(1, 'Channel name is required'),
@@ -13,6 +14,8 @@ const followChannelSchema = z.object({
  * Creates a channel entry based on existing videos in the knowledge bank
  */
 export async function POST(request: Request) {
+  const denied = await requireSession()
+  if (denied) return denied
   const timer = startApiTimer('/api/channels/similar/follow', 'POST')
   try {
     // Parse and validate request body

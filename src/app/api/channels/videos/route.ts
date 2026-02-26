@@ -2,6 +2,7 @@ import { db, discoveryVideos, videos, videoFocusAreas, focusAreas } from '@/lib/
 import { NextResponse } from 'next/server'
 import { desc, inArray, eq } from 'drizzle-orm'
 import { startApiTimer } from '@/lib/api-timing'
+import { requireSession } from '@/lib/auth-guards'
 
 interface DiscoveryVideoResponse {
   youtubeId: string
@@ -16,6 +17,8 @@ interface DiscoveryVideoResponse {
 }
 
 export async function GET(_request: Request): Promise<NextResponse> {
+  const denied = await requireSession()
+  if (denied) return denied
   const timer = startApiTimer('/api/channels/videos', 'GET')
   try {
     // Read cached videos from DB — no live RSS fetch on page load

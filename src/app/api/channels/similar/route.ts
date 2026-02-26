@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { db, channels } from '@/lib/db'
 import { findSimilarChannels } from '@/lib/channels/similarity'
 import { startApiTimer } from '@/lib/api-timing'
+import { requireSession } from '@/lib/auth-guards'
 
 const queryParamsSchema = z.object({
   limit: z
@@ -13,6 +14,8 @@ const queryParamsSchema = z.object({
 })
 
 export async function GET(request: Request) {
+  const denied = await requireSession()
+  if (denied) return denied
   const timer = startApiTimer('/api/channels/similar', 'GET')
   try {
     // Parse and validate query parameters
