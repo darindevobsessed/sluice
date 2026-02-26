@@ -27,7 +27,7 @@ function hasApiKey(): boolean {
 let _client: Anthropic | null = null
 function getClient(): Anthropic {
   if (!_client) {
-    const apiKey = process.env.ANTHROPIC_API_KEY || process.env.AI_GATEWAY_KEY
+    const apiKey = (process.env.ANTHROPIC_API_KEY || process.env.AI_GATEWAY_KEY || '').trim()
     _client = new Anthropic({ apiKey })
   }
   return _client

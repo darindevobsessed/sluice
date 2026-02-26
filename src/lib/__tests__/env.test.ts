@@ -39,14 +39,24 @@ describe('env validation', () => {
     )
   })
 
-  it('bridges AI_GATEWAY_KEY to ANTHROPIC_API_KEY for SDK compatibility', async () => {
+  it('bridges AI_GATEWAY_KEY to ANTHROPIC_API_KEY with whitespace trimmed', async () => {
     process.env.DATABASE_URL = 'postgresql://test'
-    process.env.AI_GATEWAY_KEY = 'test-gateway-key'
+    process.env.AI_GATEWAY_KEY = 'test-gateway-key\n'
     delete process.env.ANTHROPIC_API_KEY
 
     await import('../env')
 
     expect(process.env.ANTHROPIC_API_KEY).toBe('test-gateway-key')
+  })
+
+  it('trims leading and trailing whitespace from AI_GATEWAY_KEY during bridge', async () => {
+    process.env.DATABASE_URL = 'postgresql://test'
+    process.env.AI_GATEWAY_KEY = '  sk-ant-key-with-spaces  \n'
+    delete process.env.ANTHROPIC_API_KEY
+
+    await import('../env')
+
+    expect(process.env.ANTHROPIC_API_KEY).toBe('sk-ant-key-with-spaces')
   })
 
   it('warns when CRON_SECRET is missing', async () => {

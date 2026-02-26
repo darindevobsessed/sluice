@@ -18,7 +18,7 @@ if (!process.env.AI_GATEWAY_KEY) {
   console.warn('Warning: AI_GATEWAY_KEY not set. AI features will not work.')
 } else {
   // Bridge for @anthropic-ai/sdk which reads ANTHROPIC_API_KEY from process.env
-  process.env.ANTHROPIC_API_KEY = process.env.AI_GATEWAY_KEY
+  process.env.ANTHROPIC_API_KEY = process.env.AI_GATEWAY_KEY.trim()
 }
 
 if (!process.env.CRON_SECRET) {

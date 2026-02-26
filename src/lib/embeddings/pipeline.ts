@@ -1,5 +1,66 @@
-import { rm } from 'fs/promises'
+import { readFileSync, existsSync, writeFileSync } from 'fs'
+import { rm, mkdir } from 'fs/promises'
 import { resolve } from 'path'
+
+/**
+ * Read the installed onnxruntime-web version from its package.json.
+ * Used to namespace the model cache directory so version upgrades
+ * automatically bypass stale/corrupt cached models.
+ */
+function getOrtVersion(): string {
+  try {
+    const pkgPath = resolve(process.cwd(), 'node_modules/onnxruntime-web/package.json')
+    const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8'))
+    return pkg.version as string
+  } catch {
+    return 'unknown'
+  }
+}
+
+/** Cached ORT version — read once per process lifetime */
+const ORT_VERSION = getOrtVersion()
+
+/** Base cache directory, namespaced by onnxruntime-web version */
+const CACHE_BASE = `/tmp/.cache/ort-${ORT_VERSION}`
+
+/** Path to the model within the versioned cache */
+const MODEL_CACHE_PATH = `${CACHE_BASE}/Xenova/all-MiniLM-L6-v2`
+
+/** Version marker file to detect same-version corruption */
+const VERSION_MARKER_PATH = `${CACHE_BASE}/.ort-version`
+
+/**
+ * Check the version marker file in the cache directory.
+ * If it exists with a different version, clear the entire cache.
+ * If it doesn't exist, the cache is fresh — marker gets written after
+ * successful pipeline initialization.
+ */
+async function validateCacheVersion(): Promise<void> {
+  try {
+    if (existsSync(VERSION_MARKER_PATH)) {
+      const cached = readFileSync(VERSION_MARKER_PATH, 'utf-8').trim()
+      if (cached !== ORT_VERSION) {
+        console.log(`ORT version changed (${cached} -> ${ORT_VERSION}), clearing model cache`)
+        await rm(CACHE_BASE, { recursive: true, force: true })
+      }
+    }
+    // Ensure the cache directory exists
+    await mkdir(CACHE_BASE, { recursive: true })
+  } catch (error) {
+    console.warn('Cache version validation failed:', error)
+  }
+}
+
+/**
+ * Write the version marker after successful pipeline initialization.
+ */
+function writeVersionMarker(): void {
+  try {
+    writeFileSync(VERSION_MARKER_PATH, ORT_VERSION, 'utf-8')
+  } catch (error) {
+    console.warn('Failed to write version marker:', error)
+  }
+}
 
 /**
  * Type for the embedding pipeline function.
@@ -95,10 +156,13 @@ export class EmbeddingPipeline {
       return this.initPromise
     }
 
+    // Validate cache version before loading model
+    await validateCacheVersion()
+
     const { pipeline, env } = await getTransformers()
 
     // Configure Transformers.js for Vercel compatibility
-    env.cacheDir = '/tmp/.cache'
+    env.cacheDir = CACHE_BASE
     env.allowLocalModels = false
     env.allowRemoteModels = true
 
@@ -110,14 +174,16 @@ export class EmbeddingPipeline {
 
     try {
       this.pipeline = await this.initPromise
+      writeVersionMarker()
       return this.pipeline
     } catch (error) {
       // Check if this is a corruption error that can be recovered
       const errorMessage = error instanceof Error ? error.message : String(error)
+      const lowerError = errorMessage.toLowerCase()
       const isCorruption =
-        errorMessage.includes('Protobuf') ||
-        errorMessage.includes('failed to load model') ||
-        errorMessage.includes('Invalid model')
+        lowerError.includes('protobuf') ||
+        lowerError.includes('failed to load model') ||
+        lowerError.includes('invalid model')
 
       if (isCorruption && !this.hasRetried) {
         // Mark that we've attempted recovery
@@ -125,9 +191,9 @@ export class EmbeddingPipeline {
 
         // Try to clear the corrupted cache
         try {
-          await rm('/tmp/.cache/Xenova/all-MiniLM-L6-v2', {
+          await rm(MODEL_CACHE_PATH, {
             recursive: true,
-            force: true
+            force: true,
           })
         } catch (cleanupError) {
           // Log but don't fail on cleanup error
@@ -185,4 +251,15 @@ export async function generateEmbedding(text: string): Promise<Float32Array> {
 
   const instance = await EmbeddingPipeline.getInstance()
   return instance.embed(text)
+}
+
+/** @internal — exported for testing only */
+export const _testing = {
+  getOrtVersion,
+  ORT_VERSION,
+  CACHE_BASE,
+  MODEL_CACHE_PATH,
+  VERSION_MARKER_PATH,
+  validateCacheVersion,
+  writeVersionMarker,
 }
