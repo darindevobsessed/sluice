@@ -1,4 +1,7 @@
 import { timingSafeEqual } from 'crypto'
+import { NextResponse } from 'next/server'
+import { auth } from '@/lib/auth'
+import { headers } from 'next/headers'
 
 /**
  * Result of a cron secret verification.
@@ -59,4 +62,28 @@ export function safeCompare(a: string, b: string): boolean {
   const bufA = Buffer.from(a)
   const bufB = Buffer.from(b)
   return bufA.length === bufB.length && timingSafeEqual(bufA, bufB)
+}
+
+/**
+ * Guard for API routes that require an authenticated session.
+ *
+ * Returns null when the caller is authorized (proceed normally).
+ * Returns a 401 NextResponse when the caller is not authorized (return this response immediately).
+ *
+ * Development bypass: auth is skipped entirely when NODE_ENV === 'development'.
+ * Test and production environments always enforce session checks.
+ *
+ * Usage:
+ *   const unauthorized = await requireSession()
+ *   if (unauthorized) return unauthorized
+ */
+export async function requireSession(): Promise<NextResponse | null> {
+  if (process.env.NODE_ENV === 'development') {
+    return null
+  }
+  const session = await auth.api.getSession({ headers: await headers() })
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+  return null
 }
