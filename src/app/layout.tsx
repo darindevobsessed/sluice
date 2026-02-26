@@ -17,8 +17,21 @@ const jetbrainsMono = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "Sluice",
-  description: "Extract knowledge from YouTube videos and generate Claude Code plugins",
+  metadataBase: new URL(
+    process.env.VERCEL_PROJECT_PRODUCTION_URL
+      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+      : 'http://localhost:3001'
+  ),
+  title: 'Sluice',
+  description: 'Turn YouTube into a Knowledge Bank',
+  openGraph: {
+    type: 'website',
+    siteName: 'Sluice',
+    locale: 'en_US',
+  },
+  twitter: {
+    card: 'summary_large_image',
+  },
 }
 
 export default function RootLayout({
