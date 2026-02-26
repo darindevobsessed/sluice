@@ -1,6 +1,6 @@
 import { db } from '@/lib/db'
-import { videos } from '@/lib/db/schema'
-import { eq } from 'drizzle-orm'
+import { videos, chunks } from '@/lib/db/schema'
+import { eq, count } from 'drizzle-orm'
 import { fetchTranscript } from '@/lib/youtube/transcript'
 import { parseTranscript } from '@/lib/transcript/parse'
 import { chunkTranscript } from '@/lib/embeddings/chunker'
@@ -87,6 +87,20 @@ async function processGenerateEmbeddings(payload: unknown): Promise<void> {
 
   if (chunkedSegments.length === 0) {
     throw new Error('No chunks generated from transcript')
+  }
+
+  // Partial progress check: if chunks already exist for this video matching
+  // the expected count, skip re-embedding. storeChunksToDatabase uses an atomic
+  // DELETE+INSERT transaction, so partial state is impossible -- either all
+  // chunks exist (previous run succeeded) or none do (previous run failed).
+  const [existingChunkCount] = await db
+    .select({ value: count() })
+    .from(chunks)
+    .where(eq(chunks.videoId, videoId))
+
+  if (existingChunkCount && Number(existingChunkCount.value) >= chunkedSegments.length) {
+    console.log(`[embedding-job] Video ${videoId} already has ${existingChunkCount.value} chunks (expected ${chunkedSegments.length}), skipping re-embed`)
+    return
   }
 
   // Dynamic import to avoid ONNX native library crash on module load

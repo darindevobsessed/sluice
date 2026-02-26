@@ -18,6 +18,15 @@ vi.mock('@/lib/db', () => ({
     updatedAt: 'updated_at',
     publishedAt: 'published_at',
   },
+  chunks: {
+    id: 'id',
+    videoId: 'video_id',
+    content: 'content',
+    startTime: 'start_time',
+    endTime: 'end_time',
+    embedding: 'embedding',
+    createdAt: 'created_at',
+  },
 }))
 
 vi.mock('@/lib/youtube/transcript', () => ({
@@ -104,23 +113,30 @@ describe('processJob', () => {
       completedAt: null,
     }
 
-    // Mock video with transcript
-    vi.mocked(db.select).mockReturnValue({
-      from: vi.fn().mockReturnThis(),
-      where: vi.fn().mockReturnThis(),
-      limit: vi.fn().mockResolvedValue([
-        {
-          id: 456,
-          youtubeId: 'test123',
-          title: 'Test Video',
-          channel: 'Test Channel',
-          transcript: '0:00\nTest transcript',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      ]),
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any)
+    const mockVideo = {
+      id: 456,
+      youtubeId: 'test123',
+      title: 'Test Video',
+      channel: 'Test Channel',
+      transcript: '0:00\nTest transcript',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }
+
+    // First db.select() call: get video
+    vi.mocked(db.select)
+      .mockReturnValueOnce({
+        from: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+        limit: vi.fn().mockResolvedValue([mockVideo]),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any)
+      // Second db.select() call: chunk count -- 0 existing chunks
+      .mockReturnValueOnce({
+        from: vi.fn().mockReturnThis(),
+        where: vi.fn().mockResolvedValue([{ value: 0 }]),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any)
 
     vi.mocked(parseTranscript).mockReturnValue([
       { timestamp: '0:00', seconds: 0, text: 'Test transcript' },
@@ -351,12 +367,20 @@ describe('processGenerateEmbeddings', () => {
       updatedAt: new Date(),
     }
 
-    vi.mocked(db.select).mockReturnValue({
-      from: vi.fn().mockReturnThis(),
-      where: vi.fn().mockReturnThis(),
-      limit: vi.fn().mockResolvedValue([mockVideo]),
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any)
+    // First db.select() call: get video
+    vi.mocked(db.select)
+      .mockReturnValueOnce({
+        from: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+        limit: vi.fn().mockResolvedValue([mockVideo]),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any)
+      // Second db.select() call: chunk count -- 0 existing chunks
+      .mockReturnValueOnce({
+        from: vi.fn().mockReturnThis(),
+        where: vi.fn().mockResolvedValue([{ value: 0 }]),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any)
 
     const mockParsed = [
       { timestamp: '0:00', seconds: 0, text: 'Test content' },
@@ -522,5 +546,145 @@ describe('processGenerateEmbeddings', () => {
     vi.mocked(chunkTranscript).mockReturnValue([]) // no chunks generated
 
     await expect(processJob(job)).rejects.toThrow('No chunks generated from transcript')
+  })
+
+  it('skips embedding when chunks already exist', async () => {
+    const job: Job = {
+      id: 2,
+      type: 'generate_embeddings',
+      payload: { videoId: 456 },
+      status: 'processing',
+      attempts: 1,
+      maxAttempts: 3,
+      error: null,
+      createdAt: new Date(),
+      startedAt: new Date(),
+      completedAt: null,
+    }
+
+    const mockVideo = {
+      id: 456,
+      youtubeId: 'test123',
+      title: 'Test Video',
+      channel: 'Test Channel',
+      transcript: '0:00\nTest content\n\n1:00\nMore content',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }
+
+    // First db.select() call: get video
+    vi.mocked(db.select)
+      .mockReturnValueOnce({
+        from: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+        limit: vi.fn().mockResolvedValue([mockVideo]),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any)
+      // Second db.select() call: chunk count -- existing chunks match expected count
+      .mockReturnValueOnce({
+        from: vi.fn().mockReturnThis(),
+        where: vi.fn().mockResolvedValue([{ value: 2 }]),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any)
+
+    vi.mocked(parseTranscript).mockReturnValue([
+      { timestamp: '0:00', seconds: 0, text: 'Test content' },
+      { timestamp: '1:00', seconds: 60, text: 'More content' },
+    ])
+
+    // chunkTranscript returns 2 chunks -- same as existing count
+    vi.mocked(chunkTranscript).mockReturnValue([
+      {
+        content: 'Test content',
+        startTime: 0,
+        endTime: 60000,
+        segmentIndices: [0],
+      },
+      {
+        content: 'More content',
+        startTime: 60000,
+        endTime: 120000,
+        segmentIndices: [1],
+      },
+    ])
+
+    await processJob(job)
+
+    // embedChunks must NOT be called when chunks already exist
+    expect(embedChunks).not.toHaveBeenCalled()
+  })
+
+  it('proceeds with embedding when chunk count is less than expected', async () => {
+    const job: Job = {
+      id: 2,
+      type: 'generate_embeddings',
+      payload: { videoId: 456 },
+      status: 'processing',
+      attempts: 1,
+      maxAttempts: 3,
+      error: null,
+      createdAt: new Date(),
+      startedAt: new Date(),
+      completedAt: null,
+    }
+
+    const mockVideo = {
+      id: 456,
+      youtubeId: 'test123',
+      title: 'Test Video',
+      channel: 'Test Channel',
+      transcript: '0:00\nTest content\n\n1:00\nMore content',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }
+
+    // First db.select() call: get video
+    vi.mocked(db.select)
+      .mockReturnValueOnce({
+        from: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+        limit: vi.fn().mockResolvedValue([mockVideo]),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any)
+      // Second db.select() call: chunk count -- 0 existing chunks (none yet)
+      .mockReturnValueOnce({
+        from: vi.fn().mockReturnThis(),
+        where: vi.fn().mockResolvedValue([{ value: 0 }]),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any)
+
+    vi.mocked(parseTranscript).mockReturnValue([
+      { timestamp: '0:00', seconds: 0, text: 'Test content' },
+      { timestamp: '1:00', seconds: 60, text: 'More content' },
+    ])
+
+    const mockChunks = [
+      {
+        content: 'Test content',
+        startTime: 0,
+        endTime: 60000,
+        segmentIndices: [0],
+      },
+      {
+        content: 'More content',
+        startTime: 60000,
+        endTime: 120000,
+        segmentIndices: [1],
+      },
+    ]
+    vi.mocked(chunkTranscript).mockReturnValue(mockChunks)
+
+    vi.mocked(embedChunks).mockResolvedValue({
+      chunks: [],
+      totalChunks: 2,
+      successCount: 2,
+      errorCount: 0,
+      durationMs: 200,
+    })
+
+    await processJob(job)
+
+    // embedChunks MUST be called when chunk count is below expected
+    expect(embedChunks).toHaveBeenCalledWith(mockChunks, undefined, 456)
   })
 })
