@@ -1,7 +1,7 @@
 import { db as defaultDb } from '@/lib/db'
-import { jobs } from '@/lib/db/schema'
+import { jobs, videos, chunks } from '@/lib/db/schema'
 import type { Job } from '@/lib/db/schema'
-import { eq, and, asc, lt } from 'drizzle-orm'
+import { eq, and, asc, lt, sql } from 'drizzle-orm'
 import type { JobType } from './types'
 
 /**
@@ -183,4 +183,40 @@ export async function recoverStaleJobs(dbInstance = defaultDb): Promise<number> 
     )
     .returning()
   return result.length
+}
+
+/**
+ * Detect orphan videos: have a transcript but zero chunks and no pending/processing
+ * embedding job. These are videos where embedding failed silently.
+ * Enqueues a generate_embeddings job for each orphan.
+ * Returns the count of jobs enqueued.
+ */
+export async function detectOrphanVideos(dbInstance = defaultDb): Promise<number> {
+  // Find videos that:
+  // 1. Have a non-null, non-empty transcript
+  // 2. Have zero chunks
+  // 3. Have no pending or processing generate_embeddings job
+  const orphans = await dbInstance.execute(sql`
+    SELECT v.id
+    FROM videos v
+    LEFT JOIN chunks c ON c.video_id = v.id
+    WHERE v.transcript IS NOT NULL
+      AND v.transcript != ''
+      AND c.id IS NULL
+      AND v.id NOT IN (
+        SELECT (j.payload->>'videoId')::int
+        FROM jobs j
+        WHERE j.type = 'generate_embeddings'
+          AND j.status IN ('pending', 'processing')
+      )
+  `)
+
+  let enqueued = 0
+  for (const row of orphans.rows) {
+    const videoId = (row as { id: number }).id
+    await enqueueJob('generate_embeddings', { videoId }, dbInstance)
+    enqueued++
+  }
+
+  return enqueued
 }

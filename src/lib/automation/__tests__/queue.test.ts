@@ -32,7 +32,7 @@ vi.mock('@/lib/db', () => ({
 }))
 
 // Import after mocking
-const { enqueueJob, claimNextJob, completeJob, failJob, getJobsByStatus, recoverStaleJobs, failEmbeddingJob, getBackoffMs } = await import('../queue')
+const { enqueueJob, claimNextJob, completeJob, failJob, getJobsByStatus, recoverStaleJobs, failEmbeddingJob, getBackoffMs, detectOrphanVideos } = await import('../queue')
 
 describe('getBackoffMs', () => {
   it('returns 0 for 0 attempts', () => {
@@ -862,5 +862,48 @@ describe('getJobsByStatus', () => {
 
     expect(customDb.select).toHaveBeenCalledTimes(1)
     expect(mockDb.select).not.toHaveBeenCalled()
+  })
+})
+
+describe('detectOrphanVideos', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('enqueues jobs for orphan videos', async () => {
+    const mockExecute = vi.fn().mockResolvedValue({
+      rows: [{ id: 10 }, { id: 20 }],
+    })
+
+    const mockValues = vi.fn().mockReturnThis()
+    const mockReturning = vi.fn()
+      .mockResolvedValueOnce([{ id: 100 }])
+      .mockResolvedValueOnce([{ id: 101 }])
+
+    const customDb = {
+      execute: mockExecute,
+      insert: vi.fn().mockReturnValue({
+        values: mockValues,
+        returning: mockReturning,
+      }),
+    }
+
+    const count = await detectOrphanVideos(customDb as any)
+
+    expect(count).toBe(2)
+    expect(mockExecute).toHaveBeenCalledTimes(1)
+    expect(customDb.insert).toHaveBeenCalledTimes(2)
+  })
+
+  it('returns 0 when no orphans found', async () => {
+    const customDb = {
+      execute: vi.fn().mockResolvedValue({ rows: [] }),
+      insert: vi.fn(),
+    }
+
+    const count = await detectOrphanVideos(customDb as any)
+
+    expect(count).toBe(0)
+    expect(customDb.insert).not.toHaveBeenCalled()
   })
 })
