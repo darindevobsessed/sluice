@@ -7,7 +7,7 @@ import { db, personas } from '@/lib/db'
 import { getPersonaContext, formatContextForPrompt } from '@/lib/personas/context'
 import { findBestPersonas } from '@/lib/personas/ensemble'
 import { getExtractionForVideo } from '@/lib/db/insights'
-import { query } from '@anthropic-ai/claude-agent-sdk'
+import { generateText } from '@/lib/claude/client'
 
 /**
  * Register the search_rag tool with the MCP server.
@@ -102,10 +102,8 @@ export function registerGetListOfCreators(server: McpServer): void {
   )
 }
 
-const MODEL = 'claude-sonnet-4-20250514'
-
 /**
- * Makes a non-streaming query using Agent SDK for a persona query.
+ * Makes a non-streaming query for a persona question.
  * Reuses persona context scoping and prompt building patterns.
  */
 async function queryPersona(
@@ -133,32 +131,8 @@ async function queryPersona(
     systemPrompt += '\n\nAnswer based on your content and expertise.'
   }
 
-  // Concatenate system prompt and question for Agent SDK
   const prompt = systemPrompt + '\n\n' + question
-
-  // Use Agent SDK query (non-streaming)
-  const agentQuery = query({
-    prompt,
-    options: {
-      model: MODEL,
-      maxTurns: 1,
-      tools: [],
-      persistSession: false,
-    },
-  })
-
-  let text = ''
-
-  // Iterate async iterable and extract text
-  for await (const sdkMessage of agentQuery) {
-    if (sdkMessage.type === 'assistant') {
-      for (const block of sdkMessage.message.content) {
-        if (block.type === 'text') {
-          text += block.text
-        }
-      }
-    }
-  }
+  const text = await generateText(prompt)
 
   const sources = context.slice(0, 5).map(c => ({
     videoTitle: c.videoTitle,

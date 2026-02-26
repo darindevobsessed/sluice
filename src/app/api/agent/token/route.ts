@@ -12,10 +12,12 @@ import { headers } from 'next/headers'
 const TOKEN_FILE = '.agent-token'
 
 export async function GET() {
-  // Require authenticated session
-  const session = await auth.api.getSession({ headers: await headers() })
-  if (!session) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  // Require authenticated session in production; skip in dev (no login locally)
+  if (process.env.NODE_ENV !== 'development') {
+    const session = await auth.api.getSession({ headers: await headers() })
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
   }
 
   const tokenPath = path.join(process.cwd(), TOKEN_FILE)

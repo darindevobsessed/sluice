@@ -7,7 +7,7 @@ import { db as database, videos, chunks, personas } from '@/lib/db'
 import type * as schema from '@/lib/db/schema'
 import type { Persona } from '@/lib/db/schema'
 import { computeChannelCentroid } from '@/lib/channels/similarity'
-import { query } from '@anthropic-ai/claude-agent-sdk'
+import { generateText } from '@/lib/claude/client'
 
 /**
  * Generates a persona system prompt by analyzing the creator's content.
@@ -57,29 +57,7 @@ Generate a system prompt in this format:
 Keep it concise (2-3 sentences) and focus on their unique voice and expertise.`
 
   try {
-    // Use Claude Agent SDK to generate system prompt
-    const agentQuery = query({
-      prompt: analysisPrompt,
-      options: {
-        model: 'claude-sonnet-4-20250514',
-        maxTurns: 1,
-        tools: [],
-        persistSession: false,
-      },
-    })
-
-    let generatedPrompt = ''
-
-    for await (const sdkMessage of agentQuery) {
-      if (sdkMessage.type === 'assistant') {
-        for (const block of sdkMessage.message.content) {
-          if (block.type === 'text') {
-            generatedPrompt = block.text
-            break
-          }
-        }
-      }
-    }
+    const generatedPrompt = await generateText(analysisPrompt)
 
     if (!generatedPrompt) {
       throw new Error('Failed to generate system prompt from Claude API')

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 
 // Mock the database to avoid connection issues in tests
 vi.mock('@/lib/db', () => ({
@@ -8,10 +8,9 @@ vi.mock('@/lib/db', () => ({
 // Mock better-auth mcp plugin oAuthDiscoveryMetadata to return a realistic response
 vi.mock('better-auth/plugins', () => ({
   mcp: vi.fn(() => ({ id: 'mcp', hooks: { after: [] }, endpoints: {}, schema: {}, options: {} })),
-  oAuthDiscoveryMetadata: vi.fn((auth) => {
+  oAuthDiscoveryMetadata: vi.fn(() => {
     return async (_request: Request): Promise<Response> => {
       // Simulate what better-auth returns: RFC 8414 OAuth Authorization Server Metadata
-      void auth
       const baseUrl = 'http://localhost:3001'
       return new Response(
         JSON.stringify({
@@ -55,43 +54,75 @@ vi.mock('better-auth/next-js', () => ({
 const { GET } = await import('../route')
 
 describe('OAuth Authorization Server Discovery Route', () => {
-  it('GET returns 200 with JSON content', async () => {
-    const request = new Request('http://localhost:3001/.well-known/oauth-authorization-server')
-    const response = await GET(request)
-    expect(response).toBeInstanceOf(Response)
-    expect(response.status).toBe(200)
+  const originalNodeEnv = process.env.NODE_ENV
+
+  afterEach(() => {
+    process.env.NODE_ENV = originalNodeEnv
   })
 
-  it('GET returns JSON with issuer field', async () => {
-    const request = new Request('http://localhost:3001/.well-known/oauth-authorization-server')
-    const response = await GET(request)
-    const body = await response.json()
-    expect(body).toHaveProperty('issuer')
-    expect(typeof body.issuer).toBe('string')
+  describe('dev mode (non-production)', () => {
+    beforeEach(() => {
+      process.env.NODE_ENV = 'test'
+    })
+
+    it('GET returns 404 so MCP clients skip OAuth', async () => {
+      const request = new Request('http://localhost:3001/.well-known/oauth-authorization-server')
+      const response = await GET(request)
+      expect(response).toBeInstanceOf(Response)
+      expect(response.status).toBe(404)
+    })
+
+    it('GET returns empty body', async () => {
+      const request = new Request('http://localhost:3001/.well-known/oauth-authorization-server')
+      const response = await GET(request)
+      const text = await response.text()
+      expect(text).toBe('')
+    })
   })
 
-  it('GET returns JSON with authorization_endpoint field', async () => {
-    const request = new Request('http://localhost:3001/.well-known/oauth-authorization-server')
-    const response = await GET(request)
-    const body = await response.json()
-    expect(body).toHaveProperty('authorization_endpoint')
-    expect(typeof body.authorization_endpoint).toBe('string')
-  })
+  describe('production mode', () => {
+    beforeEach(() => {
+      process.env.NODE_ENV = 'production'
+    })
 
-  it('GET returns JSON with token_endpoint field', async () => {
-    const request = new Request('http://localhost:3001/.well-known/oauth-authorization-server')
-    const response = await GET(request)
-    const body = await response.json()
-    expect(body).toHaveProperty('token_endpoint')
-    expect(typeof body.token_endpoint).toBe('string')
-  })
+    it('GET returns 200 with JSON content', async () => {
+      const request = new Request('http://localhost:3001/.well-known/oauth-authorization-server')
+      const response = await GET(request)
+      expect(response).toBeInstanceOf(Response)
+      expect(response.status).toBe(200)
+    })
 
-  it('GET returns all required OAuth discovery fields', async () => {
-    const request = new Request('http://localhost:3001/.well-known/oauth-authorization-server')
-    const response = await GET(request)
-    const body = await response.json()
-    expect(body).toHaveProperty('issuer')
-    expect(body).toHaveProperty('authorization_endpoint')
-    expect(body).toHaveProperty('token_endpoint')
+    it('GET returns JSON with issuer field', async () => {
+      const request = new Request('http://localhost:3001/.well-known/oauth-authorization-server')
+      const response = await GET(request)
+      const body = await response.json()
+      expect(body).toHaveProperty('issuer')
+      expect(typeof body.issuer).toBe('string')
+    })
+
+    it('GET returns JSON with authorization_endpoint field', async () => {
+      const request = new Request('http://localhost:3001/.well-known/oauth-authorization-server')
+      const response = await GET(request)
+      const body = await response.json()
+      expect(body).toHaveProperty('authorization_endpoint')
+      expect(typeof body.authorization_endpoint).toBe('string')
+    })
+
+    it('GET returns JSON with token_endpoint field', async () => {
+      const request = new Request('http://localhost:3001/.well-known/oauth-authorization-server')
+      const response = await GET(request)
+      const body = await response.json()
+      expect(body).toHaveProperty('token_endpoint')
+      expect(typeof body.token_endpoint).toBe('string')
+    })
+
+    it('GET returns all required OAuth discovery fields', async () => {
+      const request = new Request('http://localhost:3001/.well-known/oauth-authorization-server')
+      const response = await GET(request)
+      const body = await response.json()
+      expect(body).toHaveProperty('issuer')
+      expect(body).toHaveProperty('authorization_endpoint')
+      expect(body).toHaveProperty('token_endpoint')
+    })
   })
 })

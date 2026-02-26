@@ -5,9 +5,9 @@
   "scripts": {
     "dev": "npm run dev:cleanup && concurrently -n agent,next,warmup -c cyan,green,yellow \"npm run agent\" \"npm run next:dev\" \"sleep 3 && npm run dev:warmup\"",
     "dev:warmup": "tsx scripts/dev-warmup.ts",
-    "next:dev": "exec next dev -p ${PORT:-3001}",
+    "next:dev": "exec next dev -p ${PORT:-3001} --webpack",
     "agent": "exec env AGENT_PORT=${AGENT_PORT:-9334} tsx src/agent/index.ts",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@anthropic-ai/claude-agent-sdk": "^0.2.31",
+    "@anthropic-ai/sdk": "^0.78.0",
     "@danielxceron/youtube-transcript": "^1.2.6",
     "@huggingface/transformers": "^3.8.1",
     "@modelcontextprotocol/sdk": "^1.25.2",
@@ -37,6 +38,7 @@
     "nanoid": "^5.1.6",
     "next": "16.1.6",
     "next-themes": "^0.4.6",
+    "onnxruntime-web": "1.22.0-dev.20250409-89f8206ba4",
     "pg": "^8.18.0",
     "radix-ui": "^1.4.3",
     "react": "19.2.3",
@@ -44,6 +46,9 @@
     "tailwind-merge": "^3.4.0",
     "ws": "^8.19.0",
     "zod": "^4.3.6"
+  },
+  "overrides": {
+    "onnxruntime-web": "$onnxruntime-web"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

@@ -1,9 +1,9 @@
 /**
- * Transport-agnostic insight handler for Claude Agent SDK integration.
+ * Transport-agnostic insight handler for Claude API integration.
  * Extracted from WebSocket-specific implementation to enable reuse across
  * different transport layers (WebSocket, SSE, etc.).
  */
-import { query } from '@anthropic-ai/claude-agent-sdk'
+import { streamText } from '@/lib/claude/client'
 
 const activeRequests = new Map<string, AbortController>()
 
@@ -29,51 +29,36 @@ export async function handleInsightRequest(
   activeRequests.set(id, abortController)
 
   try {
-    // Use the Claude Agent SDK to query Claude
-    // Using no tools and single turn for pure text generation
-    const agentQuery = query({
-      prompt: `${systemPrompt}\n\n---\n\n${prompt}`,
-      options: {
-        model: 'claude-sonnet-4-20250514',
-        maxTurns: 1, // Single response, no tool use
-        tools: [], // No tools - pure text generation
-        includePartialMessages: true, // Get streaming events
-        abortController,
-        persistSession: false, // Don't save to disk
-      },
-    })
+    const stream = streamText(
+      `${systemPrompt}\n\n---\n\n${prompt}`,
+      { signal: abortController.signal }
+    )
 
     let currentText = ''
 
-    for await (const sdkMessage of agentQuery) {
-      if (abortController.signal.aborted) {
-        send({ event: 'cancelled' })
-        break
+    stream.on('text', (delta) => {
+      if (abortController.signal.aborted) return
+      if (delta) {
+        currentText += delta
+        send({ event: 'text', content: delta })
       }
+    })
 
-      // Handle streaming text events
-      if (sdkMessage.type === 'stream_event') {
-        const event = sdkMessage.event
-        if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
-          const delta = event.delta.text
-          if (delta) {
-            currentText += delta
-            send({ event: 'text', content: delta })
-          }
-        }
-      }
+    // Wait for stream to complete
+    const finalMessage = await stream.finalMessage()
 
-      // Handle complete assistant message
-      if (sdkMessage.type === 'assistant') {
-        // Extract text from the message content
-        for (const block of sdkMessage.message.content) {
-          if (block.type === 'text') {
-            // If we didn't get streaming, use the full text
-            if (!currentText) {
-              currentText = block.text
-              send({ event: 'text', content: block.text })
-            }
-          }
+    if (abortController.signal.aborted) {
+      send({ event: 'cancelled' })
+      return
+    }
+
+    // If we didn't get streaming deltas, use the final message text
+    if (!currentText) {
+      for (const block of finalMessage.content) {
+        if (block.type === 'text' && block.text) {
+          currentText = block.text
+          send({ event: 'text', content: block.text })
+          break
         }
       }
     }

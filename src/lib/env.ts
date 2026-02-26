@@ -17,8 +17,7 @@ if (!process.env.DATABASE_URL && !isBuildPhase) {
 if (!process.env.AI_GATEWAY_KEY) {
   console.warn('Warning: AI_GATEWAY_KEY not set. AI features will not work.')
 } else {
-  // Bridge for @anthropic-ai/claude-agent-sdk which reads ANTHROPIC_API_KEY
-  // from process.env when spawning Claude subprocesses
+  // Bridge for @anthropic-ai/sdk which reads ANTHROPIC_API_KEY from process.env
   process.env.ANTHROPIC_API_KEY = process.env.AI_GATEWAY_KEY
 }
 

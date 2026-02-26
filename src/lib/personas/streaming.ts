@@ -1,12 +1,10 @@
 import type { Persona } from '@/lib/db/schema'
 import type { SearchResult } from '@/lib/search/types'
 import { formatContextForPrompt } from './context'
-import { query } from '@anthropic-ai/claude-agent-sdk'
-
-const MODEL = 'claude-sonnet-4-20250514'
+import { streamText } from '@/lib/claude/client'
 
 /**
- * Estimates token count (rough approximation: 1 token ≈ 4 characters)
+ * Estimates token count (rough approximation: 1 token ~ 4 characters)
  */
 function estimateTokens(text: string): number {
   return Math.ceil(text.length / 4)
@@ -58,12 +56,7 @@ interface StreamPersonaResponseParams {
 }
 
 /**
- * Streams a persona response using Agent SDK.
- *
- * Uses the Agent SDK's query() with:
- * - Persona's system prompt + relevant context
- * - User's question
- * - Streaming enabled via includePartialMessages
+ * Streams a persona response using the Anthropic SDK.
  *
  * Returns a ReadableStream that emits SSE-formatted events compatible with ensemble.ts.
  *
@@ -82,46 +75,23 @@ export async function streamPersonaResponse(
   // Concatenate system prompt and question (same pattern as service.ts)
   const prompt = `${systemPrompt}\n\n---\n\n${question}`
 
-  // Create AbortController for Agent SDK
-  const abortController = new AbortController()
-
-  // Wire incoming signal to our abort controller
-  if (signal) {
-    signal.addEventListener('abort', () => {
-      abortController.abort()
-    }, { once: true })
-  }
-
-  // Start the Agent SDK query
-  const agentQuery = query({
-    prompt,
-    options: {
-      model: MODEL,
-      maxTurns: 1, // Single response, no tool use
-      tools: [], // No tools - pure text generation
-      includePartialMessages: true, // Get streaming events
-      abortController,
-      persistSession: false, // Don't save to disk
-    },
-  })
+  // Start the streaming request
+  const stream = streamText(prompt, { signal })
 
   const encoder = new TextEncoder()
 
   return new ReadableStream({
     async start(controller) {
       try {
-        for await (const sdkMessage of agentQuery) {
-          // Handle streaming text events
-          if (sdkMessage.type === 'stream_event') {
-            const event = sdkMessage.event
-            // Emit content_block_delta events in SSE format
-            // ensemble.ts expects: data.type === 'content_block_delta' with data.delta?.text
-            if (event.type === 'content_block_delta') {
-              const sseData = `data: ${JSON.stringify(event)}\n\n`
-              controller.enqueue(encoder.encode(sseData))
-            }
+        stream.on('streamEvent', (event) => {
+          if (event.type === 'content_block_delta') {
+            const sseData = `data: ${JSON.stringify(event)}\n\n`
+            controller.enqueue(encoder.encode(sseData))
           }
-        }
+        })
+
+        // Wait for stream to complete
+        await stream.finalMessage()
 
         // Emit done event when iteration completes
         controller.enqueue(encoder.encode('data: {"type":"done"}\n\n'))

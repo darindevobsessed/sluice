@@ -175,6 +175,7 @@ describe('streamEnsembleResponse', () => {
   beforeEach(() => {
     vi.clearAllMocks()
 
+    mockGenerateEmbedding.mockResolvedValue(new Float32Array(384).fill(0.1))
     mockGetPersonaContext.mockResolvedValue(mockContext)
 
     // Mock streaming response for each persona - create fresh stream each time
@@ -311,12 +312,6 @@ describe('streamEnsembleResponse', () => {
   })
 
   it('should fetch context for each persona channel', async () => {
-    await streamEnsembleResponse({
-      question: 'What is React?',
-      personas: mockPersonas,
-    })
-
-    // Need to read the stream to trigger execution
     const stream = await streamEnsembleResponse({
       question: 'What is React?',
       personas: mockPersonas,

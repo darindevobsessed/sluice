@@ -40,8 +40,8 @@ vi.mock('@/lib/db/insights', () => ({
   getExtractionForVideo: vi.fn(),
 }))
 
-vi.mock('@anthropic-ai/claude-agent-sdk', () => ({
-  query: vi.fn(),
+vi.mock('@/lib/claude/client', () => ({
+  generateText: vi.fn(),
 }))
 
 vi.mock('@/lib/personas/context', () => ({
@@ -57,7 +57,7 @@ vi.mock('@/lib/personas/ensemble', () => ({
 import { hybridSearch } from '@/lib/search/hybrid-search'
 import { aggregateByVideo } from '@/lib/search/aggregate'
 import { getDistinctChannels } from '@/lib/db/search'
-import { query } from '@anthropic-ai/claude-agent-sdk'
+import { generateText } from '@/lib/claude/client'
 import { getPersonaContext, formatContextForPrompt } from '@/lib/personas/context'
 import { findBestPersonas } from '@/lib/personas/ensemble'
 
@@ -736,20 +736,9 @@ describe('chat_with_persona', () => {
     vi.mocked(getPersonaContext).mockResolvedValue(mockContext)
     vi.mocked(formatContextForPrompt).mockReturnValue('Context from your content:\n...')
 
-    // Mock Agent SDK query
-    const mockAssistantMessage = {
-      type: 'assistant',
-      message: {
-        content: [
-          { type: 'text', text: 'React hooks are indeed a powerful feature for managing state in functional components.' },
-        ],
-      },
-    }
-
-    vi.mocked(query).mockReturnValue(
-      (async function* () {
-        yield mockAssistantMessage
-      })() as never
+    // Mock generateText response
+    vi.mocked(generateText).mockResolvedValue(
+      'React hooks are indeed a powerful feature for managing state in functional components.'
     )
 
     const result = await toolHandler({
@@ -757,15 +746,9 @@ describe('chat_with_persona', () => {
       question: 'What are your thoughts on React hooks?',
     })
 
-    expect(query).toHaveBeenCalledWith({
-      prompt: expect.stringContaining('You are Test Creator'),
-      options: {
-        model: 'claude-sonnet-4-20250514',
-        maxTurns: 1,
-        tools: [],
-        persistSession: false,
-      },
-    })
+    expect(generateText).toHaveBeenCalledWith(
+      expect.stringContaining('You are Test Creator')
+    )
 
     const response = JSON.parse(result.content[0]?.text ?? '{}')
     expect(response.persona).toBe('Test Creator')
@@ -798,21 +781,8 @@ describe('chat_with_persona', () => {
     vi.mocked(getPersonaContext).mockResolvedValue([])
     vi.mocked(formatContextForPrompt).mockReturnValue('')
 
-    // Mock Agent SDK with no text content
-    const mockAssistantMessage = {
-      type: 'assistant',
-      message: {
-        content: [
-          { type: 'tool_use', id: 'test', name: 'test', input: {} },
-        ],
-      },
-    }
-
-    vi.mocked(query).mockReturnValue(
-      (async function* () {
-        yield mockAssistantMessage
-      })() as never
-    )
+    // Mock generateText with empty response
+    vi.mocked(generateText).mockResolvedValue('')
 
     const result = await toolHandler({
       personaName: 'Test Creator',
@@ -847,18 +817,7 @@ describe('chat_with_persona', () => {
     vi.mocked(getPersonaContext).mockResolvedValue([])
     vi.mocked(formatContextForPrompt).mockReturnValue('')
 
-    const mockAssistantMessage = {
-      type: 'assistant',
-      message: {
-        content: [{ type: 'text', text: 'Hello!' }],
-      },
-    }
-
-    vi.mocked(query).mockReturnValue(
-      (async function* () {
-        yield mockAssistantMessage
-      })() as never
-    )
+    vi.mocked(generateText).mockResolvedValue('Hello!')
 
     const result = await toolHandler({
       personaName: 'Test Channel',
@@ -1008,35 +967,16 @@ describe('ensemble_query', () => {
     vi.mocked(getPersonaContext).mockResolvedValue(mockContext)
     vi.mocked(formatContextForPrompt).mockReturnValue('Context...')
 
-    // Mock Agent SDK for each persona
-    const mockMessage1 = {
-      type: 'assistant',
-      message: {
-        content: [{ type: 'text', text: 'Answer from Creator A' }],
-      },
-    }
-    const mockMessage2 = {
-      type: 'assistant',
-      message: {
-        content: [{ type: 'text', text: 'Answer from Creator B' }],
-      },
-    }
-    const mockMessage3 = {
-      type: 'assistant',
-      message: {
-        content: [{ type: 'text', text: 'Answer from Creator C' }],
-      },
-    }
-
-    vi.mocked(query)
-      .mockReturnValueOnce((async function* () { yield mockMessage1 })() as never)
-      .mockReturnValueOnce((async function* () { yield mockMessage2 })() as never)
-      .mockReturnValueOnce((async function* () { yield mockMessage3 })() as never)
+    // Mock generateText for each persona
+    vi.mocked(generateText)
+      .mockResolvedValueOnce('Answer from Creator A')
+      .mockResolvedValueOnce('Answer from Creator B')
+      .mockResolvedValueOnce('Answer from Creator C')
 
     const result = await toolHandler({ question: 'What is React?' })
 
     expect(findBestPersonas).toHaveBeenCalledTimes(2)
-    expect(query).toHaveBeenCalledTimes(3)
+    expect(generateText).toHaveBeenCalledTimes(3)
 
     const response = JSON.parse(result.content[0]?.text ?? '{}')
     expect(response.question).toBe('What is React?')
@@ -1102,16 +1042,9 @@ describe('ensemble_query', () => {
     vi.mocked(formatContextForPrompt).mockReturnValue('')
 
     // First persona succeeds, second fails
-    const mockMessage1 = {
-      type: 'assistant',
-      message: {
-        content: [{ type: 'text', text: 'Answer from Creator A' }],
-      },
-    }
-
-    vi.mocked(query)
-      .mockReturnValueOnce((async function* () { yield mockMessage1 })() as never)
-      .mockReturnValueOnce((async function* () { throw new Error('API error') })() as never)
+    vi.mocked(generateText)
+      .mockResolvedValueOnce('Answer from Creator A')
+      .mockRejectedValueOnce(new Error('API error'))
 
     const result = await toolHandler({ question: 'Test question?' })
 

@@ -6,7 +6,7 @@ import {
   createPersona,
 } from '../service'
 import { db } from '@/lib/db'
-import { query } from '@anthropic-ai/claude-agent-sdk'
+import { generateText } from '@/lib/claude/client'
 
 // Mock dependencies
 vi.mock('@/lib/db', async () => {
@@ -20,8 +20,8 @@ vi.mock('@/lib/db', async () => {
   }
 })
 
-vi.mock('@anthropic-ai/claude-agent-sdk', () => ({
-  query: vi.fn(),
+vi.mock('@/lib/claude/client', () => ({
+  generateText: vi.fn(),
 }))
 
 vi.mock('@/lib/channels/similarity', () => ({
@@ -29,7 +29,7 @@ vi.mock('@/lib/channels/similarity', () => ({
 }))
 
 const mockDb = vi.mocked(db)
-const mockQuery = vi.mocked(query)
+const mockGenerateText = vi.mocked(generateText)
 
 describe('generatePersonaSystemPrompt', () => {
   beforeEach(() => {
@@ -56,32 +56,16 @@ describe('generatePersonaSystemPrompt', () => {
     } as never)
 
     // Mock Claude API response
-    const mockAssistantMessage = {
-      type: 'assistant',
-      message: {
-        content: [
-          {
-            type: 'text',
-            text: 'You are Test Creator, a software engineering educator. Your expertise is in React, TypeScript, and testing. You speak in a clear, practical way, focusing on real-world applications. Answer questions based on your content from your YouTube channel.',
-          },
-        ],
-      },
-    }
-
-    mockQuery.mockReturnValue(
-      (async function* () {
-        yield mockAssistantMessage
-      })() as never
+    mockGenerateText.mockResolvedValue(
+      'You are Test Creator, a software engineering educator. Your expertise is in React, TypeScript, and testing. You speak in a clear, practical way, focusing on real-world applications. Answer questions based on your content from your YouTube channel.'
     )
 
     const systemPrompt = await generatePersonaSystemPrompt(channelName)
 
     expect(systemPrompt).toContain('Test Creator')
     expect(systemPrompt).toContain('expertise')
-    expect(mockQuery).toHaveBeenCalledWith(
-      expect.objectContaining({
-        prompt: expect.stringContaining('Test Creator'),
-      })
+    expect(mockGenerateText).toHaveBeenCalledWith(
+      expect.stringContaining('Test Creator')
     )
   })
 
@@ -114,11 +98,7 @@ describe('generatePersonaSystemPrompt', () => {
       }),
     } as never)
 
-    mockQuery.mockReturnValue(
-      (async function* () {
-        throw new Error('API error')
-      })() as never
-    )
+    mockGenerateText.mockRejectedValue(new Error('API error'))
 
     await expect(generatePersonaSystemPrompt(channelName)).rejects.toThrow(
       'API error'
@@ -239,22 +219,8 @@ describe('createPersona', () => {
     } as never)
 
     // Mock Claude API response
-    const mockAssistantMessage = {
-      type: 'assistant',
-      message: {
-        content: [
-          {
-            type: 'text',
-            text: 'You are Test Creator, an expert in React and TypeScript.',
-          },
-        ],
-      },
-    }
-
-    mockQuery.mockReturnValue(
-      (async function* () {
-        yield mockAssistantMessage
-      })() as never
+    mockGenerateText.mockResolvedValue(
+      'You are Test Creator, an expert in React and TypeScript.'
     )
 
     // Mock chunk content for topics (extractExpertiseTopics still uses innerJoin)
@@ -340,18 +306,7 @@ describe('createPersona', () => {
     } as never)
 
     // Mock Claude API
-    const mockAssistantMessage = {
-      type: 'assistant',
-      message: {
-        content: [{ type: 'text', text: 'System prompt...' }],
-      },
-    }
-
-    mockQuery.mockReturnValue(
-      (async function* () {
-        yield mockAssistantMessage
-      })() as never
-    )
+    mockGenerateText.mockResolvedValue('System prompt...')
 
     // Mock topics (extractExpertiseTopics still uses innerJoin)
     mockDb.select.mockReturnValueOnce({

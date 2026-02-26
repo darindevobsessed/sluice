@@ -128,11 +128,13 @@ export async function POST(
       return NextResponse.json({ error: 'Invalid video ID' }, { status: 400 })
     }
 
-    // Require authenticated session for POST
-    const session = await auth.api.getSession({ headers: await headers() })
-    if (!session) {
-      timer.end(401)
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    // Require authenticated session for POST (skip in dev — no login locally)
+    if (process.env.NODE_ENV !== 'development') {
+      const session = await auth.api.getSession({ headers: await headers() })
+      if (!session) {
+        timer.end(401)
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      }
     }
 
     let rawBody: unknown

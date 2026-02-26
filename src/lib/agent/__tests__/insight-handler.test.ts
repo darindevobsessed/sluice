@@ -4,12 +4,47 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { handleInsightRequest, cancelInsight, type InsightRequest, type SendFn } from '../insight-handler'
 
-// Mock the Claude Agent SDK
-vi.mock('@anthropic-ai/claude-agent-sdk', () => ({
-  query: vi.fn(),
+// Mock the claude client
+vi.mock('@/lib/claude/client', () => ({
+  streamText: vi.fn(),
 }))
 
-import { query, type Query } from '@anthropic-ai/claude-agent-sdk'
+import { streamText } from '@/lib/claude/client'
+
+/** Helper to create a mock stream object that mimics MessageStream */
+function createMockStream(options: {
+  textDeltas?: string[]
+  finalContent?: string
+  error?: Error
+}) {
+  const listeners = new Map<string, ((...args: unknown[]) => void)[]>()
+
+  const stream = {
+    on(event: string, cb: (...args: unknown[]) => void) {
+      if (!listeners.has(event)) listeners.set(event, [])
+      listeners.get(event)!.push(cb)
+      return stream
+    },
+    finalMessage: vi.fn(async () => {
+      if (options.error) throw options.error
+
+      // Emit text deltas
+      if (options.textDeltas) {
+        for (const delta of options.textDeltas) {
+          for (const cb of listeners.get('text') ?? []) {
+            cb(delta)
+          }
+        }
+      }
+
+      return {
+        content: [{ type: 'text' as const, text: options.finalContent ?? '' }],
+      }
+    }),
+  }
+
+  return stream
+}
 
 describe('handleInsightRequest', () => {
   let sendMock: ReturnType<typeof vi.fn<SendFn>>
@@ -31,31 +66,12 @@ describe('handleInsightRequest', () => {
   })
 
   it('calls send with text events during streaming', async () => {
-    // Mock streaming response with text deltas
-    const mockAsyncGenerator = async function* () {
-      yield {
-        type: 'stream_event',
-        event: {
-          type: 'content_block_delta',
-          delta: { type: 'text_delta', text: 'Hello ' },
-        },
-      }
-      yield {
-        type: 'stream_event',
-        event: {
-          type: 'content_block_delta',
-          delta: { type: 'text_delta', text: 'world' },
-        },
-      }
-      yield {
-        type: 'assistant',
-        message: {
-          content: [{ type: 'text', text: 'Hello world' }],
-        },
-      }
-    }
+    const mockStream = createMockStream({
+      textDeltas: ['Hello ', 'world'],
+      finalContent: 'Hello world',
+    })
 
-    vi.mocked(query).mockReturnValue(mockAsyncGenerator() as unknown as Query)
+    vi.mocked(streamText).mockReturnValue(mockStream as never)
 
     await handleInsightRequest(sendMock, testRequest)
 
@@ -68,21 +84,17 @@ describe('handleInsightRequest', () => {
   })
 
   it('calls send with done event on completion', async () => {
-    // Mock response without streaming (assistant message only)
-    const mockAsyncGenerator = async function* () {
-      yield {
-        type: 'assistant',
-        message: {
-          content: [{ type: 'text', text: 'Final result' }],
-        },
-      }
-    }
+    // No streaming deltas — falls back to final message
+    const mockStream = createMockStream({
+      textDeltas: [],
+      finalContent: 'Final result',
+    })
 
-    vi.mocked(query).mockReturnValue(mockAsyncGenerator() as unknown as Query)
+    vi.mocked(streamText).mockReturnValue(mockStream as never)
 
     await handleInsightRequest(sendMock, testRequest)
 
-    // Should send text event with full content
+    // Should send text event with full content (fallback path)
     expect(sendMock).toHaveBeenCalledWith({ event: 'text', content: 'Final result' })
     // Should send done event
     expect(sendMock).toHaveBeenCalledWith({ event: 'done', fullContent: 'Final result' })
@@ -90,8 +102,7 @@ describe('handleInsightRequest', () => {
   })
 
   it('calls send with error event on failure', async () => {
-    // Mock query throwing an error
-    vi.mocked(query).mockImplementation(() => {
+    vi.mocked(streamText).mockImplementation(() => {
       throw new Error('API failure')
     })
 
@@ -103,8 +114,7 @@ describe('handleInsightRequest', () => {
   })
 
   it('handles non-Error exceptions', async () => {
-    // Mock query throwing a non-Error object
-    vi.mocked(query).mockImplementation(() => {
+    vi.mocked(streamText).mockImplementation(() => {
       throw 'String error'
     })
 
@@ -116,121 +126,73 @@ describe('handleInsightRequest', () => {
   })
 
   it('calls send with cancelled event when aborted during streaming', async () => {
-    // Mock streaming that will be aborted
-    const mockAsyncGenerator = async function* () {
-      yield {
-        type: 'stream_event',
-        event: {
-          type: 'content_block_delta',
-          delta: { type: 'text_delta', text: 'Start ' },
-        },
-      }
-      // Wait a bit to allow cancellation to happen
-      await new Promise((resolve) => setTimeout(resolve, 20))
-      yield {
-        type: 'stream_event',
-        event: {
-          type: 'content_block_delta',
-          delta: { type: 'text_delta', text: 'interrupted' },
-        },
-      }
+    // Create a stream that emits one delta, then waits
+    const listeners = new Map<string, ((...args: unknown[]) => void)[]>()
+    let resolveFinalize: ((val: unknown) => void) | null = null
+
+    const mockStream = {
+      on(event: string, cb: (...args: unknown[]) => void) {
+        if (!listeners.has(event)) listeners.set(event, [])
+        listeners.get(event)!.push(cb)
+        return mockStream
+      },
+      finalMessage: vi.fn(() => new Promise((resolve) => {
+        // Emit first delta immediately
+        for (const cb of listeners.get('text') ?? []) {
+          cb('Start ')
+        }
+        resolveFinalize = resolve
+      })),
     }
 
-    vi.mocked(query).mockReturnValue(mockAsyncGenerator() as unknown as Query)
+    vi.mocked(streamText).mockReturnValue(mockStream as never)
 
     // Start the request
     const promise = handleInsightRequest(sendMock, testRequest)
 
-    // Wait for first yield, then cancel
+    // Wait for first yield
     await new Promise((resolve) => setTimeout(resolve, 10))
-    const cancelled = cancelInsight(testRequest.id)
+    cancelInsight(testRequest.id)
+
+    // Resolve the stream so handleInsightRequest can finish
+    if (resolveFinalize) {
+      resolveFinalize({ content: [{ type: 'text', text: 'Start ' }] })
+    }
 
     await promise
 
-    expect(cancelled).toBe(true)
     // Should have sent text event before cancellation
     expect(sendMock).toHaveBeenCalledWith({ event: 'text', content: 'Start ' })
     // Should send cancelled event
     expect(sendMock).toHaveBeenCalledWith({ event: 'cancelled' })
   })
 
-  it('passes combined system prompt and prompt to Claude', async () => {
-    const mockAsyncGenerator = async function* () {
-      yield {
-        type: 'assistant',
-        message: {
-          content: [{ type: 'text', text: 'Result' }],
-        },
-      }
-    }
-
-    vi.mocked(query).mockReturnValue(mockAsyncGenerator() as unknown as Query)
-
-    await handleInsightRequest(sendMock, testRequest)
-
-    // Verify query was called with combined prompt
-    expect(query).toHaveBeenCalledWith({
-      prompt: 'Test system prompt\n\n---\n\nTest prompt',
-      options: expect.objectContaining({
-        model: 'claude-sonnet-4-20250514',
-        maxTurns: 1,
-        tools: [],
-        includePartialMessages: true,
-        persistSession: false,
-      }),
+  it('passes combined system prompt and prompt to streamText', async () => {
+    const mockStream = createMockStream({
+      textDeltas: [],
+      finalContent: 'Result',
     })
-  })
 
-  it('ignores non-text content blocks', async () => {
-    // Mock response with non-text content block
-    const mockAsyncGenerator = async function* () {
-      yield {
-        type: 'assistant',
-        message: {
-          content: [
-            { type: 'tool_use', id: 'tool123', name: 'test_tool' },
-            { type: 'text', text: 'Text content' },
-          ],
-        },
-      }
-    }
-
-    vi.mocked(query).mockReturnValue(mockAsyncGenerator() as unknown as Query)
+    vi.mocked(streamText).mockReturnValue(mockStream as never)
 
     await handleInsightRequest(sendMock, testRequest)
 
-    // Should only send text content
-    expect(sendMock).toHaveBeenCalledWith({ event: 'text', content: 'Text content' })
-    expect(sendMock).toHaveBeenCalledWith({ event: 'done', fullContent: 'Text content' })
-    expect(sendMock).toHaveBeenCalledTimes(2)
+    // Verify streamText was called with combined prompt and signal
+    expect(streamText).toHaveBeenCalledWith(
+      'Test system prompt\n\n---\n\nTest prompt',
+      expect.objectContaining({
+        signal: expect.any(AbortSignal),
+      }),
+    )
   })
 
-  it('handles empty streaming delta gracefully', async () => {
-    // Mock streaming with empty delta
-    const mockAsyncGenerator = async function* () {
-      yield {
-        type: 'stream_event',
-        event: {
-          type: 'content_block_delta',
-          delta: { type: 'text_delta', text: '' },
-        },
-      }
-      yield {
-        type: 'stream_event',
-        event: {
-          type: 'content_block_delta',
-          delta: { type: 'text_delta', text: 'Content' },
-        },
-      }
-      yield {
-        type: 'assistant',
-        message: {
-          content: [{ type: 'text', text: 'Content' }],
-        },
-      }
-    }
+  it('ignores empty text deltas', async () => {
+    const mockStream = createMockStream({
+      textDeltas: ['', 'Content'],
+      finalContent: 'Content',
+    })
 
-    vi.mocked(query).mockReturnValue(mockAsyncGenerator() as unknown as Query)
+    vi.mocked(streamText).mockReturnValue(mockStream as never)
 
     await handleInsightRequest(sendMock, testRequest)
 
@@ -257,26 +219,24 @@ describe('cancelInsight', () => {
   })
 
   it('returns true and aborts when request exists', async () => {
-    // Mock a long-running request
-    const mockAsyncGenerator = async function* () {
-      yield {
-        type: 'stream_event',
-        event: {
-          type: 'content_block_delta',
-          delta: { type: 'text_delta', text: 'Start' },
-        },
-      }
-      // Simulate long operation
-      await new Promise((resolve) => setTimeout(resolve, 100))
-      yield {
-        type: 'assistant',
-        message: {
-          content: [{ type: 'text', text: 'Complete' }],
-        },
-      }
+    let resolveFinalize: ((val: unknown) => void) | null = null
+    const listeners = new Map<string, ((...args: unknown[]) => void)[]>()
+
+    const mockStream = {
+      on(event: string, cb: (...args: unknown[]) => void) {
+        if (!listeners.has(event)) listeners.set(event, [])
+        listeners.get(event)!.push(cb)
+        return mockStream
+      },
+      finalMessage: vi.fn(() => new Promise((resolve) => {
+        for (const cb of listeners.get('text') ?? []) {
+          cb('Start')
+        }
+        resolveFinalize = resolve
+      })),
     }
 
-    vi.mocked(query).mockReturnValue(mockAsyncGenerator() as unknown as Query)
+    vi.mocked(streamText).mockReturnValue(mockStream as never)
 
     // Start the request (don't await)
     const promise = handleInsightRequest(sendMock, testRequest)
@@ -286,10 +246,13 @@ describe('cancelInsight', () => {
 
     // Cancel the request
     const cancelled = cancelInsight(testRequest.id)
-
     expect(cancelled).toBe(true)
 
-    // Wait for handler to finish
+    // Resolve so handler can finish
+    if (resolveFinalize) {
+      resolveFinalize({ content: [{ type: 'text', text: 'Start' }] })
+    }
+
     await promise
   })
 
@@ -299,17 +262,12 @@ describe('cancelInsight', () => {
   })
 
   it('returns false when called twice for same request', async () => {
-    // Mock a request
-    const mockAsyncGenerator = async function* () {
-      yield {
-        type: 'assistant',
-        message: {
-          content: [{ type: 'text', text: 'Result' }],
-        },
-      }
-    }
+    const mockStream = createMockStream({
+      textDeltas: [],
+      finalContent: 'Result',
+    })
 
-    vi.mocked(query).mockReturnValue(mockAsyncGenerator() as unknown as Query)
+    vi.mocked(streamText).mockReturnValue(mockStream as never)
 
     // Start and immediately cancel
     const promise = handleInsightRequest(sendMock, testRequest)

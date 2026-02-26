@@ -2,14 +2,49 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { streamPersonaResponse } from '../streaming'
 import type { Persona } from '@/lib/db/schema'
 import type { SearchResult } from '@/lib/search/types'
-import { query } from '@anthropic-ai/claude-agent-sdk'
+import { streamText } from '@/lib/claude/client'
 
-// Mock Agent SDK
-vi.mock('@anthropic-ai/claude-agent-sdk', () => ({
-  query: vi.fn(),
+// Mock claude client
+vi.mock('@/lib/claude/client', () => ({
+  streamText: vi.fn(),
 }))
 
-const mockQuery = vi.mocked(query)
+const mockStreamText = vi.mocked(streamText)
+
+/** Helper to create a mock stream that mimics MessageStream */
+function createMockStream(options: {
+  contentBlockDeltas?: Array<{ type: string, index: number, delta: { type: string, text: string } }>
+  finalContent?: string
+  error?: Error
+}) {
+  const listeners = new Map<string, ((...args: unknown[]) => void)[]>()
+
+  const stream = {
+    on(event: string, cb: (...args: unknown[]) => void) {
+      if (!listeners.has(event)) listeners.set(event, [])
+      listeners.get(event)!.push(cb)
+      return stream
+    },
+    finalMessage: vi.fn(async () => {
+      if (options.error) throw options.error
+
+      // Emit streamEvent events (raw API events, same as MessageStream)
+      if (options.contentBlockDeltas) {
+        for (const delta of options.contentBlockDeltas) {
+          for (const cb of listeners.get('streamEvent') ?? []) {
+            cb(delta)
+          }
+        }
+      }
+
+      return {
+        content: [{ type: 'text' as const, text: options.finalContent ?? '' }],
+      }
+    }),
+  }
+
+  return stream
+}
 
 describe('streamPersonaResponse', () => {
   const mockPersona: Persona = {
@@ -39,27 +74,20 @@ describe('streamPersonaResponse', () => {
   ]
 
   beforeEach(() => {
-    mockQuery.mockReset()
+    mockStreamText.mockReset()
   })
 
   it('should return a ReadableStream', async () => {
-    // Mock Agent SDK query to yield stream events
-    mockQuery.mockReturnValue(
-      (async function* () {
-        yield {
-          type: 'stream_event',
-          event: {
-            type: 'content_block_delta',
-            index: 0,
-            delta: { type: 'text_delta', text: 'Hello' },
-          },
-        }
-        yield {
-          type: 'assistant',
-          message: { content: [{ type: 'text', text: 'Hello' }] },
-        }
-      })() as never
-    )
+    const mockStream = createMockStream({
+      contentBlockDeltas: [{
+        type: 'content_block_delta',
+        index: 0,
+        delta: { type: 'text_delta', text: 'Hello' },
+      }],
+      finalContent: 'Hello',
+    })
+
+    mockStreamText.mockReturnValue(mockStream as never)
 
     const stream = await streamPersonaResponse({
       persona: mockPersona,
@@ -70,15 +98,13 @@ describe('streamPersonaResponse', () => {
     expect(stream).toBeInstanceOf(ReadableStream)
   })
 
-  it('should call Agent SDK query with correct parameters', async () => {
-    mockQuery.mockReturnValue(
-      (async function* () {
-        yield {
-          type: 'assistant',
-          message: { content: [{ type: 'text', text: 'Response' }] },
-        }
-      })() as never
-    )
+  it('should call streamText with correct prompt', async () => {
+    const mockStream = createMockStream({
+      contentBlockDeltas: [],
+      finalContent: 'Response',
+    })
+
+    mockStreamText.mockReturnValue(mockStream as never)
 
     await streamPersonaResponse({
       persona: mockPersona,
@@ -86,27 +112,19 @@ describe('streamPersonaResponse', () => {
       context: mockContext,
     })
 
-    expect(mockQuery).toHaveBeenCalledWith({
-      prompt: expect.stringContaining(mockPersona.systemPrompt),
-      options: expect.objectContaining({
-        model: 'claude-sonnet-4-20250514',
-        maxTurns: 1,
-        tools: [],
-        includePartialMessages: true,
-        persistSession: false,
-      }),
-    })
+    expect(mockStreamText).toHaveBeenCalledWith(
+      expect.stringContaining(mockPersona.systemPrompt),
+      expect.any(Object),
+    )
   })
 
   it('should include persona system prompt and question in prompt', async () => {
-    mockQuery.mockReturnValue(
-      (async function* () {
-        yield {
-          type: 'assistant',
-          message: { content: [{ type: 'text', text: 'Response' }] },
-        }
-      })() as never
-    )
+    const mockStream = createMockStream({
+      contentBlockDeltas: [],
+      finalContent: 'Response',
+    })
+
+    mockStreamText.mockReturnValue(mockStream as never)
 
     await streamPersonaResponse({
       persona: mockPersona,
@@ -114,20 +132,18 @@ describe('streamPersonaResponse', () => {
       context: mockContext,
     })
 
-    const promptArg = mockQuery.mock.calls[0]?.[0]?.prompt as string
+    const promptArg = mockStreamText.mock.calls[0]?.[0] as string
     expect(promptArg).toContain(mockPersona.systemPrompt)
     expect(promptArg).toContain('What is TypeScript?')
   })
 
   it('should include context in prompt', async () => {
-    mockQuery.mockReturnValue(
-      (async function* () {
-        yield {
-          type: 'assistant',
-          message: { content: [{ type: 'text', text: 'Response' }] },
-        }
-      })() as never
-    )
+    const mockStream = createMockStream({
+      contentBlockDeltas: [],
+      finalContent: 'Response',
+    })
+
+    mockStreamText.mockReturnValue(mockStream as never)
 
     await streamPersonaResponse({
       persona: mockPersona,
@@ -135,27 +151,21 @@ describe('streamPersonaResponse', () => {
       context: mockContext,
     })
 
-    const promptArg = mockQuery.mock.calls[0]?.[0]?.prompt as string
+    const promptArg = mockStreamText.mock.calls[0]?.[0] as string
     expect(promptArg).toContain('TypeScript is a typed superset of JavaScript')
   })
 
   it('should emit SSE-formatted content_block_delta events', async () => {
-    mockQuery.mockReturnValue(
-      (async function* () {
-        yield {
-          type: 'stream_event',
-          event: {
-            type: 'content_block_delta',
-            index: 0,
-            delta: { type: 'text_delta', text: 'Hello' },
-          },
-        }
-        yield {
-          type: 'assistant',
-          message: { content: [{ type: 'text', text: 'Hello' }] },
-        }
-      })() as never
-    )
+    const mockStream = createMockStream({
+      contentBlockDeltas: [{
+        type: 'content_block_delta',
+        index: 0,
+        delta: { type: 'text_delta', text: 'Hello' },
+      }],
+      finalContent: 'Hello',
+    })
+
+    mockStreamText.mockReturnValue(mockStream as never)
 
     const stream = await streamPersonaResponse({
       persona: mockPersona,
@@ -179,22 +189,16 @@ describe('streamPersonaResponse', () => {
   })
 
   it('should emit done event on completion', async () => {
-    mockQuery.mockReturnValue(
-      (async function* () {
-        yield {
-          type: 'stream_event',
-          event: {
-            type: 'content_block_delta',
-            index: 0,
-            delta: { type: 'text_delta', text: 'Complete' },
-          },
-        }
-        yield {
-          type: 'assistant',
-          message: { content: [{ type: 'text', text: 'Complete' }] },
-        }
-      })() as never
-    )
+    const mockStream = createMockStream({
+      contentBlockDeltas: [{
+        type: 'content_block_delta',
+        index: 0,
+        delta: { type: 'text_delta', text: 'Complete' },
+      }],
+      finalContent: 'Complete',
+    })
+
+    mockStreamText.mockReturnValue(mockStream as never)
 
     const stream = await streamPersonaResponse({
       persona: mockPersona,
@@ -219,11 +223,11 @@ describe('streamPersonaResponse', () => {
   })
 
   it('should handle query errors', async () => {
-    mockQuery.mockReturnValue(
-      (async function* () {
-        throw new Error('Query failed')
-      })() as never
-    )
+    const mockStream = createMockStream({
+      error: new Error('Query failed'),
+    })
+
+    mockStreamText.mockReturnValue(mockStream as never)
 
     const stream = await streamPersonaResponse({
       persona: mockPersona,
@@ -240,11 +244,11 @@ describe('streamPersonaResponse', () => {
     const abortController = new AbortController()
     abortController.abort()
 
-    mockQuery.mockReturnValue(
-      (async function* () {
-        throw new Error('Aborted')
-      })() as never
-    )
+    const mockStream = createMockStream({
+      error: new Error('Aborted'),
+    })
+
+    mockStreamText.mockReturnValue(mockStream as never)
 
     const stream = await streamPersonaResponse({
       persona: mockPersona,
@@ -258,17 +262,15 @@ describe('streamPersonaResponse', () => {
     await expect(reader.read()).rejects.toThrow()
   })
 
-  it('should wire abort signal to Agent SDK abortController', async () => {
+  it('should pass abort signal to streamText', async () => {
     const abortController = new AbortController()
 
-    mockQuery.mockReturnValue(
-      (async function* () {
-        yield {
-          type: 'assistant',
-          message: { content: [{ type: 'text', text: 'Response' }] },
-        }
-      })() as never
-    )
+    const mockStream = createMockStream({
+      contentBlockDeltas: [],
+      finalContent: 'Response',
+    })
+
+    mockStreamText.mockReturnValue(mockStream as never)
 
     await streamPersonaResponse({
       persona: mockPersona,
@@ -277,35 +279,11 @@ describe('streamPersonaResponse', () => {
       signal: abortController.signal,
     })
 
-    const options = mockQuery.mock.calls[0]?.[0]?.options
-    expect(options).toBeDefined()
-    expect(options?.abortController).toBeInstanceOf(AbortController)
-  })
-
-  it('should use { once: true } on abort signal listener to prevent leaks', async () => {
-    const signal = new AbortController().signal
-    const addEventListenerSpy = vi.spyOn(signal, 'addEventListener')
-
-    mockQuery.mockReturnValue(
-      (async function* () {
-        yield {
-          type: 'assistant',
-          message: { content: [{ type: 'text', text: 'Response' }] },
-        }
-      })() as never
-    )
-
-    await streamPersonaResponse({
-      persona: mockPersona,
-      question: 'What is TypeScript?',
-      context: mockContext,
-      signal,
-    })
-
-    expect(addEventListenerSpy).toHaveBeenCalledWith(
-      'abort',
-      expect.any(Function),
-      { once: true },
+    expect(mockStreamText).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.objectContaining({
+        signal: abortController.signal,
+      }),
     )
   })
 
@@ -324,14 +302,12 @@ describe('streamPersonaResponse', () => {
       similarity: 0.9,
     }))
 
-    mockQuery.mockReturnValue(
-      (async function* () {
-        yield {
-          type: 'assistant',
-          message: { content: [{ type: 'text', text: 'Response' }] },
-        }
-      })() as never
-    )
+    const mockStream = createMockStream({
+      contentBlockDeltas: [],
+      finalContent: 'Response',
+    })
+
+    mockStreamText.mockReturnValue(mockStream as never)
 
     await streamPersonaResponse({
       persona: mockPersona,
@@ -339,7 +315,7 @@ describe('streamPersonaResponse', () => {
       context: largeContext,
     })
 
-    const promptArg = mockQuery.mock.calls[0]?.[0]?.prompt as string
+    const promptArg = mockStreamText.mock.calls[0]?.[0] as string
     // Prompt should not be excessively large due to token limiting
     expect(promptArg.length).toBeLessThan(20000) // Reasonable limit
   })

@@ -1,0 +1,186 @@
+import Anthropic from '@anthropic-ai/sdk'
+import { EventEmitter } from 'events'
+
+const MODEL = 'claude-sonnet-4-20250514'
+const MAX_TOKENS = 4096
+
+/**
+ * Dual-path Claude client.
+ *
+ * The agent SDK (`@anthropic-ai/claude-agent-sdk`) spawns a subprocess
+ * (`node cli.js`) for every query(). This works locally because Claude Code's
+ * session auth handles authentication — no API key needed. But it CANNOT work
+ * on Vercel: serverless Lambdas can't spawn subprocesses reliably, and the
+ * file tracer can't include cli.js.
+ *
+ * So:
+ * - Production (Vercel): direct @anthropic-ai/sdk with AI_GATEWAY_KEY
+ * - Local dev: agent SDK query() with Claude Code session auth (no API key)
+ *
+ * Detection: if ANTHROPIC_API_KEY or AI_GATEWAY_KEY exists → production path.
+ */
+function hasApiKey(): boolean {
+  return !!(process.env.ANTHROPIC_API_KEY || process.env.AI_GATEWAY_KEY)
+}
+
+// Direct SDK client (production) — lazy singleton.
+let _client: Anthropic | null = null
+function getClient(): Anthropic {
+  if (!_client) {
+    const apiKey = process.env.ANTHROPIC_API_KEY || process.env.AI_GATEWAY_KEY
+    _client = new Anthropic({ apiKey })
+  }
+  return _client
+}
+
+/**
+ * Non-streaming text generation.
+ *
+ * Production: direct @anthropic-ai/sdk API call.
+ * Local: agent SDK query() — subprocess-based, uses Claude Code session auth.
+ */
+export async function generateText(prompt: string): Promise<string> {
+  if (hasApiKey()) {
+    const response = await getClient().messages.create({
+      model: MODEL,
+      max_tokens: MAX_TOKENS,
+      messages: [{ role: 'user', content: prompt }],
+    })
+    const textBlock = response.content.find(block => block.type === 'text')
+    return textBlock?.type === 'text' ? textBlock.text : ''
+  }
+
+  // Local: agent SDK spawns subprocess with Claude Code session auth.
+  // Dynamic import with webpackIgnore — production builds must not bundle
+  // the agent SDK (its cli.js subprocess doesn't work on Vercel).
+  const { query } = await import('@anthropic-ai/claude-agent-sdk')
+  const response = query({
+    prompt,
+    options: {
+      model: MODEL,
+      maxTurns: 1,
+      tools: [],
+      persistSession: false,
+    },
+  })
+
+  let text = ''
+  for await (const event of response) {
+    if (event.type === 'assistant') {
+      for (const block of event.message.content) {
+        if (block.type === 'text') {
+          text = block.text
+        }
+      }
+    }
+  }
+  return text
+}
+
+/**
+ * Streaming text generation.
+ *
+ * Production: returns @anthropic-ai/sdk MessageStream (.on(), .finalMessage()).
+ * Local: returns AgentSDKStream wrapper with the same interface.
+ */
+/** Shared interface for both MessageStream and AgentSDKStream. */
+export interface TextStream {
+  on(event: 'text', listener: (delta: string) => void): this
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  on(event: 'streamEvent', listener: (event: any) => void): this
+  on(event: string, listener: (...args: unknown[]) => void): this
+  finalMessage(): Promise<{ content: Array<{ type: string; text?: string }> }>
+}
+
+export function streamText(
+  prompt: string,
+  options?: { signal?: AbortSignal }
+): TextStream {
+  if (hasApiKey()) {
+    return getClient().messages.stream({
+      model: MODEL,
+      max_tokens: MAX_TOKENS,
+      messages: [{ role: 'user', content: prompt }],
+    }, { signal: options?.signal })
+  }
+
+  // Local: agent SDK wrapper matching MessageStream interface.
+  return new AgentSDKStream(prompt, options?.signal)
+}
+
+/**
+ * Wraps agent SDK query() to match the MessageStream interface.
+ *
+ * The agent SDK can't run on Vercel (subprocess-based), but locally it
+ * provides Claude Code session auth without needing an API key.
+ * This wrapper emits the same events as @anthropic-ai/sdk's MessageStream:
+ * - 'text' (string delta) — used by insight-handler.ts
+ * - 'streamEvent' (raw API event) — used by streaming.ts
+ * - finalMessage() — used by both
+ */
+class AgentSDKStream extends EventEmitter {
+  private _done: Promise<{ content: Array<{ type: string; text: string }> }>
+
+  constructor(prompt: string, signal?: AbortSignal) {
+    super()
+    this._done = this._run(prompt, signal)
+  }
+
+  private async _run(prompt: string, signal?: AbortSignal) {
+    const { query } = await import('@anthropic-ai/claude-agent-sdk')
+
+    const abortController = new AbortController()
+    if (signal) {
+      signal.addEventListener('abort', () => abortController.abort(), { once: true })
+    }
+
+    const response = query({
+      prompt,
+      options: {
+        model: MODEL,
+        maxTurns: 1,
+        tools: [],
+        includePartialMessages: true,
+        abortController,
+        persistSession: false,
+      },
+    })
+
+    let fullText = ''
+
+    for await (const sdkMessage of response) {
+      if (signal?.aborted) break
+
+      if (sdkMessage.type === 'stream_event') {
+        // Emit raw API event — matches MessageStream's 'streamEvent'
+        this.emit('streamEvent', sdkMessage.event)
+
+        // Emit 'text' convenience event — matches MessageStream's 'text'
+        if (
+          sdkMessage.event.type === 'content_block_delta'
+          && sdkMessage.event.delta?.type === 'text_delta'
+        ) {
+          const delta = sdkMessage.event.delta.text
+          this.emit('text', delta)
+          fullText += delta
+        }
+      }
+
+      if (sdkMessage.type === 'assistant') {
+        for (const block of sdkMessage.message.content) {
+          if (block.type === 'text') {
+            if (!fullText) fullText = block.text
+          }
+        }
+      }
+    }
+
+    return {
+      content: fullText ? [{ type: 'text' as const, text: fullText }] : [],
+    }
+  }
+
+  async finalMessage() {
+    return this._done
+  }
+}

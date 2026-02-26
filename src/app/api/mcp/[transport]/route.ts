@@ -78,7 +78,37 @@ async function wrappedHandler(request: Request): Promise<Response> {
     } as RequestInit)
   }
 
-  return handler(request)
+  // mcp-handler may return a Turbopack polyfill Response whose body
+  // ReadableStream is from a different realm. Native Response constructor
+  // rejects cross-realm streams. Fix: buffer JSON, pipe SSE through
+  // a native TransformStream.
+  const result = await handler(request)
+  if (result instanceof Response) return result
+
+  if (!result || typeof result !== 'object' || !('status' in result)) {
+    return new Response(null, { status: 404 })
+  }
+
+  const src = result as Response
+  const headers = new Headers()
+  try {
+    if (src.headers && typeof src.headers.forEach === 'function') {
+      src.headers.forEach((v: string, k: string) => headers.set(k, v))
+    }
+  } catch { /* ignore header extraction errors */ }
+
+  const contentType = headers.get('content-type') || ''
+
+  if (contentType.includes('text/event-stream') && src.body) {
+    // SSE stream: pipe polyfill ReadableStream through native TransformStream
+    const { readable, writable } = new TransformStream()
+    ;(src.body as ReadableStream).pipeTo(writable).catch(() => {})
+    return new Response(readable, { status: src.status, headers })
+  }
+
+  // JSON/text: buffer body to avoid cross-realm stream issues
+  const body = src.body ? await src.text() : null
+  return new Response(body, { status: src.status, headers })
 }
 
 export { wrappedHandler as GET, wrappedHandler as POST }
