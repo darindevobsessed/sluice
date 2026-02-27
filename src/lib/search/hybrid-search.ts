@@ -8,6 +8,29 @@ import { vectorSearch } from './vector-search';
 import { calculateTemporalDecay } from '@/lib/temporal/decay';
 
 /**
+ * Attempts to generate an embedding, retrying once on failure.
+ * The first failure triggers the EmbeddingPipeline's internal cache cleanup.
+ * The second attempt gets a clean cache and typically succeeds.
+ *
+ * @param text - Text to embed
+ * @returns The embedding on success, or null if both attempts fail
+ */
+async function generateEmbeddingWithRetry(text: string): Promise<Float32Array | null> {
+  const { generateEmbedding } = await import('@/lib/embeddings/pipeline')
+  try {
+    return await generateEmbedding(text)
+  } catch (firstError) {
+    console.warn('Embedding generation failed, retrying after cache cleanup:', firstError)
+    try {
+      return await generateEmbedding(text)
+    } catch (retryError) {
+      console.warn('Embedding retry also failed, degrading gracefully:', retryError)
+      return null
+    }
+  }
+}
+
+/**
  * Performs keyword search on chunk content using case-insensitive LIKE matching.
  *
  * @param query - Text query to search for
@@ -132,10 +155,14 @@ function applyTemporalDecay(
  *
  * Optionally applies temporal decay to boost recent content.
  *
+ * When embedding generation fails (e.g. corrupt ONNX cache on Vercel cold start),
+ * vector and hybrid modes retry once. On double failure, they fall back to
+ * keyword-only results and return `degraded: true` so callers can signal the user.
+ *
  * @param query - Text query to search for
  * @param options - Search options (mode, limit, temporalDecay, halfLifeDays)
  * @param db - Database instance (optional, defaults to singleton)
- * @returns Array of search results ordered by relevance
+ * @returns Object with results array and degraded flag
  */
 export async function hybridSearch(
   query: string,
@@ -146,7 +173,7 @@ export async function hybridSearch(
     halfLifeDays?: number;
   } = {},
   db: NodePgDatabase<typeof schema> = defaultDb
-): Promise<SearchResult[]> {
+): Promise<{ results: SearchResult[]; degraded: boolean }> {
   const {
     mode = 'hybrid',
     limit = 10,
@@ -155,32 +182,41 @@ export async function hybridSearch(
   } = options;
 
   let results: SearchResult[];
+  let degraded = false;
 
-  // Pure keyword mode
+  // Pure keyword mode — no embedding needed
   if (mode === 'keyword') {
     results = await keywordSearch(query, limit, db);
   }
   // Pure vector mode
   else if (mode === 'vector') {
-    const { generateEmbedding } = await import('@/lib/embeddings/pipeline')
-    const queryEmbedding = await generateEmbedding(query);
-    const embeddingArray = Array.from(queryEmbedding);
-    results = await vectorSearch(embeddingArray, limit, 0.3, db);
+    const embedding = await generateEmbeddingWithRetry(query)
+    if (embedding) {
+      const embeddingArray = Array.from(embedding)
+      results = await vectorSearch(embeddingArray, limit, 0.3, db)
+    } else {
+      // Embedding failed — fall back to keyword search
+      results = await keywordSearch(query, limit, db)
+      degraded = true
+    }
   }
   // Hybrid mode: combine both with RRF
   else {
-    const { generateEmbedding } = await import('@/lib/embeddings/pipeline')
-    const queryEmbedding = await generateEmbedding(query);
-    const embeddingArray = Array.from(queryEmbedding);
-
-    // Fetch more results (limit * 2) from each method for better fusion
-    const [vectorResults, keywordResults] = await Promise.all([
-      vectorSearch(embeddingArray, limit * 2, 0.3, db),
-      keywordSearch(query, limit * 2, db),
-    ]);
-
-    // Apply RRF and take top results
-    results = reciprocalRankFusion(vectorResults, keywordResults).slice(0, limit);
+    const embedding = await generateEmbeddingWithRetry(query)
+    if (embedding) {
+      const embeddingArray = Array.from(embedding)
+      // Fetch more results (limit * 2) from each method for better fusion
+      const [vectorResults, keywordResults] = await Promise.all([
+        vectorSearch(embeddingArray, limit * 2, 0.3, db),
+        keywordSearch(query, limit * 2, db),
+      ])
+      // Apply RRF and take top results
+      results = reciprocalRankFusion(vectorResults, keywordResults).slice(0, limit)
+    } else {
+      // Embedding failed — fall back to keyword-only
+      results = await keywordSearch(query, limit, db)
+      degraded = true
+    }
   }
 
   // Apply temporal decay if requested
@@ -188,5 +224,5 @@ export async function hybridSearch(
     results = applyTemporalDecay(results, halfLifeDays);
   }
 
-  return results;
+  return { results, degraded };
 }

@@ -131,6 +131,27 @@ describe('findBestPersonas', () => {
 
     expect(result.length).toBeLessThanOrEqual(3)
   })
+
+  it('retries embedding once and succeeds on second attempt', async () => {
+    mockGenerateEmbedding
+      .mockRejectedValueOnce(new Error('protobuf parsing failed'))
+      .mockResolvedValueOnce(new Float32Array(384).fill(0.1))
+
+    const result = await findBestPersonas('What is React?', mockPersonas)
+
+    expect(mockGenerateEmbedding).toHaveBeenCalledTimes(2)
+    expect(result.length).toBeGreaterThan(0)
+  })
+
+  it('returns empty array when both embedding attempts fail', async () => {
+    mockGenerateEmbedding
+      .mockRejectedValueOnce(new Error('protobuf parsing failed'))
+      .mockRejectedValueOnce(new Error('protobuf parsing failed'))
+
+    const result = await findBestPersonas('What is React?', mockPersonas)
+
+    expect(result).toEqual([])
+  })
 })
 
 describe('streamEnsembleResponse', () => {

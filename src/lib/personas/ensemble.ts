@@ -39,10 +39,24 @@ export async function findBestPersonas(
     return []
   }
 
-  // Generate embedding for the question
+  // Generate embedding for the question with retry on failure
+  // First failure triggers EmbeddingPipeline's internal cache cleanup;
+  // second attempt gets a clean cache and typically succeeds.
   const { generateEmbedding } = await import('@/lib/embeddings/pipeline')
-  const questionEmbedding = await generateEmbedding(question)
-  const questionVector = Array.from(questionEmbedding)
+  let questionVector: number[]
+  try {
+    const questionEmbedding = await generateEmbedding(question)
+    questionVector = Array.from(questionEmbedding)
+  } catch (firstError) {
+    console.warn('Embedding generation failed in findBestPersonas, retrying:', firstError)
+    try {
+      const questionEmbedding = await generateEmbedding(question)
+      questionVector = Array.from(questionEmbedding)
+    } catch (retryError) {
+      console.warn('Embedding retry failed in findBestPersonas, returning empty:', retryError)
+      return []
+    }
+  }
 
   // Compute similarity score for each persona
   const results: BestPersonaResult[] = personasWithEmbeddings.map(persona => {

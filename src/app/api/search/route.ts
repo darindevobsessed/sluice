@@ -22,6 +22,7 @@ interface SearchResponse {
   mode: SearchMode;
   timing: number; // ms for performance tracking
   hasEmbeddings: boolean; // Whether any videos have embeddings
+  degraded: boolean; // True when embedding failed and results are keyword-only
 }
 
 /**
@@ -78,6 +79,7 @@ export async function GET(request: Request) {
       mode,
       timing: 0,
       hasEmbeddings: true,
+      degraded: false,
     };
     return NextResponse.json(response, {
       headers: {
@@ -96,12 +98,14 @@ export async function GET(request: Request) {
   }
 
   // Run search - fetch more chunks (limit * 3) for better video aggregation
-  let chunkResults = await hybridSearch(query, {
+  const searchResult = await hybridSearch(query, {
     mode,
     limit: limit * 3,
     temporalDecay,
     halfLifeDays,
   });
+  let chunkResults = searchResult.results;
+  const embeddingDegraded = searchResult.degraded;
 
   // Filter by focus area if provided
   if (focusAreaId !== null) {
@@ -129,6 +133,7 @@ export async function GET(request: Request) {
     mode,
     timing,
     hasEmbeddings,
+    degraded: embeddingDegraded,
   };
 
   return NextResponse.json(response, {

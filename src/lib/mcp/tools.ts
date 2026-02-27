@@ -32,7 +32,7 @@ export function registerSearchRag(server: McpServer): void {
     },
     async ({ topic, creator, limit }) => {
       // Perform hybrid search
-      const results = await hybridSearch(topic, { limit: limit ?? 10 })
+      const { results } = await hybridSearch(topic, { limit: limit ?? 10 })
 
       // Filter by creator if provided (case-insensitive)
       const filtered = creator

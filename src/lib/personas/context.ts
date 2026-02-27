@@ -16,7 +16,9 @@ export async function getPersonaContext(
   question: string
 ): Promise<SearchResult[]> {
   // Fetch more results than we need since we'll filter by channel
-  const searchResults = await hybridSearch(question, {
+  // Destructure results from the new return shape; degraded flag not needed here —
+  // keyword-only fallback results are still useful context for the persona.
+  const { results: searchResults } = await hybridSearch(question, {
     mode: 'hybrid',
     limit: 50, // Fetch extra to ensure we get 10 from the target channel
   })

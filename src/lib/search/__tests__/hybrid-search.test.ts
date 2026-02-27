@@ -14,6 +14,7 @@ vi.mock('../vector-search', () => ({
 }))
 
 import { vectorSearch } from '../vector-search'
+import { generateEmbedding } from '@/lib/embeddings/pipeline'
 
 const createMockDb = () => {
   const mockSelectChain = {
@@ -70,7 +71,7 @@ describe('hybridSearch', () => {
         },
       ])
 
-      const results = await hybridSearch(
+      const { results, degraded } = await hybridSearch(
         'TypeScript',
         { mode: 'keyword', limit: 10 },
         mockDb as unknown as NodePgDatabase<typeof schema>,
@@ -78,6 +79,7 @@ describe('hybridSearch', () => {
 
       expect(results.length).toBeGreaterThan(0)
       expect(results[0]?.content).toContain('TypeScript')
+      expect(degraded).toBe(false)
     })
 
     it('performs case-insensitive keyword search', async () => {
@@ -97,7 +99,7 @@ describe('hybridSearch', () => {
         },
       ])
 
-      const results = await hybridSearch(
+      const { results, degraded } = await hybridSearch(
         'typescript',
         { mode: 'keyword', limit: 10 },
         mockDb as unknown as NodePgDatabase<typeof schema>,
@@ -105,18 +107,20 @@ describe('hybridSearch', () => {
 
       expect(results.length).toBe(1)
       expect(results[0]?.content).toContain('TypeScript')
+      expect(degraded).toBe(false)
     })
 
     it('returns empty array when no keyword matches', async () => {
       mockDb._selectChain.limit.mockResolvedValue([])
 
-      const results = await hybridSearch(
+      const { results, degraded } = await hybridSearch(
         'TypeScript',
         { mode: 'keyword', limit: 10 },
         mockDb as unknown as NodePgDatabase<typeof schema>,
       )
 
       expect(results).toEqual([])
+      expect(degraded).toBe(false)
     })
 
     it('respects limit parameter', async () => {
@@ -149,13 +153,14 @@ describe('hybridSearch', () => {
         },
       ])
 
-      const results = await hybridSearch(
+      const { results, degraded } = await hybridSearch(
         'test',
         { mode: 'keyword', limit: 2 },
         mockDb as unknown as NodePgDatabase<typeof schema>,
       )
 
       expect(results).toHaveLength(2)
+      expect(degraded).toBe(false)
     })
   })
 
@@ -177,7 +182,7 @@ describe('hybridSearch', () => {
         },
       ])
 
-      const results = await hybridSearch(
+      const { results, degraded } = await hybridSearch(
         'query text',
         { mode: 'vector', limit: 10 },
         mockDb as unknown as NodePgDatabase<typeof schema>,
@@ -186,12 +191,13 @@ describe('hybridSearch', () => {
       expect(Array.isArray(results)).toBe(true)
       expect(results.length).toBe(1)
       expect(vectorSearch).toHaveBeenCalled()
+      expect(degraded).toBe(false)
     })
 
     it('returns empty results when vector search finds nothing above threshold', async () => {
       vi.mocked(vectorSearch).mockResolvedValue([])
 
-      const results = await hybridSearch(
+      const { results, degraded } = await hybridSearch(
         'query',
         { mode: 'vector', limit: 10 },
         mockDb as unknown as NodePgDatabase<typeof schema>,
@@ -199,6 +205,7 @@ describe('hybridSearch', () => {
 
       expect(Array.isArray(results)).toBe(true)
       expect(results).toEqual([])
+      expect(degraded).toBe(false)
     })
   })
 
@@ -262,7 +269,7 @@ describe('hybridSearch', () => {
         },
       ])
 
-      const results = await hybridSearch(
+      const { results, degraded } = await hybridSearch(
         'TypeScript',
         { mode: 'hybrid', limit: 10 },
         mockDb as unknown as NodePgDatabase<typeof schema>,
@@ -270,6 +277,7 @@ describe('hybridSearch', () => {
 
       expect(results.length).toBeGreaterThan(0)
       expect(Array.isArray(results)).toBe(true)
+      expect(degraded).toBe(false)
     })
 
     it('deduplicates chunks appearing in both vector and keyword results', async () => {
@@ -305,7 +313,7 @@ describe('hybridSearch', () => {
         },
       ])
 
-      const results = await hybridSearch(
+      const { results, degraded } = await hybridSearch(
         'TypeScript',
         { mode: 'hybrid', limit: 10 },
         mockDb as unknown as NodePgDatabase<typeof schema>,
@@ -314,6 +322,7 @@ describe('hybridSearch', () => {
       const chunkIds = results.map(r => r.chunkId)
       const uniqueIds = new Set(chunkIds)
       expect(chunkIds.length).toBe(uniqueIds.size)
+      expect(degraded).toBe(false)
     })
 
     it('boosts chunks that appear in both vector and keyword results', async () => {
@@ -375,7 +384,7 @@ describe('hybridSearch', () => {
         },
       ])
 
-      const results = await hybridSearch(
+      const { results, degraded } = await hybridSearch(
         'TypeScript',
         { mode: 'hybrid', limit: 10 },
         mockDb as unknown as NodePgDatabase<typeof schema>,
@@ -384,6 +393,7 @@ describe('hybridSearch', () => {
       expect(results.length).toBeGreaterThan(0)
       // Chunk 1 (appears in both) should be first due to RRF boost
       expect(results[0]?.chunkId).toBe(1)
+      expect(degraded).toBe(false)
     })
 
     it('respects limit parameter in hybrid mode', async () => {
@@ -407,13 +417,14 @@ describe('hybridSearch', () => {
         vectorResults.map(r => ({ ...r, similarity: '1.0' })),
       )
 
-      const results = await hybridSearch(
+      const { results, degraded } = await hybridSearch(
         'TypeScript',
         { mode: 'hybrid', limit: 5 },
         mockDb as unknown as NodePgDatabase<typeof schema>,
       )
 
       expect(results.length).toBeLessThanOrEqual(5)
+      expect(degraded).toBe(false)
     })
   })
 
@@ -422,7 +433,7 @@ describe('hybridSearch', () => {
       vi.mocked(vectorSearch).mockResolvedValue([])
       mockDb._selectChain.limit.mockResolvedValue([])
 
-      const results = await hybridSearch(
+      const { results, degraded } = await hybridSearch(
         'TypeScript',
         { limit: 10 },
         mockDb as unknown as NodePgDatabase<typeof schema>,
@@ -430,19 +441,21 @@ describe('hybridSearch', () => {
 
       expect(Array.isArray(results)).toBe(true)
       expect(vectorSearch).toHaveBeenCalled()
+      expect(degraded).toBe(false)
     })
 
     it('uses limit of 10 by default', async () => {
       vi.mocked(vectorSearch).mockResolvedValue([])
       mockDb._selectChain.limit.mockResolvedValue([])
 
-      const results = await hybridSearch(
+      const { results, degraded } = await hybridSearch(
         'test',
         {},
         mockDb as unknown as NodePgDatabase<typeof schema>,
       )
 
       expect(results.length).toBeLessThanOrEqual(10)
+      expect(degraded).toBe(false)
     })
   })
 
@@ -464,7 +477,7 @@ describe('hybridSearch', () => {
         },
       ])
 
-      const results = await hybridSearch(
+      const { results, degraded } = await hybridSearch(
         'TypeScript',
         { mode: 'keyword' },
         mockDb as unknown as NodePgDatabase<typeof schema>,
@@ -483,6 +496,7 @@ describe('hybridSearch', () => {
       expect(result).toHaveProperty('channel', 'Test Channel Name')
       expect(result).toHaveProperty('youtubeId', 'abc123')
       expect(result).toHaveProperty('thumbnail', 'https://example.com/thumb.jpg')
+      expect(degraded).toBe(false)
     })
 
     it('assigns similarity score of 1.0 for keyword matches', async () => {
@@ -502,13 +516,14 @@ describe('hybridSearch', () => {
         },
       ])
 
-      const results = await hybridSearch(
+      const { results, degraded } = await hybridSearch(
         'TypeScript',
         { mode: 'keyword' },
         mockDb as unknown as NodePgDatabase<typeof schema>,
       )
 
       expect(results[0]?.similarity).toBe(1.0)
+      expect(degraded).toBe(false)
     })
   })
 
@@ -517,25 +532,27 @@ describe('hybridSearch', () => {
       vi.mocked(vectorSearch).mockResolvedValue([])
       mockDb._selectChain.limit.mockResolvedValue([])
 
-      const results = await hybridSearch(
+      const { results, degraded } = await hybridSearch(
         'anything',
         { mode: 'hybrid' },
         mockDb as unknown as NodePgDatabase<typeof schema>,
       )
 
       expect(results).toEqual([])
+      expect(degraded).toBe(false)
     })
 
     it('handles query with special characters', async () => {
       mockDb._selectChain.limit.mockResolvedValue([])
 
-      const results = await hybridSearch(
+      const { results, degraded } = await hybridSearch(
         'C++',
         { mode: 'keyword' },
         mockDb as unknown as NodePgDatabase<typeof schema>,
       )
 
       expect(results.length).toBeGreaterThanOrEqual(0)
+      expect(degraded).toBe(false)
     })
 
     it('handles partial word matches in keyword search', async () => {
@@ -555,7 +572,7 @@ describe('hybridSearch', () => {
         },
       ])
 
-      const results = await hybridSearch(
+      const { results, degraded } = await hybridSearch(
         'Type',
         { mode: 'keyword' },
         mockDb as unknown as NodePgDatabase<typeof schema>,
@@ -563,6 +580,7 @@ describe('hybridSearch', () => {
 
       expect(results.length).toBe(1)
       expect(results[0]?.content).toContain('TypeScript')
+      expect(degraded).toBe(false)
     })
   })
 
@@ -600,7 +618,7 @@ describe('hybridSearch', () => {
         },
       ])
 
-      const results = await hybridSearch(
+      const { results, degraded } = await hybridSearch(
         'TypeScript',
         { mode: 'keyword', limit: 10, temporalDecay: false },
         mockDb as unknown as NodePgDatabase<typeof schema>,
@@ -608,6 +626,7 @@ describe('hybridSearch', () => {
 
       expect(results).toHaveLength(2)
       expect(results[0]?.similarity).toBeCloseTo(results[1]?.similarity ?? 0, 2)
+      expect(degraded).toBe(false)
     })
 
     it('applies temporal decay when temporalDecay is true', async () => {
@@ -643,7 +662,7 @@ describe('hybridSearch', () => {
         },
       ])
 
-      const results = await hybridSearch(
+      const { results, degraded } = await hybridSearch(
         'TypeScript',
         { mode: 'keyword', limit: 10, temporalDecay: true },
         mockDb as unknown as NodePgDatabase<typeof schema>,
@@ -660,6 +679,7 @@ describe('hybridSearch', () => {
 
       expect(oldResult!.similarity).toBeCloseTo(0.5, 1)
       expect(newResult!.similarity).toBeCloseTo(1.0, 1)
+      expect(degraded).toBe(false)
     })
 
     it('respects custom halfLifeDays parameter', async () => {
@@ -682,7 +702,7 @@ describe('hybridSearch', () => {
         },
       ])
 
-      const results = await hybridSearch(
+      const { results, degraded } = await hybridSearch(
         'TypeScript',
         { mode: 'keyword', limit: 10, temporalDecay: true, halfLifeDays: 180 },
         mockDb as unknown as NodePgDatabase<typeof schema>,
@@ -690,6 +710,7 @@ describe('hybridSearch', () => {
 
       expect(results).toHaveLength(1)
       expect(results[0]?.similarity).toBeCloseTo(0.5, 1)
+      expect(degraded).toBe(false)
     })
 
     it('handles chunks from videos with null publishedAt', async () => {
@@ -709,7 +730,7 @@ describe('hybridSearch', () => {
         },
       ])
 
-      const results = await hybridSearch(
+      const { results, degraded } = await hybridSearch(
         'TypeScript',
         { mode: 'keyword', limit: 10, temporalDecay: true },
         mockDb as unknown as NodePgDatabase<typeof schema>,
@@ -717,6 +738,7 @@ describe('hybridSearch', () => {
 
       expect(results).toHaveLength(1)
       expect(results[0]?.similarity).toBeCloseTo(1.0, 2)
+      expect(degraded).toBe(false)
     })
 
     it('re-sorts results after applying decay', async () => {
@@ -752,13 +774,13 @@ describe('hybridSearch', () => {
         },
       ])
 
-      const resultsNoDecay = await hybridSearch(
+      const { results: resultsNoDecay } = await hybridSearch(
         'TypeScript',
         { mode: 'keyword', limit: 10, temporalDecay: false },
         mockDb as unknown as NodePgDatabase<typeof schema>,
       )
 
-      const resultsWithDecay = await hybridSearch(
+      const { results: resultsWithDecay } = await hybridSearch(
         'TypeScript',
         { mode: 'keyword', limit: 10, temporalDecay: true },
         mockDb as unknown as NodePgDatabase<typeof schema>,
@@ -830,7 +852,7 @@ describe('hybridSearch', () => {
         },
       ])
 
-      const results = await hybridSearch(
+      const { results, degraded } = await hybridSearch(
         'TypeScript',
         { mode: 'hybrid', limit: 10, temporalDecay: true },
         mockDb as unknown as NodePgDatabase<typeof schema>,
@@ -844,6 +866,7 @@ describe('hybridSearch', () => {
       expect(newResult).toBeDefined()
       expect(oldResult).toBeDefined()
       expect(newResult!.similarity).toBeGreaterThan(oldResult!.similarity)
+      expect(degraded).toBe(false)
     })
 
     it('applies decay in vector mode', async () => {
@@ -879,7 +902,7 @@ describe('hybridSearch', () => {
         },
       ])
 
-      const results = await hybridSearch(
+      const { results, degraded } = await hybridSearch(
         'query',
         { mode: 'vector', limit: 10, temporalDecay: true },
         mockDb as unknown as NodePgDatabase<typeof schema>,
@@ -891,6 +914,112 @@ describe('hybridSearch', () => {
       if (newResult && oldResult) {
         expect(newResult.similarity).toBeGreaterThan(oldResult.similarity)
       }
+      expect(degraded).toBe(false)
+    })
+  })
+
+  describe('embedding resilience', () => {
+    it('retries embedding once and succeeds on second attempt', async () => {
+      const mockGenerate = vi.mocked(generateEmbedding)
+
+      // First call fails, second succeeds
+      mockGenerate
+        .mockRejectedValueOnce(new Error('Failed to load model because protobuf parsing failed'))
+        .mockResolvedValueOnce(new Float32Array(384).fill(0.5))
+
+      vi.mocked(vectorSearch).mockResolvedValue([])
+      mockDb._selectChain.limit.mockResolvedValue([])
+
+      const { results, degraded } = await hybridSearch(
+        'test query',
+        { mode: 'hybrid', limit: 10 },
+        mockDb as unknown as NodePgDatabase<typeof schema>,
+      )
+
+      expect(mockGenerate).toHaveBeenCalledTimes(2)
+      expect(degraded).toBe(false)
+      expect(Array.isArray(results)).toBe(true)
+    })
+
+    it('falls back to keyword-only when both embedding attempts fail (hybrid mode)', async () => {
+      const mockGenerate = vi.mocked(generateEmbedding)
+
+      mockGenerate
+        .mockRejectedValueOnce(new Error('protobuf parsing failed'))
+        .mockRejectedValueOnce(new Error('protobuf parsing failed'))
+
+      mockDb._selectChain.limit.mockResolvedValue([
+        {
+          chunkId: 1,
+          content: 'Keyword match result',
+          startTime: 0,
+          endTime: 10,
+          similarity: '1.0',
+          videoId: 1,
+          videoTitle: 'Test',
+          channel: 'Test',
+          youtubeId: 'test',
+          thumbnail: null,
+          publishedAt: null,
+        },
+      ])
+
+      const { results, degraded } = await hybridSearch(
+        'Keyword',
+        { mode: 'hybrid', limit: 10 },
+        mockDb as unknown as NodePgDatabase<typeof schema>,
+      )
+
+      expect(degraded).toBe(true)
+      expect(results.length).toBeGreaterThan(0)
+      expect(results[0]?.content).toBe('Keyword match result')
+      // vectorSearch should NOT have been called since embedding failed
+      expect(vectorSearch).not.toHaveBeenCalled()
+    })
+
+    it('falls back to keyword-only when both embedding attempts fail (vector mode)', async () => {
+      const mockGenerate = vi.mocked(generateEmbedding)
+
+      mockGenerate
+        .mockRejectedValueOnce(new Error('protobuf parsing failed'))
+        .mockRejectedValueOnce(new Error('protobuf parsing failed'))
+
+      mockDb._selectChain.limit.mockResolvedValue([
+        {
+          chunkId: 1,
+          content: 'Keyword fallback',
+          startTime: 0,
+          endTime: 10,
+          similarity: '1.0',
+          videoId: 1,
+          videoTitle: 'Test',
+          channel: 'Test',
+          youtubeId: 'test',
+          thumbnail: null,
+          publishedAt: null,
+        },
+      ])
+
+      const { results, degraded } = await hybridSearch(
+        'Keyword',
+        { mode: 'vector', limit: 10 },
+        mockDb as unknown as NodePgDatabase<typeof schema>,
+      )
+
+      expect(degraded).toBe(true)
+      expect(results.length).toBeGreaterThan(0)
+    })
+
+    it('keyword mode is not affected by embedding failures', async () => {
+      mockDb._selectChain.limit.mockResolvedValue([])
+
+      const { degraded } = await hybridSearch(
+        'test',
+        { mode: 'keyword', limit: 10 },
+        mockDb as unknown as NodePgDatabase<typeof schema>,
+      )
+
+      expect(degraded).toBe(false)
     })
   })
 })
