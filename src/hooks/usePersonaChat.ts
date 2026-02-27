@@ -12,6 +12,7 @@ import {
 } from '@/lib/personas/chat-storage'
 
 export type { ChatMessage, ChatEntry }
+export { isChatMessage, isThreadBoundary }
 
 export interface PersonaChatState {
   /** All entries including thread boundaries */

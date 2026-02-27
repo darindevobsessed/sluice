@@ -14,13 +14,19 @@ let mockState: PersonaChatState = {
 
 const mockSendMessage = vi.fn()
 const mockClearHistory = vi.fn()
+const mockStartNewThread = vi.fn()
 
 vi.mock('@/hooks/usePersonaChat', () => ({
   usePersonaChat: () => ({
     state: mockState,
     sendMessage: mockSendMessage,
     clearHistory: mockClearHistory,
+    startNewThread: mockStartNewThread,
   }),
+  isThreadBoundary: (entry: { type?: string }) =>
+    'type' in entry && entry.type === 'thread-boundary',
+  isChatMessage: (entry: { type?: string }) =>
+    !('type' in entry && entry.type === 'thread-boundary'),
 }))
 
 const defaultProps = {
@@ -45,6 +51,7 @@ describe('PersonaChatDrawer', () => {
     }
     mockSendMessage.mockClear()
     mockClearHistory.mockClear()
+    mockStartNewThread.mockClear()
   })
 
   it('renders persona name in header', () => {
@@ -67,11 +74,9 @@ describe('PersonaChatDrawer', () => {
     expect(screen.getByText('Ask Fireship anything...')).toBeInTheDocument()
   })
 
-  it('shows independence disclaimer', () => {
+  it('shows memory indicator', () => {
     renderDrawer()
-    expect(
-      screen.getByText('Each question is independent — no conversation memory')
-    ).toBeInTheDocument()
+    expect(screen.getByText('Remembers last 10 messages')).toBeInTheDocument()
   })
 
   it('renders input placeholder with persona name', () => {
@@ -123,17 +128,18 @@ describe('PersonaChatDrawer', () => {
   })
 
   it('renders messages in thread', () => {
+    const messages = [
+      {
+        question: 'What is React?',
+        answer: 'React is a UI library.',
+        timestamp: 1000000,
+        isStreaming: false,
+        isError: false,
+      },
+    ]
     mockState = {
-      entries: [],
-      messages: [
-        {
-          question: 'What is React?',
-          answer: 'React is a UI library.',
-          timestamp: 1000000,
-          isStreaming: false,
-          isError: false,
-        },
-      ],
+      entries: messages,
+      messages,
       isStreaming: false,
       error: null,
     }
@@ -143,17 +149,18 @@ describe('PersonaChatDrawer', () => {
   })
 
   it('shows streaming cursor during active stream', () => {
+    const messages = [
+      {
+        question: 'What is React?',
+        answer: 'React is',
+        timestamp: 1000000,
+        isStreaming: true,
+        isError: false,
+      },
+    ]
     mockState = {
-      entries: [],
-      messages: [
-        {
-          question: 'What is React?',
-          answer: 'React is',
-          timestamp: 1000000,
-          isStreaming: true,
-          isError: false,
-        },
-      ],
+      entries: messages,
+      messages,
       isStreaming: true,
       error: null,
     }
@@ -175,17 +182,18 @@ describe('PersonaChatDrawer', () => {
   })
 
   it('shows error message with retry button when message has error', () => {
+    const messages = [
+      {
+        question: 'What is React?',
+        answer: '',
+        timestamp: 1000000,
+        isStreaming: false,
+        isError: true,
+      },
+    ]
     mockState = {
-      entries: [],
-      messages: [
-        {
-          question: 'What is React?',
-          answer: '',
-          timestamp: 1000000,
-          isStreaming: false,
-          isError: true,
-        },
-      ],
+      entries: messages,
+      messages,
       isStreaming: false,
       error: 'Something went wrong',
     }
@@ -196,17 +204,18 @@ describe('PersonaChatDrawer', () => {
 
   it('calls sendMessage with the failed question when retry is clicked', async () => {
     const user = userEvent.setup()
+    const messages = [
+      {
+        question: 'What is React?',
+        answer: '',
+        timestamp: 1000000,
+        isStreaming: false,
+        isError: true,
+      },
+    ]
     mockState = {
-      entries: [],
-      messages: [
-        {
-          question: 'What is React?',
-          answer: '',
-          timestamp: 1000000,
-          isStreaming: false,
-          isError: true,
-        },
-      ],
+      entries: messages,
+      messages,
       isStreaming: false,
       error: 'Something went wrong',
     }
@@ -217,17 +226,18 @@ describe('PersonaChatDrawer', () => {
   })
 
   it('shows clear history button when messages exist', () => {
+    const messages = [
+      {
+        question: 'What is React?',
+        answer: 'React is a UI library.',
+        timestamp: 1000000,
+        isStreaming: false,
+        isError: false,
+      },
+    ]
     mockState = {
-      entries: [],
-      messages: [
-        {
-          question: 'What is React?',
-          answer: 'React is a UI library.',
-          timestamp: 1000000,
-          isStreaming: false,
-          isError: false,
-        },
-      ],
+      entries: messages,
+      messages,
       isStreaming: false,
       error: null,
     }
@@ -242,17 +252,18 @@ describe('PersonaChatDrawer', () => {
 
   it('calls clearHistory when clear button clicked', async () => {
     const user = userEvent.setup()
+    const messages = [
+      {
+        question: 'What is React?',
+        answer: 'React is a UI library.',
+        timestamp: 1000000,
+        isStreaming: false,
+        isError: false,
+      },
+    ]
     mockState = {
-      entries: [],
-      messages: [
-        {
-          question: 'What is React?',
-          answer: 'React is a UI library.',
-          timestamp: 1000000,
-          isStreaming: false,
-          isError: false,
-        },
-      ],
+      entries: messages,
+      messages,
       isStreaming: false,
       error: null,
     }
@@ -270,17 +281,18 @@ describe('PersonaChatDrawer', () => {
   })
 
   it('shows loading skeleton when streaming with no answer text yet', () => {
+    const messages = [
+      {
+        question: 'What is React?',
+        answer: '',
+        timestamp: 1000000,
+        isStreaming: true,
+        isError: false,
+      },
+    ]
     mockState = {
-      entries: [],
-      messages: [
-        {
-          question: 'What is React?',
-          answer: '',
-          timestamp: 1000000,
-          isStreaming: true,
-          isError: false,
-        },
-      ],
+      entries: messages,
+      messages,
       isStreaming: true,
       error: null,
     }
@@ -323,25 +335,28 @@ describe('PersonaChatDrawer', () => {
   })
 
   it('renders error message in failed message bubble', () => {
-    mockState.messages = [
+    const messages = [
       { question: 'Test', answer: '', timestamp: Date.now(), isError: true },
     ]
+    mockState.messages = messages
+    mockState.entries = messages
     renderDrawer()
     expect(screen.getByText('Something went wrong, try again')).toBeInTheDocument()
   })
 
   it('renders answer paragraphs separated by double newlines', () => {
+    const messages = [
+      {
+        question: 'Explain React?',
+        answer: 'React is a UI library.\n\nIt uses a virtual DOM.\n\nComponents are the building blocks.',
+        timestamp: 1000000,
+        isStreaming: false,
+        isError: false,
+      },
+    ]
     mockState = {
-      entries: [],
-      messages: [
-        {
-          question: 'Explain React?',
-          answer: 'React is a UI library.\n\nIt uses a virtual DOM.\n\nComponents are the building blocks.',
-          timestamp: 1000000,
-          isStreaming: false,
-          isError: false,
-        },
-      ],
+      entries: messages,
+      messages,
       isStreaming: false,
       error: null,
     }
@@ -361,17 +376,18 @@ describe('PersonaChatDrawer', () => {
   })
 
   it('renders single-paragraph answer (no double newlines) as one <p> element', () => {
+    const messages = [
+      {
+        question: 'What is React?',
+        answer: 'React is a UI library.',
+        timestamp: 1000000,
+        isStreaming: false,
+        isError: false,
+      },
+    ]
     mockState = {
-      entries: [],
-      messages: [
-        {
-          question: 'What is React?',
-          answer: 'React is a UI library.',
-          timestamp: 1000000,
-          isStreaming: false,
-          isError: false,
-        },
-      ],
+      entries: messages,
+      messages,
       isStreaming: false,
       error: null,
     }
@@ -382,17 +398,18 @@ describe('PersonaChatDrawer', () => {
   })
 
   it('attaches streaming cursor to last paragraph when multi-paragraph answer is streaming', () => {
+    const messages = [
+      {
+        question: 'Explain React?',
+        answer: 'React is a UI library.\n\nIt uses a virtual DOM.',
+        timestamp: 1000000,
+        isStreaming: true,
+        isError: false,
+      },
+    ]
     mockState = {
-      entries: [],
-      messages: [
-        {
-          question: 'Explain React?',
-          answer: 'React is a UI library.\n\nIt uses a virtual DOM.',
-          timestamp: 1000000,
-          isStreaming: true,
-          isError: false,
-        },
-      ],
+      entries: messages,
+      messages,
       isStreaming: true,
       error: null,
     }
@@ -402,5 +419,146 @@ describe('PersonaChatDrawer', () => {
     // The cursor should be in the last paragraph (the one containing "It uses a virtual DOM.")
     const lastParagraph = screen.getByText(/It uses a virtual DOM\./)
     expect(lastParagraph.textContent).toContain('▌')
+  })
+
+  it('renders thread boundary divider with label', () => {
+    const boundary = { type: 'thread-boundary' as const, timestamp: 999000 }
+    const messages = [
+      {
+        question: 'Old question?',
+        answer: 'Old answer.',
+        timestamp: 1000000,
+        isStreaming: false,
+        isError: false,
+      },
+    ]
+    mockState = {
+      entries: [boundary, ...messages],
+      messages,
+      isStreaming: false,
+      error: null,
+    }
+    renderDrawer()
+    // idx=0 boundary renders as "Earlier messages (no memory)"
+    expect(screen.getByText('Earlier messages (no memory)')).toBeInTheDocument()
+  })
+
+  it('renders "New thread" label for non-first thread boundary', () => {
+    const msg1 = {
+      question: 'Old question?',
+      answer: 'Old answer.',
+      timestamp: 1000000,
+      isStreaming: false,
+      isError: false,
+    }
+    const boundary = { type: 'thread-boundary' as const, timestamp: 1001000 }
+    const msg2 = {
+      question: 'New question?',
+      answer: 'New answer.',
+      timestamp: 1002000,
+      isStreaming: false,
+      isError: false,
+    }
+    mockState = {
+      entries: [msg1, boundary, msg2],
+      messages: [msg1, msg2],
+      isStreaming: false,
+      error: null,
+    }
+    renderDrawer()
+    // Non-zero idx boundary renders as "New thread"
+    expect(screen.getByText('New thread')).toBeInTheDocument()
+  })
+
+  it('shows memory indicator text', () => {
+    renderDrawer()
+    expect(screen.getByText('Remembers last 10 messages')).toBeInTheDocument()
+  })
+
+  it('shows "New thread" button in header when messages exist', () => {
+    const messages = [
+      {
+        question: 'What is React?',
+        answer: 'React is a UI library.',
+        timestamp: 1000000,
+        isStreaming: false,
+        isError: false,
+      },
+    ]
+    mockState = {
+      entries: messages,
+      messages,
+      isStreaming: false,
+      error: null,
+    }
+    renderDrawer()
+    expect(screen.getByRole('button', { name: /new thread/i })).toBeInTheDocument()
+  })
+
+  it('does not show "New thread" button when no messages exist', () => {
+    renderDrawer()
+    expect(screen.queryByRole('button', { name: /new thread/i })).not.toBeInTheDocument()
+  })
+
+  it('calls startNewThread when "New thread" button is clicked', async () => {
+    const user = userEvent.setup()
+    const messages = [
+      {
+        question: 'What is React?',
+        answer: 'React is a UI library.',
+        timestamp: 1000000,
+        isStreaming: false,
+        isError: false,
+      },
+    ]
+    mockState = {
+      entries: messages,
+      messages,
+      isStreaming: false,
+      error: null,
+    }
+    renderDrawer()
+    const newThreadButton = screen.getByRole('button', { name: /new thread/i })
+    await user.click(newThreadButton)
+    expect(mockStartNewThread).toHaveBeenCalledOnce()
+  })
+
+  it('dims messages before the last thread boundary', () => {
+    const msg1 = {
+      question: 'Old question?',
+      answer: 'Old answer.',
+      timestamp: 1000000,
+      isStreaming: false,
+      isError: false,
+    }
+    const boundary = { type: 'thread-boundary' as const, timestamp: 1001000 }
+    const msg2 = {
+      question: 'New question?',
+      answer: 'New answer.',
+      timestamp: 1002000,
+      isStreaming: false,
+      isError: false,
+    }
+    mockState = {
+      entries: [msg1, boundary, msg2],
+      messages: [msg1, msg2],
+      isStreaming: false,
+      error: null,
+    }
+    renderDrawer()
+    // The old message bubble container should have opacity-50 class
+    const oldQuestionEl = screen.getByText('Old question?')
+    const messageContainer = oldQuestionEl.closest('.flex.flex-col.gap-2')
+    expect(messageContainer).toHaveClass('opacity-50')
+    // The new message should not be dimmed
+    const newQuestionEl = screen.getByText('New question?')
+    const newMessageContainer = newQuestionEl.closest('.flex.flex-col.gap-2')
+    expect(newMessageContainer).not.toHaveClass('opacity-50')
+  })
+
+  it('input has text-base class for iOS zoom prevention', () => {
+    renderDrawer()
+    const input = screen.getByPlaceholderText('Ask Fireship anything...')
+    expect(input).toHaveClass('text-base')
   })
 })
