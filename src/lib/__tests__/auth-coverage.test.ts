@@ -20,7 +20,8 @@ describe('API route auth coverage', () => {
     'requireSession',      // Shared session auth helper (primary)
     'verifyCronSecret',    // Cron route auth
     'safeCompare',         // Agent token-based auth
-    'getMcpSession',       // MCP OAuth auth
+    'getMcpSession',       // MCP OAuth auth (legacy — replaced by verifyAccessToken)
+    'verifyAccessToken',   // MCP OAuth2 access token verification (@better-auth/oauth-provider)
     'getSession',          // Inline session check (legacy routes not yet migrated)
   ]
 

@@ -5,18 +5,16 @@ vi.mock('@/lib/db', () => ({
   db: {},
 }))
 
-// Mock better-auth mcp plugin oAuthDiscoveryMetadata to return a realistic response
-vi.mock('better-auth/plugins', () => ({
-  mcp: vi.fn(() => ({ id: 'mcp', hooks: { after: [] }, endpoints: {}, schema: {}, options: {} })),
-  oAuthDiscoveryMetadata: vi.fn(() => {
-    return async (_request: Request): Promise<Response> => {
-      // Simulate what better-auth returns: RFC 8414 OAuth Authorization Server Metadata
+// Mock @better-auth/oauth-provider — the discovery metadata handler
+vi.mock('@better-auth/oauth-provider', () => ({
+  oauthProviderAuthServerMetadata: vi.fn(() => {
+    return async (): Promise<Response> => {
       const baseUrl = 'http://localhost:3001'
       return new Response(
         JSON.stringify({
           issuer: baseUrl,
-          authorization_endpoint: `${baseUrl}/api/auth/mcp/authorize`,
-          token_endpoint: `${baseUrl}/api/auth/mcp/token`,
+          authorization_endpoint: `${baseUrl}/api/auth/oauth2/authorize`,
+          token_endpoint: `${baseUrl}/api/auth/oauth2/token`,
           response_types_supported: ['code'],
           grant_types_supported: ['authorization_code', 'refresh_token'],
           code_challenge_methods_supported: ['S256'],
@@ -28,16 +26,19 @@ vi.mock('better-auth/plugins', () => ({
       )
     }
   }),
+  oauthProvider: vi.fn(() => ({ id: 'oauth-provider' })),
+}))
+
+// Mock better-auth/plugins with jwt (replaced mcp + oAuthDiscoveryMetadata)
+vi.mock('better-auth/plugins', () => ({
+  jwt: vi.fn(() => ({ id: 'jwt' })),
 }))
 
 // Mock better-auth core
 vi.mock('better-auth', () => ({
   betterAuth: vi.fn(() => ({
     handler: vi.fn(),
-    api: {
-      getMcpSession: vi.fn(),
-      getMcpOAuthConfig: vi.fn(),
-    },
+    api: {},
     options: {},
   })),
 }))
@@ -48,6 +49,15 @@ vi.mock('better-auth/adapters/drizzle', () => ({
 
 vi.mock('better-auth/next-js', () => ({
   nextCookies: vi.fn(() => ({ id: 'next-cookies' })),
+}))
+
+vi.mock('better-auth/api', () => ({
+  APIError: class APIError extends Error {
+    constructor(code: string, options?: { message?: string }) {
+      super(options?.message ?? code)
+      this.name = 'APIError'
+    }
+  },
 }))
 
 // Import the route after mocking
@@ -123,6 +133,14 @@ describe('OAuth Authorization Server Discovery Route', () => {
       expect(body).toHaveProperty('issuer')
       expect(body).toHaveProperty('authorization_endpoint')
       expect(body).toHaveProperty('token_endpoint')
+    })
+
+    it('GET returns oauth2 endpoint paths (not mcp paths)', async () => {
+      const request = new Request('http://localhost:3001/.well-known/oauth-authorization-server')
+      const response = await GET(request)
+      const body = await response.json()
+      expect(body.authorization_endpoint).toContain('/oauth2/authorize')
+      expect(body.token_endpoint).toContain('/oauth2/token')
     })
   })
 })
