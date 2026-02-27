@@ -1,53 +1,18 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
+import {
+  loadChatStorage,
+  saveChatStorage,
+  clearChatStorage,
+  isChatMessage,
+  type ChatMessage,
+} from '@/lib/personas/chat-storage'
 
-export interface ChatMessage {
-  question: string
-  answer: string
-  timestamp: number
-  isStreaming?: boolean
-  isError?: boolean
-}
+export type { ChatMessage }
 
 export interface PersonaChatState {
   messages: ChatMessage[]
   isStreaming: boolean
   error: string | null
-}
-
-const STORAGE_KEY_PREFIX = 'persona-chat:'
-
-function storageKey(personaId: number): string {
-  return `${STORAGE_KEY_PREFIX}${personaId}`
-}
-
-/**
- * Reads Q&A history for a persona from localStorage.
- * Returns an empty array on any parse/validation error.
- */
-function loadMessages(personaId: number): ChatMessage[] {
-  try {
-    const raw = localStorage.getItem(storageKey(personaId))
-    if (!raw) return []
-    const parsed: unknown = JSON.parse(raw)
-    if (!Array.isArray(parsed)) return []
-    return parsed as ChatMessage[]
-  } catch {
-    return []
-  }
-}
-
-/**
- * Persists only completed (non-streaming, non-error) messages to localStorage.
- */
-function saveMessages(personaId: number, messages: ChatMessage[]): void {
-  const completed = messages.filter(
-    (m) => m.isStreaming !== true && m.isError !== true
-  )
-  try {
-    localStorage.setItem(storageKey(personaId), JSON.stringify(completed))
-  } catch {
-    // Ignore quota exceeded or other storage errors
-  }
 }
 
 interface UsePersonaChatReturn {
@@ -64,11 +29,14 @@ interface UsePersonaChatReturn {
  *   data: {"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"..."}}
  *   data: {"type":"done"}
  *
+ * Uses versioned localStorage schema (v2) via chat-storage module.
+ * v1 bare arrays are automatically migrated to v2 on first load.
+ *
  * @param personaId - The persona to chat with
  */
 export function usePersonaChat(personaId: number): UsePersonaChatReturn {
   const [state, setState] = useState<PersonaChatState>(() => ({
-    messages: loadMessages(personaId),
+    messages: loadChatStorage(personaId).entries.filter(isChatMessage) as ChatMessage[],
     isStreaming: false,
     error: null,
   }))
@@ -78,7 +46,7 @@ export function usePersonaChat(personaId: number): UsePersonaChatReturn {
   // Reload messages when personaId changes
   useEffect(() => {
     setState({
-      messages: loadMessages(personaId),
+      messages: loadChatStorage(personaId).entries.filter(isChatMessage) as ChatMessage[],
       isStreaming: false,
       error: null,
     })
@@ -204,7 +172,7 @@ export function usePersonaChat(personaId: number): UsePersonaChatReturn {
                       ? { ...m, isStreaming: false }
                       : m
                   )
-                  saveMessages(personaId, messages)
+                  saveChatStorage(personaId, { version: 2, entries: messages })
                   return { ...prev, messages, isStreaming: false }
                 })
               }
@@ -246,7 +214,7 @@ export function usePersonaChat(personaId: number): UsePersonaChatReturn {
   )
 
   const clearHistory = useCallback(() => {
-    localStorage.removeItem(storageKey(personaId))
+    clearChatStorage(personaId)
     setState({ messages: [], isStreaming: false, error: null })
   }, [personaId])
 

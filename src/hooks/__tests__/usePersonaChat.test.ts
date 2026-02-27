@@ -303,10 +303,12 @@ describe('usePersonaChat', () => {
       const stored = localStorageMock.getItem(STORAGE_KEY)
       expect(stored).not.toBeNull()
       const parsed = JSON.parse(stored as string)
-      expect(Array.isArray(parsed)).toBe(true)
-      expect(parsed[0]?.answer).toBe('Saved answer')
-      expect(parsed[0]?.isStreaming).toBeFalsy()
-      expect(parsed[0]?.isError).toBeFalsy()
+      // v2 format: { version: 2, entries: [...] }
+      expect(parsed.version).toBe(2)
+      expect(Array.isArray(parsed.entries)).toBe(true)
+      expect(parsed.entries[0]?.answer).toBe('Saved answer')
+      expect(parsed.entries[0]?.isStreaming).toBeFalsy()
+      expect(parsed.entries[0]?.isError).toBeFalsy()
     })
   })
 
