@@ -7,7 +7,7 @@ import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '@/lib/utils'
 
-const sheetVariants = cva(
+const sheetContentVariants = cva(
   'bg-background fixed z-50 flex flex-col gap-4 shadow-lg transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500 data-[state=open]:animate-in data-[state=closed]:animate-out',
   {
     variants: {
@@ -64,12 +64,15 @@ function SheetOverlay({
 
 interface SheetContentProps
   extends React.ComponentProps<typeof DialogPrimitive.Content>,
-    VariantProps<typeof sheetVariants> {}
+    VariantProps<typeof sheetContentVariants> {
+  showCloseButton?: boolean
+}
 
 function SheetContent({
   side = 'right',
   className,
   children,
+  showCloseButton = true,
   ...props
 }: SheetContentProps) {
   return (
@@ -77,16 +80,18 @@ function SheetContent({
       <SheetOverlay />
       <DialogPrimitive.Content
         data-slot="sheet-content"
-        className={cn(sheetVariants({ side }), className)}
+        className={cn(sheetContentVariants({ side }), className)}
         {...props}
       >
-        <DialogPrimitive.Close
-          data-slot="sheet-close"
-          className="ring-offset-background focus:ring-ring absolute top-4 right-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
-        >
-          <XIcon />
-          <span className="sr-only">Close</span>
-        </DialogPrimitive.Close>
+        {showCloseButton && (
+          <DialogPrimitive.Close
+            data-slot="sheet-close"
+            className="ring-offset-background focus:ring-ring absolute top-4 right-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 max-md:hidden"
+          >
+            <XIcon />
+            <span className="sr-only">Close</span>
+          </DialogPrimitive.Close>
+        )}
         {children}
       </DialogPrimitive.Content>
     </SheetPortal>

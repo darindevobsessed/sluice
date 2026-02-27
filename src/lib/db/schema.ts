@@ -252,6 +252,13 @@ export const verification = pgTable('verification', {
  * These tables support OAuth clients, access tokens, refresh tokens, and user consent.
  * Table/column names must match @better-auth/oauth-provider schema expectations.
  */
+export const jwks = pgTable('jwks', {
+  id: text('id').primaryKey(),
+  publicKey: text('public_key').notNull(),
+  privateKey: text('private_key').notNull(),
+  createdAt: timestamp('created_at').notNull(),
+  expiresAt: timestamp('expires_at'),
+})
 export const oauthClient = pgTable('oauth_client', {
   id: text('id').primaryKey(),
   clientId: text('client_id').notNull().unique(),

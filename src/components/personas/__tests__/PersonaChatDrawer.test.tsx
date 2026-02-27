@@ -292,4 +292,31 @@ describe('PersonaChatDrawer', () => {
     expect(screen.getByText('React, TypeScript, Next.js')).toBeInTheDocument()
     expect(screen.queryByText(/Svelte/)).not.toBeInTheDocument()
   })
+
+  it('renders mobile back arrow', () => {
+    renderDrawer()
+    expect(screen.getByLabelText('Close chat')).toBeInTheDocument()
+  })
+
+  it('calls onOpenChange when back arrow clicked', async () => {
+    const onOpenChange = vi.fn()
+    const user = userEvent.setup()
+    render(<PersonaChatDrawer {...defaultProps} onOpenChange={onOpenChange} />)
+    await user.click(screen.getByLabelText('Close chat'))
+    expect(onOpenChange).toHaveBeenCalledWith(false)
+  })
+
+  it('has accessible labels on input and send button', () => {
+    render(<PersonaChatDrawer {...defaultProps} personaName="Theo Browne" />)
+    expect(screen.getByLabelText('Ask Theo Browne a question')).toBeInTheDocument()
+    expect(screen.getByLabelText('Send message')).toBeInTheDocument()
+  })
+
+  it('renders error message in failed message bubble', () => {
+    mockState.messages = [
+      { question: 'Test', answer: '', timestamp: Date.now(), isError: true },
+    ]
+    renderDrawer()
+    expect(screen.getByText('Something went wrong, try again')).toBeInTheDocument()
+  })
 })

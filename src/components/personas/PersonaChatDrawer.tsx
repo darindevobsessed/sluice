@@ -82,6 +82,24 @@ export function PersonaChatDrawer({
     return () => clearTimeout(timer)
   }, [open])
 
+  // Auto-scroll thread when virtual keyboard opens/closes on mobile
+  useEffect(() => {
+    if (!open) return
+
+    function handleResize() {
+      if (threadRef.current) {
+        threadRef.current.scrollTop = threadRef.current.scrollHeight
+      }
+    }
+
+    if (!window.visualViewport) return
+
+    window.visualViewport.addEventListener('resize', handleResize)
+    return () => {
+      window.visualViewport?.removeEventListener('resize', handleResize)
+    }
+  }, [open])
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     const trimmed = inputValue.trim()
@@ -118,6 +136,7 @@ export function PersonaChatDrawer({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="right"
+        showCloseButton={false}
         className={cn(
           'flex flex-col p-0 gap-0',
           'md:w-[400px] md:max-w-[400px]',
@@ -132,7 +151,7 @@ export function PersonaChatDrawer({
             size="icon-xs"
             className="md:hidden -ml-1"
             onClick={() => onOpenChange(false)}
-            aria-label="Back"
+            aria-label="Close chat"
           >
             <ArrowLeft />
           </Button>
@@ -269,7 +288,7 @@ export function PersonaChatDrawer({
             type="submit"
             size="icon"
             disabled={!inputValue.trim() || state.isStreaming}
-            aria-label="Send"
+            aria-label="Send message"
           >
             <Send />
           </Button>
