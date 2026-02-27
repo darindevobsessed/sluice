@@ -2,6 +2,12 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, waitFor, act } from '@testing-library/react';
 import { useSearch } from '../useSearch';
 
+// Mock sonner toast
+const mockToast = vi.fn();
+vi.mock('sonner', () => ({
+  toast: mockToast,
+}));
+
 // Mock fetch globally
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
@@ -333,5 +339,86 @@ describe('useSearch', () => {
       },
       { timeout: 1000 }
     );
+  });
+
+  it('shows toast when response has degraded: true', async () => {
+    const mockResponse = {
+      chunks: [],
+      videos: [],
+      query: 'test',
+      mode: 'hybrid' as const,
+      timing: 10,
+      hasEmbeddings: false,
+      degraded: true,
+    };
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: async () => mockResponse,
+    });
+
+    renderHook(() => useSearch({ query: 'test' }));
+
+    await waitFor(
+      () => {
+        expect(mockToast).toHaveBeenCalledWith('Refresh for full results', {
+          description: 'Search is running in limited mode',
+          duration: 5000,
+        });
+      },
+      { timeout: 1000 }
+    );
+  });
+
+  it('does not show toast when response has degraded: false', async () => {
+    const mockResponse = {
+      chunks: [],
+      videos: [],
+      query: 'test',
+      mode: 'hybrid' as const,
+      timing: 10,
+      hasEmbeddings: true,
+      degraded: false,
+    };
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: async () => mockResponse,
+    });
+
+    renderHook(() => useSearch({ query: 'test' }));
+
+    await waitFor(
+      () => {
+        expect(mockFetch).toHaveBeenCalledTimes(1);
+      },
+      { timeout: 1000 }
+    );
+
+    expect(mockToast).not.toHaveBeenCalled();
+  });
+
+  it('does not show toast when degraded is absent from response', async () => {
+    const mockResponse = {
+      chunks: [],
+      videos: [],
+      query: 'test',
+      mode: 'hybrid' as const,
+      timing: 10,
+      hasEmbeddings: true,
+    };
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: async () => mockResponse,
+    });
+
+    renderHook(() => useSearch({ query: 'test' }));
+
+    await waitFor(
+      () => {
+        expect(mockFetch).toHaveBeenCalledTimes(1);
+      },
+      { timeout: 1000 }
+    );
+
+    expect(mockToast).not.toHaveBeenCalled();
   });
 });

@@ -17,6 +17,7 @@ export interface SearchResponse {
   mode: SearchMode;
   timing: number;
   hasEmbeddings: boolean;
+  degraded?: boolean;
 }
 
 interface UseSearchOptions {
@@ -71,6 +72,13 @@ export function useSearch(options: UseSearchOptions) {
         });
         const data: SearchResponse = await res.json();
         setResults(data);
+        if (data.degraded) {
+          const { toast } = await import('sonner');
+          toast('Refresh for full results', {
+            description: 'Search is running in limited mode',
+            duration: 5000,
+          });
+        }
         setIsLoading(false);
       } catch (err) {
         if (err instanceof Error && err.name !== 'AbortError') {

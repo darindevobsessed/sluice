@@ -3,6 +3,7 @@ import { Inter, JetBrains_Mono } from "next/font/google"
 import "./globals.css"
 import '@/lib/env'
 import { ThemeProvider } from "@/components/providers/ThemeProvider"
+import { Toaster } from 'sonner'
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 
@@ -47,6 +48,7 @@ export default function RootLayout({
         <ThemeProvider>
           {children}
         </ThemeProvider>
+        <Toaster position="bottom-center" toastOptions={{ duration: 5000, className: 'text-sm' }} />
         <Analytics />
         <SpeedInsights />
       </body>
