@@ -18,11 +18,13 @@ export async function GET() {
         transcriptCount: sql<number>`count(${videos.id})::int`,
         personaId: personas.id,
         personaCreatedAt: personas.createdAt,
+        personaName: personas.name,
+        expertiseTopics: personas.expertiseTopics,
       })
       .from(videos)
       .leftJoin(personas, sql`${videos.channel} = ${personas.channelName}`)
       .where(sql`${videos.channel} IS NOT NULL`)
-      .groupBy(videos.channel, personas.id, personas.createdAt)
+      .groupBy(videos.channel, personas.id, personas.createdAt, personas.name, personas.expertiseTopics)
 
     // Sort: active personas first, then by transcript count descending
     const sortedChannels = channelsWithStatus.sort((a, b) => {

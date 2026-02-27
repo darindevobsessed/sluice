@@ -591,6 +591,86 @@ describe('PersonaStatus', () => {
     })
   })
 
+  describe('Chat button (Chunk 4)', () => {
+    it('shows Chat button on active persona cards', async () => {
+      vi.mocked(fetch).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          channels: [
+            {
+              channelName: 'Fireship',
+              transcriptCount: 10,
+              personaId: 1,
+              personaCreatedAt: new Date(),
+              personaName: 'The Fireship Persona',
+              expertiseTopics: ['web dev', 'JavaScript'],
+            },
+          ],
+          threshold: 5,
+        }),
+      } as Response)
+
+      render(<PersonaStatus />)
+
+      await advanceDefer()
+
+      const chatBtn = screen.getByTestId('chat-btn-Fireship')
+      expect(chatBtn).toBeInTheDocument()
+      expect(chatBtn).toHaveAttribute('aria-label', 'Chat with The Fireship Persona')
+    })
+
+    it('does not show Chat button on non-active (building/ready) cards', async () => {
+      vi.mocked(fetch).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          channels: [
+            {
+              channelName: 'Theo',
+              transcriptCount: 6,
+              personaId: null,
+              personaCreatedAt: null,
+              personaName: null,
+              expertiseTopics: null,
+            },
+          ],
+          threshold: 5,
+        }),
+      } as Response)
+
+      render(<PersonaStatus />)
+
+      await advanceDefer()
+
+      expect(screen.queryByTestId('chat-btn-Theo')).not.toBeInTheDocument()
+    })
+
+    it('uses channelName as fallback when personaName is null', async () => {
+      vi.mocked(fetch).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          channels: [
+            {
+              channelName: 'Fireship',
+              transcriptCount: 10,
+              personaId: 1,
+              personaCreatedAt: new Date(),
+              personaName: null,
+              expertiseTopics: null,
+            },
+          ],
+          threshold: 5,
+        }),
+      } as Response)
+
+      render(<PersonaStatus />)
+
+      await advanceDefer()
+
+      const chatBtn = screen.getByTestId('chat-btn-Fireship')
+      expect(chatBtn).toHaveAttribute('aria-label', 'Chat with Fireship')
+    })
+  })
+
   describe('Uniform pill sizing (Chunk 2)', () => {
     it('applies min-width and max-width constraints to active persona pills', async () => {
       vi.mocked(fetch).mockResolvedValueOnce({

@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Loader2 } from 'lucide-react'
+import { Loader2, MessageCircle } from 'lucide-react'
+import { PersonaChatDrawer } from './PersonaChatDrawer'
 
 const MAX_VISIBLE = 5
 
@@ -11,6 +12,8 @@ interface Channel {
   transcriptCount: number
   personaId: number | null
   personaCreatedAt: Date | null
+  personaName: string | null
+  expertiseTopics: string[] | null
 }
 
 interface StatusResponse {
@@ -74,6 +77,11 @@ export function PersonaStatus({ onActivePersonasChange }: PersonaStatusProps) {
   const [creating, setCreating] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [expanded, setExpanded] = useState(false)
+  const [chatPersona, setChatPersona] = useState<{
+    id: number
+    name: string
+    expertiseTopics: string[]
+  } | null>(null)
 
   useEffect(() => {
     async function fetchStatus() {
@@ -176,6 +184,7 @@ export function PersonaStatus({ onActivePersonasChange }: PersonaStatusProps) {
 
           // Active persona card
           if (isActive) {
+            const personaDisplayName = channel.personaName || channel.channelName
             return (
               <div
                 key={channel.channelName}
@@ -183,6 +192,22 @@ export function PersonaStatus({ onActivePersonasChange }: PersonaStatusProps) {
               >
                 <span className="font-medium truncate" title={channel.channelName}>@{channel.channelName}</span>
                 <span className="text-green-600 dark:text-green-400">✓</span>
+                <Button
+                  variant="ghost"
+                  size="icon-xs"
+                  className="ml-auto text-green-700 dark:text-green-400 hover:text-primary"
+                  aria-label={`Chat with ${personaDisplayName}`}
+                  data-testid={`chat-btn-${channel.channelName}`}
+                  onClick={() =>
+                    setChatPersona({
+                      id: channel.personaId!,
+                      name: personaDisplayName,
+                      expertiseTopics: channel.expertiseTopics ?? [],
+                    })
+                  }
+                >
+                  <MessageCircle />
+                </Button>
               </div>
             )
           }
@@ -272,6 +297,14 @@ export function PersonaStatus({ onActivePersonasChange }: PersonaStatusProps) {
       {error && (
         <p className="text-xs text-destructive">{error}</p>
       )}
+
+      <PersonaChatDrawer
+        open={chatPersona !== null}
+        onOpenChange={(open) => { if (!open) setChatPersona(null) }}
+        personaId={chatPersona?.id ?? 0}
+        personaName={chatPersona?.name ?? ''}
+        expertiseTopics={chatPersona?.expertiseTopics}
+      />
     </div>
   )
 }
