@@ -83,6 +83,20 @@ describe('proxy', () => {
         expect(response.headers.get('x-middleware-next')).toBe('1')
         expect(mockGetSessionCookie).not.toHaveBeenCalled()
       })
+
+      it('allows /opengraph-image without auth', () => {
+        const response = proxy(createRequest('/opengraph-image'))
+        expect(response.status).toBe(200)
+        expect(response.headers.get('x-middleware-next')).toBe('1')
+        expect(mockGetSessionCookie).not.toHaveBeenCalled()
+      })
+
+      it('allows /twitter-image without auth', () => {
+        const response = proxy(createRequest('/twitter-image'))
+        expect(response.status).toBe(200)
+        expect(response.headers.get('x-middleware-next')).toBe('1')
+        expect(mockGetSessionCookie).not.toHaveBeenCalled()
+      })
     })
 
     describe('authenticated requests', () => {
