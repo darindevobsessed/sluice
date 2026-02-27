@@ -1,7 +1,7 @@
 import { createMcpHandler } from 'mcp-handler'
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { registerSearchRag, registerGetListOfCreators, registerChatWithPersona, registerEnsembleQuery } from '@/lib/mcp/tools'
-import { auth } from '@/lib/auth'
+import { verifyAccessToken } from 'better-auth/oauth2'
 
 /**
  * MCP Route Handler for Gold Miner
@@ -52,11 +52,30 @@ const handler = createMcpHandler(
  * MCP protocol requires both methods to be available
  */
 async function wrappedHandler(request: Request): Promise<Response> {
-  // In production, verify OAuth session via Better Auth MCP plugin
+  // In production, verify OAuth access token via better-auth/oauth2
   // In development, skip auth so local MCP tools work without OAuth setup
   if (process.env.NODE_ENV === 'production') {
-    const session = await auth.api.getSession({ headers: request.headers })
-    if (!session) {
+    const authorization = request.headers.get('authorization')
+    const accessToken = authorization?.startsWith('Bearer ')
+      ? authorization.slice(7)
+      : authorization
+
+    if (!accessToken) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    }
+
+    try {
+      const authUrl = process.env.BETTER_AUTH_URL ?? ''
+      await verifyAccessToken(accessToken, {
+        verifyOptions: {
+          issuer: authUrl,
+          audience: authUrl,
+        },
+      })
+    } catch {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
         headers: { 'Content-Type': 'application/json' },
@@ -83,7 +102,11 @@ async function wrappedHandler(request: Request): Promise<Response> {
   // rejects cross-realm streams. Fix: buffer JSON, pipe SSE through
   // a native TransformStream.
   const result = await handler(request)
-  if (result instanceof Response) return result
+
+  // Do NOT short-circuit with `if (result instanceof Response) return result` here.
+  // @hono/node-server replaces global.Response with its own Response2 subclass,
+  // so instanceof checks fail cross-realm. All responses must flow through the
+  // buffering/piping logic below which constructs genuine native Response objects.
 
   if (!result || typeof result !== 'object' || !('status' in result)) {
     return new Response(null, { status: 404 })

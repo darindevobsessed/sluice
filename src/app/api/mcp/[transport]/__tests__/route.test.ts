@@ -5,14 +5,10 @@ vi.mock('@/lib/db', () => ({
   db: {},
 }))
 
-// Mock Better Auth — control getMcpSession per test
-const mockGetMcpSession = vi.fn()
-vi.mock('@/lib/auth', () => ({
-  auth: {
-    api: {
-      getMcpSession: mockGetMcpSession,
-    },
-  },
+// Mock verifyAccessToken from better-auth/oauth2
+const mockVerifyAccessToken = vi.fn()
+vi.mock('better-auth/oauth2', () => ({
+  verifyAccessToken: (...args: unknown[]) => mockVerifyAccessToken(...args),
 }))
 
 // Import after mocking
@@ -21,8 +17,8 @@ const routeModule = await import('../route')
 describe('MCP Route Handler', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    // Default: authenticated
-    mockGetMcpSession.mockResolvedValue({ user: { id: 'user-1' } })
+    // Default: token verification succeeds
+    mockVerifyAccessToken.mockResolvedValue({ sub: 'user-1', scope: 'openid' })
   })
 
   it('exports GET handler', () => {
@@ -109,8 +105,7 @@ describe('MCP Route Handler', () => {
     })
 
     it('rejects unauthenticated requests with 401 in production', async () => {
-      mockGetMcpSession.mockResolvedValue(null)
-
+      // No Authorization header — should 401 without calling verifyAccessToken
       const request = new Request('http://localhost:3000/api/mcp/mcp', {
         method: 'POST',
         headers: {
@@ -134,10 +129,13 @@ describe('MCP Route Handler', () => {
 
       const body = await response.json()
       expect(body.error).toBe('Unauthorized')
+
+      // verifyAccessToken should NOT have been called (no token to verify)
+      expect(mockVerifyAccessToken).not.toHaveBeenCalled()
     })
 
     it('allows authenticated requests through to MCP handler in production', async () => {
-      mockGetMcpSession.mockResolvedValue({ user: { id: 'user-1' } })
+      mockVerifyAccessToken.mockResolvedValue({ sub: 'user-1', scope: 'openid' })
 
       const request = new Request('http://localhost:3000/api/mcp/mcp', {
         method: 'POST',
@@ -162,27 +160,59 @@ describe('MCP Route Handler', () => {
       expect(response.status).toBe(200)
     }, 10000)
 
-    it('passes request headers to getMcpSession in production', async () => {
-      mockGetMcpSession.mockResolvedValue(null)
+    it('passes Bearer token to verifyAccessToken', async () => {
+      mockVerifyAccessToken.mockResolvedValue({ sub: 'user-1', scope: 'openid' })
 
       const request = new Request('http://localhost:3000/api/mcp/mcp', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer some-token',
+          'Authorization': 'Bearer my-access-token',
         },
         body: '{}',
       })
 
       await routeModule.POST(request)
 
-      expect(mockGetMcpSession).toHaveBeenCalledOnce()
-      const callArg = mockGetMcpSession.mock.calls[0]?.[0]
-      expect(callArg).toHaveProperty('headers')
+      expect(mockVerifyAccessToken).toHaveBeenCalledOnce()
+      const [token, opts] = mockVerifyAccessToken.mock.calls[0] as [string, { verifyOptions: { issuer: string | undefined, audience: string | undefined } }]
+      expect(token).toBe('my-access-token')
+      expect(opts).toHaveProperty('verifyOptions')
+      expect(opts.verifyOptions).toHaveProperty('issuer')
+      expect(opts.verifyOptions).toHaveProperty('audience')
+    })
+
+    it('rejects requests with invalid tokens', async () => {
+      mockVerifyAccessToken.mockRejectedValue(new Error('Token expired'))
+
+      const request = new Request('http://localhost:3000/api/mcp/mcp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json, text/event-stream',
+          'Authorization': 'Bearer expired-token',
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'initialize',
+          params: {
+            protocolVersion: '2024-11-05',
+            capabilities: {},
+            clientInfo: { name: 'test-client', version: '1.0.0' },
+          },
+        }),
+      })
+
+      const response = await routeModule.POST(request)
+      expect(response.status).toBe(401)
+
+      const body = await response.json()
+      expect(body.error).toBe('Unauthorized')
     })
 
     it('adds Accept header when missing for authenticated requests', async () => {
-      mockGetMcpSession.mockResolvedValue({ user: { id: 'user-1' }, session: { id: 'session-1' } })
+      mockVerifyAccessToken.mockResolvedValue({ sub: 'user-1', scope: 'openid' })
 
       // Request without Accept header — should still reach MCP handler after auth passes
       const request = new Request('http://localhost:3000/api/mcp/mcp', {
@@ -211,7 +241,6 @@ describe('MCP Route Handler', () => {
 
     it('skips auth check in development', async () => {
       vi.stubEnv('NODE_ENV', 'development')
-      mockGetMcpSession.mockResolvedValue(null)
 
       const request = new Request('http://localhost:3000/api/mcp/mcp', {
         method: 'POST',
@@ -234,7 +263,7 @@ describe('MCP Route Handler', () => {
       const response = await routeModule.POST(request)
       // Should pass through to MCP handler, not 401
       expect(response.status).toBe(200)
-      expect(mockGetMcpSession).not.toHaveBeenCalled()
+      expect(mockVerifyAccessToken).not.toHaveBeenCalled()
     }, 10000)
   })
 })
