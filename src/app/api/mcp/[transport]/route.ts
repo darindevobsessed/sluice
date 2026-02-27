@@ -55,7 +55,7 @@ async function wrappedHandler(request: Request): Promise<Response> {
   // In production, verify OAuth session via Better Auth MCP plugin
   // In development, skip auth so local MCP tools work without OAuth setup
   if (process.env.NODE_ENV === 'production') {
-    const session = await auth.api.getMcpSession({ headers: request.headers })
+    const session = await auth.api.getSession({ headers: request.headers })
     if (!session) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,

@@ -1,13 +1,15 @@
 import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { nextCookies } from 'better-auth/next-js'
-import { mcp } from 'better-auth/plugins'
+import { jwt } from 'better-auth/plugins'
+import { oauthProvider } from '@better-auth/oauth-provider'
 import { APIError } from 'better-auth/api'
 import { db } from '@/lib/db'
 
 const ALLOWED_EMAIL_DOMAIN = process.env.ALLOWED_EMAIL_DOMAIN ?? 'devobsessed.com'
 
 export const auth = betterAuth({
+  disabledPaths: ['/token'],
   database: drizzleAdapter(db, {
     provider: 'pg',
   }),
@@ -42,6 +44,12 @@ export const auth = betterAuth({
   },
   plugins: [
     nextCookies(),
-    mcp({ loginPage: '/sign-in' }),
+    jwt(),
+    oauthProvider({
+      loginPage: '/sign-in',
+      consentPage: '/sign-in',
+      allowDynamicClientRegistration: true,
+      allowUnauthenticatedClientRegistration: true,
+    }),
   ],
 })

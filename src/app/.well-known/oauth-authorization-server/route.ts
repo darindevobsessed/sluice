@@ -1,4 +1,4 @@
-import { oAuthDiscoveryMetadata } from 'better-auth/plugins'
+import { oauthProviderAuthServerMetadata } from '@better-auth/oauth-provider'
 import { auth } from '@/lib/auth'
 
 /**
@@ -20,7 +20,7 @@ export async function GET(request: Request): Promise<Response> {
 
   // Production: serve OAuth discovery metadata
   try {
-    const handler = oAuthDiscoveryMetadata(auth)
+    const handler = oauthProviderAuthServerMetadata(auth)
     return await handler(request)
   } catch {
     return new Response(

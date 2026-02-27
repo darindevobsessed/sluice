@@ -21,6 +21,7 @@
   "dependencies": {
     "@anthropic-ai/claude-agent-sdk": "^0.2.31",
     "@anthropic-ai/sdk": "^0.78.0",
+    "@better-auth/oauth-provider": "^1.4.19",
     "@danielxceron/youtube-transcript": "^1.2.6",
     "@huggingface/transformers": "^3.8.1",
     "@modelcontextprotocol/sdk": "^1.25.2",
