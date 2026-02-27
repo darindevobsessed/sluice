@@ -13,11 +13,11 @@ const { getPersonaContext, formatContextForPrompt } = await import('../context')
 describe('getPersonaContext', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    mockHybridSearch.mockResolvedValue([])
+    mockHybridSearch.mockResolvedValue({ results: [], degraded: false })
   })
 
   it('should return filtered search results for a specific channel', async () => {
-    mockHybridSearch.mockResolvedValue([
+    mockHybridSearch.mockResolvedValue({ results: [
       {
         chunkId: 1,
         content: 'TypeScript is a typed superset',
@@ -42,7 +42,7 @@ describe('getPersonaContext', () => {
         thumbnail: null,
         similarity: 0.80,
       },
-    ])
+    ], degraded: false })
 
     const results = await getPersonaContext('Test Channel', 'What is TypeScript?')
 
@@ -69,7 +69,7 @@ describe('getPersonaContext', () => {
       thumbnail: null,
       similarity: 0.7,
     }))
-    mockHybridSearch.mockResolvedValue(results)
+    mockHybridSearch.mockResolvedValue({ results, degraded: false })
 
     const contextResults = await getPersonaContext('Test Channel', 'Test')
 
@@ -86,7 +86,7 @@ describe('getPersonaContext', () => {
   })
 
   it('should handle empty results gracefully', async () => {
-    mockHybridSearch.mockResolvedValue([])
+    mockHybridSearch.mockResolvedValue({ results: [], degraded: false })
 
     const results = await getPersonaContext('Nonexistent Channel', 'query')
 
@@ -95,7 +95,7 @@ describe('getPersonaContext', () => {
   })
 
   it('should handle results where no chunks match the channel', async () => {
-    mockHybridSearch.mockResolvedValue([
+    mockHybridSearch.mockResolvedValue({ results: [
       {
         chunkId: 1,
         content: 'Some content',
@@ -108,7 +108,7 @@ describe('getPersonaContext', () => {
         thumbnail: null,
         similarity: 0.7,
       },
-    ])
+    ], degraded: false })
 
     const results = await getPersonaContext('Nonexistent Channel', 'query')
 
@@ -117,7 +117,7 @@ describe('getPersonaContext', () => {
   })
 
   it('should return results with correct properties', async () => {
-    mockHybridSearch.mockResolvedValue([
+    mockHybridSearch.mockResolvedValue({ results: [
       {
         chunkId: 1,
         content: 'Test query content',
@@ -130,7 +130,7 @@ describe('getPersonaContext', () => {
         thumbnail: null,
         similarity: 0.85,
       },
-    ])
+    ], degraded: false })
 
     const results = await getPersonaContext('Test Channel', 'test query')
 

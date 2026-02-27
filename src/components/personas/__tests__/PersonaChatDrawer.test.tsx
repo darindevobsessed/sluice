@@ -319,4 +319,75 @@ describe('PersonaChatDrawer', () => {
     renderDrawer()
     expect(screen.getByText('Something went wrong, try again')).toBeInTheDocument()
   })
+
+  it('renders answer paragraphs separated by double newlines', () => {
+    mockState = {
+      messages: [
+        {
+          question: 'Explain React?',
+          answer: 'React is a UI library.\n\nIt uses a virtual DOM.\n\nComponents are the building blocks.',
+          timestamp: 1000000,
+          isStreaming: false,
+          isError: false,
+        },
+      ],
+      isStreaming: false,
+      error: null,
+    }
+    renderDrawer()
+    const paragraphs = screen.getAllByRole('paragraph')
+    // Find the answer paragraphs (not the timestamp paragraph or other text)
+    const answerParagraphs = paragraphs.filter(
+      (p) =>
+        p.textContent === 'React is a UI library.' ||
+        p.textContent === 'It uses a virtual DOM.' ||
+        p.textContent === 'Components are the building blocks.'
+    )
+    expect(answerParagraphs).toHaveLength(3)
+    expect(answerParagraphs[0]?.tagName).toBe('P')
+    expect(answerParagraphs[1]?.tagName).toBe('P')
+    expect(answerParagraphs[2]?.tagName).toBe('P')
+  })
+
+  it('renders single-paragraph answer (no double newlines) as one <p> element', () => {
+    mockState = {
+      messages: [
+        {
+          question: 'What is React?',
+          answer: 'React is a UI library.',
+          timestamp: 1000000,
+          isStreaming: false,
+          isError: false,
+        },
+      ],
+      isStreaming: false,
+      error: null,
+    }
+    renderDrawer()
+    // Only one paragraph should match the answer text
+    const answerParagraph = screen.getByText('React is a UI library.')
+    expect(answerParagraph.tagName).toBe('P')
+  })
+
+  it('attaches streaming cursor to last paragraph when multi-paragraph answer is streaming', () => {
+    mockState = {
+      messages: [
+        {
+          question: 'Explain React?',
+          answer: 'React is a UI library.\n\nIt uses a virtual DOM.',
+          timestamp: 1000000,
+          isStreaming: true,
+          isError: false,
+        },
+      ],
+      isStreaming: true,
+      error: null,
+    }
+    renderDrawer()
+    // Cursor should be present
+    expect(screen.getByText(/▌/)).toBeInTheDocument()
+    // The cursor should be in the last paragraph (the one containing "It uses a virtual DOM.")
+    const lastParagraph = screen.getByText(/It uses a virtual DOM\./)
+    expect(lastParagraph.textContent).toContain('▌')
+  })
 })

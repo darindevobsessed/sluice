@@ -233,12 +233,16 @@ export function PersonaChatDrawer({
                       />
                     </div>
                   ) : (
-                    <span>
-                      {msg.answer}
-                      {msg.isStreaming && (
-                        <span className="motion-safe:animate-pulse">▌</span>
-                      )}
-                    </span>
+                    <div className="space-y-2">
+                      {msg.answer.split('\n\n').map((paragraph, pIdx, arr) => (
+                        <p key={pIdx}>
+                          {paragraph}
+                          {msg.isStreaming && pIdx === arr.length - 1 && (
+                            <span className="motion-safe:animate-pulse">▌</span>
+                          )}
+                        </p>
+                      ))}
+                    </div>
                   )}
                 </div>
               </div>

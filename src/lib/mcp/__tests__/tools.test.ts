@@ -130,7 +130,7 @@ describe('registerSearchRag', () => {
       },
     ]
 
-    ;(hybridSearch as Mock).mockResolvedValue(mockSearchResults)
+    ;(hybridSearch as Mock).mockResolvedValue({ results: mockSearchResults, degraded: false })
     ;(aggregateByVideo as Mock).mockReturnValue(mockVideoResults)
 
     const result = await toolHandler({ topic: 'TypeScript' })
@@ -189,7 +189,7 @@ describe('registerSearchRag', () => {
       },
     ]
 
-    ;(hybridSearch as Mock).mockResolvedValue(mockSearchResults)
+    ;(hybridSearch as Mock).mockResolvedValue({ results: mockSearchResults, degraded: false })
     ;(aggregateByVideo as Mock).mockReturnValue(mockVideoResults)
 
     const result = await toolHandler({ topic: 'React', creator: 'Dev' })
@@ -230,7 +230,7 @@ describe('registerSearchRag', () => {
       },
     ]
 
-    ;(hybridSearch as Mock).mockResolvedValue(mockSearchResults)
+    ;(hybridSearch as Mock).mockResolvedValue({ results: mockSearchResults, degraded: false })
     ;(aggregateByVideo as Mock).mockReturnValue([])
 
     await toolHandler({ topic: 'test', creator: 'MASTERY' })
@@ -243,7 +243,7 @@ describe('registerSearchRag', () => {
     const mockSearchResults: SearchResult[] = []
     const mockVideoResults: VideoResult[] = []
 
-    ;(hybridSearch as Mock).mockResolvedValue(mockSearchResults)
+    ;(hybridSearch as Mock).mockResolvedValue({ results: mockSearchResults, degraded: false })
     ;(aggregateByVideo as Mock).mockReturnValue(mockVideoResults)
 
     await toolHandler({ topic: 'test', limit: 25 })
@@ -255,7 +255,7 @@ describe('registerSearchRag', () => {
     const mockSearchResults: SearchResult[] = []
     const mockVideoResults: VideoResult[] = []
 
-    ;(hybridSearch as Mock).mockResolvedValue(mockSearchResults)
+    ;(hybridSearch as Mock).mockResolvedValue({ results: mockSearchResults, degraded: false })
     ;(aggregateByVideo as Mock).mockReturnValue(mockVideoResults)
 
     await toolHandler({ topic: 'test' })
@@ -264,7 +264,7 @@ describe('registerSearchRag', () => {
   })
 
   it('handles empty search results', async () => {
-    ;(hybridSearch as Mock).mockResolvedValue([])
+    ;(hybridSearch as Mock).mockResolvedValue({ results: [], degraded: false })
     ;(aggregateByVideo as Mock).mockReturnValue([])
 
     const result = await toolHandler({ topic: 'nonexistent' })
@@ -291,7 +291,7 @@ describe('registerSearchRag', () => {
       },
     ]
 
-    ;(hybridSearch as Mock).mockResolvedValue(mockSearchResults)
+    ;(hybridSearch as Mock).mockResolvedValue({ results: mockSearchResults, degraded: false })
     ;(aggregateByVideo as Mock).mockReturnValue([])
 
     await toolHandler({ topic: 'test', creator: 'Channel B' })
@@ -333,7 +333,7 @@ describe('registerSearchRag', () => {
       },
     ]
 
-    ;(hybridSearch as Mock).mockResolvedValue(mockSearchResults)
+    ;(hybridSearch as Mock).mockResolvedValue({ results: mockSearchResults, degraded: false })
     ;(aggregateByVideo as Mock).mockReturnValue(mockVideoResults)
 
     const result = await toolHandler({ topic: 'test' })
@@ -374,7 +374,7 @@ describe('registerSearchRag', () => {
       },
     ]
 
-    ;(hybridSearch as Mock).mockResolvedValue(mockSearchResults)
+    ;(hybridSearch as Mock).mockResolvedValue({ results: mockSearchResults, degraded: false })
     ;(aggregateByVideo as Mock).mockReturnValue(mockVideoResults)
 
     const result = await toolHandler({ topic: 'test' })
@@ -432,7 +432,7 @@ describe('registerSearchRag', () => {
       updatedAt: new Date(),
     }
 
-    ;(hybridSearch as Mock).mockResolvedValue(mockSearchResults)
+    ;(hybridSearch as Mock).mockResolvedValue({ results: mockSearchResults, degraded: false })
     ;(aggregateByVideo as Mock).mockReturnValue(mockVideoResults)
 
     // Mock getExtractionForVideo
@@ -495,7 +495,7 @@ describe('registerSearchRag', () => {
       updatedAt: new Date(),
     }
 
-    ;(hybridSearch as Mock).mockResolvedValue(mockSearchResults)
+    ;(hybridSearch as Mock).mockResolvedValue({ results: mockSearchResults, degraded: false })
     ;(aggregateByVideo as Mock).mockReturnValue(mockVideoResults)
 
     const { getExtractionForVideo } = await import('@/lib/db/insights')
@@ -542,7 +542,7 @@ describe('registerSearchRag', () => {
       },
     ]
 
-    ;(hybridSearch as Mock).mockResolvedValue(mockSearchResults)
+    ;(hybridSearch as Mock).mockResolvedValue({ results: mockSearchResults, degraded: false })
     ;(aggregateByVideo as Mock).mockReturnValue(mockVideoResults)
 
     const { getExtractionForVideo } = await import('@/lib/db/insights')

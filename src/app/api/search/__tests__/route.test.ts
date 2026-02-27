@@ -40,7 +40,7 @@ const { GET } = await import('../route')
 describe('GET /api/search', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    mockHybridSearch.mockResolvedValue([])
+    mockHybridSearch.mockResolvedValue({ results: [], degraded: false })
   })
 
   it('returns empty results for empty query', async () => {
@@ -57,6 +57,7 @@ describe('GET /api/search', () => {
       mode: 'hybrid',
       timing: 0,
       hasEmbeddings: true,
+      degraded: false,
     })
   })
 
@@ -74,11 +75,12 @@ describe('GET /api/search', () => {
       mode: 'hybrid',
       timing: 0,
       hasEmbeddings: true,
+      degraded: false,
     })
   })
 
   it('returns both chunk and video results', async () => {
-    mockHybridSearch.mockResolvedValue([
+    mockHybridSearch.mockResolvedValue({ results: [
       {
         chunkId: 1,
         content: 'TypeScript is a typed superset of JavaScript',
@@ -103,7 +105,7 @@ describe('GET /api/search', () => {
         thumbnail: null,
         similarity: 0.80,
       },
-    ])
+    ], degraded: false })
 
     const request = new Request('http://localhost:3000/api/search?q=TypeScript')
 
@@ -136,7 +138,7 @@ describe('GET /api/search', () => {
       thumbnail: null,
       similarity: 0.7,
     }))
-    mockHybridSearch.mockResolvedValue(chunks)
+    mockHybridSearch.mockResolvedValue({ results: chunks, degraded: false })
 
     const request = new Request('http://localhost:3000/api/search?q=TypeScript&limit=3')
 
@@ -161,7 +163,7 @@ describe('GET /api/search', () => {
       thumbnail: null,
       similarity: 0.7,
     }))
-    mockHybridSearch.mockResolvedValue(chunks)
+    mockHybridSearch.mockResolvedValue({ results: chunks, degraded: false })
 
     const request = new Request('http://localhost:3000/api/search?q=TypeScript&limit=2')
 
@@ -173,7 +175,7 @@ describe('GET /api/search', () => {
   })
 
   it('respects mode parameter: keyword', async () => {
-    mockHybridSearch.mockResolvedValue([
+    mockHybridSearch.mockResolvedValue({ results: [
       {
         chunkId: 1,
         content: 'TypeScript is great',
@@ -186,7 +188,7 @@ describe('GET /api/search', () => {
         thumbnail: null,
         similarity: 1.0,
       },
-    ])
+    ], degraded: false })
 
     const request = new Request('http://localhost:3000/api/search?q=TypeScript&mode=keyword')
 
@@ -199,7 +201,7 @@ describe('GET /api/search', () => {
   })
 
   it('respects mode parameter: vector', async () => {
-    mockHybridSearch.mockResolvedValue([
+    mockHybridSearch.mockResolvedValue({ results: [
       {
         chunkId: 1,
         content: 'Some content',
@@ -212,7 +214,7 @@ describe('GET /api/search', () => {
         thumbnail: null,
         similarity: 0.8,
       },
-    ])
+    ], degraded: false })
 
     const request = new Request('http://localhost:3000/api/search?q=content&mode=vector')
 
@@ -234,7 +236,7 @@ describe('GET /api/search', () => {
   })
 
   it('video results include all required fields', async () => {
-    mockHybridSearch.mockResolvedValue([
+    mockHybridSearch.mockResolvedValue({ results: [
       {
         chunkId: 1,
         content: 'TypeScript is great',
@@ -247,7 +249,7 @@ describe('GET /api/search', () => {
         thumbnail: 'https://example.com/thumb.jpg',
         similarity: 0.85,
       },
-    ])
+    ], degraded: false })
 
     const request = new Request('http://localhost:3000/api/search?q=TypeScript')
 
@@ -272,7 +274,7 @@ describe('GET /api/search', () => {
   })
 
   it('aggregates multiple chunks from same video', async () => {
-    mockHybridSearch.mockResolvedValue([
+    mockHybridSearch.mockResolvedValue({ results: [
       {
         chunkId: 1,
         content: 'TypeScript is great',
@@ -309,7 +311,7 @@ describe('GET /api/search', () => {
         thumbnail: null,
         similarity: 0.6,
       },
-    ])
+    ], degraded: false })
 
     const request = new Request('http://localhost:3000/api/search?q=TypeScript')
 
@@ -323,7 +325,7 @@ describe('GET /api/search', () => {
   })
 
   it('returns hasEmbeddings=false when search returns no results in hybrid mode', async () => {
-    mockHybridSearch.mockResolvedValue([])
+    mockHybridSearch.mockResolvedValue({ results: [], degraded: false })
 
     const request = new Request('http://localhost:3000/api/search?q=zzz-nonexistent-query-xyz')
 
@@ -335,7 +337,7 @@ describe('GET /api/search', () => {
   })
 
   it('returns hasEmbeddings=true when keyword mode returns results', async () => {
-    mockHybridSearch.mockResolvedValue([
+    mockHybridSearch.mockResolvedValue({ results: [
       {
         chunkId: 1,
         content: 'TypeScript content without embedding',
@@ -348,7 +350,7 @@ describe('GET /api/search', () => {
         thumbnail: null,
         similarity: 1.0,
       },
-    ])
+    ], degraded: false })
 
     const request = new Request('http://localhost:3000/api/search?q=TypeScript&mode=keyword')
 
@@ -394,7 +396,7 @@ describe('GET /api/search', () => {
   })
 
   it('handles query with special characters', async () => {
-    mockHybridSearch.mockResolvedValue([])
+    mockHybridSearch.mockResolvedValue({ results: [], degraded: false })
 
     const request = new Request('http://localhost:3000/api/search?q=C%2B%2B')
 
@@ -448,7 +450,7 @@ describe('GET /api/search', () => {
 
   describe('temporal decay parameters', () => {
     it('passes temporalDecay=true to hybridSearch', async () => {
-      mockHybridSearch.mockResolvedValue([])
+      mockHybridSearch.mockResolvedValue({ results: [], degraded: false })
 
       const request = new Request('http://localhost:3000/api/search?q=TypeScript&temporalDecay=true')
 
@@ -461,7 +463,7 @@ describe('GET /api/search', () => {
     })
 
     it('passes temporalDecay=false by default', async () => {
-      mockHybridSearch.mockResolvedValue([])
+      mockHybridSearch.mockResolvedValue({ results: [], degraded: false })
 
       const request = new Request('http://localhost:3000/api/search?q=TypeScript')
 
@@ -474,7 +476,7 @@ describe('GET /api/search', () => {
     })
 
     it('respects custom halfLifeDays parameter', async () => {
-      mockHybridSearch.mockResolvedValue([])
+      mockHybridSearch.mockResolvedValue({ results: [], degraded: false })
 
       const request = new Request(
         'http://localhost:3000/api/search?q=TypeScript&temporalDecay=true&halfLifeDays=180',
@@ -490,7 +492,7 @@ describe('GET /api/search', () => {
     })
 
     it('handles temporalDecay=false explicitly', async () => {
-      mockHybridSearch.mockResolvedValue([])
+      mockHybridSearch.mockResolvedValue({ results: [], degraded: false })
 
       const request = new Request('http://localhost:3000/api/search?q=TypeScript&temporalDecay=false')
 
@@ -503,7 +505,7 @@ describe('GET /api/search', () => {
     })
 
     it('ignores halfLifeDays when temporalDecay is false', async () => {
-      mockHybridSearch.mockResolvedValue([])
+      mockHybridSearch.mockResolvedValue({ results: [], degraded: false })
 
       const request = new Request(
         'http://localhost:3000/api/search?q=TypeScript&temporalDecay=false&halfLifeDays=1',
