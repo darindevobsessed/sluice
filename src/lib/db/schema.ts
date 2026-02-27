@@ -248,51 +248,84 @@ export const verification = pgTable('verification', {
 })
 
 /**
- * Better Auth MCP plugin tables -- required for OAuth flows
- * These tables support OAuth applications, access tokens, and user consent.
- * Table/column names must match better-auth's OIDC provider schema expectations.
+ * Better Auth OAuth Provider plugin tables -- required for MCP OAuth flows
+ * These tables support OAuth clients, access tokens, refresh tokens, and user consent.
+ * Table/column names must match @better-auth/oauth-provider schema expectations.
  */
-export const oauthApplication = pgTable('oauth_application', {
+export const oauthClient = pgTable('oauth_client', {
   id: text('id').primaryKey(),
-  name: text('name').notNull(),
-  icon: text('icon'),
-  metadata: text('metadata'),
   clientId: text('client_id').notNull().unique(),
   clientSecret: text('client_secret'),
-  redirectUrls: text('redirect_urls').notNull(),
-  type: text('type').notNull(),
+  redirectUris: text('redirect_uris').notNull(),
   disabled: boolean('disabled').default(false),
+  skipConsent: boolean('skip_consent'),
+  enableEndSession: boolean('enable_end_session'),
+  scopes: text('scopes'),
   userId: text('user_id').references(() => user.id, { onDelete: 'cascade' }),
+  referenceId: text('reference_id'),
   createdAt: timestamp('created_at').notNull(),
   updatedAt: timestamp('updated_at').notNull(),
+  name: text('name'),
+  uri: text('uri'),
+  icon: text('icon'),
+  contacts: text('contacts'),
+  tos: text('tos'),
+  policy: text('policy'),
+  softwareId: text('software_id'),
+  softwareVersion: text('software_version'),
+  softwareStatement: text('software_statement'),
+  tokenEndpointAuthMethod: text('token_endpoint_auth_method'),
+  grantTypes: text('grant_types'),
+  responseTypes: text('response_types'),
+  public: boolean('public'),
+  type: text('type'),
+  requirePkce: boolean('require_pkce'),
+  metadata: text('metadata'),
+  postLogoutRedirectUris: text('post_logout_redirect_uris'),
 }, (table) => ({
-  userIdx: index('oauth_application_user_idx').on(table.userId),
+  userIdx: index('oauth_client_user_idx').on(table.userId),
 }))
 
 export const oauthAccessToken = pgTable('oauth_access_token', {
   id: text('id').primaryKey(),
-  accessToken: text('access_token').notNull().unique(),
-  refreshToken: text('refresh_token').notNull().unique(),
-  accessTokenExpiresAt: timestamp('access_token_expires_at').notNull(),
-  refreshTokenExpiresAt: timestamp('refresh_token_expires_at').notNull(),
-  clientId: text('client_id').notNull().references(() => oauthApplication.clientId, { onDelete: 'cascade' }),
+  token: text('token').notNull().unique(),
+  clientId: text('client_id').notNull().references(() => oauthClient.clientId, { onDelete: 'cascade' }),
   userId: text('user_id').references(() => user.id, { onDelete: 'cascade' }),
+  sessionId: text('session_id'),
+  refreshId: text('refresh_id'),
+  referenceId: text('reference_id'),
   scopes: text('scopes').notNull(),
   createdAt: timestamp('created_at').notNull(),
-  updatedAt: timestamp('updated_at').notNull(),
+  expiresAt: timestamp('expires_at').notNull(),
 }, (table) => ({
   clientIdx: index('oauth_access_token_client_idx').on(table.clientId),
   userIdx: index('oauth_access_token_user_idx').on(table.userId),
 }))
 
+export const oauthRefreshToken = pgTable('oauth_refresh_token', {
+  id: text('id').primaryKey(),
+  token: text('token').notNull().unique(),
+  clientId: text('client_id').notNull().references(() => oauthClient.clientId, { onDelete: 'cascade' }),
+  userId: text('user_id').references(() => user.id, { onDelete: 'cascade' }),
+  sessionId: text('session_id'),
+  referenceId: text('reference_id'),
+  scopes: text('scopes').notNull(),
+  revoked: boolean('revoked').default(false),
+  createdAt: timestamp('created_at').notNull(),
+  expiresAt: timestamp('expires_at').notNull(),
+}, (table) => ({
+  clientIdx: index('oauth_refresh_token_client_idx').on(table.clientId),
+  userIdx: index('oauth_refresh_token_user_idx').on(table.userId),
+}))
+
 export const oauthConsent = pgTable('oauth_consent', {
   id: text('id').primaryKey(),
-  clientId: text('client_id').notNull().references(() => oauthApplication.clientId, { onDelete: 'cascade' }),
+  clientId: text('client_id').notNull().references(() => oauthClient.clientId, { onDelete: 'cascade' }),
   userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+  referenceId: text('reference_id'),
   scopes: text('scopes').notNull(),
   createdAt: timestamp('created_at').notNull(),
   updatedAt: timestamp('updated_at').notNull(),
-  consentGiven: boolean('consent_given').notNull(),
 }, (table) => ({
   clientIdx: index('oauth_consent_client_idx').on(table.clientId),
   userIdx: index('oauth_consent_user_idx').on(table.userId),
@@ -346,3 +379,15 @@ export type NewAccount = typeof account.$inferInsert;
 
 export type Verification = typeof verification.$inferSelect;
 export type NewVerification = typeof verification.$inferInsert;
+
+export type OAuthClient = typeof oauthClient.$inferSelect;
+export type NewOAuthClient = typeof oauthClient.$inferInsert;
+
+export type OAuthAccessToken = typeof oauthAccessToken.$inferSelect;
+export type NewOAuthAccessToken = typeof oauthAccessToken.$inferInsert;
+
+export type OAuthRefreshToken = typeof oauthRefreshToken.$inferSelect;
+export type NewOAuthRefreshToken = typeof oauthRefreshToken.$inferInsert;
+
+export type OAuthConsent = typeof oauthConsent.$inferSelect;
+export type NewOAuthConsent = typeof oauthConsent.$inferInsert;
