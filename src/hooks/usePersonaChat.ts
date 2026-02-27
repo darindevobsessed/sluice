@@ -4,12 +4,19 @@ import {
   saveChatStorage,
   clearChatStorage,
   isChatMessage,
+  isThreadBoundary,
+  getContextWindow,
   type ChatMessage,
+  type ChatEntry,
+  type ChatStorageV2,
 } from '@/lib/personas/chat-storage'
 
-export type { ChatMessage }
+export type { ChatMessage, ChatEntry }
 
 export interface PersonaChatState {
+  /** All entries including thread boundaries */
+  entries: ChatEntry[]
+  /** Derived: only ChatMessage entries — backward-compat getter */
   messages: ChatMessage[]
   isStreaming: boolean
   error: string | null
@@ -18,7 +25,25 @@ export interface PersonaChatState {
 interface UsePersonaChatReturn {
   state: PersonaChatState
   sendMessage: (question: string) => Promise<void>
+  startNewThread: () => void
   clearHistory: () => void
+}
+
+/**
+ * Derives PersonaChatState from a ChatStorageV2 object plus transient flags.
+ */
+function deriveState(
+  storage: ChatStorageV2,
+  isStreaming: boolean,
+  error: string | null
+): PersonaChatState {
+  const messages = storage.entries.filter(isChatMessage)
+  return {
+    entries: storage.entries,
+    messages,
+    isStreaming,
+    error,
+  }
 }
 
 /**
@@ -32,24 +57,29 @@ interface UsePersonaChatReturn {
  * Uses versioned localStorage schema (v2) via chat-storage module.
  * v1 bare arrays are automatically migrated to v2 on first load.
  *
+ * State shape:
+ * - `entries` — all ChatEntry items (messages + thread boundaries)
+ * - `messages` — derived: only ChatMessage entries (backward-compat)
+ * - `startNewThread()` — inserts a ThreadBoundary, resets context window
+ * - `sendMessage()` — sends history from active context window in POST body
+ *
  * @param personaId - The persona to chat with
  */
 export function usePersonaChat(personaId: number): UsePersonaChatReturn {
-  const [state, setState] = useState<PersonaChatState>(() => ({
-    messages: loadChatStorage(personaId).entries.filter(isChatMessage) as ChatMessage[],
-    isStreaming: false,
-    error: null,
-  }))
+  const [storage, setStorage] = useState<ChatStorageV2>(() =>
+    loadChatStorage(personaId)
+  )
+  const [isStreaming, setIsStreaming] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const abortControllerRef = useRef<AbortController | null>(null)
 
-  // Reload messages when personaId changes
+  // Reload storage when personaId changes; abort any in-flight request
   useEffect(() => {
-    setState({
-      messages: loadChatStorage(personaId).entries.filter(isChatMessage) as ChatMessage[],
-      isStreaming: false,
-      error: null,
-    })
+    abortControllerRef.current?.abort()
+    setStorage(loadChatStorage(personaId))
+    setIsStreaming(false)
+    setError(null)
   }, [personaId])
 
   // Abort any in-flight request on unmount
@@ -67,6 +97,12 @@ export function usePersonaChat(personaId: number): UsePersonaChatReturn {
       const controller = new AbortController()
       abortControllerRef.current = controller
 
+      // Capture the context window BEFORE appending the new message
+      // so the new question is not included in its own history
+      const history = getContextWindow(
+        loadChatStorage(personaId).entries
+      )
+
       const newMessage: ChatMessage = {
         question,
         answer: '',
@@ -76,18 +112,21 @@ export function usePersonaChat(personaId: number): UsePersonaChatReturn {
       }
 
       // Append the new message (streaming placeholder) and set global state
-      setState((prev) => ({
-        ...prev,
-        messages: [...prev.messages, newMessage],
-        isStreaming: true,
-        error: null,
-      }))
+      setStorage((prev) => {
+        const updated: ChatStorageV2 = {
+          version: 2,
+          entries: [...prev.entries, newMessage],
+        }
+        return updated
+      })
+      setIsStreaming(true)
+      setError(null)
 
       try {
         const response = await fetch(`/api/personas/${personaId}/query`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ question }),
+          body: JSON.stringify({ question, history }),
           signal: controller.signal,
         })
 
@@ -154,69 +193,88 @@ export function usePersonaChat(personaId: number): UsePersonaChatReturn {
                 ) {
                   const text = (delta as Record<string, unknown>)['text']
                   if (typeof text === 'string') {
-                    setState((prev) => {
-                      const messages = prev.messages.map((m, idx) =>
-                        idx === prev.messages.length - 1
-                          ? { ...m, answer: m.answer + text }
-                          : m
+                    setStorage((prev) => {
+                      const entries = prev.entries.map((entry, idx) =>
+                        idx === prev.entries.length - 1 && isChatMessage(entry)
+                          ? { ...entry, answer: entry.answer + text }
+                          : entry
                       )
-                      return { ...prev, messages }
+                      return { ...prev, entries }
                     })
                   }
                 }
               } else if (typedEvent['type'] === 'done') {
-                // Finalize the message
-                setState((prev) => {
-                  const messages = prev.messages.map((m, idx) =>
-                    idx === prev.messages.length - 1
-                      ? { ...m, isStreaming: false }
-                      : m
+                // Finalize the message and persist to localStorage
+                setStorage((prev) => {
+                  const entries = prev.entries.map((entry, idx) =>
+                    idx === prev.entries.length - 1 && isChatMessage(entry)
+                      ? { ...entry, isStreaming: false }
+                      : entry
                   )
-                  saveChatStorage(personaId, { version: 2, entries: messages })
-                  return { ...prev, messages, isStreaming: false }
+                  const updated: ChatStorageV2 = { version: 2, entries }
+                  saveChatStorage(personaId, updated)
+                  return updated
                 })
+                setIsStreaming(false)
               }
             }
           }
         } finally {
           reader.releaseLock()
           // Ensure isStreaming is cleared if stream closed without done event
-          setState((prev) => {
-            if (prev.isStreaming) {
-              return { ...prev, isStreaming: false }
-            }
-            return prev
-          })
+          setIsStreaming((prev) => (prev ? false : prev))
         }
-      } catch (error) {
+      } catch (err) {
         // Ignore abort errors — they're intentional
-        if (error instanceof Error && error.name === 'AbortError') {
+        if (err instanceof Error && err.name === 'AbortError') {
           return
         }
 
         let errorMessage = 'An error occurred. Please try again.'
-        if (error instanceof Error) {
-          errorMessage = error.message
+        if (err instanceof Error) {
+          errorMessage = err.message
         }
 
         // Mark the last message as an error
-        setState((prev) => {
-          const messages = prev.messages.map((m, idx) =>
-            idx === prev.messages.length - 1
-              ? { ...m, isStreaming: false, isError: true }
-              : m
+        setStorage((prev) => {
+          const entries = prev.entries.map((entry, idx) =>
+            idx === prev.entries.length - 1 && isChatMessage(entry)
+              ? { ...entry, isStreaming: false, isError: true }
+              : entry
           )
-          return { ...prev, messages, isStreaming: false, error: errorMessage }
+          return { ...prev, entries }
         })
+        setIsStreaming(false)
+        setError(errorMessage)
       }
     },
     [personaId]
   )
 
-  const clearHistory = useCallback(() => {
-    clearChatStorage(personaId)
-    setState({ messages: [], isStreaming: false, error: null })
+  const startNewThread = useCallback(() => {
+    const boundary = {
+      type: 'thread-boundary' as const,
+      timestamp: Date.now(),
+    }
+    setStorage((prev) => {
+      const updated: ChatStorageV2 = {
+        version: 2,
+        entries: [...prev.entries, boundary],
+      }
+      saveChatStorage(personaId, updated)
+      return updated
+    })
   }, [personaId])
 
-  return { state, sendMessage, clearHistory }
+  const clearHistory = useCallback(() => {
+    clearChatStorage(personaId)
+    setStorage({ version: 2, entries: [] })
+    setIsStreaming(false)
+    setError(null)
+  }, [personaId])
+
+  // Derive state from split state pieces
+  const state = deriveState(storage, isStreaming, error)
+
+  return { state, sendMessage, startNewThread, clearHistory }
 }

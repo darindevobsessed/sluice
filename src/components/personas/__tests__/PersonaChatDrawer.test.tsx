@@ -6,6 +6,7 @@ import type { PersonaChatState } from '@/hooks/usePersonaChat'
 
 // Mutable state object so individual tests can modify it
 let mockState: PersonaChatState = {
+  entries: [],
   messages: [],
   isStreaming: false,
   error: null,
@@ -37,6 +38,7 @@ function renderDrawer(props = {}) {
 describe('PersonaChatDrawer', () => {
   beforeEach(() => {
     mockState = {
+      entries: [],
       messages: [],
       isStreaming: false,
       error: null,
@@ -122,6 +124,7 @@ describe('PersonaChatDrawer', () => {
 
   it('renders messages in thread', () => {
     mockState = {
+      entries: [],
       messages: [
         {
           question: 'What is React?',
@@ -141,6 +144,7 @@ describe('PersonaChatDrawer', () => {
 
   it('shows streaming cursor during active stream', () => {
     mockState = {
+      entries: [],
       messages: [
         {
           question: 'What is React?',
@@ -160,6 +164,7 @@ describe('PersonaChatDrawer', () => {
 
   it('disables input during streaming', () => {
     mockState = {
+      entries: [],
       messages: [],
       isStreaming: true,
       error: null,
@@ -171,6 +176,7 @@ describe('PersonaChatDrawer', () => {
 
   it('shows error message with retry button when message has error', () => {
     mockState = {
+      entries: [],
       messages: [
         {
           question: 'What is React?',
@@ -191,6 +197,7 @@ describe('PersonaChatDrawer', () => {
   it('calls sendMessage with the failed question when retry is clicked', async () => {
     const user = userEvent.setup()
     mockState = {
+      entries: [],
       messages: [
         {
           question: 'What is React?',
@@ -211,6 +218,7 @@ describe('PersonaChatDrawer', () => {
 
   it('shows clear history button when messages exist', () => {
     mockState = {
+      entries: [],
       messages: [
         {
           question: 'What is React?',
@@ -235,6 +243,7 @@ describe('PersonaChatDrawer', () => {
   it('calls clearHistory when clear button clicked', async () => {
     const user = userEvent.setup()
     mockState = {
+      entries: [],
       messages: [
         {
           question: 'What is React?',
@@ -262,6 +271,7 @@ describe('PersonaChatDrawer', () => {
 
   it('shows loading skeleton when streaming with no answer text yet', () => {
     mockState = {
+      entries: [],
       messages: [
         {
           question: 'What is React?',
@@ -322,6 +332,7 @@ describe('PersonaChatDrawer', () => {
 
   it('renders answer paragraphs separated by double newlines', () => {
     mockState = {
+      entries: [],
       messages: [
         {
           question: 'Explain React?',
@@ -351,6 +362,7 @@ describe('PersonaChatDrawer', () => {
 
   it('renders single-paragraph answer (no double newlines) as one <p> element', () => {
     mockState = {
+      entries: [],
       messages: [
         {
           question: 'What is React?',
@@ -371,6 +383,7 @@ describe('PersonaChatDrawer', () => {
 
   it('attaches streaming cursor to last paragraph when multi-paragraph answer is streaming', () => {
     mockState = {
+      entries: [],
       messages: [
         {
           question: 'Explain React?',

@@ -78,6 +78,12 @@ describe('usePersonaChat', () => {
     expect(result.current.state.error).toBeNull()
   })
 
+  it('initializes with empty entries when no localStorage data', () => {
+    const { result } = renderHook(() => usePersonaChat(PERSONA_ID))
+
+    expect(result.current.state.entries).toEqual([])
+  })
+
   // ── 2. loadMessages from localStorage ────────────────────────────────────
 
   it('loads existing messages from localStorage on mount', () => {
@@ -151,8 +157,26 @@ describe('usePersonaChat', () => {
       expect.objectContaining({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question: 'What is TypeScript?' }),
         signal: expect.any(AbortSignal),
+      })
+    )
+  })
+
+  it('sendMessage includes empty history array when no prior context', async () => {
+    mockFetch.mockResolvedValue(
+      mockSseResponse([{ type: 'done' }])
+    )
+
+    const { result } = renderHook(() => usePersonaChat(PERSONA_ID))
+
+    await act(async () => {
+      await result.current.sendMessage('First question')
+    })
+
+    expect(mockFetch).toHaveBeenCalledWith(
+      `/api/personas/${PERSONA_ID}/query`,
+      expect.objectContaining({
+        body: JSON.stringify({ question: 'First question', history: [] }),
       })
     )
   })
@@ -497,6 +521,244 @@ describe('usePersonaChat', () => {
 
     await waitFor(() => {
       expect(result.current.state.error).not.toBeNull()
+      expect(result.current.state.isStreaming).toBe(false)
+    })
+  })
+
+  // ── 11. entries field (new in chunk 2) ───────────────────────────────────
+
+  it('state.entries contains all ChatEntry items including boundaries', async () => {
+    mockFetch.mockResolvedValue(
+      mockSseResponse([
+        { type: 'content_block_delta', index: 0, delta: { type: 'text_delta', text: 'Answer' } },
+        { type: 'done' },
+      ])
+    )
+
+    const { result } = renderHook(() => usePersonaChat(PERSONA_ID))
+
+    await act(async () => {
+      await result.current.sendMessage('Question')
+    })
+
+    await waitFor(() => {
+      expect(result.current.state.entries).toHaveLength(1)
+      expect(result.current.state.entries[0]).toMatchObject({
+        question: 'Question',
+        answer: 'Answer',
+      })
+    })
+  })
+
+  it('state.messages is a derived view of only ChatMessage entries (no boundaries)', async () => {
+    mockFetch.mockResolvedValue(
+      mockSseResponse([{ type: 'done' }])
+    )
+
+    const { result } = renderHook(() => usePersonaChat(PERSONA_ID))
+
+    await act(async () => {
+      await result.current.sendMessage('A question')
+    })
+
+    // Insert a thread boundary
+    act(() => {
+      result.current.startNewThread()
+    })
+
+    await waitFor(() => {
+      // entries has both the message and the boundary
+      expect(result.current.state.entries.length).toBeGreaterThan(1)
+      // messages only returns ChatMessage entries
+      const hasBoundary = result.current.state.messages.some(
+        (m) => 'type' in m && m.type === 'thread-boundary'
+      )
+      expect(hasBoundary).toBe(false)
+    })
+  })
+
+  // ── 12. startNewThread ───────────────────────────────────────────────────
+
+  it('startNewThread appends a thread boundary to entries', async () => {
+    const { result } = renderHook(() => usePersonaChat(PERSONA_ID))
+
+    act(() => {
+      result.current.startNewThread()
+    })
+
+    expect(result.current.state.entries).toHaveLength(1)
+    expect(result.current.state.entries[0]).toMatchObject({
+      type: 'thread-boundary',
+    })
+  })
+
+  it('startNewThread persists the boundary to localStorage', () => {
+    const { result } = renderHook(() => usePersonaChat(PERSONA_ID))
+
+    act(() => {
+      result.current.startNewThread()
+    })
+
+    const stored = localStorageMock.getItem(STORAGE_KEY)
+    expect(stored).not.toBeNull()
+    const parsed = JSON.parse(stored as string)
+    expect(parsed.version).toBe(2)
+    expect(parsed.entries).toHaveLength(1)
+    expect(parsed.entries[0]).toMatchObject({ type: 'thread-boundary' })
+  })
+
+  it('startNewThread preserves existing messages before the boundary', async () => {
+    mockFetch.mockResolvedValue(
+      mockSseResponse([
+        { type: 'content_block_delta', index: 0, delta: { type: 'text_delta', text: 'Old answer' } },
+        { type: 'done' },
+      ])
+    )
+
+    const { result } = renderHook(() => usePersonaChat(PERSONA_ID))
+
+    await act(async () => {
+      await result.current.sendMessage('Old question')
+    })
+
+    await waitFor(() => {
+      expect(result.current.state.messages).toHaveLength(1)
+    })
+
+    act(() => {
+      result.current.startNewThread()
+    })
+
+    await waitFor(() => {
+      // entries: [message, boundary]
+      expect(result.current.state.entries).toHaveLength(2)
+      // messages only returns ChatMessage entries (not boundary)
+      expect(result.current.state.messages).toHaveLength(1)
+    })
+  })
+
+  // ── 13. Context window respects thread boundaries ─────────────────────────
+
+  it('sendMessage sends history from context window (messages after last boundary)', async () => {
+    // Pre-populate localStorage with a completed Q&A
+    const storedData = {
+      version: 2,
+      entries: [
+        { question: 'Prior Q', answer: 'Prior A', timestamp: 1000 },
+      ],
+    }
+    localStorageStore[STORAGE_KEY] = JSON.stringify(storedData)
+
+    mockFetch.mockResolvedValue(
+      mockSseResponse([{ type: 'done' }])
+    )
+
+    const { result } = renderHook(() => usePersonaChat(PERSONA_ID))
+
+    await act(async () => {
+      await result.current.sendMessage('Follow-up Q')
+    })
+
+    expect(mockFetch).toHaveBeenCalledWith(
+      `/api/personas/${PERSONA_ID}/query`,
+      expect.objectContaining({
+        body: JSON.stringify({
+          question: 'Follow-up Q',
+          history: [{ question: 'Prior Q', answer: 'Prior A' }],
+        }),
+      })
+    )
+  })
+
+  it('sendMessage sends empty history when thread boundary precedes all messages', async () => {
+    // Pre-populate with a boundary followed by a message (boundary is at end — no prior context)
+    const storedData = {
+      version: 2,
+      entries: [
+        { question: 'Old Q', answer: 'Old A', timestamp: 1000 },
+        { type: 'thread-boundary', timestamp: 2000 },
+      ],
+    }
+    localStorageStore[STORAGE_KEY] = JSON.stringify(storedData)
+
+    mockFetch.mockResolvedValue(
+      mockSseResponse([{ type: 'done' }])
+    )
+
+    const { result } = renderHook(() => usePersonaChat(PERSONA_ID))
+
+    await act(async () => {
+      await result.current.sendMessage('Fresh start Q')
+    })
+
+    expect(mockFetch).toHaveBeenCalledWith(
+      `/api/personas/${PERSONA_ID}/query`,
+      expect.objectContaining({
+        body: JSON.stringify({ question: 'Fresh start Q', history: [] }),
+      })
+    )
+  })
+
+  it('context window excludes messages before thread boundary', async () => {
+    // Pre-populate with messages before boundary, then message after
+    const storedData = {
+      version: 2,
+      entries: [
+        { question: 'Before boundary', answer: 'Answer before', timestamp: 1000 },
+        { type: 'thread-boundary', timestamp: 2000 },
+        { question: 'After boundary', answer: 'Answer after', timestamp: 3000 },
+      ],
+    }
+    localStorageStore[STORAGE_KEY] = JSON.stringify(storedData)
+
+    mockFetch.mockResolvedValue(
+      mockSseResponse([{ type: 'done' }])
+    )
+
+    const { result } = renderHook(() => usePersonaChat(PERSONA_ID))
+
+    await act(async () => {
+      await result.current.sendMessage('Next question')
+    })
+
+    // History should only include the message after the boundary
+    expect(mockFetch).toHaveBeenCalledWith(
+      `/api/personas/${PERSONA_ID}/query`,
+      expect.objectContaining({
+        body: JSON.stringify({
+          question: 'Next question',
+          history: [{ question: 'After boundary', answer: 'Answer after' }],
+        }),
+      })
+    )
+  })
+
+  // ── 14. Abort on persona switch ───────────────────────────────────────────
+
+  it('aborts in-flight request and resets streaming state when personaId changes', async () => {
+    // Stream that never ends
+    mockFetch.mockResolvedValue({
+      ok: true,
+      body: new ReadableStream({ start() {} }),
+    })
+
+    const { result, rerender } = renderHook(
+      ({ id }: { id: number }) => usePersonaChat(id),
+      { initialProps: { id: 42 } }
+    )
+
+    act(() => {
+      void result.current.sendMessage('Question for 42')
+    })
+
+    await waitFor(() => {
+      expect(result.current.state.isStreaming).toBe(true)
+    })
+
+    // Switch persona — should abort the in-flight request
+    rerender({ id: 99 })
+
+    await waitFor(() => {
       expect(result.current.state.isStreaming).toBe(false)
     })
   })
