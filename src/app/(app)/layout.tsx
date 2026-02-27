@@ -6,6 +6,7 @@ import { FocusAreaProvider } from "@/components/providers/FocusAreaProvider"
 import { SidebarProvider } from "@/components/providers/SidebarProvider"
 import { SidebarDataProvider } from "@/components/providers/SidebarDataProvider"
 import { TooltipProvider } from "@/components/ui/tooltip"
+import { ChatHubDrawer } from "@/components/personas/ChatHubDrawer"
 
 export default function AppLayout({
   children,
@@ -21,6 +22,7 @@ export default function AppLayout({
               <TooltipProvider>
                 <Sidebar />
                 <MainContent>{children}</MainContent>
+                <ChatHubDrawer />
               </TooltipProvider>
             </FocusAreaProvider>
           </SidebarDataProvider>

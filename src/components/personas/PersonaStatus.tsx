@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Loader2, MessageCircle } from 'lucide-react'
-import { PersonaChatDrawer } from './PersonaChatDrawer'
 
 const MAX_VISIBLE = 5
 
@@ -77,11 +76,6 @@ export function PersonaStatus({ onActivePersonasChange }: PersonaStatusProps) {
   const [creating, setCreating] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [expanded, setExpanded] = useState(false)
-  const [chatPersona, setChatPersona] = useState<{
-    id: number
-    name: string
-    expertiseTopics: string[]
-  } | null>(null)
 
   useEffect(() => {
     async function fetchStatus() {
@@ -199,11 +193,15 @@ export function PersonaStatus({ onActivePersonasChange }: PersonaStatusProps) {
                   aria-label={`Chat with ${personaDisplayName}`}
                   data-testid={`chat-btn-${channel.channelName}`}
                   onClick={() =>
-                    setChatPersona({
-                      id: channel.personaId!,
-                      name: personaDisplayName,
-                      expertiseTopics: channel.expertiseTopics ?? [],
-                    })
+                    window.dispatchEvent(
+                      new CustomEvent('persona-chat:open', {
+                        detail: {
+                          personaId: channel.personaId!,
+                          personaName: personaDisplayName,
+                          expertiseTopics: channel.expertiseTopics ?? [],
+                        },
+                      })
+                    )
                   }
                 >
                   <MessageCircle />
@@ -297,14 +295,6 @@ export function PersonaStatus({ onActivePersonasChange }: PersonaStatusProps) {
       {error && (
         <p className="text-xs text-destructive">{error}</p>
       )}
-
-      <PersonaChatDrawer
-        open={chatPersona !== null}
-        onOpenChange={(open) => { if (!open) setChatPersona(null) }}
-        personaId={chatPersona?.id ?? 0}
-        personaName={chatPersona?.name ?? ''}
-        expertiseTopics={chatPersona?.expertiseTopics}
-      />
     </div>
   )
 }

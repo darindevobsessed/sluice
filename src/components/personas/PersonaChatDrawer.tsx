@@ -24,6 +24,10 @@ interface PersonaChatDrawerProps {
   personaId: number
   personaName: string
   expertiseTopics?: string[]
+  /** When true, renders content directly without a Sheet wrapper (used inside ChatHubDrawer) */
+  embedded?: boolean
+  /** Called when back arrow is clicked in embedded mode */
+  onBack?: () => void
 }
 
 interface PersonaAvatarProps {
@@ -59,6 +63,8 @@ export function PersonaChatDrawer({
   personaId,
   personaName,
   expertiseTopics,
+  embedded = false,
+  onBack,
 }: PersonaChatDrawerProps) {
   const { state, sendMessage, clearHistory, startNewThread } = usePersonaChat(personaId)
   const [inputValue, setInputValue] = useState('')
@@ -142,6 +148,215 @@ export function PersonaChatDrawer({
     -1
   )
 
+  // Inner content — shared between embedded and Sheet modes
+  const content = (
+    <>
+      {/* Header */}
+      <SheetHeader className="flex-row items-center gap-3 px-4 py-3 border-b shrink-0">
+        {/* Back arrow: always visible in embedded mode, mobile-only otherwise */}
+        <Button
+          variant="ghost"
+          size="icon-xs"
+          className={cn('-ml-1', !embedded && 'md:hidden')}
+          onClick={embedded ? onBack : () => onOpenChange(false)}
+          aria-label={embedded ? 'Back to hub' : 'Close chat'}
+        >
+          <ArrowLeft />
+        </Button>
+
+        <PersonaAvatar name={personaName} />
+
+        <div className="flex flex-col min-w-0 flex-1">
+          <SheetTitle className="text-base leading-tight">{personaName}</SheetTitle>
+          {topicLabel && (
+            <SheetDescription className="truncate text-xs leading-tight mt-0.5">
+              {topicLabel}
+            </SheetDescription>
+          )}
+        </div>
+
+        {/* New thread button — only when messages exist */}
+        {hasMessages && (
+          <Button
+            variant="ghost"
+            size="icon-xs"
+            onClick={startNewThread}
+            aria-label="New thread"
+            className="shrink-0 text-muted-foreground hover:text-foreground"
+          >
+            <RotateCcw />
+          </Button>
+        )}
+
+        {/* Clear history button — only when messages exist */}
+        {hasMessages && (
+          <Button
+            variant="ghost"
+            size="icon-xs"
+            onClick={clearHistory}
+            aria-label="Clear history"
+            className="shrink-0 text-muted-foreground hover:text-destructive"
+          >
+            <Trash2 />
+          </Button>
+        )}
+      </SheetHeader>
+
+      {/* Message Thread */}
+      <div
+        ref={threadRef}
+        className="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-4"
+      >
+        {/* Empty state */}
+        {!hasMessages && (
+          <div className="flex-1 flex items-center justify-center text-muted-foreground text-sm">
+            Ask {personaName} anything...
+          </div>
+        )}
+
+        {/* Entries: messages and thread boundaries */}
+        {state.entries.map((entry, idx) => {
+          if (isThreadBoundary(entry)) {
+            // Thread boundary divider
+            const label = idx === 0 ? 'Earlier messages (no memory)' : 'New thread'
+            return (
+              <div
+                key={`boundary-${idx}`}
+                className="flex items-center gap-2 my-1"
+                role="separator"
+                aria-label={label}
+              >
+                <div className="flex-1 border-t border-dashed border-muted-foreground/30" />
+                <span className="text-[11px] text-muted-foreground/60 shrink-0">{label}</span>
+                <div className="flex-1 border-t border-dashed border-muted-foreground/30" />
+              </div>
+            )
+          }
+
+          if (!isChatMessage(entry)) return null
+
+          const msg = entry
+          const isDimmed = lastBoundaryIdx !== -1 && idx < lastBoundaryIdx
+
+          return (
+            <div
+              key={idx}
+              className={cn(
+                'flex flex-col gap-2 motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 motion-safe:duration-150',
+                isDimmed && 'opacity-50'
+              )}
+            >
+              {/* Timestamp */}
+              <p className="text-[11px] text-muted-foreground text-center">
+                {formatTimestamp(msg.timestamp)}
+              </p>
+
+              {/* User question bubble */}
+              <div className="flex justify-end">
+                <div className="max-w-[80%] px-4 py-2 rounded-2xl rounded-br-md bg-primary text-primary-foreground text-sm">
+                  {msg.question}
+                </div>
+              </div>
+
+              {/* Persona answer bubble */}
+              <div className="flex items-end gap-2">
+                <PersonaAvatar name={personaName} className="size-6 text-xs" />
+                <div className="max-w-[80%] px-4 py-2 rounded-2xl rounded-bl-md bg-muted text-sm">
+                  {msg.isError ? (
+                    <span className="flex items-center gap-1.5 text-destructive">
+                      <AlertCircle className="size-4 shrink-0" />
+                      Something went wrong, try again
+                    </span>
+                  ) : msg.isStreaming && !msg.answer ? (
+                    // Loading skeleton — streaming but no text yet
+                    <div className="flex flex-col gap-1.5 py-0.5">
+                      <div
+                        data-testid="streaming-skeleton"
+                        className="h-3 w-32 rounded bg-muted-foreground/20 animate-pulse"
+                      />
+                      <div
+                        data-testid="streaming-skeleton"
+                        className="h-3 w-24 rounded bg-muted-foreground/20 animate-pulse"
+                      />
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {msg.answer.split('\n\n').map((paragraph, pIdx, arr) => (
+                        <p key={pIdx}>
+                          {paragraph}
+                          {msg.isStreaming && pIdx === arr.length - 1 && (
+                            <span className="motion-safe:animate-pulse">▌</span>
+                          )}
+                        </p>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      {/* Error banner */}
+      {state.error && lastErrorMessage && (
+        <div className="px-4 py-2 bg-destructive/10 border-t border-destructive/20 flex items-center justify-between gap-2 shrink-0">
+          <p className="text-sm text-destructive">{state.error}</p>
+          <Button
+            variant="outline"
+            size="xs"
+            onClick={() => handleRetry(lastErrorMessage.question)}
+            aria-label="Retry"
+          >
+            Retry
+          </Button>
+        </div>
+      )}
+
+      {/* Memory indicator */}
+      <p className="text-[11px] text-muted-foreground text-center py-1 px-4 shrink-0">
+        Remembers last 10 messages
+      </p>
+
+      {/* Input bar */}
+      <form
+        onSubmit={handleSubmit}
+        className={cn(
+          'flex items-center gap-2 px-4 pt-2 shrink-0 border-t',
+          'pb-[max(0.75rem,env(safe-area-inset-bottom))]'
+        )}
+      >
+        <Input
+          ref={inputRef}
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder={`Ask ${personaName} anything...`}
+          disabled={state.isStreaming}
+          className="rounded-full text-base"
+          aria-label={`Ask ${personaName} a question`}
+        />
+        <Button
+          type="submit"
+          size="icon"
+          disabled={!inputValue.trim() || state.isStreaming}
+          aria-label="Send message"
+        >
+          <Send />
+        </Button>
+      </form>
+    </>
+  )
+
+  // In embedded mode, render content in a plain div (no Sheet wrapper)
+  if (embedded) {
+    return (
+      <div className="flex flex-col h-full">
+        {content}
+      </div>
+    )
+  }
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
@@ -153,200 +368,7 @@ export function PersonaChatDrawer({
           'max-md:w-screen max-md:max-w-none max-md:border-l-0'
         )}
       >
-        {/* Header */}
-        <SheetHeader className="flex-row items-center gap-3 px-4 py-3 border-b shrink-0">
-          {/* Mobile back arrow */}
-          <Button
-            variant="ghost"
-            size="icon-xs"
-            className="md:hidden -ml-1"
-            onClick={() => onOpenChange(false)}
-            aria-label="Close chat"
-          >
-            <ArrowLeft />
-          </Button>
-
-          <PersonaAvatar name={personaName} />
-
-          <div className="flex flex-col min-w-0 flex-1">
-            <SheetTitle className="text-base leading-tight">{personaName}</SheetTitle>
-            {topicLabel && (
-              <SheetDescription className="truncate text-xs leading-tight mt-0.5">
-                {topicLabel}
-              </SheetDescription>
-            )}
-          </div>
-
-          {/* New thread button — only when messages exist */}
-          {hasMessages && (
-            <Button
-              variant="ghost"
-              size="icon-xs"
-              onClick={startNewThread}
-              aria-label="New thread"
-              className="shrink-0 text-muted-foreground hover:text-foreground"
-            >
-              <RotateCcw />
-            </Button>
-          )}
-
-          {/* Clear history button — only when messages exist */}
-          {hasMessages && (
-            <Button
-              variant="ghost"
-              size="icon-xs"
-              onClick={clearHistory}
-              aria-label="Clear history"
-              className="shrink-0 text-muted-foreground hover:text-destructive"
-            >
-              <Trash2 />
-            </Button>
-          )}
-        </SheetHeader>
-
-        {/* Message Thread */}
-        <div
-          ref={threadRef}
-          className="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-4"
-        >
-          {/* Empty state */}
-          {!hasMessages && (
-            <div className="flex-1 flex items-center justify-center text-muted-foreground text-sm">
-              Ask {personaName} anything...
-            </div>
-          )}
-
-          {/* Entries: messages and thread boundaries */}
-          {state.entries.map((entry, idx) => {
-            if (isThreadBoundary(entry)) {
-              // Thread boundary divider
-              const label = idx === 0 ? 'Earlier messages (no memory)' : 'New thread'
-              return (
-                <div
-                  key={`boundary-${idx}`}
-                  className="flex items-center gap-2 my-1"
-                  role="separator"
-                  aria-label={label}
-                >
-                  <div className="flex-1 border-t border-dashed border-muted-foreground/30" />
-                  <span className="text-[11px] text-muted-foreground/60 shrink-0">{label}</span>
-                  <div className="flex-1 border-t border-dashed border-muted-foreground/30" />
-                </div>
-              )
-            }
-
-            if (!isChatMessage(entry)) return null
-
-            const msg = entry
-            const isDimmed = lastBoundaryIdx !== -1 && idx < lastBoundaryIdx
-
-            return (
-              <div
-                key={idx}
-                className={cn(
-                  'flex flex-col gap-2 motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 motion-safe:duration-150',
-                  isDimmed && 'opacity-50'
-                )}
-              >
-                {/* Timestamp */}
-                <p className="text-[11px] text-muted-foreground text-center">
-                  {formatTimestamp(msg.timestamp)}
-                </p>
-
-                {/* User question bubble */}
-                <div className="flex justify-end">
-                  <div className="max-w-[80%] px-4 py-2 rounded-2xl rounded-br-md bg-primary text-primary-foreground text-sm">
-                    {msg.question}
-                  </div>
-                </div>
-
-                {/* Persona answer bubble */}
-                <div className="flex items-end gap-2">
-                  <PersonaAvatar name={personaName} className="size-6 text-xs" />
-                  <div className="max-w-[80%] px-4 py-2 rounded-2xl rounded-bl-md bg-muted text-sm">
-                    {msg.isError ? (
-                      <span className="flex items-center gap-1.5 text-destructive">
-                        <AlertCircle className="size-4 shrink-0" />
-                        Something went wrong, try again
-                      </span>
-                    ) : msg.isStreaming && !msg.answer ? (
-                      // Loading skeleton — streaming but no text yet
-                      <div className="flex flex-col gap-1.5 py-0.5">
-                        <div
-                          data-testid="streaming-skeleton"
-                          className="h-3 w-32 rounded bg-muted-foreground/20 animate-pulse"
-                        />
-                        <div
-                          data-testid="streaming-skeleton"
-                          className="h-3 w-24 rounded bg-muted-foreground/20 animate-pulse"
-                        />
-                      </div>
-                    ) : (
-                      <div className="space-y-2">
-                        {msg.answer.split('\n\n').map((paragraph, pIdx, arr) => (
-                          <p key={pIdx}>
-                            {paragraph}
-                            {msg.isStreaming && pIdx === arr.length - 1 && (
-                              <span className="motion-safe:animate-pulse">▌</span>
-                            )}
-                          </p>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )
-          })}
-        </div>
-
-        {/* Error banner */}
-        {state.error && lastErrorMessage && (
-          <div className="px-4 py-2 bg-destructive/10 border-t border-destructive/20 flex items-center justify-between gap-2 shrink-0">
-            <p className="text-sm text-destructive">{state.error}</p>
-            <Button
-              variant="outline"
-              size="xs"
-              onClick={() => handleRetry(lastErrorMessage.question)}
-              aria-label="Retry"
-            >
-              Retry
-            </Button>
-          </div>
-        )}
-
-        {/* Memory indicator */}
-        <p className="text-[11px] text-muted-foreground text-center py-1 px-4 shrink-0">
-          Remembers last 10 messages
-        </p>
-
-        {/* Input bar */}
-        <form
-          onSubmit={handleSubmit}
-          className={cn(
-            'flex items-center gap-2 px-4 pt-2 shrink-0 border-t',
-            'pb-[max(0.75rem,env(safe-area-inset-bottom))]'
-          )}
-        >
-          <Input
-            ref={inputRef}
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder={`Ask ${personaName} anything...`}
-            disabled={state.isStreaming}
-            className="rounded-full text-base"
-            aria-label={`Ask ${personaName} a question`}
-          />
-          <Button
-            type="submit"
-            size="icon"
-            disabled={!inputValue.trim() || state.isStreaming}
-            aria-label="Send message"
-          >
-            <Send />
-          </Button>
-        </form>
+        {content}
       </SheetContent>
     </Sheet>
   )
