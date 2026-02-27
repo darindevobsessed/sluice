@@ -1,5 +1,6 @@
 import type { Persona } from '@/lib/db/schema'
 import type { SearchResult } from '@/lib/search/types'
+import type { HistoryItem } from '@/lib/personas/chat-storage'
 import { formatContextForPrompt } from './context'
 import { streamText } from '@/lib/claude/client'
 
@@ -30,9 +31,22 @@ function limitContextTokens(context: SearchResult[], maxTokens = 3000): SearchRe
 }
 
 /**
- * Builds the system prompt with persona description and relevant context.
+ * Formats conversation history as a readable string for the system prompt.
  */
-function buildSystemPrompt(persona: Persona, context: SearchResult[]): string {
+function formatHistory(history: HistoryItem[]): string {
+  return history
+    .map((item) => `User: ${item.question}\nYou: ${item.answer}`)
+    .join('\n\n')
+}
+
+/**
+ * Builds the system prompt with persona description, relevant context, and optional history.
+ */
+function buildSystemPrompt(
+  persona: Persona,
+  context: SearchResult[],
+  history: HistoryItem[] = []
+): string {
   const limitedContext = limitContextTokens(context)
   const formattedContext = formatContextForPrompt(limitedContext)
 
@@ -45,6 +59,13 @@ function buildSystemPrompt(persona: Persona, context: SearchResult[]): string {
     )
   }
 
+  if (history.length > 0) {
+    parts.push(
+      '\n\nRecent conversation history:\n' + formatHistory(history),
+      '\n\nContinue the conversation naturally, referencing previous context when relevant.'
+    )
+  }
+
   return parts.join('')
 }
 
@@ -52,6 +73,7 @@ interface StreamPersonaResponseParams {
   persona: Persona
   question: string
   context: SearchResult[]
+  history?: HistoryItem[]
   signal?: AbortSignal
 }
 
@@ -67,10 +89,10 @@ interface StreamPersonaResponseParams {
 export async function streamPersonaResponse(
   params: StreamPersonaResponseParams
 ): Promise<ReadableStream<Uint8Array>> {
-  const { persona, question, context, signal } = params
+  const { persona, question, context, history = [], signal } = params
 
-  // Build system prompt with persona + context
-  const systemPrompt = buildSystemPrompt(persona, context)
+  // Build system prompt with persona + context + conversation history
+  const systemPrompt = buildSystemPrompt(persona, context, history)
 
   // Concatenate system prompt and question (same pattern as service.ts)
   const prompt = `${systemPrompt}\n\n---\n\n${question}`

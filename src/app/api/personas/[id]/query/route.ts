@@ -6,9 +6,11 @@ import { getPersonaContext } from '@/lib/personas/context'
 import { streamPersonaResponse } from '@/lib/personas/streaming'
 import { startApiTimer } from '@/lib/api-timing'
 import { requireSession } from '@/lib/auth-guards'
+import { historySchema } from '@/lib/personas/chat-storage'
 
 const querySchema = z.object({
   question: z.string().min(1, 'Question is required'),
+  history: historySchema.optional(),
 })
 
 /**
@@ -54,7 +56,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       )
     }
 
-    const { question } = validationResult.data
+    const { question, history } = validationResult.data
 
     // Fetch persona from database
     const [persona] = await db
@@ -76,6 +78,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       persona,
       question,
       context,
+      history: history ?? [],
     })
 
     // Return streaming response with appropriate headers

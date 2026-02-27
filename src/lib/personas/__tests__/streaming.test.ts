@@ -287,6 +287,93 @@ describe('streamPersonaResponse', () => {
     )
   })
 
+  it('should include conversation history in prompt when provided', async () => {
+    const mockStream = createMockStream({
+      contentBlockDeltas: [],
+      finalContent: 'Response',
+    })
+
+    mockStreamText.mockReturnValue(mockStream as never)
+
+    await streamPersonaResponse({
+      persona: mockPersona,
+      question: 'What about hooks?',
+      context: mockContext,
+      history: [
+        { question: 'What is TypeScript?', answer: 'TypeScript is a typed superset of JavaScript.' },
+      ],
+    })
+
+    const promptArg = mockStreamText.mock.calls[0]?.[0] as string
+    expect(promptArg).toContain('Recent conversation history:')
+    expect(promptArg).toContain('User: What is TypeScript?')
+    expect(promptArg).toContain('You: TypeScript is a typed superset of JavaScript.')
+    expect(promptArg).toContain('Continue the conversation naturally')
+  })
+
+  it('should not include history section when history is empty', async () => {
+    const mockStream = createMockStream({
+      contentBlockDeltas: [],
+      finalContent: 'Response',
+    })
+
+    mockStreamText.mockReturnValue(mockStream as never)
+
+    await streamPersonaResponse({
+      persona: mockPersona,
+      question: 'What is TypeScript?',
+      context: mockContext,
+      history: [],
+    })
+
+    const promptArg = mockStreamText.mock.calls[0]?.[0] as string
+    expect(promptArg).not.toContain('Recent conversation history:')
+    expect(promptArg).not.toContain('Continue the conversation naturally')
+  })
+
+  it('should not include history section when history is omitted', async () => {
+    const mockStream = createMockStream({
+      contentBlockDeltas: [],
+      finalContent: 'Response',
+    })
+
+    mockStreamText.mockReturnValue(mockStream as never)
+
+    await streamPersonaResponse({
+      persona: mockPersona,
+      question: 'What is TypeScript?',
+      context: mockContext,
+    })
+
+    const promptArg = mockStreamText.mock.calls[0]?.[0] as string
+    expect(promptArg).not.toContain('Recent conversation history:')
+  })
+
+  it('should format multiple history items as User/You pairs', async () => {
+    const mockStream = createMockStream({
+      contentBlockDeltas: [],
+      finalContent: 'Response',
+    })
+
+    mockStreamText.mockReturnValue(mockStream as never)
+
+    await streamPersonaResponse({
+      persona: mockPersona,
+      question: 'What about generics?',
+      context: mockContext,
+      history: [
+        { question: 'What is TypeScript?', answer: 'A typed superset of JavaScript.' },
+        { question: 'What are interfaces?', answer: 'Interfaces define the shape of objects.' },
+      ],
+    })
+
+    const promptArg = mockStreamText.mock.calls[0]?.[0] as string
+    expect(promptArg).toContain('User: What is TypeScript?')
+    expect(promptArg).toContain('You: A typed superset of JavaScript.')
+    expect(promptArg).toContain('User: What are interfaces?')
+    expect(promptArg).toContain('You: Interfaces define the shape of objects.')
+  })
+
   it('should limit context to avoid exceeding token budget', async () => {
     // Create a large context (more than 3K tokens worth)
     const largeContext: SearchResult[] = Array.from({ length: 20 }, (_, i) => ({
